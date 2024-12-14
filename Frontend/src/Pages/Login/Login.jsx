@@ -1,6 +1,7 @@
 import React from "react";
 import InputBox from "../../Components/InputBox";
 import Button from "../../Components/Button";
+import { MoveRight } from "lucide-react";
 
 const Login = () => {
   return (
@@ -10,8 +11,9 @@ const Login = () => {
           <h1 className="text-4xl h-3/4 text-white font-semibold">
             Login with your mobile number to get started !
           </h1>
-          <h1>
-            If you are not registered with us create your new account here
+          <h1 className="flex justify-around items-center">
+            If you are not registered with us create your new account here{" "}
+            <MoveRight />
           </h1>
         </div>
         <div className=" w-1/2 flex justify-center items-center flex-col whiteSoftBG">
@@ -30,7 +32,7 @@ const Login = () => {
               className={"w-1/2 hover:bg-green-500"}
             />
             <p className="text-xs text-neutral-500">
-              ** By continuing, you agree to Flipkart's Terms of Use and Privacy
+              ** By continuing, you agree to our Terms of Use and Privacy
               Policy.
             </p>
           </div>

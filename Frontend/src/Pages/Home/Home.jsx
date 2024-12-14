@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import ProductCategory from "./ProductCategory";
 import { DemoImageBanner } from "../../Constants/DemoImages";
+import ProductCard from "../../Components/ProductCard";
 
 const Home = () => {
   const BannerSlider = () => {
@@ -62,6 +63,8 @@ const Home = () => {
     <div className="px-10 flex flex-col justify-center gap-4">
       <ProductCategory />
       <BannerSlider />
+
+      {/* <ProductCard /> */}
     </div>
   );
 };
