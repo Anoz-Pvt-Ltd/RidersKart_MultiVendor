@@ -22,7 +22,11 @@ const LoginForm = () => {
     setSuccess("");
 
     try {
-      const response = await FetchData("auth/login", "post", credentials);
+      const response = await FetchData(
+        "vendor/login",
+        "post",
+        credentials
+      );
 
       if (response.status === 200) {
         setSuccess("Login successful!");

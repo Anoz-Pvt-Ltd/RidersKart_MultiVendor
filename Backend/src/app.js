@@ -18,13 +18,9 @@ app.use((req, res, next) => {
 });
 
 // routers
-// import userRouter from "./routes/patient.routes.js";
-// import doctorRouter from "./routes/doctor.routes.js";
 import vendorRouter from "./routes/vendor.routes.js";
 
-app.use("/vendor", vendorRouter);
-
-// app.use("/api/v1/patient", userRouter);
-// app.use("/api/v1/doctor", doctorRouter);
+//vendor routes
+app.use("/api/v1/vendor", vendorRouter);
 
 export { app };
