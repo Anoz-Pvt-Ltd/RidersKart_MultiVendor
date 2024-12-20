@@ -19,8 +19,12 @@ app.use((req, res, next) => {
 
 // routers
 import vendorRouter from "./routes/vendor.routes.js";
+import productRouter from "./routes/product.routes.js";
 
 //vendor routes
 app.use("/api/v1/vendor", vendorRouter);
+
+//product routes
+app.use("/api/vi/products", productRouter);
 
 export { app };
