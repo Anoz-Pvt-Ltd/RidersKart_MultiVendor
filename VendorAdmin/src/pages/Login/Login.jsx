@@ -1,8 +1,13 @@
 import React, { useState } from "react";
 import { FetchData } from "../../utils/FetchFromApi";
 import InputBox from "../../components/InputBox";
+import { addUser, clearUser } from "../../utils/Slice/UserInfoSlice";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 const LoginForm = () => {
+  const Dispatch = useDispatch();
+  const Navigate = useNavigate();
   const [credentials, setCredentials] = useState({
     email: "",
     password: "",
@@ -22,16 +27,23 @@ const LoginForm = () => {
     setSuccess("");
 
     try {
-      const response = await FetchData(
-        "vendor/login",
-        "post",
-        credentials
-      );
+      const response = await FetchData("vendor/login", "post", credentials);
+      console.log(response);
+      Dispatch(clearUser());
+      Dispatch(addUser(response.data.data.vendor));
+      setSuccess("Login successful!");
 
-      if (response.status === 200) {
-        setSuccess("Login successful!");
-        localStorage.setItem("AccessToken", response.data.token); // Save token to localStorage
-      }
+      localStorage.clear();
+
+      localStorage.setItem(
+        "AccessToken",
+        response.data.data.tokens.accessToken
+      ); // Save token to localStorage
+      localStorage.setItem(
+        "RefreshToken",
+        response.data.data.tokens.refreshToken
+      ); // Save token to localStorage
+      Navigate("/");
     } catch (err) {
       setError(err.response?.data?.message || "Invalid email or password.");
     }

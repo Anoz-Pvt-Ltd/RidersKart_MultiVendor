@@ -5,7 +5,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
 // Controller to register a new product
-const registerProduct = asyncHandler(async (req, res, next) => {
+const registerProduct = asyncHandler(async (req, res) => {
   const {
     name,
     description,
@@ -18,11 +18,13 @@ const registerProduct = asyncHandler(async (req, res, next) => {
     tags,
   } = req.body;
 
-  //   const vendorId = req.user._id; // Assumes vendor's ID is available via authentication middleware
+  console.log("reached");
+
+  const vendorId = req.user._id; // Assumes vendor's ID is available via authentication middleware
 
   // Validate required fields
   if (!name || !description || !category || !price || !stockQuantity || !sku) {
-    return next(new ApiError(400, "All required fields must be filled"));
+    throw new ApiError(400, "All required fields must be filled");
   }
 
   // Validate category
@@ -38,19 +40,19 @@ const registerProduct = asyncHandler(async (req, res, next) => {
     "Automotive",
   ];
   if (!validCategories.includes(category)) {
-    return next(new ApiError(400, "Invalid category"));
+    throw new ApiError(400, "Invalid category");
   }
 
   // Check if SKU already exists
   const existingProduct = await Product.findOne({ sku });
   if (existingProduct) {
-    return next(new ApiError(400, "A product with this SKU already exists"));
+    throw new ApiError(400, "A product with this SKU already exists");
   }
 
   // Verify vendor exists
-  const vendor = await VendorUser.findById(_id);
+  const vendor = await VendorUser.findById(vendorId);
   if (!vendor) {
-    return next(new ApiError(404, "Vendor not found"));
+    throw new ApiError(404, "Vendor not found");
   }
 
   // Create a new product instance
@@ -64,7 +66,7 @@ const registerProduct = asyncHandler(async (req, res, next) => {
     images,
     specifications,
     tags,
-    vendor: _id,
+    vendor: vendorId,
   });
 
   // Save the product to the database
@@ -74,21 +76,47 @@ const registerProduct = asyncHandler(async (req, res, next) => {
   vendor.products.push(newProduct._id);
   await vendor.save();
 
-  // Return success response
-  const response = new ApiResponse(201, {
-    product: newProduct,
-  });
-
-  res.status(response.statusCode).json(response);
+  res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        { product: newProduct },
+        "Product added successfully"
+      )
+    );
 });
 
 const getAllProducts = asyncHandler(async (req, res) => {
-  const products = await Product.find(); // Fetch all products
-  res.status(200).json({
-    success: true,
-    count: products.length,
-    data: products,
-  });
+  const products = await Product.find();
+
+  if (!products || products.length === 0) {
+    throw new ApiError(404, "No products found");
+  }
+
+  const response = new ApiResponse(
+    200,
+    products,
+    "Products fetched successfully"
+  );
+  res.status(response.statusCode).json(response);
+});
+
+const getProductsOfVendor = asyncHandler(async (req, res) => {
+  const { vendorId } = req.params;
+
+  if (!vendorId) throw new ApiError(400, "Vendor ID is required");
+
+  // Fetch the products of the given vendor ID
+  const vendor = await VendorUser.findById(vendorId).populate("products");
+  if (!vendor) throw new ApiError(404, "Vendor not found");
+
+  const response = new ApiResponse(
+    200,
+    vendor.products,
+    "Products fetched successfully"
+  );
+  res.status(response.statusCode).json(response);
 });
 
 const getProduct = asyncHandler(async (req, res) => {
@@ -135,10 +163,10 @@ const editProduct = asyncHandler(async (req, res) => {
 });
 
 const deleteProduct = asyncHandler(async (req, res) => {
-  const { id } = req.params;
+  const { productId } = req.params;
 
   // Find the product by ID
-  const product = await Product.findById(id);
+  const product = await Product.findById(productId);
 
   if (!product) {
     return res.status(404).json({
@@ -162,4 +190,5 @@ export {
   getProduct,
   editProduct,
   deleteProduct,
+  getProductsOfVendor,
 };
