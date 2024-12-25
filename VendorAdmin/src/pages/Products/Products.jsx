@@ -7,6 +7,7 @@ import SelectBox from "../../components/SelectionBox";
 
 const Products = () => {
   const user = useSelector((store) => store.UserInfo.user);
+  console.log(user)
 
   const [newProduct, setNewProduct] = useState({
     name: "",
@@ -56,12 +57,12 @@ const Products = () => {
 
   const handleAddProduct = async (e) => {
     e.preventDefault();
-
+  
     const formData = new FormData(formRef.current);
-
+  
     setError("");
     setSuccess("");
-
+  
     try {
       const response = await FetchData(
         "products/register-product",
@@ -70,6 +71,10 @@ const Products = () => {
       );
       setSuccess("Product added successfully!");
       setProducts((prev) => [...prev, response.data.product]);
+      
+      // Just for testing, try a simple reload
+      setTimeout(() => window.location.reload(), 1000); // Reload after 1 second
+  
       setNewProduct({
         name: "",
         description: "",
@@ -84,6 +89,8 @@ const Products = () => {
       setError(err.response?.data?.message || "Failed to add the product.");
     }
   };
+  
+  
 
   // console.log(products);
 
