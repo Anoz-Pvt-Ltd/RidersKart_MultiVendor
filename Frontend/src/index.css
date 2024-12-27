@@ -16,3 +16,33 @@
     @apply bg-[#FEFFFF];
   }
 }
+
+
+/* For all scrollbars */
+::-webkit-scrollbar {
+  width: 8px; /* Vertical scrollbar width */
+  height: 8px; /* Horizontal scrollbar height */
+}
+
+::-webkit-scrollbar-thumb {
+  background: #a855f7; /* Thumb color (purple in this case) */
+  border-radius: 10px; /* Rounded corners */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #9333ea; /* Darker thumb on hover */
+}
+
+::-webkit-scrollbar-track {
+  background: #f3f4f6; /* Track color (light gray in this case) */
+  border-radius: 10px; /* Rounded corners for track */
+}
+
+/* Hide the scrollbar completely (optional for specific containers) */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none; /* For Chrome, Safari, and Edge */
+}
+.scrollbar-hide {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}

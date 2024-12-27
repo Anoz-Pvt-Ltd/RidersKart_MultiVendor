@@ -16,7 +16,7 @@ router.use(VerifyUser);
 
 router.route("/register-product").post(registerProduct);
 router.route("/get-all-product-of-vendor/:vendorId").get(getProductsOfVendor);
-router.route("/get-all-product").post(getAllProducts);
+router.route("/get-all-product").get(getAllProducts);
 router.route("/get-single-product").post(getProduct);
 router.route("/edit-product").post(editProduct);
 router.route("/delete-products/:productId").delete(deleteProduct);

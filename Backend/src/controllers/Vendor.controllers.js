@@ -40,9 +40,7 @@ const registerVendor = asyncHandler(async (req, res, next) => {
     !ifscCode ||
     !password
   ) {
-    return next(
-      new ApiError(400, "All fields are required, including location details")
-    );
+    return next(new ApiError(400, "All fields are required"));
   }
 
   // Check if vendor already exists by email
