@@ -21,6 +21,7 @@ const Dashboard = () => {
   const [selectedMenu, setSelectedMenu] = useState("Home");
   const navigate = useNavigate();
   const [vendor, setVendor] = useState(null);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchVendor = async () => {
@@ -77,7 +78,7 @@ const Dashboard = () => {
         `products/get-all-product-of-vendor/${user?.[0]?._id}`,
         "get"
       );
-      // console.log(response);
+      console.log(response);
 
       const fetchedProducts = response.data.data || [];
       setProducts(fetchedProducts);
@@ -87,8 +88,8 @@ const Dashboard = () => {
       fetchedProducts.forEach((product) => {
         const { category, stockQuantity } = product;
         if (category) {
-          categoryData[category] =
-            (categoryData[category] || 0) + stockQuantity;
+          categoryData[category?.main] =
+            (categoryData[category?.main] || 0) + stockQuantity;
         }
       });
 

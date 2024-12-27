@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { categories } from "../utils/constants.js";
 
 const productSchema = new mongoose.Schema({
   name: {
@@ -12,19 +13,25 @@ const productSchema = new mongoose.Schema({
     trim: true,
   },
   category: {
-    type: String,
-    required: true,
-    enum: [
-      "Electronics",
-      "Clothing",
-      "Home & Kitchen",
-      "Beauty",
-      "Health",
-      "Books",
-      "Toys",
-      "Sports",
-      "Automotive",
-    ],
+    main: {
+      type: String,
+      required: true,
+      enum: categories.map((cat) => cat.title),
+    },
+    sub: {
+      type: String,
+      required: true,
+      validate: {
+        validator: function (value) {
+          const mainCategory = this.category.main;
+          const categoryData = categories.find(
+            (cat) => cat.title === mainCategory
+          );
+          return categoryData ? categoryData.items.includes(value) : false;
+        },
+        message: "Invalid subcategory for the selected main category.",
+      },
+    },
   },
   price: {
     type: Number,

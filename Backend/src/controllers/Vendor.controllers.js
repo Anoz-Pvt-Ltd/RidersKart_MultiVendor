@@ -21,7 +21,7 @@ const registerVendor = asyncHandler(async (req, res, next) => {
   } = req.body;
 
   const { address, city, state, country, postalCode } = location;
-
+  // console.log(req.body);
   // Validate input (all required fields, including nested location fields)
   if (
     !name ||

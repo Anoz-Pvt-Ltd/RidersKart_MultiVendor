@@ -11,7 +11,7 @@ import { VerifyUser } from "../middlewares/auth.middleware.js";
 
 const router = Router();
 
-router.use(VerifyUser);
+// router.use(VerifyUser);
 
 router.route("/register").post(registerVendor);
 router.route("/login").post(loginVendor);

@@ -4,31 +4,14 @@ import { useSelector } from "react-redux";
 import Button from "./Button";
 import { useNavigate } from "react-router-dom";
 
-const VendorProfile = ( _id ) => {
+const VendorProfile = (_id) => {
   const [vendor, setVendor] = useState(null);
   // const [loading, setLoading] = useState(true);
-  // const [error, setError] = useState(null);
+  const [error, setError] = useState(null);
   const user = useSelector((store) => store.UserInfo.user);
   console.log(user);
   const [VendorProduct, setVendorProducts] = useState(null);
   console.log(user?.[0]?._id);
-
-  const fetchProducts = async () => {
-    try {
-      const response = await FetchData(
-        `products/get-all-product-of-vendor/${user?.[0]?._id}`,
-        "get"
-      );
-      // console.log(response);
-      if (response.data.success) setVendorProducts(response.data.data);
-    } catch (err) {
-      setError(err.response?.data?.message || "Failed to fetch products.");
-    }
-  };
-
-  useEffect(() => {
-    fetchProducts();
-  }, []);
 
   useEffect(() => {
     const fetchVendor = async () => {
@@ -49,6 +32,24 @@ const VendorProfile = ( _id ) => {
 
     fetchVendor();
   }, [vendor]);
+  console.log(user?.[0]?._id);
+
+  const fetchProducts = async () => {
+    try {
+      const response = await FetchData(
+        `products/get-all-product-of-vendor/${user?.[0]?._id}`,
+        "get"
+      );
+      console.log(response);
+      if (response.data.success) setVendorProducts(response.data.data);
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to fetch products.");
+    }
+  };
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
 
   // if (loading) return <div>Loading...</div>;
   // if (error) return <div>{error}</div>;

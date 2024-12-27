@@ -4,15 +4,16 @@ import InputBox from "../../components/InputBox";
 import Button from "../../components/Button";
 import { useSelector } from "react-redux";
 import SelectBox from "../../components/SelectionBox";
+import { categories } from "../../constants/AllProducts.Vendor";
 
 const Products = () => {
   const user = useSelector((store) => store.UserInfo.user);
-  console.log(user)
+  console.log(user);
 
   const [newProduct, setNewProduct] = useState({
     name: "",
     description: "",
-    category: "",
+    category: { main: "", sub: "" },
     price: "",
     stockQuantity: "",
     sku: "",
@@ -22,6 +23,7 @@ const Products = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [subcategories, setSubcategories] = useState([]);
 
   const [products, setProducts] = useState([]);
 
@@ -31,7 +33,6 @@ const Products = () => {
         `products/get-all-product-of-vendor/${user?.[0]?._id}`,
         "get"
       );
-      console.log(response);
       if (response.data.success) setProducts(response.data.data);
     } catch (err) {
       setError(err.response?.data?.message || "Failed to fetch products.");
@@ -50,6 +51,15 @@ const Products = () => {
       const updatedImages = [...newProduct.images];
       updatedImages[parseInt(index)][field] = value;
       setNewProduct({ ...newProduct, images: updatedImages });
+    } else if (name === "category.main") {
+      setNewProduct({ ...newProduct, category: { main: value, sub: "" } });
+      const selectedCategory = categories.find((cat) => cat.title === value);
+      setSubcategories(selectedCategory ? selectedCategory.items : []);
+    } else if (name === "category.sub") {
+      setNewProduct({
+        ...newProduct,
+        category: { ...newProduct.category, sub: value },
+      });
     } else {
       setNewProduct({ ...newProduct, [name]: value });
     }
@@ -57,28 +67,25 @@ const Products = () => {
 
   const handleAddProduct = async (e) => {
     e.preventDefault();
-  
-    const formData = new FormData(formRef.current);
-  
     setError("");
     setSuccess("");
-  
+    console.log(newProduct);
+    console.log(user);
+    console.log(user?.[0]?._id);
+
     try {
       const response = await FetchData(
-        "products/register-product",
+        `products/register-product/${user?.[0]?._id}`,
         "post",
-        formData
+        newProduct
       );
       setSuccess("Product added successfully!");
       setProducts((prev) => [...prev, response.data.product]);
-      
-      // Just for testing, try a simple reload
-      setTimeout(() => window.location.reload(), 1000); // Reload after 1 second
-  
+
       setNewProduct({
         name: "",
         description: "",
-        category: "",
+        category: { main: "", sub: "" },
         price: "",
         stockQuantity: "",
         sku: "",
@@ -89,28 +96,19 @@ const Products = () => {
       setError(err.response?.data?.message || "Failed to add the product.");
     }
   };
-  
-  
-
-  // console.log(products);
 
   const handleDeleteProduct = async (_id) => {
     setError("");
     setSuccess("");
-    // alert(`products deleted ${_id}`);
 
     try {
       const response = await FetchData(
         `products/delete-products/${_id}`,
         "delete"
       );
-      console.log(response);
-
       if (response.data.success) {
         setSuccess("Product deleted successfully!");
-        // setProducts((prev) =>
-        //   prev.filter((product) => products?.[0]?._id !== product)
-        // );
+        setProducts((prev) => prev.filter((product) => product._id !== _id));
       }
     } catch (err) {
       setError(err.response?.data?.message || "Failed to delete the product.");
@@ -133,19 +131,17 @@ const Products = () => {
         onClick={() => setIsModalOpen(true)}
       />
 
-      {/* Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50 p-4 sm:p-6">
-          <div className="bg-white p-4 rounded-lg shadow-lg w-full ">
+          <div className="bg-white flex flex-col rounded-lg shadow-lg w-full">
             <h2 className="text-lg font-semibold text-gray-800 mb-4">
               Add New Product
             </h2>
             <form
-              ref={formRef}
               onSubmit={handleAddProduct}
               className="flex w-full justify-evenly items-center"
             >
-              <div className="w-1/2 m-5">
+              <div className="flex flex-col justify-start items-center">
                 <InputBox
                   LabelName="Product Name"
                   Name="name"
@@ -161,23 +157,25 @@ const Products = () => {
                   onChange={handleInputChange}
                 />
                 <SelectBox
-                  LabelName="Category"
-                  Name="category"
-                  Value={newProduct.category}
-                  Placeholder="Select category"
-                  Options={[
-                    "Electronics",
-                    "Clothing",
-                    "Home & Kitchen",
-                    "Beauty",
-                    "Health",
-                    "Books",
-                    "Toys",
-                    "Sports",
-                    "Automotive",
-                  ]}
+                  LabelName="Main Category"
+                  Name="category.main"
+                  Value={newProduct.category.main}
+                  Placeholder="Select main category"
+                  Options={categories.map((cat) => cat.title)}
                   onChange={handleInputChange}
                 />
+                {subcategories.length > 0 && (
+                  <SelectBox
+                    LabelName="Subcategory"
+                    Name="category.sub"
+                    Value={newProduct.category.sub}
+                    Placeholder="Select subcategory"
+                    Options={subcategories}
+                    onChange={handleInputChange}
+                  />
+                )}
+              </div>
+              <div className="flex flex-col justify-start items-center">
                 <InputBox
                   LabelName="Price"
                   Type="number"
@@ -186,8 +184,6 @@ const Products = () => {
                   Placeholder="Enter price"
                   onChange={handleInputChange}
                 />
-              </div>
-              <div className="w-1/2 m-5">
                 <InputBox
                   LabelName="Stock Quantity"
                   Type="number"
@@ -203,57 +199,53 @@ const Products = () => {
                   Placeholder="Enter SKU"
                   onChange={handleInputChange}
                 />
-                <div>
-                  <h3>Images</h3>
-                  {newProduct.images.map((image, index) => (
-                    <div
-                      key={index}
-                      className="flex flex-col gap-2 sm:flex-row"
-                    >
-                      <InputBox
-                        LabelName="Image URL"
-                        Name={`images.${index}.url`}
-                        Value={image.url}
-                        Placeholder="Enter image URL"
-                        onChange={handleInputChange}
-                      />
-                      <InputBox
-                        LabelName="Alt Text"
-                        Name={`images.${index}.altText`}
-                        Value={image.altText}
-                        Placeholder="Enter image alt text"
-                        onChange={handleInputChange}
-                      />
-                    </div>
-                  ))}
-                  <Button
-                    label="Add Image"
-                    Type="button"
-                    onClick={() =>
-                      setNewProduct((prev) => ({
-                        ...prev,
-                        images: [...prev.images, { url: "", altText: "" }],
-                      }))
-                    }
-                    className="mt-2"
-                  />
-                </div>
-                <div className="flex justify-end gap-2">
-                  <Button
-                    label="Cancel"
-                    Type="button"
-                    className="bg-gray-300"
-                    onClick={() => setIsModalOpen(false)}
-                  />
-                  <Button label="Add Product" Type="submit" />
-                </div>
+              </div>
+              <div>
+                <h3>Images</h3>
+                {newProduct.images.map((image, index) => (
+                  <div key={index} className="flex flex-col gap-2 sm:flex-row">
+                    <InputBox
+                      LabelName="Image URL"
+                      Name={`images.${index}.url`}
+                      Value={image.url}
+                      Placeholder="Enter image URL"
+                      onChange={handleInputChange}
+                    />
+                    <InputBox
+                      LabelName="Alt Text"
+                      Name={`images.${index}.altText`}
+                      Value={image.altText}
+                      Placeholder="Enter image alt text"
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                ))}
+                <Button
+                  label="Add Image"
+                  Type="button"
+                  onClick={() =>
+                    setNewProduct((prev) => ({
+                      ...prev,
+                      images: [...prev.images, { url: "", altText: "" }],
+                    }))
+                  }
+                  className="mt-2"
+                />
+              </div>
+              <div className="flex justify-end gap-2">
+                <Button
+                  label="Cancel"
+                  Type="button"
+                  className="bg-gray-300"
+                  onClick={() => setIsModalOpen(false)}
+                />
+                <Button label="Add Product" Type="submit" />
               </div>
             </form>
           </div>
         </div>
       )}
 
-      {/* List of Products */}
       <h2 className="text-lg font-semibold text-gray-800 mb-4">Product List</h2>
       {products.length === 0 ? (
         <div>No products available.</div>
@@ -264,11 +256,11 @@ const Products = () => {
               key={product?._id}
               className="p-4 border rounded-lg shadow-md bg-gray-100"
             >
-              {/* {console.log(product)} */}
               <h3 className="font-bold text-gray-900">{product?.name}</h3>
               <p>{product?.description}</p>
               <p>
-                <strong>Category:</strong> {product?.category}
+                <strong>Category:</strong> {product?.category.main} -{" "}
+                {product?.category.sub}
               </p>
               <p>
                 <strong>Price:</strong> ₹ {product?.price}
@@ -277,14 +269,13 @@ const Products = () => {
                 <strong>Stock:</strong> {product?.stockQuantity}
               </p>
               <Button
-                label={"Delete"}
-                Type={"button"}
-                className={"mt-2 w-full bg-red-500"}
-                onClick={() => handleDeleteProduct(product._id)}
+                label="Delete"
+                Type="button"
+                className="mt-2 w-full bg-red-500"
+                onClick={() => handleDeleteProduct(product?._id)}
               />
             </div>
           ))}
-          {/* {console.log(products?.[0]?._id)} */}
         </div>
       )}
     </div>

@@ -3,6 +3,7 @@ import { VendorUser } from "../models/vendorUser.models.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import { categories } from "../utils/constants.js";
 
 // Controller to register a new product
 const registerProduct = asyncHandler(async (req, res) => {
@@ -17,30 +18,38 @@ const registerProduct = asyncHandler(async (req, res) => {
     specifications,
     tags,
   } = req.body;
+  console.log("Controller Reached");
 
-  console.log("reached");
-
-  const vendorId = req.user._id; // Assumes vendor's ID is available via authentication middleware
+  const vendorId = req.user._id;
+  console.log(vendorId);
 
   // Validate required fields
-  if (!name || !description || !category || !price || !stockQuantity || !sku) {
+  if (
+    !name ||
+    !description ||
+    !category?.main ||
+    !category?.sub ||
+    !price ||
+    !stockQuantity ||
+    !sku
+  ) {
     throw new ApiError(400, "All required fields must be filled");
   }
 
-  // Validate category
-  const validCategories = [
-    "Electronics",
-    "Clothing",
-    "Home & Kitchen",
-    "Beauty",
-    "Health",
-    "Books",
-    "Toys",
-    "Sports",
-    "Automotive",
-  ];
-  if (!validCategories.includes(category)) {
-    throw new ApiError(400, "Invalid category");
+  // Validate main category
+  const mainCategoryData = categories.find(
+    (cat) => cat.title === category.main
+  );
+  if (!mainCategoryData) {
+    throw new ApiError(400, "Invalid main category");
+  }
+
+  // Validate subcategory
+  if (!mainCategoryData.items.includes(category.sub)) {
+    throw new ApiError(
+      400,
+      "Invalid subcategory for the selected main category"
+    );
   }
 
   // Check if SKU already exists
@@ -103,6 +112,7 @@ const getAllProducts = asyncHandler(async (req, res) => {
 });
 
 const getProductsOfVendor = asyncHandler(async (req, res) => {
+  // console.log("controller reached");
   const { vendorId } = req.params;
 
   if (!vendorId) throw new ApiError(400, "Vendor ID is required");
@@ -184,6 +194,25 @@ const deleteProduct = asyncHandler(async (req, res) => {
   });
 });
 
+const getProductByCategory = asyncHandler(async (req, res) => {
+  const { category, subcategory } = req.params;
+
+  // Fetch the product by category
+  const product = await Product.find({
+    "category.subcategory": "Mobile Phones",
+  });
+  if (!product) {
+    return res.status(404).json({
+      success: false,
+      message: "Product not found",
+    });
+  }
+  return res.status(200).json({
+    success: true,
+    data: product,
+  });
+});
+
 export {
   registerProduct,
   getAllProducts,
@@ -191,4 +220,5 @@ export {
   editProduct,
   deleteProduct,
   getProductsOfVendor,
+  getProductByCategory,
 };
