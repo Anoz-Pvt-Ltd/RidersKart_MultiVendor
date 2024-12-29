@@ -22,6 +22,7 @@ app.use((req, res, next) => {
 import vendorRouter from "./routes/vendor.routes.js";
 import productRouter from "./routes/product.routes.js";
 import orderRouter from "./routes/order.routes.js";
+import userRouter from "./routes/user.routes.js";
 
 //vendor routes
 app.use("/api/v1/vendor", vendorRouter);
@@ -31,5 +32,8 @@ app.use("/api/v1/products", productRouter);
 
 //orders routes
 app.use("/api/v1/orders", orderRouter);
+
+//user routes
+app.use("/api/v1/users", userRouter);
 
 export { app };

@@ -130,10 +130,10 @@ const getProductsOfVendor = asyncHandler(async (req, res) => {
 });
 
 const getProduct = asyncHandler(async (req, res) => {
-  const { id } = req.params;
+  const { productId } = req.params;
 
   // Fetch the product by ID
-  const product = await Product.findById(id);
+  const product = await Product.findById(productId);
 
   if (!product) {
     return res.status(404).json({
@@ -195,7 +195,7 @@ const deleteProduct = asyncHandler(async (req, res) => {
 });
 
 const getProductByCategory = asyncHandler(async (req, res) => {
-  console.log("Fetching products by category");
+  // console.log("Fetching products by category");
 
   const { category, subcategory } = req.params;
 
