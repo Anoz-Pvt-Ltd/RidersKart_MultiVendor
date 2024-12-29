@@ -4,6 +4,7 @@ import Home from "./Pages/Home/Home";
 import Header from "./Components/Header";
 import Login from "./Pages/Login/Login";
 import VendorRegistrationForm from "./Pages/Register/Register";
+import AllProducts from "./Pages/AllProducts/AllProducts";
 
 const App = () => {
   return (
@@ -14,6 +15,7 @@ const App = () => {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/vendor-register" element={<VendorRegistrationForm />} />
+          <Route path="/all-products/:category/:subcategory" element={<AllProducts />} />
         </Routes>
       </div>
     </div>

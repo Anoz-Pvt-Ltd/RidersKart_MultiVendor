@@ -195,21 +195,36 @@ const deleteProduct = asyncHandler(async (req, res) => {
 });
 
 const getProductByCategory = asyncHandler(async (req, res) => {
+  console.log("Fetching products by category");
+
   const { category, subcategory } = req.params;
 
-  // Fetch the product by category
-  const product = await Product.find({
-    "category.subcategory": "Mobile Phones",
-  });
-  if (!product) {
-    return res.status(404).json({
+  // Check if both category and subcategory are provided
+  if (!category || !subcategory) {
+    return res.status(400).json({
       success: false,
-      message: "Product not found",
+      message: "Category and subcategory are required.",
     });
   }
+
+  // Fetch the product by category and subcategory
+  const products = await Product.find({
+    "category.main": category,
+    "category.sub": subcategory,
+  });
+
+  // Check if products are found
+  if (!products || products.length === 0) {
+    return res.status(404).json({
+      success: false,
+      message: "No products found for the selected category and subcategory.",
+    });
+  }
+
+  // Return the found products
   return res.status(200).json({
     success: true,
-    data: product,
+    data: products,
   });
 });
 
