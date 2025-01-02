@@ -38,12 +38,17 @@ const VerifyUser = asyncHandler(async (req, _, next) => {
       req.cookies?.accessToken ||
       req.header("Authorization")?.replace("Bearer ", "");
 
-    // console.log(token);
+    // console.log(token, "from middleware");
     if (!token) {
       throw new ApiError(401, "Unauthorized request");
     }
-
+    console.log(process.env.ACCESS_TOKEN_SECRET);
     const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    console.log(
+      process.env.ACCESS_TOKEN_SECRET,
+      decodedToken,
+      "from middleware"
+    );
 
     const user = await User.findById(decodedToken?._id).select(
       "-password -refreshToken"

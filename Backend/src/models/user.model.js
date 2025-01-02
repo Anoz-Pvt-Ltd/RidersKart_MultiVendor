@@ -23,7 +23,6 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true,
-    // minlength: 8,
   },
   address: {
     street: {
@@ -47,6 +46,7 @@ const userSchema = new mongoose.Schema({
       required: true,
     },
   },
+  CartProducts: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
   createdAt: {
     type: Date,
     default: Date.now,

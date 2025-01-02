@@ -1,9 +1,55 @@
-import React from "react";
+import React, { useRef } from "react";
 import InputBox from "../../Components/InputBox";
 import Button from "../../Components/Button";
 import { MoveRight } from "lucide-react";
+import { useNavigate } from "react-router";
+import { useState } from "react";
+import { FetchData } from "../../Utility/FetchFromApi";
 
 const Login = () => {
+  const Navigate = useNavigate();
+
+  const NavigateRegister = () => {
+    Navigate("/register");
+  };
+
+  const formRef = useRef(null);
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setSuccess("");
+
+    try {
+      const response = await FetchData("users/login", "post", formData);
+      console.log(response);
+      if (response.data.success) {
+        setSuccess("Login successful!");
+        Navigate("/");
+        
+      } else {
+        // const result = await response.json();
+        setError(result.message || "Login failed");
+      }
+    } catch (err) {
+      setError("An error occurred during login.");
+    }
+  };
+
   return (
     <div>
       <section className="flex m-28 border rounded-lg shadow-md shadow-neutral-300 h-96 ">
@@ -17,18 +63,44 @@ const Login = () => {
           </h1>
         </div>
         <div className=" w-1/2 flex justify-center items-center flex-col whiteSoftBG">
-          <div className="login h-3/4 flex justify-top items-top flex-col w-3/4">
+          <form
+            ref={formRef}
+            className="login h-3/4 flex justify-top items-top flex-col w-3/4"
+          >
             <InputBox
+              onChange={handleChange}
+              LabelName={"Login"}
+              Placeholder={"Email Address"}
+              Type={"email"}
+              className={"w-full"}
+              Name={"email"}
+              Value={formData.email}
+            />
+            <InputBox
+              onChange={handleChange}
+              LabelName={"Password"}
+              Placeholder={"Password"}
+              Type={"password"}
+              className={"w-full"}
+              Name={"password"}
+              Value={formData.password}
+            />
+            {/* <InputBox
               LabelName={"Login"}
               Placeholder={"Your Mobile Number"}
               Type={"number"}
               className={"w-full"}
+            /> */}
+            <Button
+              label={"Login"}
+              className={"w-full"}
+              onClick={handleSubmit}
             />
-            <Button label={"Login"} className={"w-full"} />
-          </div>
+          </form>
           <div className="w-full h-full justify-center items-center flex flex-col">
             <Button
               label={"Register Here"}
+              onClick={NavigateRegister}
               className={"w-1/2 hover:bg-green-500"}
             />
             <p className="text-xs text-neutral-500">

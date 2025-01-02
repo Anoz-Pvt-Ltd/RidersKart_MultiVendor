@@ -1,29 +1,20 @@
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import { FetchData } from "../../Utility/FetchFromApi";
-import Button from "../../Components/Button";
 import InputBox from "../../Components/InputBox";
+import Button from "../../Components/Button";
 
-const VendorRegistrationForm = () => {
-  const formRef = useRef(null);
+const UserRegister = () => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    contactNumber: "",
+    phoneNumber: "",
     address: "",
     city: "",
     state: "",
     country: "",
     postalCode: "",
-    gstNumber: "",
-    businessName: "",
-    accountHolderName: "",
-    accountNumber: "",
-    bankName: "",
-    ifscCode: "",
-    password: "", // Added password field
+    password: "",
   });
-  console.log(formData.name);
-
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
@@ -36,68 +27,53 @@ const VendorRegistrationForm = () => {
     e.preventDefault();
     setError("");
     setSuccess("");
-    const formData = new FormData(formRef.current);
 
     // Structure the data to match the controller's requirements
-    // const {
-    //   name,
-    //   email,
-    //   contactNumber,
-    //   address,
-    //   city,
-    //   state,
-    //   country,
-    //   postalCode,
-    //   gstNumber,
-    //   businessName,
-    //   accountHolderName,
-    //   accountNumber,
-    //   bankName,
-    //   ifscCode,
-    //   password,
-    // } = formData;
+    const {
+      name,
+      email,
+      phoneNumber,
+      address,
+      city,
+      state,
+      country,
+      postalCode,
+      password,
+    } = formData;
 
-    // const dataToSend = {
-    //   name,
-    //   email,
-    //   contactNumber,
-    //   password, // Ensure the password is included
-    //   location: {
-    //     address,
-    //     city,
-    //     state,
-    //     country,
-    //     postalCode,
-    //   },
-    //   gstNumber,
-    //   businessName,
-    //   accountHolderName,
-    //   accountNumber,
-    //   bankName,
-    //   ifscCode,
-    // };
+    // Adjusting the address to match the schema format
+    const addressObj = {
+      street: address, // Assuming the street is being entered in the address field
+      city,
+      state,
+      country,
+      postalCode,
+    };
+
+    const dataToSend = {
+      name,
+      email,
+      phoneNumber, // This matches the model
+      password, // Ensure the password is included
+      address: addressObj, // Pass the structured address
+    };
+    console.log(dataToSend);
 
     try {
-      const response = await FetchData("vendor/register", "post", formData);
+      const response = await FetchData("users/register", "post", dataToSend);
 
       if (response.status === 201) {
         setSuccess("Vendor registered successfully!");
         setFormData({
           name: "",
           email: "",
-          contactNumber: "",
+          phoneNumber: "", // reset phone number field
           address: "",
           city: "",
           state: "",
           country: "",
           postalCode: "",
-          gstNumber: "",
-          businessName: "",
-          accountHolderName: "",
-          accountNumber: "",
-          bankName: "",
-          ifscCode: "",
-          password: "",
+          password: "", // reset password field
         });
       }
     } catch (err) {
@@ -110,22 +86,21 @@ const VendorRegistrationForm = () => {
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg">
       <h1 className="text-2xl font-bold text-gray-800 mb-6">
-        Vendor Registration
+        Welcome, register your account here and get started
       </h1>
 
       {error && <div className="text-red-500 mb-4">{error}</div>}
       {success && <div className="text-green-500 mb-4">{success}</div>}
 
       <form
-        ref={formRef}
         onSubmit={handleSubmit}
         className="grid grid-cols-1 md:grid-cols-2 gap-6"
       >
         <InputBox
-          LabelName="Vendor Name"
+          LabelName="Name"
           Name="name"
           Value={formData.name}
-          Placeholder="Enter Vendor Name"
+          Placeholder="Enter Name"
           onChange={handleChange}
         />
         <InputBox
@@ -133,7 +108,7 @@ const VendorRegistrationForm = () => {
           Type="email"
           Name="email"
           Value={formData.email}
-          Placeholder="Enter Vendor Email"
+          Placeholder="Enter Email"
           onChange={handleChange}
         />
         <InputBox
@@ -146,8 +121,8 @@ const VendorRegistrationForm = () => {
         />
         <InputBox
           LabelName="Contact Number"
-          Name="contactNumber"
-          Value={formData.contactNumber}
+          Name="phoneNumber" // updated name
+          Value={formData.phoneNumber} // updated value
           Placeholder="Enter Contact Number"
           onChange={handleChange}
         />
@@ -186,59 +161,13 @@ const VendorRegistrationForm = () => {
           Placeholder="Enter Postal Code"
           onChange={handleChange}
         />
-        <InputBox
-          LabelName="GST Number"
-          Name="gstNumber"
-          Value={formData.gstNumber}
-          Placeholder="Enter GST Number"
-          onChange={handleChange}
-        />
-        <InputBox
-          LabelName="Business Name"
-          Name="businessName"
-          Value={formData.businessName}
-          Placeholder="Enter Business Name"
-          onChange={handleChange}
-        />
-        <InputBox
-          LabelName="Account Holder Name"
-          Name="accountHolderName"
-          Value={formData.accountHolderName}
-          Placeholder="Enter Account Holder Name"
-          onChange={handleChange}
-        />
-        <InputBox
-          LabelName="Account Number"
-          Name="accountNumber"
-          Value={formData.accountNumber}
-          Placeholder="Enter Account Number"
-          onChange={handleChange}
-        />
-        <InputBox
-          LabelName="Bank Name"
-          Name="bankName"
-          Value={formData.bankName}
-          Placeholder="Enter Bank Name"
-          onChange={handleChange}
-        />
-        <InputBox
-          LabelName="IFSC Code"
-          Name="ifscCode"
-          Value={formData.ifscCode}
-          Placeholder="Enter IFSC Code"
-          onChange={handleChange}
-        />
 
         <div className="md:col-span-2">
-          <Button
-            label={"Register Vendor"}
-            Type={"submit"}
-            className={"w-full"}
-          />
+          <Button label={"Register"} Type={"submit"} className={"w-full"} />
         </div>
       </form>
     </div>
   );
 };
 
-export default VendorRegistrationForm;
+export default UserRegister;

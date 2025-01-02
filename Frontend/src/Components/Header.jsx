@@ -1,8 +1,10 @@
 import { Search, ShoppingCart } from "lucide-react";
 import React from "react";
-import { Navigate, useNavigate } from "react-router";
+import { Link, Navigate, useNavigate } from "react-router";
 import Button from "./Button";
 import InputBox from "./InputBox";
+import { useSelector } from "react-redux";
+import { motion } from "framer-motion";
 
 const Header = () => {
   const Navigate = useNavigate();
@@ -13,6 +15,8 @@ const Header = () => {
   const NavigateVendorRegister = () => {
     Navigate("/vendor-register");
   };
+  const user = useSelector((store) => store.UserInfo.user);
+  console.log(user);
 
   return (
     <header className="flex justify-between items-center mb-4 px-5 ">
@@ -24,8 +28,8 @@ const Header = () => {
           className="h-8"
         />
       </div>
-      <div>
-        <InputBox Placeholder="Search for products..." className={"w-96"} />
+      <div className=" w-[50%]">
+        <InputBox Placeholder="Search for products..." className={"w-full"} />
       </div>
       <div className="flex items-center gap-5">
         <Button label={"Login"} onClick={NavigateLogin} />
@@ -33,10 +37,16 @@ const Header = () => {
         <button className="hidden sm:block hover:underline">More</button>
 
         {/* Cart */}
-        <div className="flex items-center">
-          <ShoppingCart />
-          <span>Cart</span>
-        </div>
+        <motion.div
+          whileInView={{ opacity: 1, x: 0 }}
+          initial={{ opacity: 0, x: -100 }}
+          transition={{ duration: 0.5 }}
+        >
+          <Link to={"/cart"} className="flex items-center">
+            <ShoppingCart />
+            <span>Cart</span>
+          </Link>
+        </motion.div>
       </div>
     </header>
   );

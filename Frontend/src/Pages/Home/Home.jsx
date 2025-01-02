@@ -332,7 +332,13 @@ const Home = () => {
 
   return (
     <div className="container mx-auto p-4">
-      <BannerSlider />
+      <motion.div
+        whileInView={{ opacity: 1, x: 0 }}
+        initial={{ opacity: 0, x: 100 }}
+        transition={{ duration: 0.5 }}
+      >
+        <BannerSlider />
+      </motion.div>
 
       {error && (
         <div className="bg-red-500 text-white p-4 rounded">{error}</div>
@@ -413,6 +419,9 @@ const Home = () => {
                     <motion.div
                       className="flex-none border border-gray-200 rounded-lg p-2 text-center shadow-md hover:shadow-lg w-48 h-fit"
                       whileHover={{ scale: 1.05 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      initial={{ opacity: 0, x: -100 }}
+                      transition={{ duration: 0.5 }}
                     >
                       <div className="h-24 bg-gray-100 rounded-md mb-2 object-center flex justify-center items-center p-10 overflow-hidden">
                         <img src={item.photo} alt={item.name} />
