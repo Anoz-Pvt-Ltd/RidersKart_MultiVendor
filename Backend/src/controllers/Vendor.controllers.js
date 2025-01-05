@@ -186,6 +186,7 @@ const regenerateRefreshToken = asyncHandler(async (req, res) => {
     const user = await VendorUser.findById(DecodedToken._id).select(
       "-password -refreshToken"
     );
+    console.log(user);
 
     if (!user) throw new ApiError(400, "Invalid Token");
 

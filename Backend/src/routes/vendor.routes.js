@@ -7,11 +7,11 @@ import {
   editVendor,
   deleteVendor,
 } from "../controllers/Vendor.controllers.js";
-import { VerifyUser } from "../middlewares/auth.middleware.js";
+import { VerifyVendorUser } from "../middlewares/auth.middleware.js";
 
 const router = Router();
 
-// router.use(VerifyUser);
+// router.use(VerifyVendorUser);
 
 router.route("/register").post(registerVendor);
 router.route("/login").post(loginVendor);

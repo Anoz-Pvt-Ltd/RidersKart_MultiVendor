@@ -32,7 +32,15 @@ const Header = () => {
         <InputBox Placeholder="Search for products..." className={"w-full"} />
       </div>
       <div className="flex items-center gap-5">
-        <Button label={"Login"} onClick={NavigateLogin} />
+        {user.length ? (
+          <div>
+            <Button label={user?.[0]?.name} />
+          </div>
+        ) : (
+          <div>
+            <Button label={"Login"} onClick={NavigateLogin} />
+          </div>
+        )}
         <Button label={"Become a Seller"} onClick={NavigateVendorRegister} />
         <button className="hidden sm:block hover:underline">More</button>
 
@@ -42,7 +50,7 @@ const Header = () => {
           initial={{ opacity: 0, x: -100 }}
           transition={{ duration: 0.5 }}
         >
-          <Link to={"/cart"} className="flex items-center">
+          <Link to={`/cart/${user?.[0]?._id}`} className="flex items-center">
             <ShoppingCart />
             <span>Cart</span>
           </Link>

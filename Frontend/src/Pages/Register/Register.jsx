@@ -63,7 +63,7 @@ const UserRegister = () => {
       const response = await FetchData("users/register", "post", dataToSend);
 
       if (response.status === 201) {
-        setSuccess("Vendor registered successfully!");
+        setSuccess("User registered successfully!");
         setFormData({
           name: "",
           email: "",

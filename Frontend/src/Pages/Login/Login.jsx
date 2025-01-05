@@ -5,9 +5,13 @@ import { MoveRight } from "lucide-react";
 import { useNavigate } from "react-router";
 import { useState } from "react";
 import { FetchData } from "../../Utility/FetchFromApi";
+import { useDispatch } from "react-redux";
+import { clearUser, addUser } from "../../Utility/Slice/UserInfoSlice";
+import { parseErrorMessage } from "../../Utility/ErrorMessageParser";
 
 const Login = () => {
   const Navigate = useNavigate();
+  const Dispatch = useDispatch();
 
   const NavigateRegister = () => {
     Navigate("/register");
@@ -37,16 +41,24 @@ const Login = () => {
     try {
       const response = await FetchData("users/login", "post", formData);
       console.log(response);
-      if (response.data.success) {
-        setSuccess("Login successful!");
-        Navigate("/");
-        
-      } else {
-        // const result = await response.json();
-        setError(result.message || "Login failed");
-      }
+      localStorage.clear(); // will clear the all the data from localStorage
+      localStorage.setItem(
+        "AccessToken",
+        response.data.data.tokens.AccessToken
+      );
+      localStorage.setItem(
+        "RefreshToken",
+        response.data.data.tokens.RefreshToken
+      );
+
+      alert(response.data.message);
+      Dispatch(clearUser());
+      Dispatch(addUser(response.data.data.user));
+      setSuccess("Login successful!");
+      Navigate("/");
     } catch (err) {
-      setError("An error occurred during login.");
+      console.log(error);
+      alert(parseErrorMessage(error.response.data.data.statusCode));
     }
   };
 
