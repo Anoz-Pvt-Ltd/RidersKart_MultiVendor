@@ -73,6 +73,16 @@ const orderSchema = new mongoose.Schema({
     type: Date,
     default: Date.now, // Timestamp for when the order was last updated
   },
+  bookingDate: {
+    type: Date,
+    default: Date.now, // Date when the booking was made
+  },
+  deliveryDate: {
+    type: Date, // Expected delivery date
+  },
+  specialInstructions: {
+    type: String, // Any special instructions for the order
+  },
 });
 
 // Middleware to update the `updatedAt` timestamp before saving
