@@ -15,6 +15,9 @@ const Header = () => {
   const NavigateVendorRegister = () => {
     Navigate("/vendor-register");
   };
+  const NavigateToProfile = () => {
+    Navigate(`/user-profile/dashboard/${user?.[0]?._id}`);
+  };
   const user = useSelector((store) => store.UserInfo.user);
   console.log(user);
 
@@ -22,11 +25,13 @@ const Header = () => {
     <header className="flex justify-between items-center mb-4 px-5 ">
       {/* Logo */}
       <div className="flex items-center">
-        <img
-          src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Flipkart_logo.png/800px-Flipkart_logo.png"
-          alt="Logo"
-          className="h-8"
-        />
+        <Link to={"/"}>
+          <img
+            src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Flipkart_logo.png/800px-Flipkart_logo.png"
+            alt="Logo"
+            className="h-8"
+          />
+        </Link>
       </div>
       <div className=" w-[50%]">
         <InputBox Placeholder="Search for products..." className={"w-full"} />
@@ -34,7 +39,7 @@ const Header = () => {
       <div className="flex items-center gap-5">
         {user.length ? (
           <div>
-            <Button label={user?.[0]?.name} />
+            <Button label={user?.[0]?.name} onClick={NavigateToProfile} />
           </div>
         ) : (
           <div>
