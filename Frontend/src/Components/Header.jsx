@@ -1,4 +1,4 @@
-import { Search, ShoppingCart } from "lucide-react";
+import { LogIn, Search, ShoppingCart, Store, User2 } from "lucide-react";
 import React from "react";
 import { Link, Navigate, useNavigate } from "react-router";
 import Button from "./Button";
@@ -39,15 +39,44 @@ const Header = () => {
       <div className="flex items-center gap-5">
         {user.length ? (
           <div>
-            <Button label={user?.[0]?.name} onClick={NavigateToProfile} />
+            <Button
+              label={
+                <h1 className="flex justify-start gap-2">
+                  <span>
+                    <User2 />
+                  </span>
+                  {user?.[0]?.name}
+                </h1>
+              }
+              onClick={NavigateToProfile}
+            />
           </div>
         ) : (
           <div>
-            <Button label={"Login"} onClick={NavigateLogin} />
+            <Button
+              label={
+                <h1 className="flex  justify-start gap-2">
+                  <span>
+                    <LogIn />
+                  </span>
+                  Login{" "}
+                </h1>
+              }
+              onClick={NavigateLogin}
+            />
           </div>
         )}
-        <Button label={"Become a Seller"} onClick={NavigateVendorRegister} />
-        <button className="hidden sm:block hover:underline">More</button>
+        <Button
+          label={
+            <h1 className="flex justify-start gap-2">
+              <span>
+                <Store />
+              </span>
+              Become a Seller{" "}
+            </h1>
+          }
+          onClick={NavigateVendorRegister}
+        />
 
         {/* Cart */}
         <motion.div
@@ -63,45 +92,6 @@ const Header = () => {
       </div>
     </header>
   );
-  // return (
-  //   <header className="headerBg text-white flex justify-center items-center">
-  //     <div className="container mx-auto flex items-center justify-between py-2 px-4">
-  //       {/* Logo */}
-  //       <div className="flex items-center space-x-2">
-  //         <img
-  //           src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Flipkart_logo.png/800px-Flipkart_logo.png"
-  //           alt="Logo"
-  //           className="h-8"
-  //         />
-  //       </div>
-
-  //       {/* Search Bar */}
-  //       <div className="flex-1 mx-4 hidden sm:flex justify-center">
-  //         <input
-  //           type="text"
-  //           placeholder="Search for products, brands and more"
-  //           className="w-1/2 px-4 py-2 rounded-l-md text-gray-800 outline-none"
-  //         />
-  //         <button className="bg-yellow-500 px-4 py-2 rounded-r-md hover:bg-yellow-600">
-  //           <Search />
-  //         </button>
-  //       </div>
-
-  //       {/* User Options */}
-  //       <div className="flex items-center space-x-4">
-  //         <Button label={"Login"} onClick={NavigateLogin} />
-  //         <Button label={"Become a Seller"} onClick={NavigateVendorRegister} />
-  //         <button className="hidden sm:block hover:underline">More</button>
-
-  //         {/* Cart */}
-  //         <div className="flex items-center space-x-1">
-  //           <ShoppingCart />
-  //           <span>Cart</span>
-  //         </div>
-  //       </div>
-  //     </div>
-  //   </header>
-  // );
 };
 
 export default Header;
