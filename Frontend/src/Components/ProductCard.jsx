@@ -10,9 +10,10 @@ const ProductCard = ({
   Description,
   Image,
   productId,
+  className,
 }) => {
   return (
-    <Link to={`/current-product/${productId}`} className="w-fit">
+    <Link to={`/current-product/${productId}`} className={`w-fit ${className}`}>
       <div className="whiteSoftBG shadow-md hover:shadow-lg h-auto w-fit overflow-hidden rounded-lg hover:scale-105 duration-300 ease-in-out">
         <div className="text-2xl p-2 bg-neutral-200 m-2 w-64 h-52">
           <img src={Image} alt="No Image Found" />
