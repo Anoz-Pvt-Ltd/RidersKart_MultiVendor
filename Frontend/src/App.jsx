@@ -12,6 +12,8 @@ import { FetchData } from "./Utility/FetchFromApi";
 import { parseErrorMessage } from "./Utility/ErrorMessageParser";
 import { useSelector } from "react-redux";
 import { clearUser, addUser } from "./Utility/Slice/UserInfoSlice";
+import BuyNow from "./Pages/BuyNow/BuyNow";
+import Dashboard from "./Pages/Profile/ProfileDashboard";
 
 const App = () => {
   const user = useSelector((store) => store.UserInfo.user);
@@ -22,9 +24,6 @@ const App = () => {
     async function reLogin() {
       const RefreshToken = localStorage.getItem("RefreshToken");
       if (!RefreshToken) return;
-      // console.log(RefreshToken);
-
-      // Refresh the access token using refresh token
       try {
         const user = await FetchData("users/re-login", "post", {
           RefreshToken,
@@ -60,6 +59,10 @@ const App = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<UserRegister />} />
           <Route
+            path="/user-profile/dashboard/:userId"
+            element={<Dashboard />}
+          />
+          <Route
             path="/all-products/:category/:subcategory"
             element={<AllProducts />}
           />
@@ -68,6 +71,8 @@ const App = () => {
             element={<CurrentProduct />}
           />
           <Route path="/cart/:userId" element={<CartPage />} />
+          {/* <Route path="/cart/:userId/buy-now-product" element={<BuyNow />} /> */}
+          <Route path="/checkout/:productId/:userId" element={<BuyNow />} />
         </Routes>
       </div>
     </div>

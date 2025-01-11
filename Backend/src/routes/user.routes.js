@@ -9,9 +9,15 @@ import {
   updateProductQuantityInCart,
   getCartProducts,
   bookProduct,
+  addAddress,
+  editAddress,
+  deleteAddress,
+  deleteUser,
+  addProductToWishlist,
+  getWishlistProducts,
+  getUserAddresses,
+  editUserDetails,
   //   getUserProfile,
-  //   editUserProfile,
-  //   deleteUserProfile,
 } from "../controllers/user.controllers.js";
 
 const router = Router();
@@ -23,15 +29,27 @@ router.route("/login").post(loginUser);
 // Private routes (require authentication)
 router.route("/re-login").post(VerifyUser, regenerateRefreshToken);
 router.route("/:userId/:productId/cart/add").post(VerifyUser, addProductToCart);
+router
+  .route("/:userId/:productId/wishlist/add")
+  .post(VerifyUser, addProductToWishlist);
 router.route("/:userId/cart-products").get(VerifyUser, getCartProducts);
+router.route("/:userId/wishlist-products").get(VerifyUser, getWishlistProducts);
 router.route("/:userId/cart/remove").delete(VerifyUser, removeProductFromCart);
 router
   .route("/:userId/cart/update")
   .post(VerifyUser, updateProductQuantityInCart);
 
-router.route("/users/:userId/book-products").post(VerifyUser, bookProduct);
+router.route("/:userId/book-products").post(VerifyUser, bookProduct);
+
+//modification routes
+router.route("/:userId/addresses").post(VerifyUser, addAddress);
+router.route("/:userId/addresses").get(VerifyUser, getUserAddresses);
+router.route("/:userId/addresses/:addressId").put(VerifyUser, editAddress);
+router.route("/:userId/addresses/:addressId").delete(VerifyUser, deleteAddress);
+router.route("/edit-user-profile/:userId").post(VerifyUser, editUserDetails);
 // router.route("/user-profile/:userId").get(getUserProfile);
-// router.route("/edit-user-profile").post(editUserProfile);
-// router.route("/delete-user-profile").post(deleteUserProfile);
+
+//routes to be handled securely
+router.route("/delete-user-profile").delete(deleteUser);
 
 export default router;

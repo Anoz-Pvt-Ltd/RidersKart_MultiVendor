@@ -1,16 +1,23 @@
 import React from "react";
 import { FetchData } from "../../Utility/FetchFromApi";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useEffect } from "react";
 import { useState } from "react";
 import Button from "../../Components/Button";
 import ProductCard from "../../Components/ProductCard";
 import { useRef } from "react";
+import { useSelector } from "react-redux";
+import { Heart } from "lucide-react";
 
 const CurrentProduct = () => {
+  const navigate = useNavigate();
   const { productId } = useParams();
+  const HandleBuyNow = () => {
+    navigate(`/checkout/${productId}/${user?.[0]?._id}`);
+  };
   const [products, setProducts] = useState();
   const [AllProducts, setAllProducts] = useState();
+  const user = useSelector((store) => store.UserInfo.user);
 
   useEffect(() => {
     async function getCurrentProduct(productId) {
@@ -44,6 +51,40 @@ const CurrentProduct = () => {
     fetchProducts();
   }, []);
 
+  const addProductToCart = async () => {
+    try {
+      console.log(user);
+      console.log(products);
+      const response = await FetchData(
+        `users/${user?.[0]?._id}/${products?._id}/cart/add`,
+        "post"
+      );
+      console.log(response);
+      alert(response.data.message);
+    } catch (err) {
+      console.log(err);
+      alert(err.response?.data?.message || "Failed to add product to cart.");
+    }
+  };
+
+  const addProductToWishlist = async () => {
+    try {
+      console.log(user);
+      console.log(products);
+      const response = await FetchData(
+        `users/${user?.[0]?._id}/${products?._id}/wishlist/add`,
+        "post"
+      );
+      console.log(response);
+      alert(response.data.message);
+    } catch (err) {
+      console.log(err);
+      alert(
+        err.response?.data?.message || "Failed to add product to Wishlist."
+      );
+    }
+  };
+
   const sliderRef = useRef(null);
 
   // Function to scroll the products left
@@ -70,8 +111,17 @@ const CurrentProduct = () => {
             className="bg-neutral-200 h-96 w-96 mx-20"
           />
           <div className="flex gap-52 justify-center items-center mt-20 ">
-            <Button label={"Buy Now"} />
-            <Button label={"Add to Cart"} className={`hover:bg-orange-500`} />
+            <Button label={"Buy Now"} onClick={HandleBuyNow} />
+            <Button
+              label={"Add to Cart"}
+              className={`hover:bg-orange-500`}
+              onClick={addProductToCart}
+            />
+            <Button
+              label={<Heart className="hover:text-red-500 overflow-hidden" />}
+              className={`hover:bg-transparent rounded-full`}
+              onClick={addProductToWishlist}
+            />
           </div>
         </section>
         <div className="flex-1 px-40 py-20">
@@ -108,8 +158,12 @@ const CurrentProduct = () => {
             </li>
           </ul>
           <div className="flex gap-52 justify-center items-center mt-20 ">
-            <Button label={"Buy Now"} />
-            <Button label={"Add to Cart"} className={`hover:bg-orange-500`} />
+            <Button label={"Buy Now"} onClick={HandleBuyNow} />
+            <Button
+              label={"Add to Cart"}
+              className={`hover:bg-orange-500`}
+              onClick={addProductToCart}
+            />
           </div>
         </div>
       </div>

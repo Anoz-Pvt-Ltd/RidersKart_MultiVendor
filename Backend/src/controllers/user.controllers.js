@@ -6,6 +6,7 @@ import jwt from "jsonwebtoken";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { Product } from "../models/products.models.js";
 import { Order } from "../models/order.models.js";
+import bcrypt from "bcrypt";
 
 const generateAccessAndRefreshTokens = async (userId) => {
   try {
@@ -218,6 +219,42 @@ const addProductToCart = asyncHandler(async (req, res) => {
     return res.status(500).json({ message: "Server error" });
   }
 });
+const addProductToWishlist = asyncHandler(async (req, res) => {
+  const { userId } = req.params; // Get userId from the URL parameter
+  const { productId } = req.params; // Get productId from the request body
+
+  try {
+    // Find the user and populate CartProducts
+    const user = await User.findById(userId).populate("WishList");
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Find the product
+    const product = await Product.findById(productId);
+
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    // Check if the product is already in the user's cart
+    if (user.WishList.some((item) => item._id.toString() === productId)) {
+      return res.status(400).json({ message: "Product already in Wishlist" });
+    }
+
+    // Add the product to the user's cart
+    user.WishList.push(productId);
+
+    // Save the user document
+    await user.save();
+
+    return res.status(200).json({ message: "Product added to Wishlist", user });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Server error" });
+  }
+});
 
 const getCartProducts = asyncHandler(async (req, res) => {
   const { userId } = req.params; // Get userId from the URL parameter
@@ -232,6 +269,24 @@ const getCartProducts = asyncHandler(async (req, res) => {
 
     // Send back the cart products
     return res.status(200).json({ success: true, data: user.CartProducts });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Server error" });
+  }
+});
+const getWishlistProducts = asyncHandler(async (req, res) => {
+  const { userId } = req.params; // Get userId from the URL parameter
+
+  try {
+    // Find the user and populate the CartProducts field
+    const user = await User.findById(userId).populate("WishList");
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Send back the cart products
+    return res.status(200).json({ success: true, data: user.WishList });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: "Server error" });
@@ -353,6 +408,146 @@ const bookProduct = asyncHandler(async (req, res) => {
   }
 });
 
+// Controller to add a new address
+const addAddress = asyncHandler(async (req, res, next) => {
+  const { userId } = req.params;
+  const newAddress = req.body;
+
+  // console.log(newAddress, "address input");
+
+  if (!newAddress || Object.keys(newAddress).length === 0) {
+    throw new ApiError(400, "New address details are required");
+  }
+
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+  user.address.push(newAddress);
+  await user.save();
+  // console.log("user address");
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, user, "Address added successfully"));
+});
+
+const getUserAddresses = async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+    // Find the user in the database by their ID and return only the addresses field
+    const user = await User.findById(userId).populate("address");
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Return the addresses of the user
+    res.status(200).json(user.address);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
+// Controller to edit an existing address
+const editAddress = asyncHandler(async (req, res, next) => {
+  const { userId, addressId } = req.params;
+  const updatedAddress = req.body;
+
+  if (!updatedAddress || Object.keys(updatedAddress).length === 0) {
+    throw new ApiError(400, "Updated address details are required");
+  }
+
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+  const address = user.address.id(addressId);
+  if (!address) {
+    throw new ApiError(404, "Address not found");
+  }
+
+  Object.assign(address, updatedAddress);
+  await user.save();
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, user, "Address updated successfully"));
+});
+
+// Controller to delete an address
+const deleteAddress = asyncHandler(async (req, res, next) => {
+  const { userId, addressId } = req.params;
+
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+  const address = user.address.id(addressId);
+  if (!address) {
+    throw new ApiError(404, "Address not found");
+  }
+
+  address.remove();
+  await user.save();
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, user, "Address deleted successfully"));
+});
+
+const editUserDetails = async (req, res) => {
+  const { name, email, phoneNumber, password } = req.body;
+
+  // Get the user ID from the token
+  // const userId = req.user._id;
+  const { userId } = req.params;
+
+  try {
+    // Find the user by ID
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Check if password needs to be updated
+    if (password) {
+      const hashedPassword = await bcrypt.hash(password, 10);
+      user.password = hashedPassword;
+    }
+
+    // Update user fields (name, email, phoneNumber, address)
+    if (name) user.name = name;
+    if (email) user.email = email;
+    if (phoneNumber) user.phoneNumber = phoneNumber;
+
+    // Update the updatedAt timestamp
+    user.updatedAt = Date.now();
+
+    // Save the updated user to the database
+    await user.save();
+
+    return res.status(200).json({
+      message: "User details updated successfully",
+      user: {
+        name: user.name,
+        email: user.email,
+        phoneNumber: user.phoneNumber,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+      },
+    });
+  } catch (error) {
+    console.error("Error updating user details:", error);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+
 export {
   registerUser,
   loginUser,
@@ -360,8 +555,15 @@ export {
   updateAddress,
   regenerateRefreshToken,
   addProductToCart,
+  addProductToWishlist,
   getCartProducts,
+  getWishlistProducts,
   removeProductFromCart,
   updateProductQuantityInCart,
   bookProduct,
+  addAddress,
+  getUserAddresses,
+  editAddress,
+  deleteAddress,
+  editUserDetails,
 };

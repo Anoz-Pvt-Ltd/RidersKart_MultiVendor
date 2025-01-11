@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { motion } from "framer-motion";
 import { FetchData } from "../../Utility/FetchFromApi";
@@ -6,6 +6,8 @@ import Button from "../../Components/Button";
 import InputBox from "../../Components/InputBox";
 import ProductCard from "../../Components/ProductCard";
 import { Heart, ListOrdered, Newspaper, User } from "lucide-react";
+import Lottie from "lottie-react";
+import Loading from "../../assets/Loading/Loading.json";
 
 const Dashboard = () => {
   const user = useSelector((store) => store.UserInfo.user);
@@ -13,7 +15,9 @@ const Dashboard = () => {
   const [activeSection, setActiveSection] = useState("profile");
   const [selectedAddressIndex, setSelectedAddressIndex] = useState(0);
   const [showModal, setShowModal] = useState(false);
+  const [showModal2, setShowModal2] = useState(false);
   const [cartProducts, setWishlistProducts] = useState();
+  const fromRef = useRef(null);
   const [newAddress, setNewAddress] = useState({
     street: "",
     city: "",
@@ -21,10 +25,23 @@ const Dashboard = () => {
     postalCode: "",
     state: "",
   });
+  const [editProfile, setEditProfile] = useState({
+    name: "",
+    email: "",
+    phoneNumber: "",
+    password: "",
+  });
 
   const handleAddressInputChange = (e) => {
     const { name, value } = e.target;
     setNewAddress((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+  };
+  const handleAddressInputChange2 = (e) => {
+    const { name, value } = e.target;
+    setEditProfile((prevState) => ({
       ...prevState,
       [name]: value,
     }));
@@ -53,6 +70,9 @@ const Dashboard = () => {
   const openModal = () => {
     setShowModal(true);
   };
+  const openModal2 = () => {
+    setShowModal2(true);
+  };
 
   // Close modal
   const closeModal = () => {
@@ -63,6 +83,17 @@ const Dashboard = () => {
       country: "",
       postalCode: "",
       state: "",
+    });
+    setError(null); // Reset any errors
+  };
+  // Close modal
+  const closeModal2 = () => {
+    setShowModal2(false);
+    setEditProfile({
+      name: "",
+      email: "",
+      phoneNumber: "",
+      password: "",
     });
     setError(null); // Reset any errors
   };
@@ -105,7 +136,33 @@ const Dashboard = () => {
     fetchWishlistProducts();
   }, [user]);
 
-  return (
+  const handleEditProfileSubmit = async (e) => {
+    e.preventDefault();
+    const formData = new FormData(fromRef.current);
+    try {
+      const response = await FetchData(
+        `users/edit-user-profile/${user?.[0]?._id}`,
+        "post",
+        formData
+      );
+      console.log(response);
+      if (response.data.success) {
+        alert("Profile updated successfully");
+        closeModal2();
+        window.location.reload();
+      } else {
+        setError("Failed to update profile.");
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to update profile.");
+    }
+  };
+
+  return !user ? (
+    <div className="w-screen  flex justify-center items-center">
+      <Lottie width={50} height={50} animationData={Loading} />
+    </div>
+  ) : (
     <div className="flex min-h-screen">
       <motion.aside
         className="w-64 text-black p-4 shadow-lg"
@@ -176,18 +233,18 @@ const Dashboard = () => {
                 </div>
                 <div className="flex justify-evenly items-center gap-5">
                   <Button onClick={openModal} label={"Add Address"} />
-                  <Button label={"Edit Profile"} />
+                  <Button onClick={openModal2} label={"Edit Profile"} />
                   {/* <Button label={"Add Address"} /> */}
                 </div>
               </div>
-              <div className="flex ">
+              <div className="flex flex-wrap">
                 <p className="m-10 font-bold text-xl">
                   Select a Default Address:
                 </p>
                 {user?.[0]?.address?.map((address, index) => (
                   <div
                     key={address._id}
-                    className="gap-5 flex justify-center items-center  "
+                    className="gap-5 flex justify-center items-center  flex-wrap"
                   >
                     <input
                       type="radio"
@@ -219,7 +276,7 @@ const Dashboard = () => {
                 {/* <button onClick={openModal}>Add Address</button> */}
 
                 {showModal && (
-                  <div className="modal bg-neutral-400 fixed top-0 left-0 w-full h-full flex justify-center items-center">
+                  <div className="modal backdrop-blur-lg fixed top-0 left-0 w-full h-full flex justify-center items-center">
                     <div className="modal-content flex  justify-center items-center gap-20 bg-white p-4 rounded-xl">
                       <span
                         className="close cursor-pointer bg-neutral-300 rounded-full p-2 flex justify-center items-center text-3xl w-fit"
@@ -272,6 +329,68 @@ const Dashboard = () => {
                         />
                       </form>
                       {error && <p className="text-red-500">{error}</p>}
+                    </div>
+                  </div>
+                )}
+                {showModal2 && (
+                  <div className=" fixed top-0 left-0 w-full h-full flex flex-col justify-center items-center backdrop-blur-lg">
+                    <h1 className="mb-5">
+                      Hello{" "}
+                      <span className="text-2xl font-bold ">
+                        {user?.[0]?.name}
+                      </span>{" "}
+                      you can edit your account details here
+                    </h1>
+                    <div className="flex justify-center items-center gap-10 w-1/2 rounded-xl shadow py-10 whiteSoftBG">
+                      <div className="w-1/2">
+                        <form ref={fromRef} onSubmit={handleEditProfileSubmit}>
+                          <InputBox
+                            LabelName="Name"
+                            Placeholder="Name"
+                            Name="name"
+                            Value={editProfile.name}
+                            Type="name"
+                            onChange={handleAddressInputChange2}
+                          />
+                          <InputBox
+                            LabelName="Email Address"
+                            Placeholder="Email Address"
+                            Name="email"
+                            Value={editProfile.email}
+                            Type="email"
+                            onChange={handleAddressInputChange2}
+                          />
+                          <InputBox
+                            LabelName="Contact Number"
+                            Placeholder="Contact Number"
+                            Name="phoneNumber"
+                            Type="number"
+                            Value={editProfile.phoneNumber}
+                            onChange={handleAddressInputChange2}
+                          />
+                          <InputBox
+                            LabelName="Password"
+                            Placeholder="Password"
+                            Name="password"
+                            Value={editProfile.password}
+                            Type="password"
+                            onChange={handleAddressInputChange2}
+                          />
+                          <Button
+                            type="submit"
+                            label="Update Profile"
+                            className="mt-4"
+                          />
+                        </form>
+                      </div>
+                      <div className="flex flex-col gap-5">
+                        <Button
+                          type="button"
+                          onClick={closeModal2}
+                          label="Cancel"
+                          className="mt-4 hover:bg-orange-500"
+                        />
+                      </div>
                     </div>
                   </div>
                 )}
