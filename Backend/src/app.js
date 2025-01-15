@@ -23,6 +23,7 @@ import vendorRouter from "./routes/vendor.routes.js";
 import productRouter from "./routes/product.routes.js";
 import orderRouter from "./routes/order.routes.js";
 import userRouter from "./routes/user.routes.js";
+import adminRouter from "./routes/admin.routes.js";
 
 //vendor routes
 app.use("/api/v1/vendor", vendorRouter);
@@ -35,5 +36,8 @@ app.use("/api/v1/orders", orderRouter);
 
 //user routes
 app.use("/api/v1/users", userRouter);
+
+//admin routes
+app.use("/api/v1/admins", adminRouter);
 
 export { app };
