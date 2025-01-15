@@ -254,6 +254,34 @@ const deleteVendor = asyncHandler(async (req, res, next) => {
     .json(new ApiResponse(200, null, "Vendor deleted successfully"));
 });
 
+const getVendorDetailsByProductId = async (req, res) => {
+  const { productId } = req.params;
+  // console.log("controller reached", productId);
+
+  try {
+    // Find the product and populate the vendor details
+    const product = await Product.findById(productId).populate("vendor");
+
+    if (!product) {
+      throw new ApiError(404, "Product not found");
+    }
+
+    // Send the vendor details in the response
+    const vendorDetails = product.vendor;
+    res
+      .status(200)
+      .json(
+        new ApiResponse(
+          200,
+          vendorDetails,
+          "Vendor details fetched successfully"
+        )
+      );
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 export {
   registerVendor,
   loginVendor,
@@ -261,4 +289,5 @@ export {
   regenerateRefreshToken,
   editVendor,
   deleteVendor,
+  getVendorDetailsByProductId,
 };

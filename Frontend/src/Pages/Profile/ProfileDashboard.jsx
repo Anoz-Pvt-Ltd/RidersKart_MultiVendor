@@ -1,23 +1,39 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { motion } from "framer-motion";
 import { FetchData } from "../../Utility/FetchFromApi";
 import Button from "../../Components/Button";
 import InputBox from "../../Components/InputBox";
 import ProductCard from "../../Components/ProductCard";
-import { Heart, ListOrdered, Newspaper, User } from "lucide-react";
+import {
+  Edit,
+  Heart,
+  ListOrdered,
+  LogOut,
+  Newspaper,
+  PencilLine,
+  Plus,
+  ShoppingBag,
+  Trash,
+  User,
+  UserCheck,
+} from "lucide-react";
 import Lottie from "lottie-react";
 import Loading from "../../assets/Loading/Loading.json";
+import { useNavigate } from "react-router";
+import { clearUser } from "../../Utility/Slice/UserInfoSlice";
 
 const Dashboard = () => {
   const user = useSelector((store) => store.UserInfo.user);
+  const Dispatch = useDispatch();
   const [error, setError] = useState(null);
   const [activeSection, setActiveSection] = useState("profile");
   const [selectedAddressIndex, setSelectedAddressIndex] = useState(0);
   const [showModal, setShowModal] = useState(false);
   const [showModal2, setShowModal2] = useState(false);
-  const [cartProducts, setWishlistProducts] = useState();
+  const [wishlistProducts, setWishlistProducts] = useState();
   const fromRef = useRef(null);
+  const [allOrders, setAllOrders] = useState([]);
   const [newAddress, setNewAddress] = useState({
     street: "",
     city: "",
@@ -112,6 +128,28 @@ const Dashboard = () => {
     setSelectedAddressIndex(index);
   };
 
+  useEffect(() => {
+    const fetchAllOrders = async () => {
+      if (user?.length > 0) {
+        try {
+          const response = await FetchData(
+            `orders/all-products-of/${user?.[0]?._id}`,
+            "get"
+          );
+          // console.log(response);
+          if (response.data.success) {
+            setAllOrders(response.data.orders);
+          } else {
+            setError("Failed to load orders.");
+          }
+        } catch (err) {
+          setError(err.response?.data?.message || "Failed to fetch orders.");
+        }
+      }
+    };
+    fetchAllOrders();
+  }, [user]);
+
   const fetchWishlistProducts = async () => {
     if (user?.length > 0) {
       try {
@@ -156,6 +194,12 @@ const Dashboard = () => {
     } catch (err) {
       setError(err.response?.data?.message || "Failed to update profile.");
     }
+  };
+
+  const navigate = useNavigate();
+
+  const navigateHome = () => {
+    navigate("/");
   };
 
   return !user ? (
@@ -226,18 +270,92 @@ const Dashboard = () => {
             <section className="flex justify-center items-center flex-col">
               <div className="flex w-full justify-evenly items-center mb-20 shadow py-10 rounded-xl">
                 <div>
-                  <h2 className="text-2xl font-bold mb-4">Profile</h2>
-                  <p>Name: {user?.[0]?.name}</p>
-                  <p>Email: {user?.[0]?.email}</p>
-                  <p>Email: {user?.[0]?.phoneNumber}</p>
+                  <h2 className="text-2xl font-bold mb-4 flex justify-center items-center ">
+                    <span>
+                      <UserCheck className="mr-5" />
+                    </span>
+                    Your Profile
+                  </h2>
+                  <p>
+                    Name:{" "}
+                    <span className="text-2xl font-bold">
+                      {user?.[0]?.name}
+                    </span>
+                  </p>
+                  <p>
+                    Email:{" "}
+                    <span className="text-2xl font-bold">
+                      {user?.[0]?.email}
+                    </span>
+                  </p>
+                  <p>
+                    Number:{" "}
+                    <span className="text-2xl font-bold">
+                      {user?.[0]?.phoneNumber}
+                    </span>
+                  </p>
                 </div>
-                <div className="flex justify-evenly items-center gap-5">
-                  <Button onClick={openModal} label={"Add Address"} />
-                  <Button onClick={openModal2} label={"Edit Profile"} />
-                  {/* <Button label={"Add Address"} /> */}
+                <div className="flex flex-col gap-5 justify-center items-center">
+                  <div className="flex justify-evenly items-center gap-5">
+                    <Button
+                      onClick={navigateHome}
+                      // label={<ShoppingBag/>"Continue Shopping"}
+                      label={
+                        <h1 className="flex justify-start gap-2">
+                          <span>
+                            <ShoppingBag />
+                          </span>
+                          Continue Shopping{" "}
+                        </h1>
+                      }
+                    />
+                    <Button
+                      onClick={() => {
+                        Dispatch(clearUser());
+                        navigate("/login");
+                        alertInfo("you are logged Out! Please log in");
+                        localStorage.clear();
+                      }}
+                      className={"hover:bg-orange-500"}
+                      label={
+                        <h1 className="flex justify-start gap-2">
+                          <span>
+                            <LogOut />
+                          </span>
+                          Log Out{" "}
+                        </h1>
+                      }
+                    />
+                    {/* <Button label={"Add Address"} /> */}
+                  </div>
+                  <div className="flex justify-evenly items-center gap-5">
+                    <Button
+                      onClick={openModal}
+                      label={
+                        <h1 className="flex justify-start gap-2">
+                          <span>
+                            <Plus />
+                          </span>
+                          Add Address{" "}
+                        </h1>
+                      }
+                    />
+                    <Button
+                      onClick={openModal2}
+                      label={
+                        <h1 className="flex justify-start gap-2">
+                          <span>
+                            <Edit />
+                          </span>
+                          Edit Profile{" "}
+                        </h1>
+                      }
+                    />
+                    {/* <Button label={"Add Address"} /> */}
+                  </div>
                 </div>
               </div>
-              <div className="flex flex-wrap">
+              <div className="flex flex-wrap flex-col">
                 <p className="m-10 font-bold text-xl">
                   Select a Default Address:
                 </p>
@@ -270,6 +388,8 @@ const Dashboard = () => {
                         State: <span>{address.state}</span>
                       </li>
                     </span>
+                    <Button label={<PencilLine />} />
+                    <Button label={<Trash />} />
                   </div>
                 ))}
 
@@ -400,7 +520,21 @@ const Dashboard = () => {
           {activeSection === "orders" && (
             <section>
               <h2 className="text-2xl font-bold mb-4">Orders</h2>
-              {/* Orders content */}
+              <div className="flex justify-start items-start gap-5 flex-wrap p-5 ">
+                {console.log(allOrders)}
+                {allOrders?.map((product, index) => (
+                  <ProductCard
+                    key={index}
+                    ProductName={product?.products?.[0]?.product?.name}
+                    CurrentPrice={product?.products?.[0]?.product?.price}
+                    Mrp={product?.products?.[0]?.product?.price}
+                    Rating={product?.products?.[0]?.product?.Rating}
+                    Offer={product?.products?.[0]?.product?.off}
+                    Description={product?.products?.[0]?.product?.description}
+                    productId={product?.products?.[0]?.product?._id}
+                  />
+                ))}
+              </div>
             </section>
           )}
           {activeSection === "coupons" && (
@@ -415,11 +549,11 @@ const Dashboard = () => {
               {/* Wishlist content */}
               <h1>
                 Your wishlist is here with {""}
-                <span>{cartProducts?.length} items.</span>
+                <span>{wishlistProducts?.length} items.</span>
               </h1>
-              {/* {console.log(cartProducts)} */}
+              {/* {console.log(wishlistProducts)} */}
               <div className="flex justify-start items-start gap-5 flex-wrap p-5 ">
-                {cartProducts?.map((product, index) => (
+                {wishlistProducts?.map((product, index) => (
                   <ProductCard
                     key={index}
                     ProductName={product?.name}

@@ -39,7 +39,9 @@ router
   .route("/:userId/cart/update")
   .post(VerifyUser, updateProductQuantityInCart);
 
-router.route("/:userId/book-products").post(VerifyUser, bookProduct);
+router
+  .route("/book-product/:userId/:productId/:vendorId")
+  .post(VerifyUser, bookProduct);
 
 //modification routes
 router.route("/:userId/addresses").post(VerifyUser, addAddress);

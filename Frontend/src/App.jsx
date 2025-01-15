@@ -17,20 +17,22 @@ import Dashboard from "./Pages/Profile/ProfileDashboard";
 
 const App = () => {
   const user = useSelector((store) => store.UserInfo.user);
-  console.log(user);
+  // console.log(user);
 
   const dispatch = useDispatch();
   useEffect(() => {
+    // Check if RefreshToken exists in localStorage
+    const RefreshToken = localStorage.getItem("RefreshToken");
+    if (!RefreshToken) return; // If no RefreshToken, don't proceed further
+
     async function reLogin() {
-      const RefreshToken = localStorage.getItem("RefreshToken");
-      if (!RefreshToken) return;
       try {
         const user = await FetchData("users/re-login", "post", {
           RefreshToken,
         });
 
-        console.log(user);
-        localStorage.clear(); // will clear the all the data from localStorage
+        // Clear localStorage and set new tokens
+        localStorage.clear(); // will clear all the data from localStorage
         localStorage.setItem("AccessToken", user.data.data.tokens.AccessToken);
         localStorage.setItem(
           "RefreshToken",
@@ -48,10 +50,10 @@ const App = () => {
     }
 
     reLogin();
-  }, []);
+  }, []); // Empty dependency array ensures this runs once on component mount
 
   return (
-    <div class="absolute top-0 z-[-2] h-screen w-screen bg-white bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.3),rgba(255,255,255,0))] overflow-x-hidden antialiased selection:bg-cyan-500 selection:text-cyan-900">
+    <div class="absolute top-0 z-[-2] h-screen w-screen bg-white bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.3),rgba(255,255,255,0))] overflow-x-hidden antialiased selection:bg-cyan-500 selection:text-cyan-900 font-Fredoka">
       <div className="text-black">
         <Header />
         <Routes>

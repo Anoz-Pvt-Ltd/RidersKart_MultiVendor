@@ -19,7 +19,7 @@ const Header = () => {
     Navigate(`/user-profile/dashboard/${user?.[0]?._id}`);
   };
   const user = useSelector((store) => store.UserInfo.user);
-  console.log(user);
+  // console.log(user);
 
   return (
     <header className="flex justify-between items-center mb-4 px-5 ">

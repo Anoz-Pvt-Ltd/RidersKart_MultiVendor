@@ -13,7 +13,7 @@ const Home = () => {
   const fetchProducts = async () => {
     try {
       const response = await FetchData("products/get-all-product", "get");
-      console.log(response);
+      // console.log(response);
       if (response.data.success) {
         setProducts(response.data.data);
       } else {

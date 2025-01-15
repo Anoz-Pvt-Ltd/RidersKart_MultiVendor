@@ -69,7 +69,7 @@ const loginUser = asyncHandler(async (req, res) => {
 
   const isValid = await user.isPasswordCorrect(password);
 
-  if (!isValid) throw new ApiError(401, "Entered Credential is not correct");
+  if (!isValid) throw new ApiError(401, "Entered Password is not correct");
 
   const { AccessToken, RefreshToken } = await generateAccessAndRefreshTokens(
     user?._id
@@ -361,22 +361,27 @@ const updateProductQuantityInCart = async (req, res) => {
 };
 
 const bookProduct = asyncHandler(async (req, res) => {
-  const { userId } = req.params; // Get userId from the URL parameter
-  const { productId, quantity } = req.body; // Get productId and quantity from the request body
+  const { userId, productId, vendorId } = req.params;
+  const { quantity, shippingAddress, orderStatus } = req.body;
 
   try {
     // Find the user
     const user = await User.findById(userId);
-
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
     // Find the product
     const product = await Product.findById(productId);
-
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
+    }
+
+    // Check if the product belongs to the vendor
+    if (product.vendor.toString() !== vendorId) {
+      return res
+        .status(400)
+        .json({ message: "Product does not belong to the specified vendor" });
     }
 
     // Check product availability
@@ -391,17 +396,26 @@ const bookProduct = asyncHandler(async (req, res) => {
     // Create an order
     const order = new Order({
       user: userId,
-      product: productId,
-      quantity,
-      status: "booked",
-      totalPrice: product.price * quantity,
+      vendor: vendorId,
+      products: [
+        {
+          product: productId,
+          quantity,
+          price: product.price,
+        },
+      ],
+      totalAmount: product.price * quantity,
+      shippingAddress, // Ensure this field is provided in the request body
+      orderStatus, // Ensure this is a valid enum value in the Order model
     });
 
     await order.save();
 
-    return res
-      .status(201)
-      .json({ success: true, message: "Product booked successfully", order });
+    return res.status(201).json({
+      success: true,
+      message: "Product booked successfully",
+      order,
+    });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: "Server error" });

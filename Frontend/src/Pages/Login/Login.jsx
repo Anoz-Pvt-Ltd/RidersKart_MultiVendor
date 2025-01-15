@@ -58,7 +58,8 @@ const Login = () => {
       Navigate("/");
     } catch (err) {
       console.log(error);
-      alert(parseErrorMessage(error.response.data.data.statusCode));
+      // alert(parseErrorMessage(error.response.data.data.statusCode));
+      alert("Invalid login credentials");
     }
   };
 
@@ -67,7 +68,7 @@ const Login = () => {
       <section className="flex m-28 border rounded-lg shadow-md shadow-neutral-300 h-96 ">
         <div className="w-1/2 p-10 rounded-lg rounded-r-none headerBg text-white">
           <h1 className="text-4xl h-3/4 text-white font-semibold">
-            Login with your mobile number to get started !
+            Login with your e-mail to get started !
           </h1>
           <h1 className="flex justify-around items-center">
             If you are not registered with us create your new account here{" "}

@@ -103,4 +103,28 @@ const GetVendorOrders = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, orders, "Orders retrieved successfully"));
 });
 
-export { CreateOrder, CancelOrder, GetVendorOrders };
+// Controller to fetch all orders for a specific user
+const getUserAllOrders = asyncHandler(async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    // Fetch all orders for the specified user
+    const orders = await Order.find({ user: userId }).populate(
+      "products.product"
+    );
+
+    if (!orders || orders.length === 0) {
+      return res.status(404).json({ message: "No orders found for this user" });
+    }
+
+    return res.status(200).json({
+      success: true,
+      orders,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Server error" });
+  }
+});
+
+export { CreateOrder, CancelOrder, GetVendorOrders, getUserAllOrders };
