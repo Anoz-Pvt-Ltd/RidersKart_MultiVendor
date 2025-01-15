@@ -22,6 +22,28 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const [vendor, setVendor] = useState(null);
   const [error, setError] = useState(null);
+  const [allOrders, setAllOrders] = useState([]);
+
+  useEffect(() => {
+    const fetchAllOrders = async () => {
+      if (user?.length > 0) {
+        try {
+          const response = await FetchData(
+            `orders/all-products-of-vendor/${user?.[0]?._id}`,
+            "get"
+          );
+          if (response.data.success) {
+            setAllOrders(response.data.orders);
+          } else {
+            setError("Failed to load orders.");
+          }
+        } catch (err) {
+          setError(err.response?.data?.message || "Failed to fetch orders.");
+        }
+      }
+    };
+    fetchAllOrders();
+  }, [user]);
 
   useEffect(() => {
     const fetchVendor = async () => {
@@ -31,7 +53,7 @@ const Dashboard = () => {
           `vendors/vendor-profile/${user?.[0]?._id}`,
           "get"
         );
-        console.log(response);
+        // console.log(response);
         setVendor(response.data.data);
         // console.log(response);
       } catch (err) {
@@ -137,9 +159,9 @@ const Dashboard = () => {
           <div>
             <div className="grid grid-cols-4 gap-6 mb-6">
               <div className="p-4 bg-white shadow rounded">
-                <h3 className="text-gray-500">Orders</h3>
-                {/* <p className="text-2xl font-bold">{user?.[0]?.order}</p> */}
-                <p className="text-2xl font-bold">order</p>
+                <h3 className="text-gray-500">Total Orders</h3>
+                <p className="text-2xl font-bold">{allOrders?.length}</p>
+                {/* <p className="text-2xl font-bold">order</p> */}
               </div>
               <div className="p-4 bg-white shadow rounded">
                 <h3 className="text-gray-500">Products</h3>
@@ -159,12 +181,12 @@ const Dashboard = () => {
                 <p className="text-2xl font-bold">2,02,14,448.18</p>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-6 mb-6">
-              <div className="bg-white shadow rounded p-4">
+            <div className="flex justify-center items-center">
+              {/* <div className="bg-white shadow rounded p-4">
                 <h3 className="text-gray-500 mb-4">Monthly Orders</h3>
                 <Bar data={barData} />
-              </div>
-              <div className="bg-white shadow rounded p-4">
+              </div> */}
+              <div className="bg-white shadow rounded p-4 w-1/2">
                 <h3 className="text-gray-500 mb-4">
                   Category Wise Product's Count
                 </h3>

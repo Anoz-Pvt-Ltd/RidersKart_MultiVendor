@@ -127,4 +127,33 @@ const getUserAllOrders = asyncHandler(async (req, res) => {
   }
 });
 
-export { CreateOrder, CancelOrder, GetVendorOrders, getUserAllOrders };
+const getVendorAllOrders = asyncHandler(async (req, res) => {
+  const { vendorId } = req.params;
+
+  try {
+    // Fetch all orders for the specified user
+    const orders = await Order.find({ vendor: vendorId }).populate(
+      "products.product"
+    );
+
+    if (!orders || orders.length === 0) {
+      return res.status(404).json({ message: "No orders found for this user" });
+    }
+
+    return res.status(200).json({
+      success: true,
+      orders,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Server error" });
+  }
+});
+
+export {
+  CreateOrder,
+  CancelOrder,
+  GetVendorOrders,
+  getUserAllOrders,
+  getVendorAllOrders,
+};

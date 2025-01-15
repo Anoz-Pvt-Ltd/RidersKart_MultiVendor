@@ -13,88 +13,32 @@ import { useSelector } from "react-redux";
 
 const Orders = () => {
   const user = useSelector((store) => store.UserInfo.user);
-  console.log(user);
-  const [orderSummary, setOrderSummary] = useState([]);
-  const [detailedOrders, setDetailedOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  // Fetch orders for the vendor
-  const fetchOrders = async () => {
-    try {
-      setLoading(true);
-      // const vendorId = {user?.[0]?._id}; // Replace with the actual vendor ID
-      const response = await FetchData(
-        `orders/get-vendor-orders/${user?.[0]?._id}`,
-        "get"
-      );
-
-      if (response?.status === 200) {
-        const orders = response.data.data;
-
-        // Process order summary
-        const summary = [
-          {
-            title: "Total Orders",
-            count: orders.length,
-            color: "bg-blue-500",
-            icon: <FaClipboardList />,
-          },
-          {
-            title: "Delivered Orders",
-            count: orders.filter((order) => order.status === "Delivered")
-              .length,
-            color: "bg-green-500",
-            icon: <FaCheckCircle />,
-          },
-          {
-            title: "Cancelled Orders",
-            count: orders.filter((order) => order.status === "Cancelled")
-              .length,
-            color: "bg-red-500",
-            icon: <FaTimesCircle />,
-          },
-          {
-            title: "Pending Orders",
-            count: orders.filter((order) => order.status === "Pending").length,
-            color: "bg-yellow-500",
-            icon: <FaUndoAlt />,
-          },
-          {
-            title: "Shipped Orders",
-            count: orders.filter((order) => order.status === "Shipped").length,
-            color: "bg-indigo-500",
-            icon: <FaTruck />,
-          },
-          {
-            title: "Processing Orders",
-            count: orders.filter((order) => order.status === "Processing")
-              .length,
-            color: "bg-purple-500",
-            icon: <FaBox />,
-          },
-        ];
-
-        setOrderSummary(summary);
-        setDetailedOrders(orders);
-      } else {
-        setError("Failed to fetch orders. Please try again later.");
-      }
-    } catch (err) {
-      console.error(err);
-      setError("An error occurred while fetching orders.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [allOrders, setAllOrders] = useState([]);
 
   useEffect(() => {
-    fetchOrders();
-  }, []);
+    const fetchAllOrders = async () => {
+      if (user?.length > 0) {
+        try {
+          const response = await FetchData(
+            `orders/all-products-of-vendor/${user?.[0]?._id}`,
+            "get"
+          );
+          if (response.data.success) {
+            setAllOrders(response.data.orders);
+          } else {
+            setError("Failed to load orders.");
+          }
+        } catch (err) {
+          setError(err.response?.data?.message || "Failed to fetch orders.");
+        }
+      }
+    };
+    fetchAllOrders();
+  }, [user]);
+  console.log(allOrders);
 
-  if (loading) {
-    return <p className="text-gray-700 text-center">Loading orders...</p>;
-  }
+  
 
   if (error) {
     return <p className="text-red-600 text-center">{error}</p>;
@@ -103,71 +47,68 @@ const Orders = () => {
   return (
     <div className="bg-white p-6 rounded-lg shadow-lg">
       <h2 className="text-2xl font-bold text-gray-700 mb-4">Orders</h2>
-
-      {/* Order Summary Cards */}
-      <div className="grid grid-cols-3 gap-6 mb-6">
-        {orderSummary.map((order, index) => (
-          <OrderCard
-            key={index}
-            title={order.title}
-            count={order.count}
-            color={order.color}
-            icon={order.icon}
-          />
-        ))}
-      </div>
-
       {/* Detailed Order List */}
-      <div>
-        <h3 className="text-xl font-semibold text-gray-600 mb-4">
-          Order Details
-        </h3>
+      <div className="container mx-auto p-4">
         <div className="overflow-x-auto">
-          <table className="min-w-full bg-white border border-gray-200 rounded-lg">
+          <table className="min-w-full bg-white border border-gray-200">
             <thead>
-              <tr className="bg-gray-100 text-gray-600 text-left text-sm font-medium">
-                <th className="py-3 px-4 border-b">Order ID</th>
-                <th className="py-3 px-4 border-b">Customer Name</th>
-                <th className="py-3 px-4 border-b">Product</th>
-                <th className="py-3 px-4 border-b">Status</th>
-                <th className="py-3 px-4 border-b">Payment</th>
-                <th className="py-3 px-4 border-b">Date</th>
+              <tr>
+                <th className="py-2 px-4 border-b">Order ID</th>
+                <th className="py-2 px-4 border-b">Product Name</th>
+                <th className="py-2 px-4 border-b">Category</th>
+                <th className="py-2 px-4 border-b">Quantity</th>
+                <th className="py-2 px-4 border-b">Price</th>
+                <th className="py-2 px-4 border-b">Total Amount</th>
+                <th className="py-2 px-4 border-b">Order Status</th>
+                <th className="py-2 px-4 border-b">Payment Status</th>
+                <th className="py-2 px-4 border-b">Shipping Address</th>
+                <th className="py-2 px-4 border-b">Placed At</th>
+                <th className="py-2 px-4 border-b">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {detailedOrders.map((order, index) => (
-                <tr
-                  key={index}
-                  className="text-sm text-gray-700 border-b hover:bg-gray-50"
-                >
-                  <td className="py-3 px-4">{order._id}</td>
-                  <td className="py-3 px-4">{order.customer.name}</td>
-                  <td className="py-3 px-4">{order.product.name}</td>
-                  <td
-                    className={`py-3 px-4 font-bold ${
-                      order.status === "Delivered"
-                        ? "text-green-600"
-                        : order.status === "Cancelled"
-                        ? "text-red-600"
-                        : "text-gray-600"
-                    }`}
-                  >
-                    {order.status}
-                  </td>
-                  <td
-                    className={`py-3 px-4 ${
-                      order.paymentStatus === "Paid"
-                        ? "text-green-600"
-                        : "text-yellow-600"
-                    }`}
-                  >
-                    {order.paymentStatus}
-                  </td>
-                  <td className="py-3 px-4">
-                    {new Date(order.createdAt).toLocaleDateString()}
+              {allOrders.length > 0 ? (
+                allOrders.map((order) => (
+                  <tr key={order._id} className="hover:bg-gray-100">
+                    <td className="py-2 px-4 border-b">{order._id}</td>
+                    <td className="py-2 px-4 border-b">
+                      {order.products[0]?.product.name || "N/A"}
+                    </td>
+                    <td className="py-2 px-4 border-b">
+                      {order.products[0]?.product.category.main || "N/A"} -{" "}
+                      {order.products[0]?.product.category.sub || "N/A"}
+                    </td>
+                    <td className="py-2 px-4 border-b">
+                      {order.products[0]?.quantity}
+                    </td>
+                    <td className="py-2 px-4 border-b">
+                      {order.products[0]?.price}
+                    </td>
+                    <td className="py-2 px-4 border-b">{order.totalAmount}</td>
+                    <td className="py-2 px-4 border-b">{order.orderStatus}</td>
+                    <td className="py-2 px-4 border-b">
+                      {order.paymentStatus}
+                    </td>
+                    <td className="py-2 px-4 border-b">
+                      {`${order.shippingAddress.street}, ${order.shippingAddress.city}, ${order.shippingAddress.state}, ${order.shippingAddress.country}, ${order.shippingAddress.postalCode}`}
+                    </td>
+                    <td className="py-2 px-4 border-b">
+                      {new Date(order.placedAt).toLocaleDateString()}
+                    </td>
+                    <td className="py-2 px-4 border-b">
+                      <button className="bg-blue-500 text-white py-1 px-3 rounded hover:bg-blue-600">
+                        View
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="11" className="py-2 px-4 text-center">
+                    No orders found.
                   </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>
