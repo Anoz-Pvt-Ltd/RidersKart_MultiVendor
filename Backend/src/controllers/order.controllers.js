@@ -150,10 +150,38 @@ const getVendorAllOrders = asyncHandler(async (req, res) => {
   }
 });
 
+const getAllOrders = asyncHandler(async (req, res) => {
+  // const { orderId } = req.body;
+  try {
+    const orders = await Order.find({});
+    res.json(
+      new ApiResponse(200, { orders }, "All users fetched successfully")
+    );
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Server error" });
+  }
+});
+
+const getCurrentOrder = asyncHandler(async (req, res) => {
+  const { orderId } = req.params;
+  try {
+    const orders = await Order.findById({ _id: orderId });
+    res.json(
+      new ApiResponse(200, { orders }, "All users fetched successfully")
+    );
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Server error" });
+  }
+});
+
 export {
   CreateOrder,
   CancelOrder,
   GetVendorOrders,
   getUserAllOrders,
   getVendorAllOrders,
+  getAllOrders,
+  getCurrentOrder,
 };

@@ -17,6 +17,9 @@ import {
   getWishlistProducts,
   getUserAddresses,
   editUserDetails,
+  getAllUsers,
+  getCurrentUser,
+  AdminGetUserAddresses,
   //   getUserProfile,
 } from "../controllers/user.controllers.js";
 
@@ -50,6 +53,11 @@ router.route("/:userId/addresses/:addressId").put(VerifyUser, editAddress);
 router.route("/:userId/addresses/:addressId").delete(VerifyUser, deleteAddress);
 router.route("/edit-user-profile/:userId").post(VerifyUser, editUserDetails);
 // router.route("/user-profile/:userId").get(getUserProfile);
+
+//routes for admin usage
+router.route("/admin/get-all-users").get(getAllUsers);
+router.route("/admin/get-current-user/:userId").get(getCurrentUser);
+router.route("/admin/:userId/addresses").get(AdminGetUserAddresses);
 
 //routes to be handled securely
 router.route("/delete-user-profile").delete(deleteUser);

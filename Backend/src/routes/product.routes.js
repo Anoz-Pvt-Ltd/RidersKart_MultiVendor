@@ -34,4 +34,8 @@ router
   .route("/delete-products/:productId")
   .delete(VerifyVendorUser, deleteProduct);
 
+//routes for admin
+router.route("/admin/get-all-products").get(getAllProducts);
+router.route("/admin/get-single-product/:productId").get(getProduct);
+
 export default router;

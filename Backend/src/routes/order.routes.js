@@ -5,6 +5,8 @@ import {
   GetVendorOrders,
   getUserAllOrders,
   getVendorAllOrders,
+  getAllOrders,
+  getCurrentOrder,
 } from "../controllers/order.controllers.js";
 import {
   VerifyUser,
@@ -24,5 +26,9 @@ router.route("/all-products-of/:userId").get(VerifyUser, getUserAllOrders);
 router
   .route("/all-products-of-vendor/:vendorId")
   .get(VerifyVendorUser, getVendorAllOrders);
+
+//admin routes
+router.route("/admin/all-orders").get(getAllOrders);
+router.route("/admin/current-order/:orderId").get(getCurrentOrder);
 
 export default router;

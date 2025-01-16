@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 import { Route, Routes } from "react-router-dom";
-// import Home from "./Pages/Home/Home";
 import Header from "./Components/Header";
 import { useDispatch } from "react-redux";
 import { FetchData } from "./Utility/FetchFromApi";
@@ -10,6 +9,9 @@ import { clearUser, addUser } from "./Utility/Slice/UserInfoSlice";
 import Dashboard from "./Pages/Home/Home";
 import AdminRegister from "./Pages/Register/Register";
 import AdminLogin from "./Pages/Login/Login";
+import CurrentUser from "./Pages/CurrentUser/CurrentUser";
+import CurrentProduct from "./Pages/CurrentProduct/CurrentProduct";
+import CurrentOrder from "./Pages/CurrentOrder/CurrentOrder";
 
 const App = () => {
   const user = useSelector((store) => store.UserInfo.user);
@@ -54,6 +56,12 @@ const App = () => {
           <Route path="/admin-register" element={<AdminRegister />} />
           <Route path="/" element={<AdminLogin />} />
           <Route path="/home" element={<Dashboard />} />
+          <Route path="/current-user/:userId" element={<CurrentUser />} />
+          <Route
+            path="/current-product/:productId"
+            element={<CurrentProduct />}
+          />
+          <Route path="/current-order/:orderId" element={<CurrentOrder />} />
         </Routes>
       </div>
     </div>

@@ -464,6 +464,24 @@ const getUserAddresses = async (req, res) => {
     res.status(500).json({ message: "Server Error" });
   }
 };
+const AdminGetUserAddresses = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    // Find the user in the database by their ID and return only the addresses field
+    const user = await User.findById(userId).populate("address");
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Return the addresses of the user
+    res.status(200).json(user.address);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
 
 // Controller to edit an existing address
 const editAddress = asyncHandler(async (req, res, next) => {
@@ -562,6 +580,28 @@ const editUserDetails = async (req, res) => {
   }
 };
 
+const getAllUsers = asyncHandler(async (req, res) => {
+  try {
+    const users = await User.find({});
+    res.json(new ApiResponse(200, { users }, "All users fetched successfully"));
+  } catch (error) {
+    throw new ApiError(500, error.message || "Something went wrong");
+  }
+});
+
+const getCurrentUser = asyncHandler(async (req, res) => {
+  const { userId } = req.params;
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      throw new ApiError(404, "User not found");
+    }
+    res.json(new ApiResponse(200, { user }, "User fetched successfully"));
+  } catch (error) {
+    throw new ApiError(500, error.message || "Something went wrong");
+  }
+});
+
 export {
   registerUser,
   loginUser,
@@ -577,7 +617,10 @@ export {
   bookProduct,
   addAddress,
   getUserAddresses,
+  AdminGetUserAddresses,
   editAddress,
   deleteAddress,
   editUserDetails,
+  getAllUsers,
+  getCurrentUser,
 };
