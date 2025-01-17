@@ -11,6 +11,8 @@ import { motion } from "framer-motion";
 import { useSelector } from "react-redux";
 import { FetchData } from "../../Utility/FetchFromApi";
 import { Link } from "react-router-dom";
+import InputBox from "../../Components/InputBox";
+import { all } from "axios";
 
 const Dashboard = () => {
   const user = useSelector((store) => store.UserInfo.user);
@@ -19,6 +21,15 @@ const Dashboard = () => {
   const [allUser, setAllUsers] = useState([]);
   const [allProducts, setAllProducts] = useState([]);
   const [allOrders, setAllOrders] = useState([]);
+  const [allVerifiedVendors, setAllVerifiedVendors] = useState([]);
+  const sectionVariants = {
+    hidden: { opacity: 0, x: -50 },
+    visible: { opacity: 1, x: 0 },
+  };
+  const sidebarVariants = {
+    hidden: { opacity: 0, x: -100 },
+    visible: { opacity: 1, x: 0, transition: { duration: 0.8 } },
+  };
   const tableHeadersUsers = ["ID", "Name", "Email", "Contact No."];
   const tableHeadersProducts = [
     "Product ID",
@@ -33,16 +44,98 @@ const Dashboard = () => {
     "Status",
     "Placed On",
   ];
-  const sectionVariants = {
-    hidden: { opacity: 0, x: -50 },
-    visible: { opacity: 1, x: 0 },
+  const tableHeadersVendors = [
+    "Vendor ID",
+    "Name",
+    "Email",
+    "Contact No.",
+    "Total Products",
+  ];
+
+  const [searchTermUser, setSearchTermUser] = useState("");
+  const [filteredUsers, setFilteredUsers] = useState(allUser);
+
+  const [searchTermProduct, setSearchTermProduct] = useState("");
+  const [filteredProducts, setFilteredProducts] = useState(allProducts);
+
+  const [searchTermOrders, setSearchTermOrders] = useState("");
+  const [filteredOrders, setFilteredOrders] = useState(allOrders);
+
+  const [searchTermVerifiedVendors, setSearchTermVerifiedVendors] =
+    useState("");
+  const [filteredVerifiedVendors, setFilteredVerifiedVendors] =
+    useState(allVerifiedVendors);
+
+  //filtering functions for each entities
+  const handleSearchUser = (e) => {
+    const searchValueUser = e.target.value;
+    setSearchTermUser(searchValueUser);
+
+    if (searchValueUser === "") {
+      setFilteredUsers(allUser);
+    } else {
+      const filtered = allUser.filter(
+        (user) =>
+          user._id.includes(searchValueUser) ||
+          user.phoneNumber.includes(searchValueUser)
+      );
+      setFilteredUsers(filtered);
+    }
+  };
+  const handleSearchProduct = (e) => {
+    const searchValueProduct = e.target.value;
+    setSearchTermProduct(searchValueProduct);
+
+    if (searchValueProduct === "") {
+      setFilteredProducts(allProducts);
+    } else {
+      const filtered = allProducts.filter(
+        (product) =>
+          product._id.includes(searchValueProduct) ||
+          product.vendor.includes(searchValueProduct)
+      );
+      setFilteredProducts(filtered);
+    }
+  };
+  const handleSearchOrder = (e) => {
+    const searchValueOrder = e.target.value;
+    setSearchTermOrders(searchValueOrder);
+
+    if (searchValueOrder === "") {
+      setFilteredOrders(allOrders);
+    } else {
+      const filtered = allOrders.filter(
+        (order) =>
+          order._id.includes(searchValueOrder) ||
+          order.user.includes(searchValueOrder)
+      );
+      setFilteredOrders(filtered);
+    }
+  };
+  const handleSearchVerifiedVendors = (e) => {
+    const searchValueVerifiedVendors = e.target.value;
+    setSearchTermVerifiedVendors(searchValueVerifiedVendors);
+
+    if (searchValueVerifiedVendors === "") {
+      setFilteredVerifiedVendors(allVerifiedVendors);
+    } else {
+      const filtered = allVerifiedVendors.filter(
+        (vendor) =>
+          vendor._id.includes(searchValueVerifiedVendors) ||
+          vendor.contactNumber.includes(searchValueVerifiedVendors)
+      );
+      setFilteredVerifiedVendors(filtered);
+    }
   };
 
-  const sidebarVariants = {
-    hidden: { opacity: 0, x: -100 },
-    visible: { opacity: 1, x: 0, transition: { duration: 0.8 } },
-  };
+  useEffect(() => {
+    setFilteredUsers(allUser);
+    setFilteredProducts(allProducts);
+    setFilteredOrders(allOrders);
+    setFilteredVerifiedVendors(allVerifiedVendors);
+  }, [allUser, allProducts, allOrders, allVerifiedVendors]);
 
+  //fetching all data for all users,products,orders,vendors(verified) and vendors(not-verified)
   useEffect(() => {
     const fetchAllUsers = async () => {
       if (user?.length > 0) {
@@ -95,12 +188,32 @@ const Dashboard = () => {
       }
     };
 
+    const fetchAllVerifiedVendors = async () => {
+      if (user?.length > 0) {
+        try {
+          const response = await FetchData(
+            "vendor/admin/get-all-verified-vendor",
+            "get"
+          );
+          // console.log(response);
+          if (response.data.success) {
+            setAllVerifiedVendors(response.data.data.vendors);
+          } else {
+            setError("Failed to load vendors.");
+          }
+        } catch (err) {
+          setError(err.response?.data?.message || "Failed to fetch vendors.");
+        }
+      }
+    };
+
     fetchAllUsers();
     fetchAllProducts();
     fetchAllOrders();
+    fetchAllVerifiedVendors();
   }, [user]);
 
-  // console.log(allOrders);
+  console.log(allVerifiedVendors);
 
   return (
     <div className="flex min-h-screen">
@@ -186,6 +299,15 @@ const Dashboard = () => {
             <section>
               {/* main component */}
               <h2 className="text-2xl font-bold mb-4">Users</h2>
+              {/* sorting box */}
+              <div className="mb-4">
+                <InputBox
+                  Type="test"
+                  Value={searchTermUser}
+                  onChange={handleSearchUser}
+                  Placeholder={"Search by ID or Contact Number"}
+                />
+              </div>
               <div className="overflow-x-auto">
                 <table className="min-w-full border-collapse border border-gray-300 rounded-xl">
                   <thead>
@@ -201,24 +323,35 @@ const Dashboard = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {allUser.map((user) => (
-                      <tr key={user.id}>
-                        <td className="border border-gray-500 px-4 py-2">
-                          <Link to={`/current-user/${user._id}`}>
-                            {user._id}
-                          </Link>
-                        </td>
-                        <td className="border border-gray-500 px-4 py-2">
-                          {user.name}
-                        </td>
-                        <td className="border border-gray-500 px-4 py-2">
-                          {user.email}
-                        </td>
-                        <td className="border border-gray-500 px-4 py-2">
-                          {user.phoneNumber}
+                    {filteredUsers.length > 0 ? (
+                      filteredUsers.map((user) => (
+                        <tr key={user.id}>
+                          <td className="border border-gray-500 px-4 py-2">
+                            <Link to={`/current-user/${user._id}`}>
+                              {user?._id}
+                            </Link>
+                          </td>
+                          <td className="border border-gray-500 px-4 py-2">
+                            {user?.name}
+                          </td>
+                          <td className="border border-gray-500 px-4 py-2">
+                            {user?.email}
+                          </td>
+                          <td className="border border-gray-500 px-4 py-2">
+                            {user?.phoneNumber}
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td
+                          colSpan={tableHeadersUsers.length}
+                          className="text-center py-4"
+                        >
+                          No users found.
                         </td>
                       </tr>
-                    ))}
+                    )}
                   </tbody>
                 </table>
               </div>
@@ -236,11 +369,73 @@ const Dashboard = () => {
             <section>
               <h2 className="text-2xl font-bold mb-4">Vendors (Verified)</h2>
               {/* Vendors (Verified) content */}
+              <InputBox
+                Type="test"
+                Value={searchTermVerifiedVendors}
+                onChange={handleSearchVerifiedVendors}
+                Placeholder={"Search by Product ID or Vendor ID"}
+              />
+              <div className="overflow-x-auto">
+                <table className="min-w-full border-collapse border border-gray-300 rounded-xl">
+                  <thead>
+                    <tr>
+                      {tableHeadersVendors.map((header, index) => (
+                        <th
+                          key={index}
+                          className="border border-gray-500 px-4 py-2 bg-neutral-300"
+                        >
+                          {header}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredVerifiedVendors.length > 0 ? (
+                      filteredVerifiedVendors.map((vendor) => (
+                        <tr key={vendor.id}>
+                          <td className="border border-gray-500 px-4 py-2">
+                            <Link to={`/current-vendor/${vendor?._id}`}>
+                              {vendor?._id}
+                            </Link>
+                          </td>
+                          <td className="border border-gray-500 px-4 py-2">
+                            {vendor?.name}
+                          </td>
+                          <td className="border border-gray-500 px-4 py-2">
+                            {vendor?.email}
+                          </td>
+                          <td className="border border-gray-500 px-4 py-2">
+                            {vendor?.contactNumber}
+                          </td>
+                          <td className="border border-gray-500 px-4 py-2">
+                            {vendor?.products?.length}
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td
+                          colSpan={tableHeadersProducts.length}
+                          className="text-center py-4"
+                        >
+                          No Vendors found.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </section>
           )}
           {activeSection === "Products" && (
             <section>
               <h2 className="text-2xl font-bold mb-4">Products</h2>
+              <InputBox
+                Type="test"
+                Value={searchTermProduct}
+                onChange={handleSearchProduct}
+                Placeholder={"Search by Product ID or Vendor ID"}
+              />
               <div className="overflow-x-auto">
                 <table className="min-w-full border-collapse border border-gray-300 rounded-xl">
                   <thead>
@@ -256,24 +451,35 @@ const Dashboard = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {allProducts.map((product) => (
-                      <tr key={product.id}>
-                        <td className="border border-gray-500 px-4 py-2">
-                          <Link to={`/current-product/${product._id}`}>
-                            {product._id}
-                          </Link>
-                        </td>
-                        <td className="border border-gray-500 px-4 py-2">
-                          {product.vendor}
-                        </td>
-                        <td className="border border-gray-500 px-4 py-2">
-                          {product.category.main}
-                        </td>
-                        <td className="border border-gray-500 px-4 py-2">
-                          {product.category.sub}
+                    {filteredProducts.length > 0 ? (
+                      filteredProducts.map((product) => (
+                        <tr key={product.id}>
+                          <td className="border border-gray-500 px-4 py-2">
+                            <Link to={`/current-product/${product._id}`}>
+                              {product._id}
+                            </Link>
+                          </td>
+                          <td className="border border-gray-500 px-4 py-2">
+                            {product.vendor}
+                          </td>
+                          <td className="border border-gray-500 px-4 py-2">
+                            {product.category.main}
+                          </td>
+                          <td className="border border-gray-500 px-4 py-2">
+                            {product.category.sub}
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td
+                          colSpan={tableHeadersProducts.length}
+                          className="text-center py-4"
+                        >
+                          No products found.
                         </td>
                       </tr>
-                    ))}
+                    )}
                   </tbody>
                 </table>
               </div>
@@ -283,6 +489,12 @@ const Dashboard = () => {
             <section>
               <h2 className="text-2xl font-bold mb-4">Orders</h2>
               <div className="overflow-x-auto">
+                <InputBox
+                  Type="text"
+                  Value={searchTermOrders}
+                  onChange={handleSearchOrder}
+                  Placeholder={"Search by Product ID or Vendor ID"}
+                />
                 <table className="min-w-full border-collapse border border-gray-300 rounded-xl">
                   <thead>
                     <tr>
@@ -297,27 +509,38 @@ const Dashboard = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {allOrders.map((order) => (
-                      <tr key={order.id}>
-                        <td className="border border-gray-500 px-4 py-2">
-                          <Link to={`/current-order/${order._id}`}>
-                            {order._id}
-                          </Link>
-                        </td>
-                        <td className="border border-gray-500 px-4 py-2">
-                          {order.user}
-                        </td>
-                        <td className="border border-gray-500 px-4 py-2">
-                          {order.totalAmount}
-                        </td>
-                        <td className="border border-gray-500 px-4 py-2">
-                          {order.orderStatus}
-                        </td>
-                        <td className="border border-gray-500 px-4 py-2">
-                          {order.bookingDate}
+                    {filteredOrders.length > 0 ? (
+                      filteredOrders.map((order) => (
+                        <tr key={order.id}>
+                          <td className="border border-gray-500 px-4 py-2">
+                            <Link to={`/current-order/${order._id}`}>
+                              {order._id}
+                            </Link>
+                          </td>
+                          <td className="border border-gray-500 px-4 py-2">
+                            {order?.user}
+                          </td>
+                          <td className="border border-gray-500 px-4 py-2">
+                            {order.totalAmount}
+                          </td>
+                          <td className="border border-gray-500 px-4 py-2">
+                            {order.orderStatus}
+                          </td>
+                          <td className="border border-gray-500 px-4 py-2">
+                            {order.bookingDate}
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td
+                          colSpan={tableHeadersOrder.length}
+                          className="text-center py-4"
+                        >
+                          No orders found.
                         </td>
                       </tr>
-                    ))}
+                    )}
                   </tbody>
                 </table>
               </div>

@@ -282,6 +282,41 @@ const getVendorDetailsByProductId = async (req, res) => {
   }
 };
 
+const getAllVendors = asyncHandler(async (req, res) => {
+  try {
+    const vendors = await VendorUser.find({});
+    res.json(
+      new ApiResponse(200, { vendors }, "All vendors fetched successfully")
+    );
+  } catch (error) {
+    throw new ApiError(500, error.message || "Something went wrong");
+  }
+});
+
+const getCurrentVendor = asyncHandler(async (req, res) => {
+  const { vendorId } = req.params;
+  try {
+    const vendor = await VendorUser.findById(vendorId);
+    if (!vendor) {
+      throw new ApiError(404, "vendor not found");
+    }
+    res.json(new ApiResponse(200, { vendor }, "vendor fetched successfully"));
+  } catch (error) {
+    throw new ApiError(500, error.message || "Something went wrong");
+  }
+});
+
+const VendorBan = asyncHandler(async (req, res) => {
+  const { vendorId } = req.params;
+
+  const vendor = await VendorUser.findById(vendorId);
+  if (!vendor) throw new ApiError(404, "vendor not found");
+
+  vendor.isBanned = !vendor.isBanned;
+  vendor.save();
+  res.status(200).json(new ApiResponse(200, vendor, "vendor status updated"));
+});
+
 export {
   registerVendor,
   loginVendor,
@@ -290,4 +325,7 @@ export {
   editVendor,
   deleteVendor,
   getVendorDetailsByProductId,
+  getAllVendors,
+  getCurrentVendor,
+  VendorBan,
 };

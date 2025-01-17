@@ -602,6 +602,17 @@ const getCurrentUser = asyncHandler(async (req, res) => {
   }
 });
 
+const UserBan = asyncHandler(async (req, res) => {
+  const { userId } = req.params;
+
+  const user = await User.findById(userId);
+  if (!user) throw new ApiError(404, "user not found");
+
+  user.isBanned = !user.isBanned;
+  user.save();
+  res.status(200).json(new ApiResponse(200, user, "User status updated"));
+});
+
 export {
   registerUser,
   loginUser,
@@ -623,4 +634,5 @@ export {
   editUserDetails,
   getAllUsers,
   getCurrentUser,
+  UserBan,
 };

@@ -20,6 +20,7 @@ import {
   getAllUsers,
   getCurrentUser,
   AdminGetUserAddresses,
+  UserBan,
   //   getUserProfile,
 } from "../controllers/user.controllers.js";
 
@@ -58,6 +59,7 @@ router.route("/edit-user-profile/:userId").post(VerifyUser, editUserDetails);
 router.route("/admin/get-all-users").get(getAllUsers);
 router.route("/admin/get-current-user/:userId").get(getCurrentUser);
 router.route("/admin/:userId/addresses").get(AdminGetUserAddresses);
+router.route("/admin/ban-user/:userId").post(UserBan);
 
 //routes to be handled securely
 router.route("/delete-user-profile").delete(deleteUser);

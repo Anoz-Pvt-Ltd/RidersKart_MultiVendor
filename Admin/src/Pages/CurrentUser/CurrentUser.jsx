@@ -54,13 +54,31 @@ const CurrentUser = () => {
     fetchAllAddress();
   }, [user]);
 
-  console.log(currentUser);
+  const HandleUserBan = async () => {
+    try {
+      const response = await FetchData(
+        `users/admin/ban-user/${userId}`,
+        "post"
+      );
+      console.log(response);
+      if (response.statusText) {
+        alert("User Banned Successfully");
+      } else {
+        alert("Failed to ban user");
+      }
+    } catch (err) {
+      console.log(err);
+      alert("Failed to ban user");
+    }
+  };
+
+  // console.log(currentUserAddress);
 
   return (
     <div className="p-5">
       <div className="flex justify-center items-center gap-10 py-10">
-        <Button label={"Ban User"} />
-        <Button label={"Edit User"} />
+        <Button label={"Ban User"} onClick={HandleUserBan} />
+        {/* <Button label={"Edit User"} /> */}
         <div>
           <h1>
             User Id:{" "}
@@ -73,64 +91,34 @@ const CurrentUser = () => {
         <h2 className="text-2xl font-semibold text-gray-800 mb-4">
           User Details
         </h2>
-        <table className="min-w-full table-auto">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">
-                Email
-              </th>
-              <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">
-                Name
-              </th>
-              <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">
-                Contact Number
-              </th>
-              <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">
-                Account Created On
-              </th>
-              <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">
-                Total Address Stored
-              </th>
-              <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">
-                Total Orders
-              </th>
-              <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">
-                Total Cart Products
-              </th>
-              <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">
-                Total Wishlist Products
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr className="border-t">
-              <td className="px-4 py-2 text-sm text-gray-700">
-                {currentUser?.email}
-              </td>
-              <td className="px-4 py-2 text-sm text-gray-700">
-                {currentUser?.name}
-              </td>
-              <td className="px-4 py-2 text-sm text-gray-700">
-                {currentUser?.phoneNumber}
-              </td>
-              <td className="px-4 py-2 text-sm text-gray-700">
-                {currentUser?.createdAt}
-              </td>
-              <td className="px-4 py-2 text-sm text-gray-700">
-                {currentUser?.address?.length}
-              </td>
-              <td className="px-4 py-2 text-sm text-gray-700">
-                {currentUser?.totalOrders}
-              </td>
-              <td className="px-4 py-2 text-sm text-gray-700">
-                {currentUser?.CartProducts?.length}
-              </td>
-              <td className="px-4 py-2 text-sm text-gray-700">
-                {currentUser?.WishList?.length}
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <div className="space-y-4">
+          {[
+            { label: "Email", value: currentUser?.email },
+            { label: "Name", value: currentUser?.name },
+            { label: "Contact Number", value: currentUser?.phoneNumber },
+            { label: "Account Created On", value: currentUser?.createdAt },
+            {
+              label: "Total Address Stored",
+              value: currentUser?.address?.length,
+            },
+            { label: "Total Orders", value: currentUser?.totalOrders },
+            {
+              label: "Total Cart Products",
+              value: currentUser?.CartProducts?.length,
+            },
+            {
+              label: "Total Wishlist Products",
+              value: currentUser?.WishList?.length,
+            },
+          ].map((item, index) => (
+            <div key={index} className="flex">
+              <span className="font-medium text-gray-600 w-1/3">
+                {item.label}
+              </span>
+              <span className="text-sm text-gray-700">{item.value}</span>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

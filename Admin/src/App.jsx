@@ -12,6 +12,7 @@ import AdminLogin from "./Pages/Login/Login";
 import CurrentUser from "./Pages/CurrentUser/CurrentUser";
 import CurrentProduct from "./Pages/CurrentProduct/CurrentProduct";
 import CurrentOrder from "./Pages/CurrentOrder/CurrentOrder";
+import CurrentVerifiedVendor from "./Pages/Current-VerifiedVendor/CurrentVerifiedVendor";
 
 const App = () => {
   const user = useSelector((store) => store.UserInfo.user);
@@ -62,6 +63,10 @@ const App = () => {
             element={<CurrentProduct />}
           />
           <Route path="/current-order/:orderId" element={<CurrentOrder />} />
+          <Route
+            path="/current-vendor/:vendorId"
+            element={<CurrentVerifiedVendor />}
+          />
         </Routes>
       </div>
     </div>

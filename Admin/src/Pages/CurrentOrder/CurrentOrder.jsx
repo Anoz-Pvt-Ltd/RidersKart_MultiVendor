@@ -20,7 +20,6 @@ const CurrentOrder = () => {
             `orders/admin/current-order/${orderId}`,
             "get"
           );
-          //   console.log(response);
           if (response.data.success) {
             setCurrentOrder(response.data.data.orders);
             setCurrentOrderProducts(response.data.data.orders.products);
@@ -41,16 +40,6 @@ const CurrentOrder = () => {
   //   console.log(currentOrderProducts);
   //   console.log(CurrentOrderAddress);
 
-  const Entities = [
-    { label: "User Id" },
-    { label: "Product Id" },
-    { label: "Shipping Address" },
-    { label: "Booking Date" },
-    { label: "Order Status" },
-    { label: "Payment Status" },
-    { label: "Amount" },
-    { label: "Vendor Id" },
-  ];
 
   const fullAddress = `${CurrentOrderAddress?.street}, ${CurrentOrderAddress?.city}, ${CurrentOrderAddress?.state} ${CurrentOrderAddress?.postalCode}, ${CurrentOrderAddress?.country}`;
 
@@ -70,46 +59,33 @@ const CurrentOrder = () => {
           <Button label={"Make Order Pending"} />
           <Button label={"Cancel Order"} />
         </div>
-        <table className="min-w-full table-auto mt-10">
-          <thead>
-            <tr className="bg-gray-100">
-              {Entities.map((header, index) => (
-                <th
-                  key={index}
-                  className="px-4 py-2 text-left text-sm font-medium text-gray-600"
-                >
-                  {header.label}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            <tr className="border-t">
-              <td className="px-4 py-2 text-sm text-gray-700">
-                {currentOrder?.user}
-              </td>
-              <td className="px-4 py-2 text-sm text-gray-700">
-                {currentOrderProducts?.[0]?._id}
-              </td>
-              <td className="px-4 py-2 text-sm text-gray-700">{fullAddress}</td>
-              <td className="px-4 py-2 text-sm text-gray-700">
-                {currentOrder?.bookingDate}
-              </td>
-              <td className="px-4 py-2 text-sm text-gray-700">
-                {currentOrder?.orderStatus}
-              </td>
-              <td className="px-4 py-2 text-sm text-gray-700">
-                {currentOrder?.paymentStatus}
-              </td>
-              <td className="px-4 py-2 text-sm text-gray-700">
-                ₹ {currentOrderProducts?.[0]?.price}
-              </td>
-              <td className="px-4 py-2 text-sm text-gray-700">
-                {currentOrder?.vendor}
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <div className="p-6 mx-auto bg-white shadow-md rounded-lg">
+          <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+            Order Details
+          </h2>
+          <div className="space-y-4">
+            {[
+              { label: "User", value: currentOrder?.user },
+              { label: "Product ID", value: currentOrderProducts?.[0]?._id },
+              { label: "Address", value: fullAddress },
+              { label: "Booking Date", value: currentOrder?.bookingDate },
+              { label: "Order Status", value: currentOrder?.orderStatus },
+              { label: "Payment Status", value: currentOrder?.paymentStatus },
+              {
+                label: "Price",
+                value: `₹ ${currentOrderProducts?.[0]?.price}`,
+              },
+              { label: "Vendor", value: currentOrder?.vendor },
+            ].map((item, index) => (
+              <div key={index} className="flex">
+                <span className="font-medium text-gray-600 w-1/3">
+                  {item.label}
+                </span>
+                <span className="text-xl font-medium text-gray-700">{item.value}</span>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );
