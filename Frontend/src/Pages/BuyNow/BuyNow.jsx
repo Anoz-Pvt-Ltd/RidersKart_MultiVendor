@@ -9,7 +9,7 @@ const BuyNow = () => {
   const { productId } = useParams();
   const [product, setProduct] = useState(null);
   const [addresses, setAddresses] = useState([]);
-  const [selectedAddress, setSelectedAddress] = useState("");
+  const [selectedAddress, setSelectedAddress] = useState();
   const [paymentMethod, setPaymentMethod] = useState("");
   const [productVendor, setProductVendor] = useState("");
   const [error, setError] = useState("");
@@ -18,6 +18,8 @@ const BuyNow = () => {
   const HandleHome = () => {
     Navigate("/");
   };
+
+  console.log(addresses[selectedAddress]);
 
   useEffect(() => {
     const fetchProductDetails = async () => {
@@ -102,19 +104,12 @@ const BuyNow = () => {
         "post",
         {
           quantity,
-          addressId: selectedAddress,
           paymentMethod,
-          shippingAddress: {
-            postalCode: "12345",
-            country: "CountryName",
-            state: "StateName",
-            city: "CityName",
-            street: "StreetName",
-          },
+          shippingAddress: addresses[selectedAddress],
           orderStatus: "booked", // Ensure this is a valid enum value in your model
         }
       );
-      console.log(response);
+      // console.log(response);
 
       if (response.data.success) {
         alert("Order placed successfully!");
@@ -153,15 +148,11 @@ const BuyNow = () => {
               onChange={handleAddressChange}
               className="bg-gray-400 p-5 rounded-xl outline-none"
             >
-              <option value="" disabled>
+              <option value="" selected disabled>
                 Select an address
               </option>
-              {addresses?.map((address) => (
-                <option
-                  key={address?._id}
-                  value={address?._id}
-                  className="bg-white"
-                >
+              {addresses?.map((address, index) => (
+                <option key={address?._id} value={index} className="bg-white">
                   {`${address?.street}, ${address?.city}, ${address?.state}, ${address?.country}, ${address?.postalCode}`}
                 </option>
               ))}
