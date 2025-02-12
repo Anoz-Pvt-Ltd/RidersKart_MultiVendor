@@ -1,16 +1,16 @@
 import dotenv from "dotenv";
 import connectDB from "./db/index.js";
-import { app } from "./app.js";
+import { server } from "./app.js";
 
 dotenv.config({ path: "./env" });
 
 connectDB()
   .then(() => {
-    app.on("error", (err) => {
+    server.on("error", (err) => {
       console.log("ERROR", err);
     });
 
-    app.listen(process.env.PORT || 2000, () => {
+    server.listen(process.env.PORT || 2000, () => {
       console.log("Server is running at the post:" + process.env.PORT);
     });
   })
