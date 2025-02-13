@@ -8,8 +8,9 @@ import { FetchData } from "../../Utility/FetchFromApi";
 import { useDispatch } from "react-redux";
 import { clearUser, addUser } from "../../Utility/Slice/UserInfoSlice";
 import { parseErrorMessage } from "../../Utility/ErrorMessageParser";
+import LoadingUI from "../../Components/Loading";
 
-const Login = () => {
+const Login = ({ startLoading, stopLoading }) => {
   const Navigate = useNavigate();
   const Dispatch = useDispatch();
 
@@ -37,6 +38,7 @@ const Login = () => {
     e.preventDefault();
     setError("");
     setSuccess("");
+    startLoading(); // Start loading when login button is clicked
 
     try {
       const response = await FetchData("users/login", "post", formData);
@@ -60,6 +62,8 @@ const Login = () => {
       console.log(error);
       // alert(parseErrorMessage(error.response.data.data.statusCode));
       alert("Invalid login credentials");
+    } finally {
+      stopLoading(); // Stop loading once response is received
     }
   };
 
@@ -127,4 +131,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default LoadingUI(Login);

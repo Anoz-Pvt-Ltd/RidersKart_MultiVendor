@@ -7,6 +7,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { Product } from "../models/products.models.js";
 import { Order } from "../models/order.models.js";
 import bcrypt from "bcrypt";
+import SendMail from "../utils/Nodemailer.js";
 
 const generateAccessAndRefreshTokens = async (userId) => {
   try {
@@ -74,6 +75,9 @@ const loginUser = asyncHandler(async (req, res) => {
   const { AccessToken, RefreshToken } = await generateAccessAndRefreshTokens(
     user?._id
   );
+
+  const mailSent = await SendMail();
+  console.log(mailSent);
 
   const options = {
     httpOnly: true,
