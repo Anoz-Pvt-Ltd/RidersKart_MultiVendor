@@ -1,7 +1,7 @@
 import axios from "axios";
 
-// export const DomainUrl = "http://localhost:3000";
-export const DomainUrl = "https://multi-vendor-e-commerce.onrender.com";
+export const DomainUrl = "http://localhost:3000";
+// export const DomainUrl = "https://multi-vendor-e-commerce.onrender.com";
 
 export const FetchData = async (url, method, data) => {
   const Base_URL = `${DomainUrl}/api/v1`;

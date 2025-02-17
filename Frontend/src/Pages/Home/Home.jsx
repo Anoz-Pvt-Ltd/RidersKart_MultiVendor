@@ -49,7 +49,7 @@ const Home = () => {
     }, []);
 
     return (
-      <div className="relative w-full h-96 mx-auto overflow-hidden rounded-lg mb-20">
+      <div className="relative w-full lg:h-96 h-64 mx-auto overflow-hidden rounded-lg lg:mb-20">
         <div
           className="transition-transform duration-500 ease-in-out flex items-top object-center"
           style={{ transform: `translateX(-${currentIndex * 100}%)` }}
@@ -93,7 +93,7 @@ const Home = () => {
         <div className="bg-red-500 text-white p-4 rounded">{error}</div>
       )}
 
-      <div>
+      <div className="">
         {categories.map((category, index) => {
           const scrollContainer = useRef(null);
 
@@ -143,7 +143,7 @@ const Home = () => {
 
               <div
                 ref={scrollContainer}
-                className="flex overflow-x-auto overflow-y-hidden scrollbar-hide gap-4 h-60 justify-center items-center py-20"
+                className="flex overflow-x-auto overflow-y-hidden scrollbar-hide gap-4 lg:h-60 justify-start items-start lg:py-20 "
               >
                 {category.items.map((item, idx) => (
                   <Link
@@ -169,15 +169,15 @@ const Home = () => {
           );
         })}
       </div>
-      <div className="flex gap-4 bg-transparent justify-center items-center overflow-x-auto p-5 max-w-full">
+      <div className="flex gap-4 bg-transparent justify-start items-center overflow-x-auto p-5 max-w-full">
         {products.map((product) => (
           <ProductCard
             key={product?._id}
             ProductName={product?.name}
             CurrentPrice={product?.price}
-            Mrp={product?.price} // Assuming the price is the same for now
+            Mrp={product?.price}
             Rating={product?.rating || "No rating"}
-            Offer={"No offer"} // If the offer isn't provided, adjust this as needed
+            Offer={"No offer"}
             Category={product?.category}
             StockQuantity={product?.stockQuantity}
           />
