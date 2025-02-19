@@ -1,21 +1,28 @@
 import express from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import { Server as SocketIOServer } from "socket.io";
-import http from "http";
+// import { Server as SocketIOServer } from "socket.io";
+// import http from "http";
 
 const app = express();
 
-const server = http.createServer(app);
-const io = new SocketIOServer(server, {
-  cors: {
-    origin: "http://localhost:5173/",
-    credentials: true,
-  },
-});
+// const server = http.createServer(app);
+// const io = new SocketIOServer(server, {
+//   cors: {
+//     origin: "http://localhost:5173/",
+//     credentials: true,
+//   },
+// });
+
+const allowedDomains = [
+  "http://localhost:5174/",
+  "http://localhost:5176/",
+  "http://localhost:5175/",
+  "http://localhost:5173/",
+];
 
 const corsOptions = {
-  origin: "http://localhost:5173/",
+  origin: allowedDomains,
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"],
@@ -35,20 +42,20 @@ app.use((req, res, next) => {
   next();
 });
 
-io.on("connection", (socket) => {
-  console.log(`User connected: ${socket.id}`);
+// io.on("connection", (socket) => {
+//   console.log(`User connected: ${socket.id}`);
 
-  socket.on("UsersRoom", (userId) => {
-    if (userId) {
-      socket.join(userId);
-      console.log(`User ${userId} joined their room`);
-    }
-  });
+//   socket.on("UsersRoom", (userId) => {
+//     if (userId) {
+//       socket.join(userId);
+//       console.log(`User ${userId} joined their room`);
+//     }
+//   });
 
-  socket.on("disconnect", () => {
-    console.log(`User disconnected: ${socket.id}`);
-  });
-});
+//   socket.on("disconnect", () => {
+//     console.log(`User disconnected: ${socket.id}`);
+//   });
+// });
 
 // routers
 import vendorRouter from "./routes/vendor.routes.js";
@@ -72,4 +79,4 @@ app.use("/api/v1/users", userRouter);
 //admin routes
 app.use("/api/v1/admins", adminRouter);
 
-export { app, server, io };
+export { app };
