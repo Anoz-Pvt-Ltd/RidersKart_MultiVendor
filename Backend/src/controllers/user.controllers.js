@@ -45,14 +45,17 @@ const registerUser = asyncHandler(async (req, res, next) => {
     password,
     address,
   });
-  const token = newUser.generateAccessToken();
+  if (!newUser) throw new ApiError(500, "Internal server error");
+  const { RefreshToken, AccessToken } = await generateAccessAndRefreshTokens(
+    newUser._id
+  );
 
   res
     .status(201)
     .json(
       new ApiResponse(
         201,
-        { user: newUser, token },
+        { user: newUser, token: { RefreshToken, AccessToken } },
         "User registered successfully"
       )
     );

@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import { FetchData } from "../../Utility/FetchFromApi";
 import InputBox from "../../Components/InputBox";
 import Button from "../../Components/Button";
+import { addUser, clearUser } from "../../Utility/Slice/UserInfoSlice";
+import {  useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
 
 const UserRegister = () => {
   const [formData, setFormData] = useState({
@@ -17,6 +20,8 @@ const UserRegister = () => {
   });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const navigate = useNavigate();
+  const Dispatch = useDispatch();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -61,6 +66,18 @@ const UserRegister = () => {
 
     try {
       const response = await FetchData("users/register", "post", dataToSend);
+      console.log(response);
+
+      localStorage.clear(); // will clear the all the data from localStorage
+      localStorage.setItem("AccessToken", response.data.data.token.AccessToken);
+      localStorage.setItem(
+        "RefreshToken",
+        response.data.data.token.RefreshToken
+      );
+      Dispatch(clearUser());
+      Dispatch(addUser(response.data.data.user));
+      navigate("/");
+      alert(response.data.message);
 
       if (response.status === 201) {
         setSuccess("User registered successfully!");

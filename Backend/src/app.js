@@ -6,23 +6,16 @@ import cors from "cors";
 
 const app = express();
 
-// const server = http.createServer(app);
-// const io = new SocketIOServer(server, {
-//   cors: {
-//     origin: "http://localhost:5173/",
-//     credentials: true,
-//   },
-// });
-
-const allowedDomains = [
-  "http://localhost:5174/",
-  "http://localhost:5176/",
-  "http://localhost:5175/",
-  "http://localhost:5173/",
-];
+const server = http.createServer(app);
+const io = new SocketIOServer(server, {
+  cors: {
+    origin: "http://localhost:5173",
+    credentials: true,
+  },
+});
 
 const corsOptions = {
-  origin: allowedDomains,
+  origin: "http://localhost:5173",
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"],

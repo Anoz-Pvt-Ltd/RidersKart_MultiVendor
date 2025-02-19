@@ -207,17 +207,17 @@ const Dashboard = () => {
       <Lottie width={50} height={50} animationData={Loading} />
     </div>
   ) : (
-    <div className="flex min-h-screen">
+    <div className="flex flex-col lg:flex-row min-h-screen">
       <motion.aside
-        className="w-64 text-black p-4 shadow-lg"
+        className="lg:w-64 text-black p-4 shadow-lg"
         initial="hidden"
         animate="visible"
         variants={sidebarVariants}
       >
         <nav>
-          <ul>
+          <ul className="flex lg:flex-col justify-evenly items-center lg:jun">
             <li
-              className={`p-4 rounded-md mb-2 cursor-pointer transition-all duration-300 ${
+              className={`lg:p-4 rounded-md lg:mb-2 cursor-pointer transition-all duration-300 p-2 flex flex-col justify-center items-center lg:justify-start lg:items-start lg:w-full ${
                 activeSection === "profile"
                   ? "bg-blue-600 text-white"
                   : "bg-gray-300 text-black"
@@ -227,7 +227,7 @@ const Dashboard = () => {
               {<User />}Profile
             </li>
             <li
-              className={`p-4 rounded-md mb-2 cursor-pointer transition-all duration-300 ${
+              className={`lg:p-4 rounded-md lg:mb-2 cursor-pointer transition-all duration-300 p-2 flex flex-col justify-center items-center lg:justify-start lg:items-start lg:w-full ${
                 activeSection === "orders"
                   ? "bg-blue-600 text-white"
                   : "bg-gray-300 text-black"
@@ -237,17 +237,17 @@ const Dashboard = () => {
               {<ListOrdered />}Orders
             </li>
             <li
-              className={`p-4 rounded-md mb-2 cursor-pointer transition-all duration-300 ${
+              className={`lg:p-4 rounded-md lg:mb-2 cursor-pointer transition-all duration-300 p-2 flex flex-col justify-center items-center lg:justify-start lg:items-start lg:w-full ${
                 activeSection === "coupons"
                   ? "bg-blue-600 text-white"
                   : "bg-gray-300 text-black"
               }`}
               onClick={() => setActiveSection("coupons")}
             >
-              {<Newspaper />}Available Coupons
+              {<Newspaper />} Coupons
             </li>
             <li
-              className={`p-4 rounded-md cursor-pointer transition-all duration-300 ${
+              className={`lg:p-4 rounded-md cursor-pointer transition-all duration-300 p-2 flex flex-col justify-center items-center lg:justify-start lg:items-start lg:w-full ${
                 activeSection === "wishlist"
                   ? "bg-blue-600 text-white"
                   : "bg-gray-300 text-black"
@@ -268,9 +268,9 @@ const Dashboard = () => {
         >
           {activeSection === "profile" && (
             <section className="flex justify-center items-center flex-col">
-              <div className="flex w-full justify-evenly items-center mb-20 shadow py-10 rounded-xl">
-                <div>
-                  <h2 className="text-2xl font-bold mb-4 flex justify-center items-center ">
+              <div className="flex lg:flex-row flex-col w-full justify-evenly items-center mb-20 lg:shadow py-10 rounded-xl">
+                <div className="name">
+                  <h2 className="text-2xl font-bold mb-4 flex justify-center items-center hidden lg:block">
                     <span>
                       <UserCheck className="mr-5" />
                     </span>
@@ -278,25 +278,25 @@ const Dashboard = () => {
                   </h2>
                   <p>
                     Name:{" "}
-                    <span className="text-2xl font-bold">
+                    <span className="lg:text-2xl font-bold">
                       {user?.[0]?.name}
                     </span>
                   </p>
                   <p>
                     Email:{" "}
-                    <span className="text-2xl font-bold">
+                    <span className="lg:text-2xl font-bold">
                       {user?.[0]?.email}
                     </span>
                   </p>
                   <p>
                     Number:{" "}
-                    <span className="text-2xl font-bold">
+                    <span className="lg:text-2xl font-bold">
                       {user?.[0]?.phoneNumber}
                     </span>
                   </p>
                 </div>
-                <div className="flex flex-col gap-5 justify-center items-center">
-                  <div className="flex justify-evenly items-center gap-5">
+                <div className="flex flex-col gap-5 justify-center items-center mt-10 lg:mt-0">
+                  <div className="button flex flex-col lg:flex-row justify-evenly items-center gap-5">
                     <Button
                       onClick={navigateHome}
                       // label={<ShoppingBag/>"Continue Shopping"}
@@ -328,7 +328,7 @@ const Dashboard = () => {
                     />
                     {/* <Button label={"Add Address"} /> */}
                   </div>
-                  <div className="flex justify-evenly items-center gap-5">
+                  <div className="button flex flex-col lg:flex-row justify-evenly items-center gap-5">
                     <Button
                       onClick={openModal}
                       label={
@@ -355,7 +355,7 @@ const Dashboard = () => {
                   </div>
                 </div>
               </div>
-              <div className="flex flex-wrap flex-col">
+              <div className="address flex flex-wrap flex-col">
                 <p className="m-10 font-bold text-xl">
                   Select a Default Address:
                 </p>

@@ -69,8 +69,8 @@ const Login = ({ startLoading, stopLoading }) => {
 
   return (
     <div>
-      <section className="flex m-28 border rounded-lg shadow-md shadow-neutral-300 h-96 ">
-        <div className="w-1/2 p-10 rounded-lg rounded-r-none headerBg text-white">
+      <section className="flex lg:m-28 lg:border rounded-lg lg:shadow-md lg:shadow-neutral-300 lg:h-96 my-20">
+        <div className="lg:w-1/2 p-10 rounded-lg rounded-r-none headerBg text-white hidden lg:block">
           <h1 className="text-4xl h-3/4 text-white font-semibold">
             Login with your e-mail to get started !
           </h1>
@@ -79,7 +79,7 @@ const Login = ({ startLoading, stopLoading }) => {
             <MoveRight />
           </h1>
         </div>
-        <div className=" w-1/2 flex justify-center items-center flex-col whiteSoftBG">
+        <div className=" lg:w-1/2 w-full flex justify-center items-center flex-col lg:whiteSoftBG">
           <form
             ref={formRef}
             className="login h-3/4 flex justify-top items-top flex-col w-3/4"
@@ -114,13 +114,13 @@ const Login = ({ startLoading, stopLoading }) => {
               onClick={handleSubmit}
             />
           </form>
-          <div className="w-full h-full justify-center items-center flex flex-col">
+          <div className="w-full h-full justify-center items-center flex flex-col mt-20 lg:mt-0">
             <Button
               label={"Register Here"}
               onClick={NavigateRegister}
               className={"w-1/2 hover:bg-green-500"}
             />
-            <p className="text-xs text-neutral-500">
+            <p className="text-xs text-neutral-500 text-center">
               ** By continuing, you agree to our Terms of Use and Privacy
               Policy.
             </p>
