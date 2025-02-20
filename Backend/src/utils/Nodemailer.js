@@ -5,13 +5,13 @@ function SendMail() {
   async function main() {
     // send mail with defined transport object
     const transporter = nodemailer.createTransport({
-     //  host: "smtp.ethereal.email",
-     service: "gmail",
+      //  host: "smtp.ethereal.email",
+      service: "gmail",
       port: 465,
       secure: true, // true for port 465, false for other ports
       auth: {
-        user: "vivekkrishan440@gmail.com",
-        pass: "bniijsumpnfmeykb",
+        user: "",
+        pass: "",
       },
     });
 

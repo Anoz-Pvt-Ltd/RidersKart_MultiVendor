@@ -79,8 +79,8 @@ const loginUser = asyncHandler(async (req, res) => {
     user?._id
   );
 
-  const mailSent = await SendMail();
-  console.log(mailSent);
+  // const mailSent = await SendMail();
+  // console.log(mailSent);
 
   const options = {
     httpOnly: true,
