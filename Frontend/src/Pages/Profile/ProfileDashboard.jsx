@@ -22,6 +22,7 @@ import Lottie from "lottie-react";
 import Loading from "../../assets/Loading/Loading.json";
 import { useNavigate } from "react-router";
 import { clearUser } from "../../Utility/Slice/UserInfoSlice";
+import ProductCardMobile from "../../Components/ProductCardMobile";
 
 const Dashboard = () => {
   const user = useSelector((store) => store.UserInfo.user);
@@ -552,7 +553,7 @@ const Dashboard = () => {
                 <span>{wishlistProducts?.length} items.</span>
               </h1>
               {/* {console.log(wishlistProducts)} */}
-              <div className="flex justify-start items-start gap-5 flex-wrap p-5 ">
+              <div className="flex justify-start items-start gap-5 flex-wrap p-5">
                 {wishlistProducts?.map((product, index) => (
                   <ProductCard
                     key={index}
@@ -563,6 +564,21 @@ const Dashboard = () => {
                     Offer={product?.off}
                     Description={product?.description}
                     productId={product?._id}
+                    className={`hidden lg:block`}
+                  />
+                ))}
+              </div>
+              <div className="flex justify-start items-start gap-5 flex-wrap lg:hidden">
+                {wishlistProducts?.map((product, index) => (
+                  <ProductCardMobile
+                    key={product._id}
+                    ProductName={product.name}
+                    CurrentPrice={product.price}
+                    Mrp={product.price}
+                    Rating={product.rating || "No rating"}
+                    Offer="No offer"
+                    Category={product.category.main}
+                    StockQuantity={product.stockQuantity}
                   />
                 ))}
               </div>

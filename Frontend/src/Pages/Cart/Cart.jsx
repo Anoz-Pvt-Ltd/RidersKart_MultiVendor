@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import { FetchData } from "../../Utility/FetchFromApi";
 import ProductCard from "../../Components/ProductCard";
 import Button from "../../Components/Button";
+import ProductCardMobile from "../../Components/ProductCardMobile";
 
 const CartPage = () => {
   const [cartProducts, setCartProducts] = useState([]);
@@ -158,9 +159,24 @@ const CartPage = () => {
       <h1 className="text-xl mx-4 my-10 w-full text-center border-t border-neutral-400 font-bold">
         Recommendations
       </h1>
-      <div className="flex flex-wrap gap-4 bg-transparent justify-center items-center overflow-x-auto p-5 w-full">
+      <div className="flex flex-row gap-4 bg-transparent justify-start items-center overflow-x-auto p-5 w-full">
         {products.map((product) => (
           <ProductCard
+            key={product._id}
+            ProductName={product.name}
+            CurrentPrice={product.price}
+            Mrp={product.price}
+            Rating={product.rating || "No rating"}
+            Offer="No offer"
+            Category={product.category.main}
+            StockQuantity={product.stockQuantity}
+            className={`hidden lg:block`}
+          />
+        ))}
+      </div>
+      <div className="flex lg:hidden flex-col gap-4 bg-transparent justify-start items-center overflow-x-auto w-full">
+        {products.map((product) => (
+          <ProductCardMobile
             key={product._id}
             ProductName={product.name}
             CurrentPrice={product.price}
