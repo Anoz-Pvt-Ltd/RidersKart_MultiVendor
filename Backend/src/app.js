@@ -1,8 +1,8 @@
 import express from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-// import { Server as SocketIOServer } from "socket.io";
-// import http from "http";
+import { Server as SocketIOServer } from "socket.io";
+import http from "http";
 
 const app = express();
 
