@@ -4,18 +4,25 @@ import cors from "cors";
 import { Server as SocketIOServer } from "socket.io";
 import http from "http";
 
+const allowedOrigins = [
+  process.env.ORIGIN_1,
+  process.env.ORIGIN_2,
+  process.env.ORIGIN_3,
+  process.env.ORIGIN_4,
+];
+
 const app = express();
 
 const server = http.createServer(app);
 const io = new SocketIOServer(server, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: allowedOrigins,
     credentials: true,
   },
 });
 
 const corsOptions = {
-  origin: "http://localhost:5173",
+  origin: allowedOrigins,
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"],
