@@ -56,6 +56,10 @@ const VendorProfile = () => {
   return (
     <div className="p-6 rounded-lg shadow-md max-w-5xl mx-auto">
       {/* Profile Header */}
+      <div className="flex gap-4 justify-evenly items-center border-b-2 pb-5 lg:hidden">
+        <Button label="Home" onClick={handleHome} />
+        <Button label="Edit Profile" onClick={handleHome} />
+      </div>
       <motion.div
         className="flex items-center justify-between border-b pb-4 mb-6"
         initial={{ opacity: 0, y: -20 }}
@@ -76,7 +80,7 @@ const VendorProfile = () => {
             </p>
           </div>
         </div>
-        <div className="flex gap-4">
+        <div className="lg:flex gap-4 hidden ">
           <Button label="Home" onClick={handleHome} />
           <Button label="Edit Profile" onClick={handleHome} />
         </div>
