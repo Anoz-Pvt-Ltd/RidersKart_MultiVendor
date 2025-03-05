@@ -313,9 +313,11 @@ const Dashboard = () => {
                     <Button
                       onClick={() => {
                         Dispatch(clearUser());
-                        navigate("/login");
-                        alertInfo("you are logged Out! Please log in");
-                        localStorage.clear();
+                        localStorage.removeItem("AccessToken");
+                        localStorage.removeItem("RefreshToken");
+                        alert("You are logged out! Please log in.");
+                        setTimeout(() => navigate("/login"), 100);
+                        console.log(localStorage.getItem("RefreshToken"));
                       }}
                       className={"hover:bg-orange-500"}
                       label={

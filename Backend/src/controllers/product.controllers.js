@@ -1,4 +1,6 @@
+import { Category } from "../models/category.model.js";
 import { Product } from "../models/products.models.js";
+import { Subcategory } from "../models/sub-category.model.js";
 import { VendorUser } from "../models/vendorUser.models.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
@@ -31,31 +33,43 @@ const registerProduct = asyncHandler(async (req, res) => {
     !category?.sub ||
     !price ||
     !stockQuantity ||
-    !sku
+    !sku // Stock keeping unit => Provided to every unique type of products for keeping track of quantity.
   ) {
     throw new ApiError(400, "All required fields must be filled");
   }
 
   // Validate main category
-  const mainCategoryData = categories.find(
-    (cat) => cat.title === category.main
-  );
-  if (!mainCategoryData) {
-    throw new ApiError(400, "Invalid main category");
-  }
+  // const mainCategoryData = categories.find(
+  //   (cat) => cat.title === category.main
+  // );
+  // if (!mainCategoryData) {
+  //   throw new ApiError(400, "Invalid main category");
+  // }
 
-  // Validate subcategory
-  if (!mainCategoryData.items.includes(category.sub)) {
-    throw new ApiError(
-      400,
-      "Invalid subcategory for the selected main category"
-    );
-  }
+  // // Validate subcategory
+  // if (!mainCategoryData.items.includes(category.sub)) {
+  //   throw new ApiError(
+  //     400,
+  //     "Invalid subcategory for the selected main category"
+  //   );
+  // }
+
+  // Validate main category
+  const existingCategory = await Category.findById(category.main);
+  if (!existingCategory) throw new ApiError(400, "Invalid category selected");
+
+  const existingSubCategory = await Subcategory.findById(category.sub);
+  if (!existingSubCategory)
+    throw new ApiError(400, "Invalid subcategory selected");
 
   // Check if SKU already exists
   const existingProduct = await Product.findOne({ sku });
   if (existingProduct) {
-    throw new ApiError(400, "A product with this SKU already exists");
+    // throw new ApiError(400, "A product with this SKU already exists");
+    throw new ApiError(
+      400,
+      "This product might have already been added!! Please try increasing the quantity"
+    );
   }
 
   // Verify vendor exists
@@ -68,7 +82,8 @@ const registerProduct = asyncHandler(async (req, res) => {
   const newProduct = new Product({
     name,
     description,
-    category,
+    category: category.main,
+    subcategory: category.sub,
     price,
     stockQuantity,
     sku,
@@ -209,8 +224,8 @@ const getProductByCategory = asyncHandler(async (req, res) => {
 
   // Fetch the product by category and subcategory
   const products = await Product.find({
-    "category.main": category,
-    "category.sub": subcategory,
+    category,
+    subcategory,
   });
 
   // Check if products are found
