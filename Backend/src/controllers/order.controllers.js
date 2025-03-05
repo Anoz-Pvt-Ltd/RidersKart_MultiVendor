@@ -136,6 +136,8 @@ const getVendorAllOrders = asyncHandler(async (req, res) => {
       "products.product"
     );
 
+    console.log(orders)
+
     if (!orders || orders.length === 0) {
       return res.status(404).json({ message: "No orders found for this user" });
     }
