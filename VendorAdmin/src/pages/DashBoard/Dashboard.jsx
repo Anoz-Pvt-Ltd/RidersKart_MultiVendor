@@ -13,10 +13,12 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { clearUser } from "../../utils/Slice/UserInfoSlice";
 import { FetchData } from "../../utils/FetchFromApi";
+import { motion } from "framer-motion";
+import { Menu, X } from "lucide-react";
 
 const Dashboard = () => {
   const user = useSelector((store) => store.UserInfo.user);
-  // console.log(user);
+  console.log(user);
   const Dispatch = useDispatch();
   const [selectedMenu, setSelectedMenu] = useState("Home");
   const navigate = useNavigate();
@@ -92,7 +94,6 @@ const Dashboard = () => {
       },
     ],
   });
-  // console.log(user?.[0]?._id);
 
   const fetchProducts = async () => {
     try {
@@ -156,12 +157,11 @@ const Dashboard = () => {
       case "Home":
       default:
         return (
-          <div>
-            <div className="grid grid-cols-4 gap-6 mb-6">
+          <div className="flex flex-col gap-5">
+            <div className="flex flex-col lg:flex-row gap-4 lg:gap-0 lg:justify-evenly lg:w-full lg:items-center">
               <div className="p-4 bg-white shadow rounded">
                 <h3 className="text-gray-500">Total Orders</h3>
                 <p className="text-2xl font-bold">{allOrders?.length}</p>
-                {/* <p className="text-2xl font-bold">order</p> */}
               </div>
               <div className="p-4 bg-white shadow rounded">
                 <h3 className="text-gray-500">Products</h3>
@@ -181,12 +181,13 @@ const Dashboard = () => {
                 <p className="text-2xl font-bold">2,02,14,448.18</p>
               </div>
             </div>
-            <div className="flex justify-center items-center">
+
+            <div className="flex justify-center items-center ">
               {/* <div className="bg-white shadow rounded p-4">
                 <h3 className="text-gray-500 mb-4">Monthly Orders</h3>
                 <Bar data={barData} />
               </div> */}
-              <div className="bg-white shadow rounded p-4 w-1/2">
+              <div className="bg-white shadow rounded p-4 lg:w-1/2 w-full ">
                 <h3 className="text-gray-500 mb-4">
                   Category Wise Product's Count
                 </h3>
@@ -198,9 +199,105 @@ const Dashboard = () => {
     }
   };
 
+  const Hamburger = () => {
+    const [hamburger, showHamburger] = useState(false);
+    const menuVariants = {
+      hidden: { x: "-100%", opacity: 0 },
+      visible: {
+        x: "0%",
+        opacity: 1,
+        transition: { duration: 0.4, ease: "easeOut" },
+      },
+      exit: {
+        x: "-100%",
+        opacity: 0,
+        transition: { duration: 0.3, ease: "easeIn" },
+      },
+    };
+    return (
+      <div className="  w-full lg:hidden bg-purple-600 flex justify-start py-5 ">
+        <div className="flex justify-start items-center w-full gap-10">
+          <button
+            className={`ml-5 border rounded-lg p-1 text-white`}
+            onClick={() => showHamburger(true)}
+          >
+            <Menu />
+          </button>
+          <h1>
+            Hello, <span className="text-white">{user?.[0]?.name}</span>
+          </h1>
+        </div>
+
+        {hamburger && (
+          <motion.div
+            variants={menuVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            className="dashboard w-full h-screen bg-gray-800 text-white flex flex-col absolute top-0 "
+          >
+            <div className="p-4 text-2xl font-bold bg-purple-600 flex justify-between items-center">
+              <h1>Dashboard</h1>
+              <button onClick={() => showHamburger(false)} className="">
+                <X />
+              </button>
+            </div>
+            <ul className="flex-1">
+              {[
+                "Home",
+                "Orders",
+                "Categories",
+                "Brands",
+                "Manage Stock",
+                "Products",
+                "Wallet Transactions",
+              ].map((menu) => (
+                <li
+                  key={menu}
+                  className={`p-4 hover:bg-gray-700 cursor-pointer ${
+                    selectedMenu === menu ? "bg-gray-700" : ""
+                  }`}
+                  onClick={() => setSelectedMenu(menu)}
+                >
+                  {menu}
+                </li>
+              ))}
+            </ul>
+            <div className="mb-10 w-full flex flex-col gap-5 justify-center items-center p-5">
+              {user?.length > 0 ? (
+                <div className="flex flex-col justify-center items-center gap-5 w-full">
+                  <Button
+                    label={"View Profile"}
+                    className={"w-full"}
+                    onClick={handleProfile}
+                  />
+                  <Button
+                    label={"Logout"}
+                    className={"w-full"}
+                    onClick={() => {
+                      Dispatch(clearUser());
+                      alert("you are logged Out! Please log in");
+                      navigate("/login");
+                    }}
+                  />
+                </div>
+              ) : (
+                <Button
+                  label={"Login"}
+                  className={"w-full"}
+                  onClick={handleLogin}
+                />
+              )}
+            </div>
+          </motion.div>
+        )}
+      </div>
+    );
+  };
+
   return (
-    <div className="flex h-screen bg-gray-100">
-      <div className="w-64 bg-gray-800 text-white flex flex-col">
+    <div className="flex lg:flex-row flex-col h-screen bg-gray-100">
+      <div className="dashboard w-64 bg-gray-800 text-white lg:flex flex-col hidden ">
         <div className="p-4 text-2xl font-bold bg-purple-600">Dashboard</div>
         <ul className="flex-1">
           {[
@@ -249,6 +346,9 @@ const Dashboard = () => {
             />
           )}
         </div>
+      </div>
+      <div>
+        <Hamburger />
       </div>
 
       <div className="flex-1 p-6 overflow-y-auto">{renderContent()}</div>

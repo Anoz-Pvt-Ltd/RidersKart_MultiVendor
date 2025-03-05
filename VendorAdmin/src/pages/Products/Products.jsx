@@ -8,7 +8,7 @@ import { categories } from "../../constants/AllProducts.Vendor";
 
 const Products = () => {
   const user = useSelector((store) => store.UserInfo.user);
-  console.log(user);
+  // console.log(user);
 
   const [newProduct, setNewProduct] = useState({
     name: "",
@@ -116,7 +116,7 @@ const Products = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-4 sm:p-6 bg-white shadow-lg rounded-lg">
+    <div className="lg:max-w-6xl lg:mx-auto lg:p-4 bg-white shadow-lg rounded-lg">
       <h1 className="text-2xl font-bold text-gray-800 mb-4 sm:mb-6">
         Vendor Products
       </h1>
@@ -132,14 +132,14 @@ const Products = () => {
       />
 
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50 p-4 sm:p-6">
-          <div className="bg-white flex flex-col rounded-lg shadow-lg w-full">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50 p-4 h-screen w-screen overflow-auto">
+          <div className="bg-white flex flex-col rounded-lg shadow-lg w-full h-fit mt-96 lg:mt-0 overflow-auto">
+            <h2 className="text-lg font-semibold text-gray-800 lg:mb-4 pl-5">
               Add New Product
             </h2>
             <form
               onSubmit={handleAddProduct}
-              className="flex w-full justify-evenly items-center"
+              className="flex flex-col lg:flex-row overscroll-scroll w-full justify-evenly items-center"
             >
               <div className="flex flex-col justify-start items-center">
                 <InputBox
