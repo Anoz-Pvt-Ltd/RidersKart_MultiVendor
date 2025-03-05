@@ -1,9 +1,9 @@
 import { Category } from "../models/category.model.js";
 import { Product } from "../models/products.models.js";
 import { Subcategory } from "../models/sub-category.model.js";
-import { ApiError } from "../utils/ApiError";
+import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
-import { asyncHandler } from "../utils/asyncHandler";
+import { asyncHandler } from "../utils/asyncHandler.js";
 
 const AddCategory = asyncHandler(async (req, res) => {
   const { category, subcategory } = req.body;
@@ -13,6 +13,9 @@ const AddCategory = asyncHandler(async (req, res) => {
 
   if (typeof category !== "string" || typeof subcategory !== "string")
     throw new ApiError(400, "Invalid input type for category or subcategory!");
+
+  const existingCategory = await Category.findOne({ title: category });
+  if (existingCategory) throw new ApiError(400, "Category already exists!");
 
   const newCategory = await Category.create({
     title: category,
@@ -66,6 +69,13 @@ const AddSubcategory = asyncHandler(async (req, res) => {
 
   if (typeof subcategory !== "string")
     throw new ApiError(400, "Invalid input type for subcategory!");
+
+  const existingSubcategory = await Subcategory.findOne({
+    title: subcategory,
+    category: categoryId,
+  });
+  if (existingSubcategory)
+    throw new ApiError(400, "Subcategory already exists!");
 
   const category = await Category.findById(categoryId);
   if (!category) throw new ApiError(404, "Category not found!");

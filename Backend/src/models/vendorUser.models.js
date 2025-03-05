@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import mongoose from "mongoose";
 import Jwt from "jsonwebtoken";
+import { Subcategory } from "./sub-category.model";
 
 const vendorSchema = new mongoose.Schema({
   name: {
@@ -59,6 +60,19 @@ const vendorSchema = new mongoose.Schema({
       ref: "Product",
     },
   ],
+
+  category: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Category",
+    required: true,
+  },
+
+  Subcategory: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Subcategory",
+    required: true,
+  },
+
   businessDetails: {
     gstNumber: {
       type: String,
