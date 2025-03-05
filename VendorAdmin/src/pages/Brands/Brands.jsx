@@ -102,18 +102,18 @@ const Brands = () => {
       <h2 className="text-2xl font-bold text-gray-700 mb-4">Brands</h2>
 
       {/* Search and Sort */}
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex flex-col lg:flex-row w-full justify-evenly items-center mb-4 gap-4 lg:gap-0">
         <input
           type="text"
           placeholder="Search by name..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="border px-3 py-2 rounded w-1/3"
+          className="border px-3 py-2 rounded lg:w-1/3 w-full"
         />
         <select
           value={sortBy}
           onChange={handleSortChange}
-          className="border px-3 py-2 rounded"
+          className="border px-3 py-2 rounded w-full lg:w-1/3 "
         >
           <option value="name">Sort by Name</option>
           <option value="products">Sort by Products</option>
