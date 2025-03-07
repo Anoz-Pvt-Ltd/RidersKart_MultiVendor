@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import {
+  ChevronDown,
   Heart,
   ListOrdered,
   Newspaper,
   Package,
   ScanLine,
   User,
+  X,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useSelector } from "react-redux";
@@ -13,6 +15,9 @@ import { FetchData } from "../../Utility/FetchFromApi";
 import { Link } from "react-router-dom";
 import InputBox from "../../Components/InputBox";
 import { all } from "axios";
+import Button from "../../Components/Button";
+import { useRef } from "react";
+import { ClipboardCopy } from "lucide-react";
 
 const Dashboard = () => {
   const user = useSelector((store) => store.UserInfo.user);
@@ -22,6 +27,16 @@ const Dashboard = () => {
   const [allProducts, setAllProducts] = useState([]);
   const [allOrders, setAllOrders] = useState([]);
   const [allVerifiedVendors, setAllVerifiedVendors] = useState([]);
+  const [AllCategories, setAllCategories] = useState([]);
+  const [selectedCategoryId, setSelectedCategoryId] = useState(null);
+  const [handlePopup, setHandlePopup] = useState({
+    addCategoryPopup: false,
+    allCategoryPopup: false,
+    allSubCategoryPopup: false,
+    addSubCategory: false,
+  });
+  const formRef = useRef(null);
+
   const sectionVariants = {
     hidden: { opacity: 0, x: -50 },
     visible: { opacity: 1, x: 0 },
@@ -89,7 +104,7 @@ const Dashboard = () => {
     if (searchValueProduct === "") {
       setFilteredProducts(allProducts);
     } else {
-      const filtered = allProducts.filter(
+      const filtered = allProducts?.filter(
         (product) =>
           product._id.includes(searchValueProduct) ||
           product.vendor.includes(searchValueProduct)
@@ -213,7 +228,75 @@ const Dashboard = () => {
     fetchAllVerifiedVendors();
   }, [user]);
 
-  console.log(allVerifiedVendors);
+  // const formData = new FormData(formRef.current);
+  // console.log(formData);
+  const submitCategory = async () => {
+    const formData = new FormData(formRef.current);
+
+    for (let [key, value] of formData.entries()) {
+      console.log(`${key}: ${value}`);
+    }
+
+    try {
+      const response = await FetchData(
+        "main-sub-category/main-category/add",
+        "post",
+        formData
+      );
+      console.log(response);
+      // setAddShowCategoryPopup(false);
+      alert("Your category has been added successfully");
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  useEffect(() => {
+    const getAllMainSubcategories = async () => {
+      try {
+        const response = await FetchData(
+          "main-sub-category/get-all-main-sub-categories",
+          "get"
+        );
+        console.log(response);
+
+        // Ensure categories exist before setting state
+        setAllCategories(response.data?.data?.categories || []);
+      } catch (error) {
+        console.log("Error getting all main subcategories", error);
+      }
+    };
+
+    getAllMainSubcategories();
+  }, []);
+
+  const submitSubCategory = async (categoryId) => {
+    const formData = new FormData(formRef.current);
+    formData.append("category", categoryId); // Attach category ID
+
+    // Debugging: Log form data before sending it
+    for (let [key, value] of formData.entries()) {
+      console.log(key, value);
+    }
+
+    try {
+      const response = await FetchData(
+        "main-sub-category/sub-category/add",
+        "post",
+        formData
+      );
+      console.log("Subcategory Added:", response);
+      alert("Subcategory Added Successfully!");
+      window.location.reload();
+
+      setHandlePopup((prev) => ({
+        ...prev,
+        addSubCategory: false, // Close popup after submission
+      }));
+    } catch (error) {
+      console.error("Error adding subcategory:", error);
+    }
+  };
 
   return (
     <div className="flex min-h-screen">
@@ -437,6 +520,208 @@ const Dashboard = () => {
                 Placeholder={"Search by Product ID or Vendor ID"}
               />
               <div className="overflow-x-auto">
+                <div className="py-4 flex w-full justify-start items-center gap-5">
+                  <Button
+                    label={"Add Category"}
+                    onClick={() =>
+                      setHandlePopup((prev) => {
+                        return { ...prev, addCategoryPopup: true };
+                      })
+                    }
+                  />
+                  <Button
+                    label={"Show all available categories or subcategories"}
+                    onClick={() =>
+                      setHandlePopup((prev) => {
+                        return { ...prev, allCategoryPopup: true };
+                      })
+                    }
+                  />
+                </div>
+                {handlePopup.addCategoryPopup && (
+                  <div className="backdrop-blur-xl absolute top-0 w-full h-full flex justify-center items-center flex-col left-0">
+                    <div className="bg-white shadow-2xl rounded-xl w-96 h-96 flex justify-center items-center">
+                      <form
+                        ref={formRef}
+                        onSubmit={submitCategory}
+                        className="flex flex-col gap-2 "
+                      >
+                        <h1>Add Main & Sub category</h1>
+                        <InputBox
+                          LabelName={"Category"}
+                          Placeholder={"Add Category"}
+                          Name={"category"}
+                          Required
+                        />
+                        <InputBox
+                          LabelName={"Sub Category"}
+                          Placeholder={"Add Sub Category"}
+                          Name={"subcategory"}
+                          Required
+                        />
+                        <Button label={"Confirm"} type={"submit"} />
+                        <Button
+                          label={"Cancel"}
+                          onClick={() =>
+                            setHandlePopup((prev) => {
+                              return { ...prev, addCategoryPopup: false };
+                            })
+                          }
+                          className={"hover:bg-red-500"}
+                        />
+                      </form>
+                    </div>
+                  </div>
+                )}
+                {handlePopup.allCategoryPopup && (
+                  <div className="backdrop-blur-3xl absolute top-0 h-full w-full left-0 ">
+                    <Button
+                      label={<X />}
+                      onClick={() =>
+                        setHandlePopup((prev) => {
+                          return { ...prev, allCategoryPopup: false };
+                        })
+                      }
+                    />
+                    {AllCategories.map((category) => (
+                      <div
+                        key={category._id}
+                        className="p-4 border rounded shadow-md"
+                      >
+                        <div className="flex justify-between items-center">
+                          <div>
+                            <h2 className="text-sm font-semibold">
+                              Main category:{" "}
+                              <span className="text-xl">{category.title}</span>
+                            </h2>
+                            <p className="text-gray-600">
+                              Category ID: {category._id}
+                            </p>
+                          </div>
+
+                          {/* Toggle Dropdown Button */}
+                          <Button
+                            label={<ChevronDown />}
+                            onClick={() =>
+                              setHandlePopup((prev) => ({
+                                ...prev,
+                                [category._id]: !prev[category._id], // Toggle dropdown for specific category
+                              }))
+                            }
+                          />
+                        </div>
+
+                        {/* Dropdown for Subcategories */}
+                        {handlePopup[category._id] && (
+                          <div className="mt-3">
+                            {/* Add Subcategory Button */}
+                            <Button
+                              label={<h1>Add more in {category.title}</h1>}
+                              onClick={() => {
+                                setSelectedCategoryId(category._id); // Store category ID
+                                // setSelectedCategoryId(category.title); // Store category ID
+                                setHandlePopup((prev) => ({
+                                  ...prev,
+                                  addSubCategory: true,
+                                }));
+                              }}
+                            />
+
+                            {/* Form Popup */}
+                            {handlePopup.addSubCategory &&
+                              selectedCategoryId === category._id && (
+                                <div className="h-full w-full bg-opacity-90 bg-neutral-300 absolute top-0 left-0 flex justify-center items-center">
+                                  <form
+                                    ref={formRef}
+                                    className="flex flex-col justify-center px-10 rounded-xl gap-2 bg-white py-10"
+                                    onSubmit={(e) => {
+                                      e.preventDefault();
+                                      submitSubCategory(category._id); // Pass category ID to function
+                                    }}
+                                  >
+                                    <h2 className="text-sm font-semibold">
+                                      Main category:{" "}
+                                      <span className="text-xl">
+                                        {category.title}
+                                      </span>
+                                    </h2>
+
+                                    <InputBox
+                                      LabelName={"Add Sub Category"}
+                                      Placeholder={"Sub category"}
+                                      Name={"subcategory"}
+                                      Required
+                                    />
+                                    <InputBox
+                                      LabelName={
+                                        <h1>
+                                          Paste the main category ID below{" "}
+                                          <span className="text-blue-600 font-semibold">
+                                            {category._id}
+                                          </span>
+                                          <button
+                                            onClick={() => {
+                                              navigator.clipboard.writeText(
+                                                category._id
+                                              );
+                                              alert("Category ID copied!");
+                                            }}
+                                            className="ml-2 p-1 border rounded bg-gray-200 hover:bg-gray-300 transition"
+                                          >
+                                            <ClipboardCopy size={16} />
+                                          </button>
+                                        </h1>
+                                      }
+                                      Placeholder={"Paste the above ID"}
+                                      Name={"categoryId"}
+                                      Required
+                                    />
+                                    {/* <InputBox
+                                      LabelName={"Main category id"}
+                                      Placeholder={category._id}
+                                      name={"subcategory"}
+                                      Required
+                                      DisableRequired={true}
+                                    /> */}
+
+                                    <Button label={"Add"} type="submit" />
+                                    <Button
+                                      className={"hover:bg-red-500"}
+                                      label={"Cancel"}
+                                      onClick={() =>
+                                        setHandlePopup((prev) => ({
+                                          ...prev,
+                                          addSubCategory: false,
+                                        }))
+                                      }
+                                    />
+                                  </form>
+                                </div>
+                              )}
+
+                            {/* Display Subcategories */}
+                            {category.subcategories.length > 0 ? (
+                              <>
+                                <h3 className="font-medium">Subcategories:</h3>
+                                <ul className="list-disc pl-5">
+                                  {category.subcategories.map((sub) => (
+                                    <li key={sub._id} className="text-gray-700">
+                                      {sub.title} (ID: {sub._id})
+                                    </li>
+                                  ))}
+                                </ul>
+                              </>
+                            ) : (
+                              <p className="text-gray-500">
+                                No subcategories available
+                              </p>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
                 <table className="min-w-full border-collapse border border-gray-300 rounded-xl">
                   <thead>
                     <tr>

@@ -25,7 +25,7 @@ const Home = () => {
   };
 
   useEffect(() => {
-    fetchProducts();
+    // fetchProducts();
   }, []);
 
   const BannerSlider = () => {
@@ -170,7 +170,7 @@ const Home = () => {
         })}
       </div>
       <div className="flex gap-4 bg-transparent justify-start items-center overflow-x-auto p-5 max-w-full">
-        {products.map((product) => (
+        {products?.map((product) => (
           <ProductCard
             key={product?._id}
             ProductName={product?.name}

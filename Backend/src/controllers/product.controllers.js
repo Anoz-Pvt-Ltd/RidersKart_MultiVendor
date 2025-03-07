@@ -112,19 +112,45 @@ const registerProduct = asyncHandler(async (req, res) => {
 });
 
 const getAllProducts = asyncHandler(async (req, res) => {
-  const products = await Product.find();
+  try {
+    const { category, subcategory, vendor, page = 1, limit = 10 } = req.query;
 
-  if (!products || products.length === 0) {
-    throw new ApiError(404, "No products found");
+    const filter = {};
+    if (category) filter.category = category;
+    if (subcategory) filter.subcategory = subcategory;
+    if (vendor) filter.vendor = vendor;
+
+    const products = await Product.find(filter)
+      .populate("category", "name") 
+      .populate("subcategory", "name") 
+      .populate("vendor", "name email")
+      .sort({ createdAt: -1 }) 
+      .skip((page - 1) * limit) 
+      .limit(parseInt(limit));
+
+    if (!products || products.length === 0) {
+      throw new ApiError(404, "No products found");
+    }
+
+    const totalProducts = await Product.countDocuments(filter);
+
+    const response = new ApiResponse(
+      200,
+      {
+        total: totalProducts,
+        page: parseInt(page),
+        limit: parseInt(limit),
+        products,
+      },
+      "Products fetched successfully"
+    );
+
+    res.status(response.statusCode).json(response);
+  } catch (error) {
+    throw new ApiError(500, error.message || "Internal Server Error");
   }
-
-  const response = new ApiResponse(
-    200,
-    products,
-    "Products fetched successfully"
-  );
-  res.status(response.statusCode).json(response);
 });
+
 
 const getProductsOfVendor = asyncHandler(async (req, res) => {
   // console.log("controller reached");

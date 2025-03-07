@@ -4,199 +4,135 @@ import { useEffect, useState } from "react";
 import { FetchData } from "../../Utility/FetchFromApi";
 
 const AllProducts = () => {
-  const allproducts = [
-    {
-      ProductName: "just another product",
-      CurrentPrice: 500,
-      Mrp: 1000,
-      Rating: "4.5",
-      off: "50% OFF",
-    },
-    {
-      ProductName: "just another product",
-      CurrentPrice: 800,
-      Mrp: 1200,
-      Rating: "4.0",
-      off: "33% OFF",
-    },
-    {
-      ProductName: "just another product",
-      CurrentPrice: 1200,
-      Mrp: 1500,
-      Rating: "4.8",
-      off: "20% OFF",
-    },
-    {
-      ProductName: "just another product",
-      CurrentPrice: 1200,
-      Mrp: 1500,
-      Rating: "4.8",
-      off: "20% OFF",
-    },
-    {
-      ProductName: "just another product",
-      CurrentPrice: 1200,
-      Mrp: 1500,
-      Rating: "4.8",
-      off: "20% OFF",
-    },
-    {
-      ProductName: "just another product",
-      CurrentPrice: 1200,
-      Mrp: 1500,
-      Rating: "4.8",
-      off: "20% OFF",
-    },
-    {
-      ProductName: "just another product",
-      CurrentPrice: 1200,
-      Mrp: 1500,
-      Rating: "4.8",
-      off: "20% OFF",
-    },
-    {
-      ProductName: "just another product",
-      CurrentPrice: 1200,
-      Mrp: 1500,
-      Rating: "4.8",
-      off: "20% OFF",
-    },
-    {
-      ProductName: "just another product",
-      CurrentPrice: 1200,
-      Mrp: 1500,
-      Rating: "4.8",
-      off: "20% OFF",
-    },
-    {
-      ProductName: "just another product",
-      CurrentPrice: 1200,
-      Mrp: 1500,
-      Rating: "4.8",
-      off: "20% OFF",
-    },
-    {
-      ProductName: "just another product",
-      CurrentPrice: 1200,
-      Mrp: 1500,
-      Rating: "4.8",
-      off: "20% OFF",
-    },
-    {
-      ProductName: "just another product",
-      CurrentPrice: 1200,
-      Mrp: 1500,
-      Rating: "4.8",
-      off: "20% OFF",
-    },
-    {
-      ProductName: "just another product",
-      CurrentPrice: 1200,
-      Mrp: 1500,
-      Rating: "4.8",
-      off: "20% OFF",
-    },
-    {
-      ProductName: "just another product",
-      CurrentPrice: 1200,
-      Mrp: 1500,
-      Rating: "4.8",
-      off: "20% OFF",
-    },
-    {
-      ProductName: "just another product",
-      CurrentPrice: 1200,
-      Mrp: 1500,
-      Rating: "4.8",
-      off: "20% OFF",
-    },
-    {
-      ProductName: "just another product",
-      CurrentPrice: 1200,
-      Mrp: 1500,
-      Rating: "4.8",
-      off: "20% OFF",
-    },
-  ];
-
-  const [products, setProducts] = useState();
+  const [products, setProducts] = useState([]);
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
   const { category, subcategory } = useParams();
-  // console.log("response");
-  // console.log(category, subcategory);
 
-  // useEffect(() => {
-  //   const fetchProducts = async () => {
-  //     try {
-  //       const response = await FetchData(
-  //         `products/get-all-product/${category}/${subcategory}`,
-  //         // `products/get-all-product`,
-  //         "get"
-  //       );
-  //       console.log("response");
-  //       console.log(response);
-  //       if (response.data.success) {
-  //         setProducts(response.data.data);
-  //       } else {
-  //         setError("Failed to load products.");
-  //       }
-  //     } catch (err) {
-  //       setError(err.response?.data?.message || "Failed to fetch products.");
-  //     }
-  //   };
+  const fetchProducts = async (page = 1) => {
+    setLoading(true);
+    setError(null);
 
-  //   fetchProducts();
-  // }, [category]);
-
-  const fetchProducts = async () => {
     try {
+      const queryParams = new URLSearchParams({
+        category: category || "",
+        subcategory: subcategory || "",
+        page,
+        limit: 10,
+      }).toString();
+
       const response = await FetchData(
-        `products/get-all-product/${category}/${subcategory}`,
-        // `products/get-all-product`,
+        `products/get-all-products?${queryParams}`,
         "get"
       );
-      // console.log("response");
       console.log(response);
+
       if (response.data.success) {
-        setProducts(response.data.data);
+        setProducts(response.data.data.products);
+        setTotalPages(Math.ceil(response.data.data.total / 10));
       } else {
         setError("Failed to load products.");
       }
     } catch (err) {
       setError(err.response?.data?.message || "Failed to fetch products.");
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    // console.log("response");
-    fetchProducts();
-  }, []);
+    fetchProducts(page);
+  }, [category, subcategory, page]);
 
   return (
     <div className="flex flex-col flex-wrap justify-center gap-6 p-4">
       <div>
         <h1 className="text-3xl font-bold">
-          {category}:{" "}
-          <span className="text-xl font-medium ml-20">{subcategory}</span>
+          {category || "All Products"}{" "}
+          {subcategory && (
+            <span className="text-xl font-medium ml-4"> - {subcategory}</span>
+          )}
         </h1>
-        {/* <h1 className="text-3xl">{subcategory}</h1> */}
       </div>
-      <div className="flex flex-wrap justify-start items-center gap-6 p-4">
-        {products?.map((product, index) => (
-          <ProductCard
-            key={index}
-            ProductName={product?.name}
-            CurrentPrice={product?.price}
-            Mrp={product?.price}
-            Rating={product?.Rating}
-            Offer={product?.off}
-            Description={product?.description}
-            productId={product?._id}
-          />
-        ))}
-      </div>
+
+      {loading ? (
+        <p className="text-center text-gray-600">Loading products...</p>
+      ) : error ? (
+        <p className="text-center text-red-500">{error}</p>
+      ) : (
+        <div className="flex flex-wrap justify-start items-center gap-6 p-4">
+          {products.length > 0 ? (
+            products.map((product, index) => (
+              <ProductCard
+                key={product._id}
+                ProductName={product.name}
+                CurrentPrice={product.price}
+                Mrp={product.price}
+                Rating={product.Rating}
+                Offer={product.off}
+                Description={product.description}
+                productId={product._id}
+              />
+            ))
+          ) : (
+            <p className="text-center text-gray-500">No products found.</p>
+          )}
+        </div>
+      )}
+
+      {/* Pagination Controls */}
+      {totalPages > 1 && (
+        <div className="flex justify-center items-center mt-4">
+          <button
+            className="px-4 py-2 bg-gray-300 rounded-md mr-2 disabled:opacity-50"
+            onClick={() => setPage(page - 1)}
+            disabled={page === 1}
+          >
+            Previous
+          </button>
+          <span className="text-lg font-medium">
+            {page} / {totalPages}
+          </span>
+          <button
+            className="px-4 py-2 bg-gray-300 rounded-md ml-2 disabled:opacity-50"
+            onClick={() => setPage(page + 1)}
+            disabled={page === totalPages}
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   );
 };
 
 export default AllProducts;
+
+// console.log("response");
+// console.log(category, subcategory);
+
+// useEffect(() => {
+//   const fetchProducts = async () => {
+//     try {
+//       const response = await FetchData(
+//         `products/get-all-product/${category}/${subcategory}`,
+//         // `products/get-all-product`,
+//         "get"
+//       );
+//       console.log("response");
+//       console.log(response);
+//       if (response.data.success) {
+//         setProducts(response.data.data);
+//       } else {
+//         setError("Failed to load products.");
+//       }
+//     } catch (err) {
+//       setError(err.response?.data?.message || "Failed to fetch products.");
+//     }
+//   };
+
+//   fetchProducts();
+// }, [category]);

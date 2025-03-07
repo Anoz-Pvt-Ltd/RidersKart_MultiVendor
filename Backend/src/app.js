@@ -63,6 +63,7 @@ import productRouter from "./routes/product.routes.js";
 import orderRouter from "./routes/order.routes.js";
 import userRouter from "./routes/user.routes.js";
 import adminRouter from "./routes/admin.routes.js";
+import categoryRouter from "./routes/category-and-subcategory.routes.js";
 
 //vendor routes
 app.use("/api/v1/vendor", vendorRouter);
@@ -78,5 +79,8 @@ app.use("/api/v1/users", userRouter);
 
 //admin routes
 app.use("/api/v1/admins", adminRouter);
+
+//category and subcategory routes
+app.use("/api/v1/main-sub-category", categoryRouter);
 
 export { app };

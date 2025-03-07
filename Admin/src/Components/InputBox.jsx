@@ -8,6 +8,7 @@ const InputBox = ({
   Name,
   Value,
   onChange,
+  DisableRequired = false, // Default: Input is enabled
   Required = true,
 }) => {
   return (
@@ -24,10 +25,17 @@ const InputBox = ({
           name={Name}
           type={Type}
           value={Value}
-          onChange={onChange}
+          onChange={!DisableRequired ? onChange : undefined} // Prevents change when disabled
           placeholder={Placeholder}
           required={Required}
-          className={`w-full px-4 py-2 text-gray-700 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 outline-none transition duration-200 ease-in-out hover:shadow-md ${className}`}
+          disabled={DisableRequired} // Disables input if required
+          className={`w-full px-4 py-2 border rounded-md outline-none transition duration-200 ease-in-out 
+            ${
+              DisableRequired
+                ? "bg-gray-200 cursor-not-allowed"
+                : "text-gray-700 border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 hover:shadow-md"
+            } 
+            ${className}`}
         />
       </div>
     </div>

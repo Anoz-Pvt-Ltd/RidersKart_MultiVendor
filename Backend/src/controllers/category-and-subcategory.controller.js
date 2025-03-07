@@ -7,6 +7,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 
 const AddCategory = asyncHandler(async (req, res) => {
   const { category, subcategory } = req.body;
+  console.log("category", category);
 
   if (!category || !subcategory)
     throw new ApiError(404, "Category not found!!");
@@ -63,6 +64,11 @@ const DeleteCategory = asyncHandler(async (req, res) => {
 
 const AddSubcategory = asyncHandler(async (req, res) => {
   const { categoryId, subcategory } = req.body;
+  // const { subcategory } = req.body;
+  // const { categoryId } = req.params;
+
+  console.log("category id", categoryId);
+  console.log("subcategory", subcategory);
 
   if (!categoryId || !subcategory)
     throw new ApiError(404, "Category or Subcategory not found!");
@@ -124,4 +130,47 @@ const DeleteSubcategory = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, null, "Subcategory deleted successfully"));
 });
 
-export { AddCategory, DeleteCategory, AddSubcategory, DeleteSubcategory };
+// const getAllMainSubcategories = asyncHandler(async (req, res) => {
+//   console.log("getAllMainSubcategories controller reached");
+//   const categories = await Category.find({})
+//     .populate("subcategories")
+//     .populate("Category");
+
+//   const mainSubcategories = categories.flatMap(
+//     (category) => category.subcategories
+//   );
+
+//   res.json(
+//     new ApiResponse(
+//       200,
+//       { mainSubcategories },
+//       "Main subcategories fetched successfully"
+//     )
+//   );
+// });
+
+const getAllMainSubcategories = asyncHandler(async (req, res) => {
+  const categories = await Category.find({}).populate({
+    path: "subcategories",
+    populate: {
+      path: "category", // This will populate the `category` field inside each subcategory
+      model: "Category",
+    },
+  });
+
+  res.json(
+    new ApiResponse(
+      200,
+      { categories },
+      "Categories with subcategories fetched successfully"
+    )
+  );
+});
+
+export {
+  AddCategory,
+  DeleteCategory,
+  AddSubcategory,
+  DeleteSubcategory,
+  getAllMainSubcategories,
+};

@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
 import mongoose from "mongoose";
 import Jwt from "jsonwebtoken";
-import { Subcategory } from "./sub-category.model";
+import { Subcategory } from "./sub-category.model.js";
 
 const vendorSchema = new mongoose.Schema({
   name: {
