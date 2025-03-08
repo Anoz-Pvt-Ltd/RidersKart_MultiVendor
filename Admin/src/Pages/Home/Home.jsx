@@ -272,7 +272,7 @@ const Dashboard = () => {
 
   const submitSubCategory = async (categoryId) => {
     const formData = new FormData(formRef.current);
-    formData.append("category", categoryId); // Attach category ID
+    // formData.append("category", categoryId); // Attach category ID
 
     // Debugging: Log form data before sending it
     for (let [key, value] of formData.entries()) {

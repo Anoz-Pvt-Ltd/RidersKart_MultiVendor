@@ -2,9 +2,9 @@ import ImageKit from "imagekit";
 import fs from "fs";
 
 var imageKit = new ImageKit({
-  publicKey: "your_public_key",
-  privateKey: "your_private_key",
-  urlEndpoint: "https://ik.imagekit.io/your_imagekit_id/",
+  publicKey: process.env.imageKit_Public_Key,
+  privateKey: process.env.imageKit_Private_Key,
+  urlEndpoint: process.env.imageKit_Private_Key,
 });
 
 export const UploadImages = (imageName, tags = []) => {

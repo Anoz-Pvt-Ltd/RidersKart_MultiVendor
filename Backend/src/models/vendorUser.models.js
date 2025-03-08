@@ -61,17 +61,19 @@ const vendorSchema = new mongoose.Schema({
     },
   ],
 
-  category: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Category",
-    required: true,
-  },
+  category: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Category",
+    },
+  ],
 
-  Subcategory: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Subcategory",
-    required: true,
-  },
+  Subcategory: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Subcategory",
+    },
+  ],
 
   businessDetails: {
     gstNumber: {
