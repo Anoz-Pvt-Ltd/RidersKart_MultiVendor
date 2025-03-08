@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { categoryData as initialData } from "../../constants/VendorDashboard.Categories";
+import { FetchData } from "../../utils/FetchFromApi";
 
 const Categories = () => {
-  const [categories, setCategories] = useState(initialData);
+  const [categories, setCategories] = useState([]);
   const [newCategory, setNewCategory] = useState({
     id: "",
     name: "",
@@ -15,6 +16,26 @@ const Categories = () => {
   const [showForm, setShowForm] = useState(false);
   const [sortBy, setSortBy] = useState("name");
   const [selectedCategories, setSelectedCategories] = useState([]);
+
+  useEffect(() => {
+    const getAllMainSubcategories = async () => {
+      try {
+        const response = await FetchData(
+          "main-sub-category/get-all-main-sub-categories",
+          "get"
+        );
+        console.log(response);
+
+        // Ensure categories exist before setting state
+        setCategories(response.data?.data?.categories || []);
+      } catch (error) {
+        console.log("Error getting all main subcategories", error);
+      }
+    };
+
+    getAllMainSubcategories();
+  }, []);
+  console.log(categories);
 
   // Handle input changes for the form
   const handleInputChange = (e) => {
@@ -75,7 +96,7 @@ const Categories = () => {
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-lg">
-      <h2 className="text-2xl font-bold text-gray-700 mb-4">Categories</h2>
+      <h2 className="text-2xl font-bold text-gray-700 mb-4">Active categories</h2>
 
       {/* Add Category Button */}
       <div className="mb-4 flex justify-between items-center">
@@ -214,18 +235,18 @@ const Categories = () => {
           <tbody>
             {categories.map((category) => (
               <tr
-                key={category.id}
+                key={category._id}
                 className="text-sm text-gray-700 border-b hover:bg-gray-50"
               >
                 <td className="py-3 px-4">
                   <input
                     type="checkbox"
-                    checked={selectedCategories.includes(category.id)}
-                    onChange={() => toggleCategorySelection(category.id)}
+                    checked={selectedCategories.includes(category._id)}
+                    onChange={() => toggleCategorySelection(category._id)}
                   />
                 </td>
-                <td className="py-3 px-4">{category.id}</td>
-                <td className="py-3 px-4 font-semibold">{category.name}</td>
+                <td className="py-3 px-4">{category._id}</td>
+                <td className="py-3 px-4 font-semibold">{category.title}</td>
                 <td className="py-3 px-4">{category.description}</td>
                 <td className="py-3 px-4 text-center">{category.products}</td>
                 <td

@@ -574,7 +574,7 @@ const Dashboard = () => {
                   </div>
                 )}
                 {handlePopup.allCategoryPopup && (
-                  <div className="backdrop-blur-3xl absolute top-0 h-full w-full left-0 ">
+                  <div className="backdrop-blur-3xl absolute top-0 h-full w-full left-0 px-10 py-5">
                     <Button
                       label={<X />}
                       onClick={() =>
@@ -586,9 +586,9 @@ const Dashboard = () => {
                     {AllCategories.map((category) => (
                       <div
                         key={category._id}
-                        className="p-4 border rounded shadow-md"
+                        className="p-4 rounded "
                       >
-                        <div className="flex justify-between items-center">
+                        <div className="flex justify-between items-center bg-white p-2 rounded-xl ">
                           <div>
                             <h2 className="text-sm font-semibold">
                               Main category:{" "}
@@ -605,7 +605,7 @@ const Dashboard = () => {
                             onClick={() =>
                               setHandlePopup((prev) => ({
                                 ...prev,
-                                [category._id]: !prev[category._id], // Toggle dropdown for specific category
+                                [category._id]: !prev[category._id],
                               }))
                             }
                           />
@@ -613,13 +613,12 @@ const Dashboard = () => {
 
                         {/* Dropdown for Subcategories */}
                         {handlePopup[category._id] && (
-                          <div className="mt-3">
+                          <div className="mt-3 bg-white p-4 rounded-xl">
                             {/* Add Subcategory Button */}
                             <Button
                               label={<h1>Add more in {category.title}</h1>}
                               onClick={() => {
-                                setSelectedCategoryId(category._id); // Store category ID
-                                // setSelectedCategoryId(category.title); // Store category ID
+                                setSelectedCategoryId(category._id); //currentcategory ID
                                 setHandlePopup((prev) => ({
                                   ...prev,
                                   addSubCategory: true,
@@ -636,7 +635,7 @@ const Dashboard = () => {
                                     className="flex flex-col justify-center px-10 rounded-xl gap-2 bg-white py-10"
                                     onSubmit={(e) => {
                                       e.preventDefault();
-                                      submitSubCategory(category._id); // Pass category ID to function
+                                      submitSubCategory(category._id);
                                     }}
                                   >
                                     <h2 className="text-sm font-semibold">
