@@ -12,13 +12,14 @@ import {
   VerifyUser,
   VerifyVendorUser,
 } from "../middlewares/auth.middleware.js";
+import { upload } from "../middlewares/multer.middleware.js";
 
 const router = Router();
 
 //routes without authorization (public)
 router
   .route("/register-product/:vendorId")
-  .post(VerifyVendorUser, registerProduct);
+  .post(VerifyVendorUser, upload.single("image"), registerProduct);
 router.route("/get-all-product").get(getAllProducts);
 router.route("/get-single-product/:productId").get(getProduct);
 

@@ -68,7 +68,7 @@ const vendorSchema = new mongoose.Schema({
     },
   ],
 
-  Subcategory: [
+  subcategory: [
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Subcategory",

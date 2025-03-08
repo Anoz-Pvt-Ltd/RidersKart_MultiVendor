@@ -13,10 +13,10 @@ const registerProduct = asyncHandler(async (req, res) => {
     name,
     description,
     category,
+    subcategory,
     price,
     stockQuantity,
     sku,
-    images,
     specifications,
     tags,
   } = req.body;
@@ -29,8 +29,8 @@ const registerProduct = asyncHandler(async (req, res) => {
   if (
     !name ||
     !description ||
-    !category?.main ||
-    !category?.sub ||
+    !category ||
+    !subcategory ||
     !price ||
     !stockQuantity ||
     !sku // Stock keeping unit => Provided to every unique type of products for keeping track of quantity.
@@ -55,10 +55,10 @@ const registerProduct = asyncHandler(async (req, res) => {
   // }
 
   // Validate main category
-  const existingCategory = await Category.findById(category.main);
+  const existingCategory = await Category.findById(category);
   if (!existingCategory) throw new ApiError(400, "Invalid category selected");
 
-  const existingSubCategory = await Subcategory.findById(category.sub);
+  const existingSubCategory = await Subcategory.findById(subcategory);
   if (!existingSubCategory)
     throw new ApiError(400, "Invalid subcategory selected");
 
@@ -78,12 +78,15 @@ const registerProduct = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Vendor not found");
   }
 
+  const ImageFile = req.file;
+  console.log("Image", req.file);
+
   // Create a new product instance
   const newProduct = new Product({
     name,
     description,
-    category: category.main,
-    subcategory: category.sub,
+    category,
+    subcategory,
     price,
     stockQuantity,
     sku,
@@ -121,11 +124,11 @@ const getAllProducts = asyncHandler(async (req, res) => {
     if (vendor) filter.vendor = vendor;
 
     const products = await Product.find(filter)
-      .populate("category", "name") 
-      .populate("subcategory", "name") 
+      .populate("category", "name")
+      .populate("subcategory", "name")
       .populate("vendor", "name email")
-      .sort({ createdAt: -1 }) 
-      .skip((page - 1) * limit) 
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
       .limit(parseInt(limit));
 
     if (!products || products.length === 0) {
@@ -151,7 +154,6 @@ const getAllProducts = asyncHandler(async (req, res) => {
   }
 });
 
-
 const getProductsOfVendor = asyncHandler(async (req, res) => {
   // console.log("controller reached");
   const { vendorId } = req.params;
@@ -159,7 +161,14 @@ const getProductsOfVendor = asyncHandler(async (req, res) => {
   if (!vendorId) throw new ApiError(400, "Vendor ID is required");
 
   // Fetch the products of the given vendor ID
-  const vendor = await VendorUser.findById(vendorId).populate("products");
+  const vendor = await VendorUser.findById(vendorId).populate({
+    path: "products",
+    populate: [
+      { path: "category" }, // Populate category inside products
+      { path: "subcategory" }, // Populate subcategory inside products
+    ],
+  });
+
   if (!vendor) throw new ApiError(404, "Vendor not found");
 
   const response = new ApiResponse(

@@ -16,6 +16,7 @@ import { FetchData } from "../../utils/FetchFromApi";
 import { motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
 
+
 const Dashboard = () => {
   const user = useSelector((store) => store.UserInfo.user);
   console.log(user);
