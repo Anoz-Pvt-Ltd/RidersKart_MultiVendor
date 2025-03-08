@@ -5,7 +5,7 @@ import { VendorUser } from "../models/vendorUser.models.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
-import { categories } from "../utils/constants.js";
+import { UploadImages } from "../utils/imageKit.io.js";
 
 // Controller to register a new product
 const registerProduct = asyncHandler(async (req, res) => {
@@ -23,7 +23,6 @@ const registerProduct = asyncHandler(async (req, res) => {
   console.log("Controller Reached");
 
   const vendorId = req.user._id;
-  console.log(vendorId);
 
   // Validate required fields
   if (
@@ -37,22 +36,6 @@ const registerProduct = asyncHandler(async (req, res) => {
   ) {
     throw new ApiError(400, "All required fields must be filled");
   }
-
-  // Validate main category
-  // const mainCategoryData = categories.find(
-  //   (cat) => cat.title === category.main
-  // );
-  // if (!mainCategoryData) {
-  //   throw new ApiError(400, "Invalid main category");
-  // }
-
-  // // Validate subcategory
-  // if (!mainCategoryData.items.includes(category.sub)) {
-  //   throw new ApiError(
-  //     400,
-  //     "Invalid subcategory for the selected main category"
-  //   );
-  // }
 
   // Validate main category
   const existingCategory = await Category.findById(category);
@@ -79,7 +62,20 @@ const registerProduct = asyncHandler(async (req, res) => {
   }
 
   const ImageFile = req.file;
-  console.log("Image", req.file);
+  const UploadedImage = await UploadImages(
+    ImageFile.filename,
+    {
+      root: "all-vendor",
+      name: vendor.name,
+      category,
+      subcategory,
+      item: name,
+    },
+    tags,
+    { description, category, subcategory }
+  );
+
+  // console.log("UploadedImage", UploadedImage);
 
   // Create a new product instance
   const newProduct = new Product({
@@ -90,7 +86,7 @@ const registerProduct = asyncHandler(async (req, res) => {
     price,
     stockQuantity,
     sku,
-    images,
+    images: { url: UploadedImage.url, altText: name },
     specifications,
     tags,
     vendor: vendorId,

@@ -8,17 +8,8 @@ import SelectBox from "../../components/SelectionBox";
 
 const Products = () => {
   const user = useSelector((store) => store.UserInfo.user);
-  // console.log(user);
 
-  const [newProduct, setNewProduct] = useState({
-    name: "",
-    description: "",
-    category: { main: "", sub: "" },
-    price: "",
-    stockQuantity: "",
-    sku: "",
-    images: [{ url: "", altText: "" }],
-  });
+  const [images, setImages] = useState(null);
   const formRef = useRef(null);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -28,81 +19,52 @@ const Products = () => {
 
   const [products, setProducts] = useState([]);
 
-  const fetchProducts = async () => {
-    try {
-      const response = await FetchData(
-        `products/get-all-product-of-vendor/${user?.[0]?._id}`,
-        "get"
-      );
-      console.log(response);
-      if (response.data.success) setProducts(response.data.data);
-    } catch (err) {
-      setError(err.response?.data?.message || "Failed to fetch products.");
-    }
+  const handleFileChange = (e) => {
+    setImages(e.target.files[0]);
   };
 
   useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await FetchData(
+          `products/get-all-product-of-vendor/${user?.[0]?._id}`,
+          "get"
+        );
+        if (response.data.success) setProducts(response.data.data);
+      } catch (err) {
+        setError(err.response?.data?.message || "Failed to fetch products.");
+      }
+    };
     fetchProducts();
   }, []);
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-
-    if (name.startsWith("images")) {
-      const [_, index, field] = name.split(".");
-      const updatedImages = [...newProduct.images];
-      updatedImages[parseInt(index)][field] = value;
-      setNewProduct({ ...newProduct, images: updatedImages });
-    } else if (name === "category.main") {
-      // Find selected category by its _id
-      const selectedCategory = categories.find((cat) => cat._id === value);
-
-      // Ensure subcategories are updated correctly
-      setSubcategories(selectedCategory ? selectedCategory.subcategories : []);
-
-      // Update product state, resetting subcategory selection
-      setNewProduct({
-        ...newProduct,
-        category: { main: value, sub: "" },
-      });
-    } else if (name === "category.sub") {
-      setNewProduct({
-        ...newProduct,
-        category: { ...newProduct.category, sub: value },
-      });
-    } else {
-      setNewProduct({ ...newProduct, [name]: value });
-    }
-  };
 
   const handleAddProduct = async (e) => {
     e.preventDefault();
     setError("");
     setSuccess("");
-    console.log(newProduct);
-    console.log(user);
-    console.log(user?.[0]?._id);
+
+    const formData = new FormData(formRef.current);
+    console.log(images);
+    // formData.append("image", images);
+
+    for (var pair of formData.entries()) {
+      console.log(pair[0] + ", " + pair[1]);
+    }
 
     try {
       const response = await FetchData(
         `products/register-product/${user?.[0]?._id}`,
         "post",
-        newProduct
+        formData,
+        true
       );
+      console.log(response);
       setSuccess("Product added successfully!");
       setProducts((prev) => [...prev, response.data.product]);
 
-      setNewProduct({
-        name: "",
-        description: "",
-        category: { main: "", sub: "" },
-        price: "",
-        stockQuantity: "",
-        sku: "",
-        images: [{ url: "", altText: "" }],
-      });
       setIsModalOpen(false);
     } catch (err) {
+      console.log(err);
       setError(err.response?.data?.message || "Failed to add the product.");
     }
   };
@@ -151,9 +113,6 @@ const Products = () => {
     getAllMainSubcategories();
   }, []);
 
-  console.log(categories);
-  console.log(subcategories);
-
   return (
     <div className="lg:max-w-6xl lg:mx-auto lg:p-4 bg-white shadow-lg rounded-lg">
       <h1 className="text-2xl font-bold text-gray-800 mb-4 sm:mb-6">
@@ -177,6 +136,7 @@ const Products = () => {
               Add New Product
             </h2>
             <form
+              ref={formRef}
               onSubmit={handleAddProduct}
               className="flex flex-col lg:flex-row overscroll-scroll w-full justify-evenly items-center"
             >
@@ -184,40 +144,32 @@ const Products = () => {
                 <InputBox
                   LabelName="Product Name"
                   Name="name"
-                  Value={newProduct.name}
                   Placeholder="Enter product name"
-                  onChange={handleInputChange}
                 />
                 <InputBox
                   LabelName="Description"
                   Name="description"
-                  Value={newProduct.description}
                   Placeholder="Enter product description"
-                  onChange={handleInputChange}
                 />
                 <SelectBox
                   LabelName="Main Category"
-                  Name="category.main"
-                  Value={newProduct.category.main}
+                  Name="category"
                   Placeholder="Select main category"
                   Options={categories?.map((cat) => ({
                     label: cat.title,
                     value: cat._id, // Correctly linking ID for selection
                   }))}
-                  onChange={handleInputChange}
                 />
 
                 {subcategories.length > 0 && (
                   <SelectBox
                     LabelName="Subcategory"
-                    Name="category.sub"
-                    Value={newProduct.category.sub}
+                    Name="subcategory"
                     Placeholder="Select subcategory"
                     Options={subcategories.map((sub) => ({
                       label: sub.title,
                       value: sub._id, // Ensure unique key
                     }))}
-                    onChange={handleInputChange}
                   />
                 )}
               </div>
@@ -226,32 +178,22 @@ const Products = () => {
                   LabelName="Price"
                   Type="number"
                   Name="price"
-                  Value={newProduct.price}
                   Placeholder="Enter price"
-                  onChange={handleInputChange}
                 />
                 <InputBox
                   LabelName="Stock Quantity"
                   Type="number"
                   Name="stockQuantity"
-                  Value={newProduct.stockQuantity}
                   Placeholder="Enter stock quantity"
-                  onChange={handleInputChange}
                 />
-                <InputBox
-                  LabelName="SKU"
-                  Name="sku"
-                  Value={newProduct.sku}
-                  Placeholder="Enter SKU"
-                  onChange={handleInputChange}
-                />
+                <InputBox LabelName="SKU" Name="sku" Placeholder="Enter SKU" />
               </div>
               <div>
                 <h3>Images</h3>
-                {newProduct.images.map((image, index) => (
+                {/* {newProduct.images.map((image, index) => (
                   <div key={index} className="flex flex-col gap-2 sm:flex-row">
                     <InputBox
-                      LabelName="Image URL"
+                      LabelName="Upload Image"
                       Name={`images.${index}.url`}
                       Value={image.url}
                       Placeholder="Enter image URL"
@@ -265,8 +207,17 @@ const Products = () => {
                       onChange={handleInputChange}
                     />
                   </div>
-                ))}
-                <Button
+                ))} */}
+                <InputBox
+                  LabelName="Upload Image"
+                  Type="file"
+                  Name={`image`}
+                  Placeholder="Enter image URL"
+                  onChange={(e) => {
+                    handleFileChange(e);
+                  }}
+                />
+                {/* <Button
                   label="Add Image"
                   Type="button"
                   onClick={() =>
@@ -276,7 +227,7 @@ const Products = () => {
                     }))
                   }
                   className="mt-2"
-                />
+                /> */}
               </div>
               <div className="flex justify-end gap-2">
                 <Button
