@@ -64,13 +64,13 @@ const vendorSchema = new mongoose.Schema({
   category: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Category",
-    required: true,
+    // required: true,
   },
 
   Subcategory: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Subcategory",
-    required: true,
+    // required: true,
   },
 
   businessDetails: {

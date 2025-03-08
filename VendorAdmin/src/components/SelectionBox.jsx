@@ -3,9 +3,9 @@ const SelectBox = ({
   Name,
   Value,
   Placeholder,
-  Options,
+  Options = [], // Ensure it's always an array
   onChange,
-  className,
+  className = "",
 }) => {
   return (
     <div className="mb-4">
@@ -26,8 +26,11 @@ const SelectBox = ({
           {Placeholder}
         </option>
         {Options.map((option) => (
-          <option key={option} value={option}>
-            {option}
+          <option
+            key={option.value || option._id}
+            value={option.value || option._id}
+          >
+            {option.label || option.title}
           </option>
         ))}
       </select>

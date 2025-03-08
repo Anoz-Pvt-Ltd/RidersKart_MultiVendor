@@ -130,30 +130,11 @@ const DeleteSubcategory = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, null, "Subcategory deleted successfully"));
 });
 
-// const getAllMainSubcategories = asyncHandler(async (req, res) => {
-//   console.log("getAllMainSubcategories controller reached");
-//   const categories = await Category.find({})
-//     .populate("subcategories")
-//     .populate("Category");
-
-//   const mainSubcategories = categories.flatMap(
-//     (category) => category.subcategories
-//   );
-
-//   res.json(
-//     new ApiResponse(
-//       200,
-//       { mainSubcategories },
-//       "Main subcategories fetched successfully"
-//     )
-//   );
-// });
-
 const getAllMainSubcategories = asyncHandler(async (req, res) => {
   const categories = await Category.find({}).populate({
     path: "subcategories",
     populate: {
-      path: "category", // This will populate the `category` field inside each subcategory
+      path: "category",
       model: "Category",
     },
   });

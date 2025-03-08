@@ -4,7 +4,7 @@ import InputBox from "../../components/InputBox";
 import Button from "../../components/Button";
 import { useSelector } from "react-redux";
 import SelectBox from "../../components/SelectionBox";
-import { categories } from "../../constants/AllProducts.Vendor";
+// import { categories } from "../../constants/AllProducts.Vendor";
 
 const Products = () => {
   const user = useSelector((store) => store.UserInfo.user);
@@ -23,6 +23,7 @@ const Products = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [categories, setCategories] = useState([]);
   const [subcategories, setSubcategories] = useState([]);
 
   const [products, setProducts] = useState([]);
@@ -33,6 +34,7 @@ const Products = () => {
         `products/get-all-product-of-vendor/${user?.[0]?._id}`,
         "get"
       );
+      console.log(response);
       if (response.data.success) setProducts(response.data.data);
     } catch (err) {
       setError(err.response?.data?.message || "Failed to fetch products.");
@@ -52,9 +54,17 @@ const Products = () => {
       updatedImages[parseInt(index)][field] = value;
       setNewProduct({ ...newProduct, images: updatedImages });
     } else if (name === "category.main") {
-      setNewProduct({ ...newProduct, category: { main: value, sub: "" } });
-      const selectedCategory = categories.find((cat) => cat.title === value);
-      setSubcategories(selectedCategory ? selectedCategory.items : []);
+      // Find selected category by its _id
+      const selectedCategory = categories.find((cat) => cat._id === value);
+
+      // Ensure subcategories are updated correctly
+      setSubcategories(selectedCategory ? selectedCategory.subcategories : []);
+
+      // Update product state, resetting subcategory selection
+      setNewProduct({
+        ...newProduct,
+        category: { main: value, sub: "" },
+      });
     } else if (name === "category.sub") {
       setNewProduct({
         ...newProduct,
@@ -115,6 +125,35 @@ const Products = () => {
     }
   };
 
+  useEffect(() => {
+    const getAllMainSubcategories = async () => {
+      try {
+        const response = await FetchData(
+          "main-sub-category/get-all-main-sub-categories",
+          "get"
+        );
+        // console.log(response);
+
+        // Ensure categories exist before setting state
+        const categories = response.data?.data?.categories || [];
+        setCategories(categories);
+
+        // Extract all subcategories from each category
+        const allSubcategories = categories.flatMap(
+          (category) => category.subcategories || []
+        );
+        setSubcategories(allSubcategories);
+      } catch (error) {
+        console.log("Error getting all main subcategories", error);
+      }
+    };
+
+    getAllMainSubcategories();
+  }, []);
+
+  console.log(categories);
+  console.log(subcategories);
+
   return (
     <div className="lg:max-w-6xl lg:mx-auto lg:p-4 bg-white shadow-lg rounded-lg">
       <h1 className="text-2xl font-bold text-gray-800 mb-4 sm:mb-6">
@@ -161,16 +200,23 @@ const Products = () => {
                   Name="category.main"
                   Value={newProduct.category.main}
                   Placeholder="Select main category"
-                  Options={categories.map((cat) => cat.title)}
+                  Options={categories?.map((cat) => ({
+                    label: cat.title,
+                    value: cat._id, // Correctly linking ID for selection
+                  }))}
                   onChange={handleInputChange}
                 />
+
                 {subcategories.length > 0 && (
                   <SelectBox
                     LabelName="Subcategory"
                     Name="category.sub"
                     Value={newProduct.category.sub}
                     Placeholder="Select subcategory"
-                    Options={subcategories}
+                    Options={subcategories.map((sub) => ({
+                      label: sub.title,
+                      value: sub._id, // Ensure unique key
+                    }))}
                     onChange={handleInputChange}
                   />
                 )}
