@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { categoryData as initialData } from "../../constants/VendorDashboard.Categories";
 import { FetchData } from "../../utils/FetchFromApi";
+import { useSelector } from "react-redux";
 
 const Categories = () => {
+  const user = useSelector((store) => store.UserInfo.user);
   const [categories, setCategories] = useState([]);
   const [newCategory, setNewCategory] = useState({
     id: "",
@@ -16,6 +18,9 @@ const Categories = () => {
   const [showForm, setShowForm] = useState(false);
   const [sortBy, setSortBy] = useState("name");
   const [selectedCategories, setSelectedCategories] = useState([]);
+  const [products, setProducts] = useState([]);
+  const [error, setError] = useState("");
+  console.log(categories);
 
   useEffect(() => {
     const getAllMainSubcategories = async () => {
@@ -24,7 +29,7 @@ const Categories = () => {
           "main-sub-category/get-all-main-sub-categories",
           "get"
         );
-        console.log(response);
+        // console.log(response);
 
         // Ensure categories exist before setting state
         setCategories(response.data?.data?.categories || []);
@@ -35,7 +40,22 @@ const Categories = () => {
 
     getAllMainSubcategories();
   }, []);
-  console.log(categories);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await FetchData(
+          `products/get-all-product-of-vendor/${user?.[0]?._id}`,
+          "get"
+        );
+        // console.log(response);
+        if (response.data.success) setProducts(response.data.data);
+      } catch (err) {
+        setError(err.response?.data?.message || "Failed to fetch products.");
+      }
+    };
+    fetchProducts();
+  }, []);
 
   // Handle input changes for the form
   const handleInputChange = (e) => {
@@ -96,140 +116,59 @@ const Categories = () => {
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-lg">
-      <h2 className="text-2xl font-bold text-gray-700 mb-4">Active categories</h2>
+      <h2 className="text-2xl font-bold text-gray-700 mb-4">
+        Active categories
+      </h2>
 
-      {/* Add Category Button */}
-      <div className="mb-4 flex justify-between items-center">
-        <button
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-          onClick={() => setShowForm(!showForm)}
-        >
-          {showForm ? "Cancel" : "Add Category"}
-        </button>
-
-        {/* Sorting */}
-        <div>
-          <label className="mr-2 text-gray-700">Sort By:</label>
-          <select
-            value={sortBy}
-            onChange={handleSortChange}
-            className="px-3 py-2 border rounded"
-          >
-            <option value="name">Name</option>
-            <option value="products">Number of Products</option>
-          </select>
-        </div>
-      </div>
-
-      {/* Add/Edit Category Form */}
-      {showForm && (
-        <form
-          onSubmit={handleAddCategory}
-          className="bg-gray-100 p-4 rounded mb-6 shadow"
-        >
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-gray-700">Category ID</label>
-              <input
-                type="text"
-                name="id"
-                value={newCategory.id}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 border rounded"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-gray-700">Category Name</label>
-              <input
-                type="text"
-                name="name"
-                value={newCategory.name}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 border rounded"
-                required
-              />
-            </div>
-          </div>
-          <div className="mt-4">
-            <label className="block text-gray-700">Description</label>
-            <textarea
-              name="description"
-              value={newCategory.description}
-              onChange={handleInputChange}
-              className="w-full px-3 py-2 border rounded"
-              required
-            />
-          </div>
-          <div className="mt-4 grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-gray-700">Parent Category</label>
-              <select
-                name="parent"
-                value={newCategory.parent}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 border rounded"
-              >
-                <option value="">None</option>
-                {categories.map((cat) => (
-                  <option key={cat.id} value={cat.name}>
-                    {cat.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-gray-700">Category Image</label>
-              <input
-                type="file"
-                name="image"
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 border rounded"
-              />
-            </div>
-          </div>
-          <button
-            type="submit"
-            className="mt-4 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-          >
-            Save Category
-          </button>
-        </form>
-      )}
-
-      {/* Bulk Actions */}
-      <div className="mb-4">
-        {selectedCategories.length > 0 && (
-          <button
-            onClick={handleBulkDelete}
-            className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
-          >
-            Delete Selected
-          </button>
-        )}
-      </div>
-
-      {/* Category Table */}
+      {/* selling Category Table */}
       <div className="overflow-x-auto">
         <table className="min-w-full bg-white border border-gray-200 rounded-lg">
           <thead>
             <tr className="bg-gray-100 text-gray-600 text-left text-sm font-medium">
-              <th className="py-3 px-4 border-b">
-                <input
-                  type="checkbox"
-                  onChange={(e) =>
-                    setSelectedCategories(
-                      e.target.checked ? categories.map((cat) => cat.id) : []
-                    )
-                  }
-                />
-              </th>
               <th className="py-3 px-4 border-b">Category ID</th>
               <th className="py-3 px-4 border-b">Category Name</th>
-              <th className="py-3 px-4 border-b">Description</th>
-              <th className="py-3 px-4 border-b">Products</th>
+              <th className="py-3 px-4 border-b">Number of Products</th>
               <th className="py-3 px-4 border-b">Status</th>
-              <th className="py-3 px-4 border-b">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {products.map((elements) => (
+              <tr
+                key={elements._id}
+                className="text-sm text-gray-700 border-b hover:bg-gray-50"
+              >
+                <td className="py-3 px-4">{elements?.category?._id}</td>
+                <td className="py-3 px-4 font-semibold">
+                  {elements?.category?.title}
+                </td>
+                <td className="py-3 px-4 text-center">
+                  {elements?.stockQuantity}
+                </td>
+                <td
+                  className={`py-3 px-4 font-bold ${
+                    elements.status === "Active"
+                      ? "text-red-600"
+                      : "text-green-600"
+                  }`}
+                >
+                  {elements.status}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {/* all available category table */}
+      <div className="overflow-x-auto my-20">
+        <h2 className="text-2xl font-bold text-gray-700 mb-4">
+          All available categories
+        </h2>
+        <table className="min-w-full bg-white border border-gray-200 rounded-lg">
+          <thead>
+            <tr className="bg-gray-100 text-gray-600 text-left text-sm font-medium">
+              <th className="py-3 px-4 border-b">Category ID</th>
+              <th className="py-3 px-4 border-b">Category Name</th>
+              <th className="py-3 px-4 border-b">Status</th>
             </tr>
           </thead>
           <tbody>
@@ -238,18 +177,18 @@ const Categories = () => {
                 key={category._id}
                 className="text-sm text-gray-700 border-b hover:bg-gray-50"
               >
-                <td className="py-3 px-4">
-                  <input
-                    type="checkbox"
-                    checked={selectedCategories.includes(category._id)}
-                    onChange={() => toggleCategorySelection(category._id)}
-                  />
-                </td>
                 <td className="py-3 px-4">{category._id}</td>
                 <td className="py-3 px-4 font-semibold">{category.title}</td>
-                <td className="py-3 px-4">{category.description}</td>
-                <td className="py-3 px-4 text-center">{category.products}</td>
                 <td
+                  className={`py-3 px-4 font-bold ${
+                    category.status === "Active"
+                      ? "text-green-600"
+                      : "text-green-600"
+                  }`}
+                >
+                  Active
+                </td>
+                {/* <td
                   className={`py-3 px-4 font-bold ${
                     category.status === "Active"
                       ? "text-green-600"
@@ -257,15 +196,7 @@ const Categories = () => {
                   }`}
                 >
                   {category.status}
-                </td>
-                <td className="py-3 px-4">
-                  <button className="text-blue-600 hover:underline mr-2">
-                    Edit
-                  </button>
-                  <button className="text-red-600 hover:underline">
-                    Delete
-                  </button>
-                </td>
+                </td> */}
               </tr>
             ))}
           </tbody>

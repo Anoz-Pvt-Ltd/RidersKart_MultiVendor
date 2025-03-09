@@ -16,11 +16,43 @@ const Products = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [categories, setCategories] = useState([]);
   const [subcategories, setSubcategories] = useState([]);
+  const [imagePreview, setImagePreview] = useState(null);
 
   const [products, setProducts] = useState([]);
+  console.log(products);
 
-  const handleFileChange = (e) => {
-    setImages(e.target.files[0]);
+  const handleImageFileChange = (e) => {
+    const file = e.target.files[0];
+
+    if (!file) return;
+
+    const validImageTypes = [
+      "image/jpeg",
+      "image/png",
+      "image/gif",
+      "image/webp",
+      "image/svg+xml",
+    ];
+    const maxSize = 1 * 1024 * 1024;
+
+    if (!validImageTypes.includes(file.type)) {
+      alert("Please upload a valid image file (JPG, PNG, GIF, WebP, SVG).");
+      e.target.value = "";
+      return;
+    }
+
+    if (file.size > maxSize) {
+      alert("File size must be less than 1MB.");
+      e.target.value = "";
+      return;
+    }
+    setImages(file);
+    setImagePreview(URL.createObjectURL(file));
+  };
+  const handleImageCancel = () => {
+    setImages(null);
+    setImagePreview(null);
+    document.getElementById("imageInput").value = "";
   };
 
   useEffect(() => {
@@ -30,6 +62,7 @@ const Products = () => {
           `products/get-all-product-of-vendor/${user?.[0]?._id}`,
           "get"
         );
+        console.log(response);
         if (response.data.success) setProducts(response.data.data);
       } catch (err) {
         setError(err.response?.data?.message || "Failed to fetch products.");
@@ -61,6 +94,8 @@ const Products = () => {
       console.log(response);
       setSuccess("Product added successfully!");
       setProducts((prev) => [...prev, response.data.product]);
+      alert("Product added successfully!");
+      window.location.reload();
 
       setIsModalOpen(false);
     } catch (err) {
@@ -115,8 +150,8 @@ const Products = () => {
 
   return (
     <div className="lg:max-w-6xl lg:mx-auto lg:p-4 bg-white shadow-lg rounded-lg">
-      <h1 className="text-2xl font-bold text-gray-800 mb-4 sm:mb-6">
-        Vendor Products
+      <h1 className="text-2xl font-bold text-gray-800 mb-4 sm:mb-6 mx-4">
+        Your Products
       </h1>
 
       {error && <div className="text-red-500 mb-4">{error}</div>}
@@ -125,7 +160,7 @@ const Products = () => {
       <Button
         label="Add New Product"
         Type="button"
-        className="mb-6"
+        className="mb-6 mx-4"
         onClick={() => setIsModalOpen(true)}
       />
 
@@ -214,9 +249,26 @@ const Products = () => {
                   Name={`image`}
                   Placeholder="Enter image URL"
                   onChange={(e) => {
-                    handleFileChange(e);
+                    handleImageFileChange(e);
                   }}
                 />
+                {imagePreview && (
+                  <div className="flex items-center gap-3">
+                    <img
+                      src={imagePreview}
+                      alt="Preview"
+                      className="w-16 h-16 object-cover rounded-md border"
+                    />
+
+                    {/* Cancel Button */}
+                    <button
+                      onClick={handleImageCancel}
+                      className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                )}
                 {/* <Button
                   label="Add Image"
                   Type="button"
@@ -243,7 +295,9 @@ const Products = () => {
         </div>
       )}
 
-      <h2 className="text-lg font-semibold text-gray-800 mb-4">Product List</h2>
+      <h2 className="text-lg font-semibold text-gray-800 mb-4 mx-4">
+        Product List
+      </h2>
       {products.length === 0 ? (
         <div>No products available.</div>
       ) : (
@@ -251,13 +305,21 @@ const Products = () => {
           {products.map((product) => (
             <div
               key={product?._id}
-              className="p-4 border rounded-lg shadow-md bg-gray-100"
+              className="mx-2 p-4 border rounded-lg shadow-md bg-gray-100"
             >
-              <h3 className="font-bold text-gray-900">{product?.name}</h3>
+              <h3 className="font-bold text-gray-900 flex items-center justify-start gap-10 ">
+                {product?.name}{" "}
+                <span className="bg-white p-1 rounded-xl shadow">
+                  <img
+                    src={product?.images[0]?.url}
+                    className="w-20 h-20 rounded-xl shadow"
+                  />
+                </span>
+              </h3>
               <p>{product?.description}</p>
               <p>
-                <strong>Category:</strong> {product?.category.main} -{" "}
-                {product?.category.sub}
+                <strong>Category:</strong> {product?.category.title} -{" "}
+                {product?.subcategory.title}
               </p>
               <p>
                 <strong>Price:</strong> ₹ {product?.price}
@@ -268,7 +330,7 @@ const Products = () => {
               <Button
                 label="Delete"
                 Type="button"
-                className="mt-2 w-full bg-red-500"
+                className="mt-2 w-full hover:bg-red-500"
                 onClick={() => handleDeleteProduct(product?._id)}
               />
             </div>

@@ -15,8 +15,8 @@ const ProductCard = ({
   return (
     <Link to={`/current-product/${productId}`} className={`w-fit ${className}`}>
       <div className="whiteSoftBG shadow-md hover:shadow-lg h-auto w-fit overflow-hidden rounded-lg hover:scale-105 duration-300 ease-in-out">
-        <div className="text-2xl p-2 bg-neutral-200 m-2 w-64 h-52">
-          <img src={Image} alt="No Image Found" />
+        <div className="text-2xl p-2 bg-neutral-200 m-2 w-64 h-52 overflow-hidden object-center flex justify-center items-center">
+          <img src={Image} alt="No Image found" />
         </div>
         <div className="h-1/3 px-4 py-3 gap-2 flex flex-col">
           <h1 className="text-xl sm:text-2xl font-semibold">{ProductName}</h1>

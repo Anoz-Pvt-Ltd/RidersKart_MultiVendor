@@ -106,14 +106,15 @@ const Dashboard = () => {
 
       const fetchedProducts = response.data.data || [];
       setProducts(fetchedProducts);
+      console.log(fetchedProducts);
 
       // Aggregate stockQuantity by category
       const categoryData = {};
       fetchedProducts.forEach((product) => {
         const { category, stockQuantity } = product;
         if (category) {
-          categoryData[category?.main] =
-            (categoryData[category?.main] || 0) + stockQuantity;
+          categoryData[category?.title] =
+            (categoryData[category?.title] || 0) + stockQuantity;
         }
       });
 

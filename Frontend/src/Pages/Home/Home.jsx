@@ -9,23 +9,23 @@ import { categories } from "../../Constants/Home/Home.Constants";
 const Home = () => {
   const [products, setProducts] = useState([]);
   const [error, setError] = useState(null);
-
-  const fetchProducts = async () => {
-    try {
-      const response = await FetchData("products/get-all-product", "get");
-      // console.log(response);
-      if (response.data.success) {
-        setProducts(response.data.data);
-      } else {
-        setError("Failed to load products.");
-      }
-    } catch (err) {
-      setError(err.response?.data?.message || "Failed to fetch products.");
-    }
-  };
+  console.log(products);
 
   useEffect(() => {
-    // fetchProducts();
+    const fetchProducts = async () => {
+      try {
+        const response = await FetchData("products/get-all-product", "get");
+        console.log(response);
+        if (response.data.success) {
+          setProducts(response.data.data.products);
+        } else {
+          setError("Failed to load products.");
+        }
+      } catch (err) {
+        setError(err.response?.data?.message || "Failed to fetch products.");
+      }
+    };
+    fetchProducts();
   }, []);
 
   const BannerSlider = () => {
@@ -172,6 +172,7 @@ const Home = () => {
       <div className="flex gap-4 bg-transparent justify-start items-center overflow-x-auto p-5 max-w-full">
         {products?.map((product) => (
           <ProductCard
+            Image={product?.images[0]?.url}
             key={product?._id}
             ProductName={product?.name}
             CurrentPrice={product?.price}
