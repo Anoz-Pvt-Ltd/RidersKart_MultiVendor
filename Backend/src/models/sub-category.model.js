@@ -11,6 +11,7 @@ const subcategorySchema = new Schema(
     image: {
       fileId: {
         type: String, // ImageKit file ID
+        default: null,
         required: true, // The unique identifier for the uploaded image file
       },
       url: {

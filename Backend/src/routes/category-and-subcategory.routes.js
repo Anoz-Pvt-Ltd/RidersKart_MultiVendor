@@ -13,14 +13,16 @@ import { upload } from "../middlewares/multer.middleware.js";
 const router = Router();
 
 router
-  .route("/main-category/add")
+  .route("/category/add")
   .post(VerifyAdminUser, upload.single("image"), AddCategory);
-router.route("/main-category/delete").delete(VerifyAdminUser, DeleteCategory);
+router.route("/category/delete").delete(VerifyAdminUser, DeleteCategory);
 router
   .route("/sub-category/add")
   .post(VerifyAdminUser, upload.single("image"), AddSubcategory);
 router.route("/sub-category/delete").delete(VerifyAdminUser, DeleteSubcategory);
-router.route("/get-all-main-sub-categories").get(getAllMainSubcategories);
+router
+  .route("/get-all-category-and-subcategories")
+  .get(getAllMainSubcategories);
 router
   .route("/edit-sub-category/:subcategoryId")
   .post(VerifyAdminUser, upload.single("image"), editSubcategory);

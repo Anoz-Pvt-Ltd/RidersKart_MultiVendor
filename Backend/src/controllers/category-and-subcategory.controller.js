@@ -28,7 +28,7 @@ const AddCategory = asyncHandler(async (req, res) => {
   console.log("imageFile : ", imageFile);
   if (!imageFile) throw new ApiError(404, "Image file not found!");
   const image = await UploadImages(imageFile.filename, {
-    folderStructure: `images-Of-Subcategory/${subcategory}`,
+    folderStructure: `images-Of-Subcategory/${subcategory.split(" ").join("-")}`,
   });
   if (!image)
     throw new ApiError(500, "Failed to upload image! Please try again");
@@ -188,11 +188,14 @@ const editSubcategory = asyncHandler(async (req, res) => {
   const imageFile = req.file;
   if (!imageFile) throw new ApiError(404, "Image file not found");
 
-  const deletedImage = await DeleteImage(subcategory.image.fileId);
-  if (!deletedImage) throw new ApiError(500, "Failed to delete previous image");
+  if (subcategory.image.fileId) {
+    const deletedImage = await DeleteImage(subcategory.image.fileId);
+    if (!deletedImage)
+      throw new ApiError(500, "Failed to delete previous image");
+  }
 
   const image = await UploadImages(imageFile.filename, {
-    folderStructure: `images-Of-Subcategory/${subcategory}`,
+    folderStructure: `images-Of-Subcategory/${newTitle.split(" ").join("-")}`,
   });
   if (!image) throw new ApiError(500, "Failed to upload image");
 

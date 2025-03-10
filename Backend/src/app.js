@@ -37,6 +37,7 @@ app.use(cookieParser());
 
 //print function to ensure every step is executed
 app.use((req, res, next) => {
+  console.log("--------------------------------")
   console.log(`Received:`, req.method);
   console.log(`at:`, req.url);
   console.log(`with body:`, req.body);
@@ -82,6 +83,6 @@ app.use("/api/v1/users", userRouter);
 app.use("/api/v1/admins", adminRouter);
 
 //category and subcategory routes
-app.use("/api/v1/main-sub-category", categoryRouter);
+app.use("/api/v1/categories", categoryRouter);
 
 export { app };

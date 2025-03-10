@@ -40,7 +40,9 @@ const Dashboard = () => {
     selectedSubcategoryTitle: null,
   });
   // const [image, setImage] = useState(null);
-  const formRef = useRef(null);
+  const categoryFormRef = useRef(null);
+  const subcategoryFormRef = useRef(null);
+  const editSubcategoryFormRef = useRef(null);
 
   const sectionVariants = {
     hidden: { opacity: 0, x: -50 },
@@ -196,7 +198,7 @@ const Dashboard = () => {
       if (user?.length > 0) {
         try {
           const response = await FetchData("orders/admin/all-orders", "get");
-          console.log(response);
+          // console.log(response);
           if (response.data.success) {
             setAllOrders(response.data.data.orders);
           } else {
@@ -235,8 +237,9 @@ const Dashboard = () => {
 
   // const formData = new FormData(formRef.current);
   // console.log(formData);
-  const submitCategory = async () => {
-    const formData = new FormData(formRef.current);
+  const submitCategory = async (e) => {
+    e.preventDefault();
+    const formData = new FormData(categoryFormRef.current);
     // formData.append("image", image);
 
     for (let [key, value] of formData.entries()) {
@@ -245,13 +248,17 @@ const Dashboard = () => {
 
     try {
       const response = await FetchData(
-        "main-sub-category/main-category/add",
+        "categories/category/add",
         "post",
         formData,
         true
       );
       console.log(response);
       // setAddShowCategoryPopup(false);
+      setHandlePopup((prev) => ({
+        ...prev,
+        addCategoryPopup: false,
+      }));
       alert("Your category has been added successfully");
     } catch (err) {
       console.log(err);
@@ -262,10 +269,10 @@ const Dashboard = () => {
     const getAllMainSubcategories = async () => {
       try {
         const response = await FetchData(
-          "main-sub-category/get-all-main-sub-categories",
+          "categories/get-all-category-and-subcategories",
           "get"
         );
-        console.log(response);
+        // console.log(response);
 
         // Ensure categories exist before setting state
         setAllCategories(response.data?.data?.categories || []);
@@ -277,8 +284,9 @@ const Dashboard = () => {
     getAllMainSubcategories();
   }, []);
 
-  const submitSubCategory = async (categoryId) => {
-    const formData = new FormData(formRef.current);
+  const submitSubCategory = async (e, categoryId) => {
+    e.preventDefault();
+    const formData = new FormData(subcategoryFormRef.current);
     // formData.append("image");
     // formData.append("category", categoryId); // Attach category ID
 
@@ -289,7 +297,7 @@ const Dashboard = () => {
 
     try {
       const response = await FetchData(
-        "main-sub-category/sub-category/add",
+        "categories/sub-category/add",
         "post",
         formData,
         true
@@ -316,7 +324,7 @@ const Dashboard = () => {
         return;
       }
 
-      const formData = new FormData(formRef.current);
+      const formData = new FormData(editSubcategoryFormRef.current);
       // formData.append("image", image);
 
       // Log form data for debugging
@@ -325,7 +333,7 @@ const Dashboard = () => {
       }
 
       const response = await FetchData(
-        `main-sub-category/edit-sub-category/${handlePopup.selectedSubcategoryId}`,
+        `categories/edit-sub-category/${handlePopup.selectedSubcategoryId}`,
         "post",
         formData,
         true
@@ -590,7 +598,7 @@ const Dashboard = () => {
                   <div className="backdrop-blur-xl absolute top-0 w-full h-full flex justify-center items-center flex-col left-0">
                     <div className="bg-white shadow-2xl rounded-xl w-fit h-fit px-10 py-10 flex justify-center items-center">
                       <form
-                        ref={formRef}
+                        ref={categoryFormRef}
                         onSubmit={submitCategory}
                         // onSubmit={(e) => {
                         //   e.preventDefault();
@@ -694,11 +702,11 @@ const Dashboard = () => {
                               selectedCategoryId === category._id && (
                                 <div className="h-full w-full bg-opacity-90 bg-neutral-300 absolute top-0 left-0 flex justify-center items-center">
                                   <form
-                                    ref={formRef}
+                                    ref={subcategoryFormRef}
                                     className="flex flex-col justify-center px-10 rounded-xl gap-2 bg-white py-10"
                                     onSubmit={(e) => {
                                       e.preventDefault();
-                                      submitSubCategory(category._id);
+                                      submitSubCategory(e, category._id);
                                     }}
                                   >
                                     <h2 className="text-sm font-semibold">
@@ -803,7 +811,7 @@ const Dashboard = () => {
 
                                     {/* Edit Form */}
                                     <form
-                                      ref={formRef}
+                                      ref={editSubcategoryFormRef}
                                       onSubmit={handleEditSubcategory}
                                     >
                                       {/* Display Selected Subcategory ID */}
@@ -832,13 +840,11 @@ const Dashboard = () => {
                                           Upload Image
                                         </label>
                                         <input
-                                          // name="image"
+                                          name="image"
                                           type="file"
                                           accept="image/*"
                                           className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                                          // onChange={(e) =>
-                                          //   setImage(e.target.files[0])
-                                          // }
+                                         
                                         />
                                       </div>
 

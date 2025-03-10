@@ -126,7 +126,7 @@ const Products = () => {
     const getAllMainSubcategories = async () => {
       try {
         const response = await FetchData(
-          "main-sub-category/get-all-main-sub-categories",
+          "categories/get-all-category-and-subcategories",
           "get"
         );
         // console.log(response);

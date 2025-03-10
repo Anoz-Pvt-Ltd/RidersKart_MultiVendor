@@ -33,7 +33,7 @@ const InputBox = ({
             ${
               DisableRequired
                 ? "bg-gray-200 cursor-not-allowed"
-                : "text-gray-700 border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 hover:shadow-md"
+                : "text-gray-700 bg-white border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 hover:shadow-md"
             } 
             ${className}`}
         />
