@@ -4,9 +4,10 @@ import InputBox from "../../components/InputBox";
 import Button from "../../components/Button";
 import { useSelector } from "react-redux";
 import SelectBox from "../../components/SelectionBox";
+import LoadingUI from "../../components/Loading";
 // import { categories } from "../../constants/AllProducts.Vendor";
 
-const Products = () => {
+const Products = ({ startLoading, stopLoading }) => {
   const user = useSelector((store) => store.UserInfo.user);
 
   const [images, setImages] = useState(null);
@@ -58,6 +59,7 @@ const Products = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
+        startLoading();
         const response = await FetchData(
           `products/get-all-product-of-vendor/${user?.[0]?._id}`,
           "get"
@@ -66,6 +68,8 @@ const Products = () => {
         if (response.data.success) setProducts(response.data.data);
       } catch (err) {
         setError(err.response?.data?.message || "Failed to fetch products.");
+      } finally {
+        stopLoading();
       }
     };
     fetchProducts();
@@ -85,6 +89,7 @@ const Products = () => {
     }
 
     try {
+      startLoading();
       const response = await FetchData(
         `products/register-product/${user?.[0]?._id}`,
         "post",
@@ -96,11 +101,12 @@ const Products = () => {
       setProducts((prev) => [...prev, response.data.product]);
       alert("Product added successfully!");
       window.location.reload();
-
       setIsModalOpen(false);
     } catch (err) {
       console.log(err);
       setError(err.response?.data?.message || "Failed to add the product.");
+    } finally {
+      stopLoading();
     }
   };
 
@@ -109,6 +115,7 @@ const Products = () => {
     setSuccess("");
 
     try {
+      startLoading();
       const response = await FetchData(
         `products/delete-products/${_id}`,
         "delete"
@@ -119,12 +126,15 @@ const Products = () => {
       }
     } catch (err) {
       setError(err.response?.data?.message || "Failed to delete the product.");
+    } finally {
+      stopLoading();
     }
   };
 
   useEffect(() => {
     const getAllMainSubcategories = async () => {
       try {
+        startLoading();
         const response = await FetchData(
           "categories/get-all-category-and-subcategories",
           "get"
@@ -142,6 +152,8 @@ const Products = () => {
         setSubcategories(allSubcategories);
       } catch (error) {
         console.log("Error getting all main subcategories", error);
+      } finally {
+        stopLoading();
       }
     };
 
@@ -341,4 +353,4 @@ const Products = () => {
   );
 };
 
-export default Products;
+export default LoadingUI(Products);

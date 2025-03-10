@@ -8,8 +8,9 @@ import ProductCard from "../../Components/ProductCard";
 import { useRef } from "react";
 import { useSelector } from "react-redux";
 import { Heart } from "lucide-react";
+import LoadingUI from "../../Components/Loading";
 
-const CurrentProduct = () => {
+const CurrentProduct = ({ startLoading, stopLoading }) => {
   const navigate = useNavigate();
   const { productId } = useParams();
   const HandleBuyNow = () => {
@@ -21,12 +22,14 @@ const CurrentProduct = () => {
 
   useEffect(() => {
     async function getCurrentProduct(productId) {
+      startLoading();
       const Product = await FetchData(
         `products/get-single-product/${productId}`,
         "get"
       );
       console.log(Product);
       setProducts(Product?.data?.data);
+      stopLoading();
       return Product;
     }
 
@@ -35,6 +38,7 @@ const CurrentProduct = () => {
 
   const fetchProducts = async () => {
     try {
+      startLoading();
       const response = await FetchData("products/get-all-product", "get");
       console.log(response);
       if (response.data.success) {
@@ -44,6 +48,8 @@ const CurrentProduct = () => {
       }
     } catch (err) {
       setError(err.response?.data?.message || "Failed to fetch products.");
+    } finally {
+      stopLoading();
     }
   };
 
@@ -53,8 +59,7 @@ const CurrentProduct = () => {
 
   const addProductToCart = async () => {
     try {
-      console.log(user);
-      console.log(products);
+      startLoading();
       const response = await FetchData(
         `users/${user?.[0]?._id}/${products?._id}/cart/add`,
         "post"
@@ -64,13 +69,14 @@ const CurrentProduct = () => {
     } catch (err) {
       console.log(err);
       alert(err.response?.data?.message || "Failed to add product to cart.");
+    } finally {
+      stopLoading();
     }
   };
 
   const addProductToWishlist = async () => {
     try {
-      console.log(user);
-      console.log(products);
+      startLoading();
       const response = await FetchData(
         `users/${user?.[0]?._id}/${products?._id}/wishlist/add`,
         "post"
@@ -82,6 +88,8 @@ const CurrentProduct = () => {
       alert(
         err.response?.data?.message || "Failed to add product to Wishlist."
       );
+    } finally {
+      stopLoading();
     }
   };
 
@@ -211,4 +219,4 @@ const CurrentProduct = () => {
   );
 };
 
-export default CurrentProduct;
+export default LoadingUI(CurrentProduct);

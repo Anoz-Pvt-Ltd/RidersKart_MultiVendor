@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import LoadingUI from "../../components/Loading";
 
 const initialBrandData = [
   {
@@ -17,7 +18,7 @@ const initialBrandData = [
   },
 ];
 
-const Brands = () => {
+const Brands = ({ startLoading, stopLoading }) => {
   const [brands, setBrands] = useState(initialBrandData);
   const [newBrand, setNewBrand] = useState({
     id: "",
@@ -256,4 +257,4 @@ const Brands = () => {
   );
 };
 
-export default Brands;
+export default LoadingUI(Brands);

@@ -2,8 +2,9 @@ import { useParams } from "react-router";
 import ProductCard from "../../Components/ProductCard";
 import { useEffect, useState } from "react";
 import { FetchData } from "../../Utility/FetchFromApi";
+import LoadingUI from "../../Components/Loading";
 
-const AllProducts = () => {
+const AllProducts = ({ startLoading, stopLoading }) => {
   const [products, setProducts] = useState([]);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -13,7 +14,7 @@ const AllProducts = () => {
   const { category, subcategory } = useParams();
 
   const fetchProducts = async (page = 1) => {
-    setLoading(true);
+    startLoading();
     setError(null);
 
     try {
@@ -39,7 +40,7 @@ const AllProducts = () => {
     } catch (err) {
       setError(err.response?.data?.message || "Failed to fetch products.");
     } finally {
-      setLoading(false);
+      stopLoading();
     }
   };
 
@@ -109,7 +110,7 @@ const AllProducts = () => {
   );
 };
 
-export default AllProducts;
+export default LoadingUI(AllProducts);
 
 // console.log("response");
 // console.log(category, subcategory);

@@ -23,8 +23,9 @@ import Loading from "../../assets/Loading/Loading.json";
 import { useNavigate } from "react-router";
 import { clearUser } from "../../Utility/Slice/UserInfoSlice";
 import ProductCardMobile from "../../Components/ProductCardMobile";
+import LoadingUI from "../../Components/Loading";
 
-const Dashboard = () => {
+const Dashboard = ({ startLoading, stopLoading }) => {
   const user = useSelector((store) => store.UserInfo.user);
   const Dispatch = useDispatch();
   const [error, setError] = useState(null);
@@ -66,6 +67,7 @@ const Dashboard = () => {
 
   const addAddress = async () => {
     try {
+      startLoading();
       const response = await FetchData(
         `users/${user?.[0]?._id}/addresses`,
         "post",
@@ -81,6 +83,8 @@ const Dashboard = () => {
       }
     } catch (err) {
       setError(err.response?.data?.message || "Failed to add address.");
+    } finally {
+      stopLoading();
     }
   };
 
@@ -133,6 +137,7 @@ const Dashboard = () => {
     const fetchAllOrders = async () => {
       if (user?.length > 0) {
         try {
+          startLoading();
           const response = await FetchData(
             `orders/all-products-of/${user?.[0]?._id}`,
             "get"
@@ -145,6 +150,8 @@ const Dashboard = () => {
           }
         } catch (err) {
           setError(err.response?.data?.message || "Failed to fetch orders.");
+        } finally {
+          stopLoading();
         }
       }
     };
@@ -154,6 +161,7 @@ const Dashboard = () => {
   const fetchWishlistProducts = async () => {
     if (user?.length > 0) {
       try {
+        startLoading();
         const response = await FetchData(
           `users/${user?.[0]?._id}/wishlist-products`,
           "get"
@@ -168,6 +176,8 @@ const Dashboard = () => {
         setError(
           err.response?.data?.message || "Failed to fetch Wishlist products."
         );
+      } finally {
+        stopLoading();
       }
     }
   };
@@ -179,6 +189,7 @@ const Dashboard = () => {
     e.preventDefault();
     const formData = new FormData(fromRef.current);
     try {
+      startLoading();
       const response = await FetchData(
         `users/edit-user-profile/${user?.[0]?._id}`,
         "post",
@@ -194,6 +205,8 @@ const Dashboard = () => {
       }
     } catch (err) {
       setError(err.response?.data?.message || "Failed to update profile.");
+    } finally {
+      stopLoading();
     }
   };
 
@@ -592,4 +605,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default LoadingUI(Dashboard);

@@ -3,10 +3,11 @@ import { FetchData } from "../../Utility/FetchFromApi";
 import InputBox from "../../Components/InputBox";
 import Button from "../../Components/Button";
 import { addUser, clearUser } from "../../Utility/Slice/UserInfoSlice";
-import {  useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
+import LoadingUI from "../../Components/Loading";
 
-const UserRegister = () => {
+const UserRegister = ({ startLoading, stopLoading }) => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -65,6 +66,7 @@ const UserRegister = () => {
     console.log(dataToSend);
 
     try {
+      startLoading();
       const response = await FetchData("users/register", "post", dataToSend);
       console.log(response);
 
@@ -97,6 +99,8 @@ const UserRegister = () => {
       setError(
         err.response?.data?.message || "An error occurred during registration."
       );
+    } finally {
+      stopLoading();
     }
   };
 
@@ -187,4 +191,4 @@ const UserRegister = () => {
   );
 };
 
-export default UserRegister;
+export default LoadingUI(UserRegister);

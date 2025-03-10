@@ -2,8 +2,9 @@ import React, { useState } from "react";
 import { FetchData } from "../../utils/FetchFromApi";
 import InputBox from "../../components/InputBox";
 import Button from "../../components/Button";
+import LoadingUI from "../../components/Loading";
 
-const VendorRegistrationForm = () => {
+const VendorRegistrationForm = ({ startLoading, stopLoading }) => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -75,6 +76,7 @@ const VendorRegistrationForm = () => {
     };
 
     try {
+      startLoading();
       const response = await FetchData("vendor/register", "post", dataToSend);
 
       if (response.status === 201) {
@@ -101,6 +103,8 @@ const VendorRegistrationForm = () => {
       setError(
         err.response?.data?.message || "An error occurred during registration."
       );
+    } finally {
+      stopLoading();
     }
   };
 
@@ -237,4 +241,4 @@ const VendorRegistrationForm = () => {
   );
 };
 
-export default VendorRegistrationForm;
+export default LoadingUI(VendorRegistrationForm);

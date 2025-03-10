@@ -1,17 +1,10 @@
 import React, { useEffect, useState } from "react";
 import OrderCard from "./OrderCard";
-import {
-  FaBox,
-  FaTruck,
-  FaCheckCircle,
-  FaTimesCircle,
-  FaUndoAlt,
-  FaClipboardList,
-} from "react-icons/fa";
 import { FetchData } from "../../utils/FetchFromApi";
 import { useSelector } from "react-redux";
+import LoadingUI from "../../components/Loading";
 
-const Orders = () => {
+const Orders = ({ startLoading, stopLoading }) => {
   const user = useSelector((store) => store.UserInfo.user);
   const [error, setError] = useState(null);
   const [allOrders, setAllOrders] = useState([]);
@@ -20,6 +13,7 @@ const Orders = () => {
     const fetchAllOrders = async () => {
       if (user?.length > 0) {
         try {
+          startLoading();
           const response = await FetchData(
             `orders/all-products-of-vendor/${user?.[0]?._id}`,
             "get"
@@ -31,14 +25,14 @@ const Orders = () => {
           }
         } catch (err) {
           setError(err.response?.data?.message || "Failed to fetch orders.");
+        } finally {
+          stopLoading();
         }
       }
     };
     fetchAllOrders();
   }, [user]);
   console.log(allOrders);
-
-  
 
   if (error) {
     return <p className="text-red-600 text-center">{error}</p>;
@@ -117,4 +111,4 @@ const Orders = () => {
   );
 };
 
-export default Orders;
+export default LoadingUI(Orders);

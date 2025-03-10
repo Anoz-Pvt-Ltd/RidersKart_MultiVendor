@@ -4,8 +4,9 @@ import InputBox from "../../components/InputBox";
 import { addUser, clearUser } from "../../utils/Slice/UserInfoSlice";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import LoadingUI from "../../components/Loading";
 
-const LoginForm = () => {
+const LoginForm = ({ startLoading, stopLoading }) => {
   const Dispatch = useDispatch();
   const Navigate = useNavigate();
   const [credentials, setCredentials] = useState({
@@ -27,6 +28,7 @@ const LoginForm = () => {
     setSuccess("");
 
     try {
+      startLoading();
       const response = await FetchData("vendor/login", "post", credentials);
       console.log(response);
       Dispatch(clearUser());
@@ -46,6 +48,8 @@ const LoginForm = () => {
       Navigate("/");
     } catch (err) {
       setError(err.response?.data?.message || "Invalid email or password.");
+    } finally {
+      stopLoading();
     }
   };
 
@@ -91,4 +95,4 @@ const LoginForm = () => {
   );
 };
 
-export default LoginForm;
+export default LoadingUI(LoginForm);

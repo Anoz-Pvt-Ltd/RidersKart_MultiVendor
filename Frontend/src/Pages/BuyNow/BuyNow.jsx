@@ -4,8 +4,9 @@ import { FetchData } from "../../Utility/FetchFromApi";
 import { useSelector } from "react-redux";
 import ProductCard from "../../Components/ProductCard";
 import Button from "../../Components/Button";
+import LoadingUI from "../../Components/Loading";
 
-const BuyNow = () => {
+const BuyNow = ({ startLoading, stopLoading }) => {
   const { productId } = useParams();
   const [product, setProduct] = useState(null);
   const [addresses, setAddresses] = useState([]);
@@ -24,6 +25,7 @@ const BuyNow = () => {
   useEffect(() => {
     const fetchProductDetails = async () => {
       if (user?.length > 0) {
+        startLoading();
         try {
           const response = await FetchData(
             `products/get-single-product/${productId}`,
@@ -38,12 +40,15 @@ const BuyNow = () => {
           setError(
             err.response?.data?.message || "Failed to fetch product details."
           );
+        } finally {
+          stopLoading();
         }
       }
     };
 
     const fetchUserAddresses = async () => {
       if (user?.length > 0) {
+        startLoading();
         try {
           const response = await FetchData(
             `users/${user?.[0]?._id}/addresses`,
@@ -56,12 +61,15 @@ const BuyNow = () => {
           }
         } catch (err) {
           setError(err.response?.data?.message || "Failed to fetch addresses.");
+        } finally {
+          stopLoading();
         }
       }
     };
 
     const fetchVendorByProductId = async () => {
       if (user?.length > 0) {
+        startLoading();
         try {
           const response = await FetchData(
             `vendor/get-vendor-by-product-id/${productId}`,
@@ -78,6 +86,8 @@ const BuyNow = () => {
           setError(
             err.response?.data?.message || "Failed to fetch vendor details."
           );
+        } finally {
+          stopLoading();
         }
       }
     };
@@ -96,6 +106,7 @@ const BuyNow = () => {
   // console.log(product);
   const handleBuyNow = async () => {
     try {
+      startLoading();
       const quantity = 1;
 
       // Ensure all required fields are included
@@ -119,6 +130,8 @@ const BuyNow = () => {
       }
     } catch (err) {
       alert(err.response?.data?.message || "Failed to place order.");
+    } finally {
+      stopLoading();
     }
   };
 
@@ -188,4 +201,4 @@ const BuyNow = () => {
   );
 };
 
-export default BuyNow;
+export default LoadingUI(BuyNow);

@@ -2,8 +2,9 @@ import React, { useEffect, useState } from "react";
 import { categoryData as initialData } from "../../constants/VendorDashboard.Categories";
 import { FetchData } from "../../utils/FetchFromApi";
 import { useSelector } from "react-redux";
+import LoadingUI from "../../components/Loading";
 
-const Categories = () => {
+const Categories = ({ startLoading, stopLoading }) => {
   const user = useSelector((store) => store.UserInfo.user);
   const [categories, setCategories] = useState([]);
   const [newCategory, setNewCategory] = useState({
@@ -25,6 +26,7 @@ const Categories = () => {
   useEffect(() => {
     const getAllMainSubcategories = async () => {
       try {
+        startLoading();
         const response = await FetchData(
           "categories/get-all-category-and-subcategories",
           "get"
@@ -35,6 +37,8 @@ const Categories = () => {
         setCategories(response.data?.data?.categories || []);
       } catch (error) {
         console.log("Error getting all main subcategories", error);
+      } finally {
+        stopLoading();
       }
     };
 
@@ -44,6 +48,7 @@ const Categories = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
+        startLoading();
         const response = await FetchData(
           `products/get-all-product-of-vendor/${user?.[0]?._id}`,
           "get"
@@ -52,16 +57,12 @@ const Categories = () => {
         if (response.data.success) setProducts(response.data.data);
       } catch (err) {
         setError(err.response?.data?.message || "Failed to fetch products.");
+      } finally {
+        stopLoading();
       }
     };
     fetchProducts();
   }, []);
-
-  // Handle input changes for the form
-  const handleInputChange = (e) => {
-    const { name, value, files } = e.target;
-    setNewCategory({ ...newCategory, [name]: files ? files[0] : value });
-  };
 
   // Handle form submission
   const handleAddCategory = (e) => {
@@ -206,4 +207,4 @@ const Categories = () => {
   );
 };
 
-export default Categories;
+export default LoadingUI(Categories);

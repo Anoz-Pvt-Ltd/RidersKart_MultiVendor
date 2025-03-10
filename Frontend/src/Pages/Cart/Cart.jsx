@@ -4,8 +4,9 @@ import { FetchData } from "../../Utility/FetchFromApi";
 import ProductCard from "../../Components/ProductCard";
 import Button from "../../Components/Button";
 import ProductCardMobile from "../../Components/ProductCardMobile";
+import LoadingUI from "../../Components/Loading";
 
-const CartPage = () => {
+const CartPage = ({ startLoading, stopLoading }) => {
   const [cartProducts, setCartProducts] = useState([]);
   const [error, setError] = useState("");
   const [products, setProducts] = useState([]);
@@ -15,6 +16,7 @@ const CartPage = () => {
     const fetchCartProducts = async () => {
       if (user?.length > 0) {
         try {
+          startLoading();
           const response = await FetchData(
             `users/${user?.[0]._id}/cart-products`,
             "get"
@@ -28,6 +30,8 @@ const CartPage = () => {
           setError(
             err.response?.data?.message || "Failed to fetch cart products."
           );
+        } finally {
+          stopLoading();
         }
       }
     };
@@ -37,6 +41,7 @@ const CartPage = () => {
 
   const fetchProducts = async () => {
     try {
+      startLoading();
       const response = await FetchData("products/get-all-product", "get");
       if (response.data.success) {
         setProducts(response.data.data);
@@ -45,6 +50,8 @@ const CartPage = () => {
       }
     } catch (err) {
       setError(err.response?.data?.message || "Failed to fetch products.");
+    } finally {
+      stopLoading();
     }
   };
 
@@ -192,4 +199,4 @@ const CartPage = () => {
   );
 };
 
-export default CartPage;
+export default LoadingUI(CartPage);

@@ -15,12 +15,12 @@ import { useSelector } from "react-redux";
 import { FetchData } from "../../Utility/FetchFromApi";
 import { Link } from "react-router-dom";
 import InputBox from "../../Components/InputBox";
-import { all } from "axios";
 import Button from "../../Components/Button";
 import { useRef } from "react";
 import { ClipboardCopy } from "lucide-react";
+import LoadingUI from "../../Components/Loading";
 
-const Dashboard = () => {
+const Dashboard = ({ startLoading, stopLoading }) => {
   const user = useSelector((store) => store.UserInfo.user);
   const [activeSection, setActiveSection] = useState("Users");
   const [error, setError] = useState("");
@@ -39,7 +39,7 @@ const Dashboard = () => {
     selectedSubcategoryId: null,
     selectedSubcategoryTitle: null,
   });
-  // const [image, setImage] = useState(null);
+
   const categoryFormRef = useRef(null);
   const subcategoryFormRef = useRef(null);
   const editSubcategoryFormRef = useRef(null);
@@ -159,9 +159,11 @@ const Dashboard = () => {
 
   //fetching all data for all users,products,orders,vendors(verified) and vendors(not-verified)
   useEffect(() => {
+
     const fetchAllUsers = async () => {
       if (user?.length > 0) {
         try {
+          startLoading();
           const response = await FetchData("users/admin/get-all-users", "get");
           // console.log(response);
           if (response.data.success) {
@@ -171,6 +173,8 @@ const Dashboard = () => {
           }
         } catch (err) {
           setError(err.response?.data?.message || "Failed to fetch orders.");
+        } finally {
+          stopLoading();
         }
       }
     };
@@ -178,6 +182,7 @@ const Dashboard = () => {
     const fetchAllProducts = async () => {
       if (user?.length > 0) {
         try {
+          startLoading();
           const response = await FetchData(
             "products/admin/get-all-products",
             "get"
@@ -190,6 +195,8 @@ const Dashboard = () => {
           }
         } catch (err) {
           setError(err.response?.data?.message || "Failed to Products");
+        } finally {
+          stopLoading();
         }
       }
     };
@@ -197,6 +204,7 @@ const Dashboard = () => {
     const fetchAllOrders = async () => {
       if (user?.length > 0) {
         try {
+          startLoading();
           const response = await FetchData("orders/admin/all-orders", "get");
           // console.log(response);
           if (response.data.success) {
@@ -206,6 +214,8 @@ const Dashboard = () => {
           }
         } catch (err) {
           setError(err.response?.data?.message || "Failed to Products");
+        } finally {
+          stopLoading();
         }
       }
     };
@@ -213,6 +223,7 @@ const Dashboard = () => {
     const fetchAllVerifiedVendors = async () => {
       if (user?.length > 0) {
         try {
+          startLoading();
           const response = await FetchData(
             "vendor/admin/get-all-verified-vendor",
             "get"
@@ -225,6 +236,8 @@ const Dashboard = () => {
           }
         } catch (err) {
           setError(err.response?.data?.message || "Failed to fetch vendors.");
+        } finally {
+          stopLoading();
         }
       }
     };
@@ -247,6 +260,7 @@ const Dashboard = () => {
     }
 
     try {
+      startLoading();
       const response = await FetchData(
         "categories/category/add",
         "post",
@@ -262,12 +276,15 @@ const Dashboard = () => {
       alert("Your category has been added successfully");
     } catch (err) {
       console.log(err);
+    } finally {
+      stopLoading();
     }
   };
 
   useEffect(() => {
     const getAllMainSubcategories = async () => {
       try {
+        startLoading();
         const response = await FetchData(
           "categories/get-all-category-and-subcategories",
           "get"
@@ -278,6 +295,8 @@ const Dashboard = () => {
         setAllCategories(response.data?.data?.categories || []);
       } catch (error) {
         console.log("Error getting all main subcategories", error);
+      } finally {
+        stopLoading();
       }
     };
 
@@ -296,6 +315,7 @@ const Dashboard = () => {
     }
 
     try {
+      startLoading();
       const response = await FetchData(
         "categories/sub-category/add",
         "post",
@@ -312,6 +332,8 @@ const Dashboard = () => {
       }));
     } catch (error) {
       console.error("Error adding subcategory:", error);
+    } finally {
+      stopLoading();
     }
   };
 
@@ -319,6 +341,7 @@ const Dashboard = () => {
     e.preventDefault(); // Prevent default form submission
 
     try {
+      startLoading();
       if (!handlePopup.selectedSubcategoryId) {
         alert("Subcategory ID is missing!");
         return;
@@ -351,6 +374,8 @@ const Dashboard = () => {
     } catch (error) {
       console.error("Error editing subcategory:", error);
       alert("Failed to edit subcategory.");
+    } finally {
+      stopLoading();
     }
   };
 
@@ -689,7 +714,7 @@ const Dashboard = () => {
                             <Button
                               label={<h1>Add more in {category.title}</h1>}
                               onClick={() => {
-                                setSelectedCategoryId(category._id); //currentcategory ID
+                                setSelectedCategoryId(category._id); //current category ID
                                 setHandlePopup((prev) => ({
                                   ...prev,
                                   addSubCategory: true,
@@ -844,7 +869,6 @@ const Dashboard = () => {
                                           type="file"
                                           accept="image/*"
                                           className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                                         
                                         />
                                       </div>
 
@@ -1003,4 +1027,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default LoadingUI(Dashboard);

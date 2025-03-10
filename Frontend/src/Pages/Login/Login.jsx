@@ -7,7 +7,6 @@ import { useState } from "react";
 import { FetchData } from "../../Utility/FetchFromApi";
 import { useDispatch } from "react-redux";
 import { clearUser, addUser } from "../../Utility/Slice/UserInfoSlice";
-import { parseErrorMessage } from "../../Utility/ErrorMessageParser";
 import LoadingUI from "../../Components/Loading";
 
 const Login = ({ startLoading, stopLoading }) => {

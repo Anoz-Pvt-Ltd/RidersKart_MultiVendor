@@ -5,8 +5,9 @@ import { FetchData } from "../../Utility/FetchFromApi";
 import ProductCard from "../../Components/ProductCard";
 import { Link } from "react-router";
 import { categories } from "../../Constants/Home/Home.Constants";
+import LoadingUI from "../../Components/Loading";
 
-const Home = () => {
+const Home = ({ startLoading, stopLoading }) => {
   const [products, setProducts] = useState([]);
   const [error, setError] = useState(null);
   // console.log(products);
@@ -14,6 +15,7 @@ const Home = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
+        startLoading();
         const response = await FetchData("products/get-all-product", "get");
         console.log(response);
         if (response.data.success) {
@@ -23,6 +25,8 @@ const Home = () => {
         }
       } catch (err) {
         setError(err.response?.data?.message || "Failed to fetch products.");
+      } finally {
+        stopLoading();
       }
     };
     fetchProducts();
@@ -188,4 +192,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default LoadingUI(Home);

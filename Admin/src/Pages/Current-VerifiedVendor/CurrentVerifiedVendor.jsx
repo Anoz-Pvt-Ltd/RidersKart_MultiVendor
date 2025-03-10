@@ -3,8 +3,9 @@ import { useParams } from "react-router";
 import { FetchData } from "../../Utility/FetchFromApi";
 import { useSelector } from "react-redux";
 import Button from "../../Components/Button";
+import LoadingUI from "../../Components/Loading";
 
-const CurrentVerifiedVendor = () => {
+const CurrentVerifiedVendor = ({ startLoading, stopLoading }) => {
   const { vendorId } = useParams();
   const user = useSelector((store) => store.UserInfo.user);
   const [error, setError] = useState("");
@@ -20,6 +21,7 @@ const CurrentVerifiedVendor = () => {
     const fetchVendor = async () => {
       if (user?.length > 0) {
         try {
+          startLoading();
           const response = await FetchData(
             `vendor/admin/get-current-vendor/${vendorId}`,
             "get"
@@ -38,13 +40,14 @@ const CurrentVerifiedVendor = () => {
           }
         } catch (err) {
           setError(err.response?.data?.message || "Failed to fetch vendors.");
+        } finally {
+          stopLoading();
         }
       }
     };
 
     fetchVendor();
   }, [user]);
-  //   console.log(currentVendorAddressDetails);
 
   const BankDetails = `${currentVendorBankDetails?.accountHolderName}, ${currentVendorBankDetails?.accountNumber}, ${currentVendorBankDetails?.bankName}, ${currentVendorBankDetails?.ifscCode}`;
 
@@ -103,4 +106,4 @@ const CurrentVerifiedVendor = () => {
   );
 };
 
-export default CurrentVerifiedVendor;
+export default LoadingUI(CurrentVerifiedVendor);

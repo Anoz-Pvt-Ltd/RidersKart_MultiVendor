@@ -15,9 +15,9 @@ import { clearUser } from "../../utils/Slice/UserInfoSlice";
 import { FetchData } from "../../utils/FetchFromApi";
 import { motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
+import LoadingUI from "../../components/Loading";
 
-
-const Dashboard = () => {
+const Dashboard = ({ startLoading, stopLoading }) => {
   const user = useSelector((store) => store.UserInfo.user);
   console.log(user);
   const Dispatch = useDispatch();
@@ -31,6 +31,7 @@ const Dashboard = () => {
     const fetchAllOrders = async () => {
       if (user?.length > 0) {
         try {
+          startLoading();
           const response = await FetchData(
             `orders/all-products-of-vendor/${user?.[0]?._id}`,
             "get"
@@ -42,6 +43,8 @@ const Dashboard = () => {
           }
         } catch (err) {
           setError(err.response?.data?.message || "Failed to fetch orders.");
+        } finally {
+          stopLoading();
         }
       }
     };
@@ -51,7 +54,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchVendor = async () => {
       try {
-        // setLoading(true);
+        startLoading();
         const response = await FetchData(
           `vendors/vendor-profile/${user?.[0]?._id}`,
           "get"
@@ -62,7 +65,7 @@ const Dashboard = () => {
       } catch (err) {
         setError("Failed to load vendor profile.");
       } finally {
-        // setLoading(false);
+        stopLoading();
       }
     };
 
@@ -98,6 +101,7 @@ const Dashboard = () => {
 
   const fetchProducts = async () => {
     try {
+      startLoading()
       const response = await FetchData(
         `products/get-all-product-of-vendor/${user?.[0]?._id}`,
         "get"
@@ -135,6 +139,8 @@ const Dashboard = () => {
     } catch (err) {
       console.error(err);
       setError(err.response?.data?.message || "Failed to fetch products.");
+    } finally {
+      stopLoading();
     }
   };
 
@@ -361,4 +367,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default LoadingUI(Dashboard);

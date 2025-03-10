@@ -3,8 +3,9 @@ import { useSelector } from "react-redux";
 import { useParams } from "react-router";
 import { FetchData } from "../../Utility/FetchFromApi";
 import Button from "../../Components/Button";
+import LoadingUI from "../../Components/Loading";
 
-const CurrentUser = () => {
+const CurrentUser = ({ startLoading, stopLoading }) => {
   const { userId } = useParams();
   const user = useSelector((store) => store.UserInfo.user);
   const [error, setError] = useState("");
@@ -15,6 +16,7 @@ const CurrentUser = () => {
     const fetchAllOrders = async () => {
       if (user?.length > 0) {
         try {
+          startLoading();
           const response = await FetchData(
             `users/admin/get-current-user/${userId}`,
             "get"
@@ -27,6 +29,8 @@ const CurrentUser = () => {
           }
         } catch (err) {
           setError(err.response?.data?.message || "Failed to fetch orders.");
+        } finally {
+          stopLoading();
         }
       }
     };
@@ -34,6 +38,7 @@ const CurrentUser = () => {
     const fetchAllAddress = async () => {
       if (user?.length > 0) {
         try {
+          startLoading();
           const response = await FetchData(
             `users/admin/${userId}/addresses`,
             "get"
@@ -46,6 +51,8 @@ const CurrentUser = () => {
           }
         } catch (err) {
           setError(err.response?.data?.message || "Failed to fetch orders.");
+        } finally {
+          stopLoading();
         }
       }
     };
@@ -56,6 +63,7 @@ const CurrentUser = () => {
 
   const HandleUserBan = async () => {
     try {
+      startLoading();
       const response = await FetchData(
         `users/admin/ban-user/${userId}`,
         "post"
@@ -69,6 +77,8 @@ const CurrentUser = () => {
     } catch (err) {
       console.log(err);
       alert("Failed to ban user");
+    } finally {
+      stopLoading();
     }
   };
 
@@ -124,4 +134,4 @@ const CurrentUser = () => {
   );
 };
 
-export default CurrentUser;
+export default LoadingUI(CurrentUser);
