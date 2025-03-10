@@ -12,7 +12,9 @@ import { upload } from "../middlewares/multer.middleware.js";
 
 const router = Router();
 
-router.route("/main-category/add").post(VerifyAdminUser, AddCategory);
+router
+  .route("/main-category/add")
+  .post(VerifyAdminUser, upload.single("image"), AddCategory);
 router.route("/main-category/delete").delete(VerifyAdminUser, DeleteCategory);
 router
   .route("/sub-category/add")

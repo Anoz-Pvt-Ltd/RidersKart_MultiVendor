@@ -23,9 +23,20 @@ const AddCategory = asyncHandler(async (req, res) => {
     title: category,
   });
 
+  const imageFile = req.file;
+
+  console.log("imageFile : ", imageFile);
+  if (!imageFile) throw new ApiError(404, "Image file not found!");
+  const image = await UploadImages(imageFile.filename, {
+    folderStructure: `images-Of-Subcategory/${subcategory}`,
+  });
+  if (!image)
+    throw new ApiError(500, "Failed to upload image! Please try again");
+
   const newSubcategory = await Subcategory.create({
     title: subcategory,
     category: newCategory._id,
+    image: { url: image.url, alt: subcategory, fileId: image.fileId },
   });
   if (!newCategory || !newSubcategory)
     throw new ApiError(

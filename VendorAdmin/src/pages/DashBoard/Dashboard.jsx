@@ -278,8 +278,11 @@ const Dashboard = () => {
                     className={"w-full"}
                     onClick={() => {
                       Dispatch(clearUser());
-                      alert("you are logged Out! Please log in");
-                      navigate("/login");
+                      localStorage.removeItem("AccessToken");
+                      localStorage.removeItem("RefreshToken");
+                      alert("You are logged out! Please log in.");
+                      setTimeout(() => navigate("/login"), 100);
+                      console.log(localStorage.getItem("RefreshToken"));
                     }}
                   />
                 </div>

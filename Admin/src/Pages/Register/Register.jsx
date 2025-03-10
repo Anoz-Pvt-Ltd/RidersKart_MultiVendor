@@ -16,7 +16,7 @@ const AdminRegister = () => {
   });
 
   const HandleLogin = () => {
-    navigate("/admin-login");
+    navigate("/");
   };
 
   const handleChange = (e) => {

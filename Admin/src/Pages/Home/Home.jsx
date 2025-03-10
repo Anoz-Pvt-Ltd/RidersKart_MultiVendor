@@ -592,6 +592,10 @@ const Dashboard = () => {
                       <form
                         ref={formRef}
                         onSubmit={submitCategory}
+                        // onSubmit={(e) => {
+                        //   e.preventDefault();
+                        //   submitCategory;
+                        // }}
                         className="flex flex-col gap-2 "
                       >
                         <h1>Add Main & Sub category</h1>
@@ -612,7 +616,7 @@ const Dashboard = () => {
                             Upload Image
                           </label>
                           <input
-                            // name="image"
+                            name="image"
                             type="file"
                             accept="image/*"
                             className="mt-1 block w-full border border-gray-300 rounded-md p-2"

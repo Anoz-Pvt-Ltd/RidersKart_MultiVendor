@@ -9,7 +9,7 @@ import { categories } from "../../Constants/Home/Home.Constants";
 const Home = () => {
   const [products, setProducts] = useState([]);
   const [error, setError] = useState(null);
-  console.log(products);
+  // console.log(products);
 
   useEffect(() => {
     const fetchProducts = async () => {
