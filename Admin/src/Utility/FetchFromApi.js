@@ -2,13 +2,13 @@ import axios from "axios";
 
 export const DomainUrl = "http://localhost:3000";
 
-export const FetchData = async (url, method, data) => {
+export const FetchData = async (url, method, data, file = false) => {
   const Base_URL = `${DomainUrl}/api/v1`;
   const AccessToken = localStorage.getItem("AccessToken");
 
   const options = {
     headers: {
-      "Content-Type": "application/json",
+      "Content-Type": file ? "multipart/form-data" : "application/json",
       Authorization: `Bearer ${AccessToken}`,
     },
     // withCredentials: true,

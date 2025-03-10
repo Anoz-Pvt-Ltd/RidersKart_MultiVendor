@@ -22,7 +22,7 @@ export const UploadImages = async (
       file: data, // required
       fileName: imageName, // required
       tags,
-      folder: `${folderDetails.root}/${folderDetails.name.split(" ").join("-")}/${folderDetails.category.split(" ").join("-")}/${folderDetails.subcategory.split(" ").join("-")}/${folderDetails.item.split(" ").join("-")}`,
+      folder: folderDetails.folderStructure,
       isPrivateFile: false,
       useUniqueFileName: false,
     });
@@ -35,4 +35,22 @@ export const UploadImages = async (
     console.error("Error in UploadImages:", error);
     throw error; // Ensure errors propagate to the caller
   }
+};
+
+export const DeleteImage = async (fileId = "") => {
+  imageKit.deleteFile(fileId, function (error, result) {
+    if (error) console.log(error);
+    else console.log(result);
+  });
+};
+
+export const DeleteBulkImage = async (fileId = []) => {
+  imageKit
+    .bulkDeleteFiles(fileId)
+    .then((response) => {
+      console.log(response);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
 };

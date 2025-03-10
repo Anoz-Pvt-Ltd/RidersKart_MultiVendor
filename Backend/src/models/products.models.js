@@ -44,6 +44,10 @@ const productSchema = new mongoose.Schema({
   },
   images: [
     {
+      fileId: {
+        type: String, // ImageKit file ID
+        required: true, // The unique identifier for the uploaded image file
+      },
       url: {
         type: String,
         required: true,

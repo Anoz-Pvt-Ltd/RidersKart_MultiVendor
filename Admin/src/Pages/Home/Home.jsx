@@ -5,6 +5,7 @@ import {
   ListOrdered,
   Newspaper,
   Package,
+  PencilLine,
   ScanLine,
   User,
   X,
@@ -34,7 +35,11 @@ const Dashboard = () => {
     allCategoryPopup: false,
     allSubCategoryPopup: false,
     addSubCategory: false,
+    editSubcategory: false,
+    selectedSubcategoryId: null,
+    selectedSubcategoryTitle: null,
   });
+  // const [image, setImage] = useState(null);
   const formRef = useRef(null);
 
   const sectionVariants = {
@@ -232,6 +237,7 @@ const Dashboard = () => {
   // console.log(formData);
   const submitCategory = async () => {
     const formData = new FormData(formRef.current);
+    // formData.append("image", image);
 
     for (let [key, value] of formData.entries()) {
       console.log(`${key}: ${value}`);
@@ -241,7 +247,8 @@ const Dashboard = () => {
       const response = await FetchData(
         "main-sub-category/main-category/add",
         "post",
-        formData
+        formData,
+        true
       );
       console.log(response);
       // setAddShowCategoryPopup(false);
@@ -272,6 +279,7 @@ const Dashboard = () => {
 
   const submitSubCategory = async (categoryId) => {
     const formData = new FormData(formRef.current);
+    // formData.append("image");
     // formData.append("category", categoryId); // Attach category ID
 
     // Debugging: Log form data before sending it
@@ -283,7 +291,8 @@ const Dashboard = () => {
       const response = await FetchData(
         "main-sub-category/sub-category/add",
         "post",
-        formData
+        formData,
+        true
       );
       console.log("Subcategory Added:", response);
       alert("Subcategory Added Successfully!");
@@ -295,6 +304,45 @@ const Dashboard = () => {
       }));
     } catch (error) {
       console.error("Error adding subcategory:", error);
+    }
+  };
+
+  const handleEditSubcategory = async (e) => {
+    e.preventDefault(); // Prevent default form submission
+
+    try {
+      if (!handlePopup.selectedSubcategoryId) {
+        alert("Subcategory ID is missing!");
+        return;
+      }
+
+      const formData = new FormData(formRef.current);
+      // formData.append("image", image);
+
+      // Log form data for debugging
+      for (let [key, value] of formData.entries()) {
+        console.log(`${key}: ${value}`);
+      }
+
+      const response = await FetchData(
+        `main-sub-category/edit-sub-category/${handlePopup.selectedSubcategoryId}`,
+        "post",
+        formData,
+        true
+      );
+
+      console.log("Response:", response);
+      alert("Subcategory Edited Successfully!");
+      window.location.reload(); // Refresh page to reflect changes
+
+      // Close popup and reset state
+      setHandlePopup({
+        editSubcategory: false,
+        selectedSubcategoryId: null,
+      });
+    } catch (error) {
+      console.error("Error editing subcategory:", error);
+      alert("Failed to edit subcategory.");
     }
   };
 
@@ -540,7 +588,7 @@ const Dashboard = () => {
                 </div>
                 {handlePopup.addCategoryPopup && (
                   <div className="backdrop-blur-xl absolute top-0 w-full h-full flex justify-center items-center flex-col left-0">
-                    <div className="bg-white shadow-2xl rounded-xl w-96 h-96 flex justify-center items-center">
+                    <div className="bg-white shadow-2xl rounded-xl w-fit h-fit px-10 py-10 flex justify-center items-center">
                       <form
                         ref={formRef}
                         onSubmit={submitCategory}
@@ -559,6 +607,20 @@ const Dashboard = () => {
                           Name={"subcategory"}
                           Required
                         />
+                        <div className="mt-4">
+                          <label className="block text-sm font-medium text-gray-700">
+                            Upload Image
+                          </label>
+                          <input
+                            // name="image"
+                            type="file"
+                            accept="image/*"
+                            className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                            // onChange={(e) =>
+                            //   setImage(e.target.files[0])
+                            // }
+                          />
+                        </div>
                         <Button label={"Confirm"} type={"submit"} />
                         <Button
                           label={"Cancel"}
@@ -584,10 +646,7 @@ const Dashboard = () => {
                       }
                     />
                     {AllCategories.map((category) => (
-                      <div
-                        key={category._id}
-                        className="p-4 rounded "
-                      >
+                      <div key={category._id} className="p-4 rounded ">
                         <div className="flex justify-between items-center bg-white p-2 rounded-xl ">
                           <div>
                             <h2 className="text-sm font-semibold">
@@ -675,13 +734,20 @@ const Dashboard = () => {
                                       Name={"categoryId"}
                                       Required
                                     />
-                                    {/* <InputBox
-                                      LabelName={"Main category id"}
-                                      Placeholder={category._id}
-                                      name={"subcategory"}
-                                      Required
-                                      DisableRequired={true}
-                                    /> */}
+                                    <div className="mt-4">
+                                      <label className="block text-sm font-medium text-gray-700">
+                                        Upload Image
+                                      </label>
+                                      <input
+                                        name="image"
+                                        type="file"
+                                        accept="image/*"
+                                        className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                                        onChange={(e) =>
+                                          console.log(e.target.files[0])
+                                        }
+                                      />
+                                    </div>
 
                                     <Button label={"Add"} type="submit" />
                                     <Button
@@ -704,11 +770,96 @@ const Dashboard = () => {
                                 <h3 className="font-medium">Subcategories:</h3>
                                 <ul className="list-disc pl-5">
                                   {category.subcategories.map((sub) => (
-                                    <li key={sub._id} className="text-gray-700">
-                                      {sub.title} (ID: {sub._id})
-                                    </li>
+                                    <div className="flex justify-start items-center">
+                                      <li
+                                        key={sub._id}
+                                        className="text-gray-700"
+                                      >
+                                        {sub.title} (ID: {sub._id})
+                                      </li>
+
+                                      <button
+                                        onClick={() =>
+                                          setHandlePopup((prev) => ({
+                                            ...prev,
+                                            editSubcategory: true,
+                                            selectedSubcategoryId: sub._id,
+                                            selectedSubcategoryTitle: sub.title,
+                                          }))
+                                        }
+                                      >
+                                        <PencilLine className="font-thin h-5 w-5" />
+                                      </button>
+                                    </div>
                                   ))}
                                 </ul>
+                                {handlePopup.editSubcategory && (
+                                  <div className="absolute top-0 left-0 h-full w-full p-20 bg-white shadow-lg rounded-md">
+                                    {/* Close Button */}
+
+                                    {/* Edit Form */}
+                                    <form
+                                      ref={formRef}
+                                      onSubmit={handleEditSubcategory}
+                                    >
+                                      {/* Display Selected Subcategory ID */}
+                                      <p className="text-gray-700 font-medium">
+                                        Editing Subcategory Name:{" "}
+                                        {handlePopup.selectedSubcategoryTitle}
+                                        <span className="mx-5">
+                                          Editing Subcategory ID:
+                                          {handlePopup.selectedSubcategoryId}
+                                        </span>
+                                      </p>
+
+                                      {/* Input for Subcategory Title */}
+                                      <InputBox
+                                        Placeholder={
+                                          "Enter new Subcategory name"
+                                        }
+                                        LabelName="Edit Subcategory"
+                                        Name="newTitle"
+                                        Required
+                                      />
+
+                                      {/* Input for Image Upload */}
+                                      <div className="mt-4">
+                                        <label className="block text-sm font-medium text-gray-700">
+                                          Upload Image
+                                        </label>
+                                        <input
+                                          // name="image"
+                                          type="file"
+                                          accept="image/*"
+                                          className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                                          // onChange={(e) =>
+                                          //   setImage(e.target.files[0])
+                                          // }
+                                        />
+                                      </div>
+
+                                      {/* Submit Button */}
+                                      <div className="flex justify-start my-10 items-center w-full gap-20">
+                                        <Button
+                                          label={"Update"}
+                                          type={"submit"}
+                                        />
+                                        <Button
+                                          label={"Cancel"}
+                                          className={"hover:bg-red-500"}
+                                          onClick={() =>
+                                            setHandlePopup((prev) => ({
+                                              ...prev,
+                                              editSubcategory: false,
+                                              selectedSubcategoryId: null,
+                                              selectedSubcategoryTitle: null,
+                                            }))
+                                          }
+                                        />
+                                      </div>
+                                    </form>
+                                  </div>
+                                )}
                               </>
                             ) : (
                               <p className="text-gray-500">

@@ -4,6 +4,7 @@ import { Subcategory } from "../models/sub-category.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import { DeleteImage, UploadImages } from "../utils/imageKit.io.js";
 
 const AddCategory = asyncHandler(async (req, res) => {
   const { category, subcategory } = req.body;
@@ -64,12 +65,6 @@ const DeleteCategory = asyncHandler(async (req, res) => {
 
 const AddSubcategory = asyncHandler(async (req, res) => {
   const { categoryId, subcategory } = req.body;
-  // const { subcategory } = req.body;
-  // const { categoryId } = req.params;
-
-  console.log("category id", categoryId);
-  console.log("subcategory", subcategory);
-
   if (!categoryId || !subcategory)
     throw new ApiError(404, "Category or Subcategory not found!");
 
@@ -86,9 +81,20 @@ const AddSubcategory = asyncHandler(async (req, res) => {
   const category = await Category.findById(categoryId);
   if (!category) throw new ApiError(404, "Category not found!");
 
+  const imageFile = req.file;
+
+  console.log("imageFile : ", imageFile);
+  if (!imageFile) throw new ApiError(404, "Image file not found!");
+  const image = await UploadImages(imageFile.filename, {
+    folderStructure: `images-Of-Subcategory/${subcategory}`,
+  });
+  if (!image)
+    throw new ApiError(500, "Failed to upload image! Please try again");
+
   const newSubcategory = await Subcategory.create({
     title: subcategory,
     category: category._id,
+    image: { url: image.url, alt: subcategory, fileId: image.fileId },
   });
   if (!newSubcategory)
     throw new ApiError(500, "Failed to create subcategory! Please try again");
@@ -148,10 +154,53 @@ const getAllMainSubcategories = asyncHandler(async (req, res) => {
   );
 });
 
+const editSubcategory = asyncHandler(async (req, res) => {
+  const { subcategoryId } = req.params;
+  const { newTitle } = req.body;
+  console.log("controller reached");
+  console.log("newTitle", newTitle);
+  console.log("subcategoryId", subcategoryId);
+
+  if (!subcategoryId) {
+    throw new ApiError(400, "Subcategory ID is required");
+  }
+
+  if (!newTitle || typeof newTitle !== "string") {
+    throw new ApiError(400, "New title is required and must be a string");
+  }
+
+  const subcategory = await Subcategory.findById(subcategoryId);
+
+  if (!subcategory) {
+    throw new ApiError(404, "Subcategory not found");
+  }
+  const imageFile = req.file;
+  if (!imageFile) throw new ApiError(404, "Image file not found");
+
+  const deletedImage = await DeleteImage(subcategory.image.fileId);
+  if (!deletedImage) throw new ApiError(500, "Failed to delete previous image");
+
+  const image = await UploadImages(imageFile.filename, {
+    folderStructure: `images-Of-Subcategory/${subcategory}`,
+  });
+  if (!image) throw new ApiError(500, "Failed to upload image");
+
+  subcategory.title = newTitle;
+  subcategory.image = { url: image.url, alt: newTitle, fileId: image.fileId };
+  await subcategory.save();
+
+  res
+    .status(200)
+    .json(
+      new ApiResponse(200, { subcategory }, "Subcategory updated successfully")
+    );
+});
+
 export {
   AddCategory,
   DeleteCategory,
   AddSubcategory,
   DeleteSubcategory,
   getAllMainSubcategories,
+  editSubcategory,
 };
