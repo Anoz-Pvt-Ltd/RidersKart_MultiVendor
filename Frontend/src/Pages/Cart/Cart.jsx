@@ -60,18 +60,20 @@ const CartPage = ({ startLoading, stopLoading }) => {
   }, []);
 
   const updateQuantity = (productId, operation) => {
-    setCartProducts((prevCartProducts) =>
-      prevCartProducts.map((item) =>
-        item._id === productId
-          ? {
-              ...item,
-              quantity:
-                operation === "increase"
-                  ? item.quantity + 1
-                  : Math.max(item.quantity - 1, 1),
-            }
-          : item
-      )
+    setCartProducts(
+      (prevCartProducts) =>
+        prevCartProducts.length > 0 &&
+        prevCartProducts?.map((item) =>
+          item._id === productId
+            ? {
+                ...item,
+                quantity:
+                  operation === "increase"
+                    ? item.quantity + 1
+                    : Math.max(item.quantity - 1, 1),
+              }
+            : item
+        )
     );
   };
 
@@ -98,7 +100,7 @@ const CartPage = ({ startLoading, stopLoading }) => {
           <div className="flex w-full justify-around items-center ">
             <div className="lg:col-span-2 w-1/2">
               <div className="bg-white shadow-md rounded-md p-4">
-                {cartProducts.map((item) => (
+                {cartProducts?.map((item) => (
                   <div
                     key={item._id}
                     className="flex items-center justify-between border-b pb-4 mb-4"
@@ -166,37 +168,45 @@ const CartPage = ({ startLoading, stopLoading }) => {
       <h1 className="text-xl mx-4 my-10 w-full text-center border-t border-neutral-400 font-bold">
         Recommendations
       </h1>
-
-      
-      <div className="flex flex-row gap-4 bg-transparent justify-start items-center overflow-x-auto p-5 w-full">
-        {products.map((product) => (
-          <ProductCard
-            key={product._id}
-            ProductName={product.name}
-            CurrentPrice={product.price}
-            Mrp={product.price}
-            Rating={product.rating || "No rating"}
-            Offer="No offer"
-            Category={product.category.main}
-            StockQuantity={product.stockQuantity}
-            className={`hidden lg:block`}
-          />
-        ))}
-      </div>
-      <div className="flex lg:hidden flex-col gap-4 bg-transparent justify-start items-center overflow-x-auto w-full">
-        {products.map((product) => (
-          <ProductCardMobile
-            key={product._id}
-            ProductName={product.name}
-            CurrentPrice={product.price}
-            Mrp={product.price}
-            Rating={product.rating || "No rating"}
-            Offer="No offer"
-            Category={product.category.main}
-            StockQuantity={product.stockQuantity}
-          />
-        ))}
-      </div>
+      {products.length === 0 ? (
+        <div>
+          <h1>No Recommendations available </h1>
+          {/* {console.log("Products : ", products)} */}
+        </div>
+      ) : (
+        <>
+          {console.log("Products : ", products)}
+          <div className="flex flex-row gap-4 bg-transparent justify-start items-center overflow-x-auto p-5 w-full">
+            {products?.map((product) => (
+              <ProductCard
+                key={product._id}
+                ProductName={product.name}
+                CurrentPrice={product.price}
+                Mrp={product.price}
+                Rating={product.rating || "No rating"}
+                Offer="No offer"
+                Category={product.category.main}
+                StockQuantity={product.stockQuantity}
+                className={`hidden lg:block`}
+              />
+            ))}
+          </div>
+          <div className="flex lg:hidden flex-col gap-4 bg-transparent justify-start items-center overflow-x-auto w-full">
+            {products?.map((product) => (
+              <ProductCardMobile
+                key={product._id}
+                ProductName={product.name}
+                CurrentPrice={product.price}
+                Mrp={product.price}
+                Rating={product.rating || "No rating"}
+                Offer="No offer"
+                Category={product.category.main}
+                StockQuantity={product.stockQuantity}
+              />
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 };
