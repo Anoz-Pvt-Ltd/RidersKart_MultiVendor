@@ -283,14 +283,24 @@ const getVendorDetailsByProductId = async (req, res) => {
 };
 
 const getAllVendors = asyncHandler(async (req, res) => {
-  try {
-    const vendors = await VendorUser.find({});
-    res.json(
-      new ApiResponse(200, { vendors }, "All vendors fetched successfully")
-    );
-  } catch (error) {
-    throw new ApiError(500, error.message || "Something went wrong");
-  }
+  const vendors = await VendorUser.find({});
+  res.json(
+    new ApiResponse(200, { vendors }, "All vendors fetched successfully")
+  );
+});
+
+const getVerifiedVendors = asyncHandler(async (req, res) => {
+  const vendor = await VendorUser.find({ isVerified: true });
+  res.json(
+    new ApiResponse(200, { vendor }, "Verified vendors fetched successfully")
+  );
+});
+
+const getUnverifiedVendors = asyncHandler(async (req, res) => {
+  const vendor = await VendorUser.find({ isVerified: false });
+  res.json(
+    new ApiResponse(200, { vendor }, "Unverified vendors fetched successfully")
+  );
 });
 
 const getCurrentVendor = asyncHandler(async (req, res) => {
@@ -326,6 +336,8 @@ export {
   deleteVendor,
   getVendorDetailsByProductId,
   getAllVendors,
+  getVerifiedVendors,
+  getUnverifiedVendors,
   getCurrentVendor,
   VendorBan,
 };

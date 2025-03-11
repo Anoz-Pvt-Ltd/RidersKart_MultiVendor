@@ -166,6 +166,8 @@ const CartPage = ({ startLoading, stopLoading }) => {
       <h1 className="text-xl mx-4 my-10 w-full text-center border-t border-neutral-400 font-bold">
         Recommendations
       </h1>
+
+      
       <div className="flex flex-row gap-4 bg-transparent justify-start items-center overflow-x-auto p-5 w-full">
         {products.map((product) => (
           <ProductCard

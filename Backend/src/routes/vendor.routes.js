@@ -9,8 +9,13 @@ import {
   getVendorDetailsByProductId,
   getAllVendors,
   getCurrentVendor,
+  getVerifiedVendors,
+  getUnverifiedVendors,
 } from "../controllers/Vendor.controllers.js";
-import { VerifyVendorUser } from "../middlewares/auth.middleware.js";
+import {
+  VerifyVendorUser,
+  VerifyAdminUser,
+} from "../middlewares/auth.middleware.js";
 
 const router = Router();
 
@@ -27,9 +32,19 @@ router
   .get(getVendorDetailsByProductId);
 
 //admin routes
-router.route("/admin/get-all-verified-vendor").get(getAllVendors);
-router.route("/admin/get-current-vendor/:vendorId").get(getCurrentVendor);
-router.route("/admin/ban-vendor/:vendorId").post(deleteVendor);
-router.route("/admin/delete-vendor/:vendorId").delete(deleteVendor);
+router.route("/admin/get-all-vendor").get(VerifyAdminUser, getAllVendors);
+router
+  .route("/admin/get-all-verified-vendor")
+  .get(VerifyAdminUser, getVerifiedVendors);
+router
+  .route("/admin/get-all-unverified-vendor")
+  .get(VerifyAdminUser, getUnverifiedVendors);
+router
+  .route("/admin/get-current-vendor/:vendorId")
+  .get(VerifyAdminUser, getCurrentVendor);
+router.route("/admin/ban-vendor/:vendorId").post(VerifyAdminUser, deleteVendor);
+router
+  .route("/admin/delete-vendor/:vendorId")
+  .delete(VerifyAdminUser, deleteVendor);
 
 export default router;

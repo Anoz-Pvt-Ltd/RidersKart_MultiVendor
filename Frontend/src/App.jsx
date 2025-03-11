@@ -14,6 +14,7 @@ import { useSelector } from "react-redux";
 import { clearUser, addUser } from "./Utility/Slice/UserInfoSlice";
 import BuyNow from "./Pages/BuyNow/BuyNow";
 import Dashboard from "./Pages/Profile/ProfileDashboard";
+import VendorRegistrationForm from "../src/Pages/VendorRegister/Registration";
 // import { io } from "socket.io-client";
 
 const App = () => {
@@ -100,6 +101,7 @@ const App = () => {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<UserRegister />} />
+          <Route path="/vendor-register" element={<VendorRegistrationForm />} />
           <Route
             path="/user-profile/dashboard/:userId"
             element={<Dashboard />}
