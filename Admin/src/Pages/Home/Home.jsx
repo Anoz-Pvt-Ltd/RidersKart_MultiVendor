@@ -28,6 +28,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
   const [allProducts, setAllProducts] = useState([]);
   const [allOrders, setAllOrders] = useState([]);
   const [allVerifiedVendors, setAllVerifiedVendors] = useState([]);
+  const [allUnverifiedVendors, setAllUnverifiedVendors] = useState([]);
   const [AllCategories, setAllCategories] = useState([]);
   const [selectedCategoryId, setSelectedCategoryId] = useState(null);
   const [handlePopup, setHandlePopup] = useState({
@@ -87,6 +88,10 @@ const Dashboard = ({ startLoading, stopLoading }) => {
     useState("");
   const [filteredVerifiedVendors, setFilteredVerifiedVendors] =
     useState(allVerifiedVendors);
+  const [searchTermUnVerifiedVendors, setSearchTermUnVerifiedVendors] =
+    useState("");
+  const [filteredUnVerifiedVendors, setFilteredUnVerifiedVendors] =
+    useState(allUnverifiedVendors);
 
   //filtering functions for each entities
   const handleSearchUser = (e) => {
@@ -134,6 +139,21 @@ const Dashboard = ({ startLoading, stopLoading }) => {
       setFilteredOrders(filtered);
     }
   };
+  const handleSearchUnVerifiedVendors = (e) => {
+    const searchValueUnVerifiedVendors = e.target.value;
+    setSearchTermUnVerifiedVendors(searchValueUnVerifiedVendors);
+
+    if (searchValueUnVerifiedVendors === "") {
+      setFilteredUnVerifiedVendors(allUnverifiedVendors);
+    } else {
+      const filtered = allUnverifiedVendors.filter(
+        (vendor) =>
+          vendor._id.includes(searchValueUnVerifiedVendors) ||
+          vendor.contactNumber.includes(searchValueUnVerifiedVendors)
+      );
+      setFilteredUnVerifiedVendors(filtered);
+    }
+  };
   const handleSearchVerifiedVendors = (e) => {
     const searchValueVerifiedVendors = e.target.value;
     setSearchTermVerifiedVendors(searchValueVerifiedVendors);
@@ -154,12 +174,18 @@ const Dashboard = ({ startLoading, stopLoading }) => {
     setFilteredUsers(allUser);
     setFilteredProducts(allProducts);
     setFilteredOrders(allOrders);
+    setFilteredUnVerifiedVendors(allUnverifiedVendors);
     setFilteredVerifiedVendors(allVerifiedVendors);
-  }, [allUser, allProducts, allOrders, allVerifiedVendors]);
+  }, [
+    allUser,
+    allProducts,
+    allOrders,
+    allUnverifiedVendors,
+    allVerifiedVendors,
+  ]);
 
   //fetching all data for all users,products,orders,vendors(verified) and vendors(not-verified)
   useEffect(() => {
-
     const fetchAllUsers = async () => {
       if (user?.length > 0) {
         try {
@@ -220,6 +246,27 @@ const Dashboard = ({ startLoading, stopLoading }) => {
       }
     };
 
+    const fetchAllUnVerifiedVendors = async () => {
+      if (user?.length > 0) {
+        try {
+          startLoading();
+          const response = await FetchData(
+            "vendor/admin/get-all-unverified-vendor",
+            "get"
+          );
+          // console.log(response);
+          if (response.data.success) {
+            setAllUnverifiedVendors(response.data.data.vendor);
+          } else {
+            setError("Failed to load vendors.");
+          }
+        } catch (err) {
+          setError(err.response?.data?.message || "Failed to fetch vendors.");
+        } finally {
+          stopLoading();
+        }
+      }
+    };
     const fetchAllVerifiedVendors = async () => {
       if (user?.length > 0) {
         try {
@@ -228,9 +275,9 @@ const Dashboard = ({ startLoading, stopLoading }) => {
             "vendor/admin/get-all-verified-vendor",
             "get"
           );
-          // console.log(response);
+          console.log(response);
           if (response.data.success) {
-            setAllVerifiedVendors(response.data.data.vendors);
+            setAllVerifiedVendors(response.data.data.vendor);
           } else {
             setError("Failed to load vendors.");
           }
@@ -245,6 +292,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
     fetchAllUsers();
     fetchAllProducts();
     fetchAllOrders();
+    fetchAllUnVerifiedVendors();
     fetchAllVerifiedVendors();
   }, [user]);
 
@@ -382,7 +430,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
   return (
     <div className="flex min-h-screen">
       <motion.aside
-        className="w-64 text-black p-4 shadow-lg"
+        className="w-64 text-black p-4 shadow-lg fixed"
         initial="hidden"
         animate="visible"
         variants={sidebarVariants}
@@ -452,7 +500,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
           </ul>
         </nav>
       </motion.aside>
-      <main className="flex-1 p-6">
+      <main className="flex-1 p-6 ml-64">
         <motion.div
           initial="hidden"
           animate="visible"
@@ -460,7 +508,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
           transition={{ duration: 0.5 }}
         >
           {activeSection === "Users" && (
-            <section>
+            <section className="">
               {/* main component */}
               <h2 className="text-2xl font-bold mb-4">Users</h2>
               {/* sorting box */}
@@ -523,10 +571,64 @@ const Dashboard = ({ startLoading, stopLoading }) => {
           )}
           {activeSection === "Vendors (Under review)" && (
             <section>
-              <h2 className="text-2xl font-bold mb-4">
-                Vendors (Under review)
-              </h2>
-              {/*content*/}
+              <h2 className="text-2xl font-bold mb-4">Vendors (Verified)</h2>
+              {/* Vendors (Verified) content */}
+              <InputBox
+                Type="test"
+                Value={searchTermUnVerifiedVendors}
+                onChange={handleSearchUnVerifiedVendors}
+                Placeholder={"Search by Vendor ID"}
+              />
+              <div className="overflow-x-auto">
+                <table className="min-w-full border-collapse border border-gray-300 rounded-xl">
+                  <thead>
+                    <tr>
+                      {tableHeadersVendors.map((header, index) => (
+                        <th
+                          key={index}
+                          className="border border-gray-500 px-4 py-2 bg-neutral-300"
+                        >
+                          {header}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredUnVerifiedVendors?.length > 0 ? (
+                      filteredUnVerifiedVendors.map((vendor) => (
+                        <tr key={vendor.id}>
+                          <td className="border border-gray-500 px-4 py-2">
+                            <Link to={`/current-vendor/${vendor?._id}`}>
+                              {vendor?._id}
+                            </Link>
+                          </td>
+                          <td className="border border-gray-500 px-4 py-2">
+                            {vendor?.name}
+                          </td>
+                          <td className="border border-gray-500 px-4 py-2">
+                            {vendor?.email}
+                          </td>
+                          <td className="border border-gray-500 px-4 py-2">
+                            {vendor?.contactNumber}
+                          </td>
+                          <td className="border border-gray-500 px-4 py-2">
+                            {vendor?.products?.length}
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td
+                          colSpan={tableHeadersProducts.length}
+                          className="text-center py-4"
+                        >
+                          No Vendors found.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </section>
           )}
           {activeSection === "Vendors (Verified)" && (
@@ -554,7 +656,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredVerifiedVendors.length > 0 ? (
+                    {filteredVerifiedVendors?.length > 0 ? (
                       filteredVerifiedVendors.map((vendor) => (
                         <tr key={vendor.id}>
                           <td className="border border-gray-500 px-4 py-2">
