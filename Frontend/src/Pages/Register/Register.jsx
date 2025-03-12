@@ -115,7 +115,7 @@ const UserRegister = ({ startLoading, stopLoading }) => {
 
       <form
         onSubmit={handleSubmit}
-        className="grid grid-cols-1 md:grid-cols-2 gap-6"
+        className="grid grid-cols-1 md:grid-cols-2 lg:gap-6"
       >
         <InputBox
           LabelName="Name"

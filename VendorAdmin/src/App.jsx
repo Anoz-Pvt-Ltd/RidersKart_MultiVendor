@@ -48,8 +48,8 @@ function App() {
   return (
     <div className="text-black whiteSoftBG">
       <Routes>
-        {/* <Route path="/" element={<Hero />} /> */}
-        <Route path="/" element={<Dashboard />} />
+        <Route path="/" element={<Hero />} />
+        <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/login" element={<LoginForm />} />
         <Route path="/register" element={<VendorRegistrationForm />} />
         <Route path="/vendor-profile" element={<VendorProfile />} />

@@ -43,8 +43,9 @@ const CartPage = ({ startLoading, stopLoading }) => {
     try {
       startLoading();
       const response = await FetchData("products/get-all-product", "get");
+      // console.log(response);
       if (response.data.success) {
-        setProducts(response.data.data);
+        setProducts(response.data.data.products);
       } else {
         setError("Failed to load products.");
       }

@@ -5,6 +5,7 @@ import { addUser, clearUser } from "../../utils/Slice/UserInfoSlice";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import LoadingUI from "../../components/Loading";
+import Button from "../../components/Button";
 
 const LoginForm = ({ startLoading, stopLoading }) => {
   const Dispatch = useDispatch();
@@ -45,7 +46,7 @@ const LoginForm = ({ startLoading, stopLoading }) => {
         "RefreshToken",
         response.data.data.tokens.refreshToken
       ); // Save token to localStorage
-      Navigate("/");
+      Navigate("/dashboard");
     } catch (err) {
       setError(err.response?.data?.message || "Invalid email or password.");
     } finally {
@@ -54,13 +55,13 @@ const LoginForm = ({ startLoading, stopLoading }) => {
   };
 
   return (
-    <div className="max-w-md mx-auto p-6 bg-white shadow-lg rounded-lg">
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">Login</h1>
+    <div className="max-w-md mx-auto p-6 backdrop-blur-sm shadow-lg rounded-lg w-96">
+      <h1 className="text-2xl font-bold text-gray-800 lg:mb-6">Login</h1>
 
       {error && <div className="text-red-500 mb-4">{error}</div>}
       {success && <div className="text-green-500 mb-4">{success}</div>}
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="lg:space-y-6">
         {/* Email Input */}
         <InputBox
           LabelName="Email"
@@ -83,12 +84,13 @@ const LoginForm = ({ startLoading, stopLoading }) => {
 
         {/* Submit Button */}
         <div>
-          <button
+          <Button Type={"submit"} label={"Login"} className={"w-full"} />
+          {/* <button
             type="submit"
             className="w-full bg-blue-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-600"
           >
             Login
-          </button>
+          </button> */}
         </div>
       </form>
       <div>

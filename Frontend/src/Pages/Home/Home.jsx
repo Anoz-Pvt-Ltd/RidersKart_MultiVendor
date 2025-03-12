@@ -127,7 +127,7 @@ const Home = ({ startLoading, stopLoading }) => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.2 }}
             >
-              <div className="flex justify-between items-center mb-4">
+              <div className="flex justify-between items-center ">
                 <h2 className="text-lg font-bold">{category.title}</h2>
                 <div className="flex gap-2">
                   <button
@@ -147,7 +147,7 @@ const Home = ({ startLoading, stopLoading }) => {
 
               <div
                 ref={scrollContainer}
-                className="flex overflow-x-auto overflow-y-hidden scrollbar-hide gap-4 lg:h-60 justify-start items-start lg:py-20 "
+                className=" flex overflow-x-auto overflow-y-hidden scrollbar-hide gap-4 py-2 px-1 justify-start items-start "
               >
                 {category.items.map((item, idx) => (
                   <Link

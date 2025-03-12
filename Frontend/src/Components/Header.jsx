@@ -62,14 +62,14 @@ const Header = () => {
             onClick={() => navigate("/login")}
           />
         )}
-        <Button
+        {/* <Button
           label={
             <h1 className="flex gap-2">
               <Store /> Become a Seller
             </h1>
           }
           onClick={() => navigate("/vendor-register")}
-        />
+        /> */}
         <motion.div whileHover={{ scale: 1.1 }}>
           <Link
             to={`/cart/${user?.[0]?._id}`}
@@ -126,7 +126,7 @@ const Header = () => {
               }}
             />
           )}
-          <Button
+          {/* <Button
             label={
               <h1 className="flex gap-2">
                 <Store /> Become a Seller
@@ -136,7 +136,7 @@ const Header = () => {
               navigate("/vendor-register");
               toggleMenu();
             }}
-          />
+          /> */}
           <Link
             to={`/cart/${user?.[0]?._id}`}
             className="flex items-center gap-2"

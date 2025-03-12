@@ -18,6 +18,7 @@ const registerVendor = asyncHandler(async (req, res, next) => {
     bankName,
     ifscCode,
     password,
+    panNumber,
   } = req.body;
 
   const { address, city, state, country, postalCode } = location;
@@ -38,7 +39,8 @@ const registerVendor = asyncHandler(async (req, res, next) => {
     !accountNumber ||
     !bankName ||
     !ifscCode ||
-    !password
+    !password ||
+    !panNumber
   ) {
     return next(new ApiError(400, "All fields are required"));
   }
@@ -54,6 +56,7 @@ const registerVendor = asyncHandler(async (req, res, next) => {
     name,
     email,
     contactNumber,
+    panNumber,
     location: {
       address,
       city,
@@ -88,6 +91,7 @@ const registerVendor = asyncHandler(async (req, res, next) => {
       name: newVendor.name,
       email: newVendor.email,
       contactNumber: newVendor.contactNumber,
+      panNumber: newVendor.panNumber,
       location: newVendor.location,
       status: newVendor.status,
       createdAt: newVendor.createdAt,

@@ -20,6 +20,10 @@ const vendorSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  panNumber: {
+    type: String,
+    required: true,
+  },
   location: {
     address: {
       type: String,
