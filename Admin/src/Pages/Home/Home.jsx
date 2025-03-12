@@ -598,7 +598,9 @@ const Dashboard = ({ startLoading, stopLoading }) => {
                       filteredUnVerifiedVendors.map((vendor) => (
                         <tr key={vendor.id}>
                           <td className="border border-gray-500 px-4 py-2">
-                            <Link to={`/current-vendor/${vendor?._id}`}>
+                            <Link
+                              to={`/current-un-verified-vendor/${vendor?._id}`}
+                            >
                               {vendor?._id}
                             </Link>
                           </td>
@@ -660,7 +662,9 @@ const Dashboard = ({ startLoading, stopLoading }) => {
                       filteredVerifiedVendors.map((vendor) => (
                         <tr key={vendor.id}>
                           <td className="border border-gray-500 px-4 py-2">
-                            <Link to={`/current-vendor/${vendor?._id}`}>
+                            <Link
+                              to={`/current-verified-vendor/${vendor?._id}`}
+                            >
                               {vendor?._id}
                             </Link>
                           </td>
