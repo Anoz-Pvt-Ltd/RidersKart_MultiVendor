@@ -18,12 +18,13 @@ import {
   VerifyVendorUser,
   VerifyAdminUser,
 } from "../middlewares/auth.middleware.js";
+import { upload } from "../middlewares/multer.middleware.js";
 
 const router = Router();
 
 // router.use(VerifyVendorUser);
 
-router.route("/register").post(registerVendor);
+router.route("/register").post(upload.single("image"), registerVendor);
 router.route("/login").post(loginVendor);
 router.route("/re-login").post(regenerateRefreshToken);
 router.route("/vendor-profile/:vendorId").get(getVendorData);
