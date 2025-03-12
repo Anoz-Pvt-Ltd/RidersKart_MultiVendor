@@ -65,11 +65,6 @@ const registerProduct = asyncHandler(async (req, res) => {
   const UploadedImage = await UploadImages(
     ImageFile.filename,
     {
-      // root: "all-vendor",
-      // name: vendor.name,
-      // category,
-      // subcategory,
-      // item: name,
       folderStructure: `all-vendor/${vendor.name.split(" ").join("-")}/${category.split(" ").join("-")}/${subcategory.split(" ").join("-")}/${name.split(" ").join("-")}`,
     },
     tags,

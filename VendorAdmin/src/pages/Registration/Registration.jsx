@@ -7,43 +7,53 @@ import LoadingUI from "../../components/Loading";
 
 const steps = [
   "Basic Details",
-  "Business Details",
-  "Bank Details",
   "Address Details",
+  "Bank Details",
+  "Business Details",
 ];
 
-const VendorRegistrationForm = ({ startLoading, stopLoading }) => {
+const VendorRegistrationForm = ({ startLoading, stopLoading, onClose }) => {
   const [step, setStep] = useState(0);
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: "",
-    contactNumber: "",
-    businessName: "",
-    gstNumber: "",
-    panNumber: "",
-    accountHolderName: "",
-    accountNumber: "",
-    bankName: "",
-    ifscCode: "",
-    address: "",
-    city: "",
-    state: "",
-    country: "",
-    postalCode: "",
-    image: null,
-  });
 
   const formRef = useRef(null);
 
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  const nextStep = (e) => {
+    e.preventDefault();
+    const data = new FormData(formRef.current);
+
+    // Convert FormData to a plain object
+    const formObject = {};
+    data.forEach((value, key) => {
+      formObject[key] = value;
+    });
+
+    // Retrieve existing data from localStorage
+    const existingData = localStorage.getItem("vendorRegistrationForm");
+
+    let existingObject = {};
+
+    if (existingData) {
+      // Parse existing JSON and merge new data
+      existingObject = JSON.parse(existingData);
+    }
+
+    // Append new form data to existing data
+    Object.assign(existingObject, formObject);
+
+    // Save the updated object back to localStorage
+    localStorage.setItem(
+      "vendorRegistrationForm",
+      JSON.stringify(existingObject)
+    );
+
+    console.log(existingObject);
+    setStep((prev) => prev + 1);
+    console.log(step);
   };
 
-  const nextStep = () => setStep((prev) => prev + 1);
   const prevStep = () => setStep((prev) => prev - 1);
 
   const handleSubmit = async (e) => {
@@ -51,51 +61,56 @@ const VendorRegistrationForm = ({ startLoading, stopLoading }) => {
     setError("");
     setSuccess("");
 
-    const dataToSend = {
-      ...formData,
-      location: {
-        address: formData.address,
-        city: formData.city,
-        state: formData.state,
-        country: formData.country,
-        postalCode: formData.postalCode,
-      },
-    };
+    const formData = new FormData(formRef.current);
+
+    // Retrieve existing data from localStorage
+    const existingData = localStorage.getItem("vendorRegistrationForm");
+
+    let existingObject = {};
+
+    if (existingData) {
+      // Parse existing JSON and merge new data
+      existingObject = JSON.parse(existingData);
+    }
+
+    // Convert existing object into formData
+    const existingFormData = new FormData();
+    Object.entries(existingObject).forEach(([key, value]) => {
+      existingFormData.append(key, value);
+    });
+
+    // Append both formData
+    for (let [key, value] of existingFormData.entries()) {
+      formData.append(key, value);
+    }
 
     try {
       startLoading();
-      const response = await FetchData("vendor/register", "post", dataToSend);
+      const response = await FetchData(
+        "vendor/register",
+        "post",
+        formData,
+        true
+      );
+      console.log(response);
       if (response.status === 201) {
         setSuccess("Vendor registered successfully!");
         alert(
           "Please wait until our team completes the verification process. Please try logging in again."
         );
-        window.location.href = "/login";
-        setFormData({
-          name: "",
-          email: "",
-          password: "",
-          contactNumber: "",
-          businessName: "",
-          gstNumber: "",
-          panNumber: "",
-          accountHolderName: "",
-          accountNumber: "",
-          bankName: "",
-          ifscCode: "",
-          address: "",
-          city: "",
-          state: "",
-          country: "",
-          postalCode: "",
-        });
+        // window.location.href = "/";
+
         setStep(0);
       }
     } catch (err) {
+      console.log(err);
       setError(
         err.response?.data?.message || "An error occurred during registration."
       );
     } finally {
+      localStorage.removeItem("vendorRegistrationForm");
+      setStep(0);
+      onClose();
       stopLoading();
     }
   };
@@ -150,32 +165,24 @@ const VendorRegistrationForm = ({ startLoading, stopLoading }) => {
               <InputBox
                 LabelName="Business Owner Name"
                 Name="name"
-                Value={formData.name}
                 Placeholder="Business Owner Name"
-                onChange={handleChange}
               />
               <InputBox
                 LabelName="Email"
                 Type="email"
                 Name="email"
-                Value={formData.email}
                 Placeholder="Business Owner Email"
-                onChange={handleChange}
               />
               <InputBox
                 LabelName="Password"
                 Type="password"
                 Name="password"
-                Value={formData.password}
                 Placeholder="Enter Password"
-                onChange={handleChange}
               />
               <InputBox
                 LabelName="Mobile Number"
                 Name="contactNumber"
-                Value={formData.contactNumber}
                 Placeholder="Enter Mobile Number"
-                onChange={handleChange}
               />
             </>
           )}
@@ -183,33 +190,25 @@ const VendorRegistrationForm = ({ startLoading, stopLoading }) => {
           {step === 1 && (
             <>
               <InputBox
-                LabelName="Business Name"
-                Name="businessName"
-                Value={formData.businessName}
-                Placeholder="Enter Business Name"
-                onChange={handleChange}
+                LabelName="Address"
+                Name="address"
+                Placeholder="Enter Address"
+              />
+              <InputBox LabelName="City" Name="city" Placeholder="Enter City" />
+              <InputBox
+                LabelName="State"
+                Name="state"
+                Placeholder="Enter State"
               />
               <InputBox
-                LabelName="Pan Number"
-                Name="panNumber"
-                Value={formData.panNumber}
-                Placeholder="Enter GST Number"
-                onChange={handleChange}
+                LabelName="Country"
+                Name="country"
+                Placeholder="Enter Country"
               />
               <InputBox
-                LabelName="GST Number"
-                Name="gstNumber"
-                Value={formData.gstNumber}
-                Placeholder="Enter GST Number"
-                onChange={handleChange}
-              />
-              <InputBox
-                Type="file"
-                Name={"image"}
-                LabelName={"Upload your G.S.T certificate"}
-                onChange={(e) => {
-                  setFormData({ ...formData, [e.target.name]: e.target.value });
-                }}
+                LabelName="Postal Code"
+                Name="postalCode"
+                Placeholder="Enter Postal Code"
               />
             </>
           )}
@@ -219,44 +218,36 @@ const VendorRegistrationForm = ({ startLoading, stopLoading }) => {
               {/* <InputBox
                 LabelName="Business Name"
                 Name="businessName"
-                Value={formData.businessName}
+                
                 Placeholder="Enter Business Name"
-                onChange={handleChange}
+                
               /> */}
               {/* <InputBox
                 LabelName="GST Number"
                 Name="gstNumber"
-                Value={formData.gstNumber}
+                
                 Placeholder="Enter GST Number"
-                onChange={handleChange}
+                
               /> */}
               <InputBox
                 LabelName="Account Holder Name"
                 Name="accountHolderName"
-                Value={formData.accountHolderName}
                 Placeholder="Enter Account Holder Name"
-                onChange={handleChange}
               />
               <InputBox
                 LabelName="Account Number"
                 Name="accountNumber"
-                Value={formData.accountNumber}
                 Placeholder="Enter Account Number"
-                onChange={handleChange}
               />
               <InputBox
                 LabelName="Bank Name"
                 Name="bankName"
-                Value={formData.bankName}
                 Placeholder="Enter Bank Name"
-                onChange={handleChange}
               />
               <InputBox
                 LabelName="IFSC Code"
                 Name="ifscCode"
-                Value={formData.ifscCode}
                 Placeholder="Enter IFSC Code"
-                onChange={handleChange}
               />
             </>
           )}
@@ -264,39 +255,24 @@ const VendorRegistrationForm = ({ startLoading, stopLoading }) => {
           {step === 3 && (
             <>
               <InputBox
-                LabelName="Address"
-                Name="address"
-                Value={formData.address}
-                Placeholder="Enter Address"
-                onChange={handleChange}
+                LabelName="Business Name"
+                Name="businessName"
+                Placeholder="Enter Business Name"
               />
               <InputBox
-                LabelName="City"
-                Name="city"
-                Value={formData.city}
-                Placeholder="Enter City"
-                onChange={handleChange}
+                LabelName="Pan Number"
+                Name="panNumber"
+                Placeholder="Enter GST Number"
               />
               <InputBox
-                LabelName="State"
-                Name="state"
-                Value={formData.state}
-                Placeholder="Enter State"
-                onChange={handleChange}
+                LabelName="GST Number"
+                Name="gstNumber"
+                Placeholder="Enter GST Number"
               />
               <InputBox
-                LabelName="Country"
-                Name="country"
-                Value={formData.country}
-                Placeholder="Enter Country"
-                onChange={handleChange}
-              />
-              <InputBox
-                LabelName="Postal Code"
-                Name="postalCode"
-                Value={formData.postalCode}
-                Placeholder="Enter Postal Code"
-                onChange={handleChange}
+                Type="file"
+                Name={"image"}
+                LabelName={"Upload your G.S.T certificate"}
               />
             </>
           )}

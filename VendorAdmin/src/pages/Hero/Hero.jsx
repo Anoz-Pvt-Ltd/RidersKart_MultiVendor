@@ -17,7 +17,7 @@ const Hero = () => {
       {/* Login Component */}
       <section className="flex">
         <div className=" lg:w-1/2 h-screen flex lg:justify-center lg:items-center items-start justify-start relative">
-          <Login />
+          <Login openRegister={() => setShowPopup(true)} />
         </div>
         <div className=" lg:w-1/2 h-screen flex lg:justify-center lg:items-center items-start justify-start relative">
           <div className="flex flex-col justify-center items-start gap-10 px-5 py-10 mr-5 shadow-xl rounded-xl  text-black backdrop-blur-sm">
@@ -66,7 +66,11 @@ const Hero = () => {
                   setShowPopup(false);
                 }}
               />
-              <VendorRegistrationForm />
+              <VendorRegistrationForm
+                onClose={() => {
+                  setShowPopup(false);
+                }}
+              />
             </div>
           </div>
         )}

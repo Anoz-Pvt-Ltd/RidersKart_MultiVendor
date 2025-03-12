@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import LoadingUI from "../../components/Loading";
 import Button from "../../components/Button";
 
-const LoginForm = ({ startLoading, stopLoading }) => {
+const LoginForm = ({ startLoading, stopLoading, openRegister }) => {
   const Dispatch = useDispatch();
   const Navigate = useNavigate();
   const [credentials, setCredentials] = useState({
@@ -98,7 +98,7 @@ const LoginForm = ({ startLoading, stopLoading }) => {
           Don't have an account?{" "}
           <span
             className="font-bold underline text-blue-500 cursor-pointer"
-            onClick={() => (window.location.href = "/register")}
+            onClick={openRegister}
           >
             Sign Up
           </span>

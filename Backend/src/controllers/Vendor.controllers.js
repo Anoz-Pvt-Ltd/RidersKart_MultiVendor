@@ -4,13 +4,18 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { VendorUser } from "../models/vendorUser.models.js";
 import { Product } from "../models/products.models.js";
 import jwt from "jsonwebtoken";
+import { UploadImages } from "../utils/imageKit.io.js";
 
 const registerVendor = asyncHandler(async (req, res, next) => {
   const {
     name,
     email,
     contactNumber,
-    location = {}, // Default to an empty object to avoid destructuring issues
+    address,
+    city,
+    state,
+    country,
+    postalCode, // Default to an empty object to avoid destructuring issues
     gstNumber,
     businessName,
     accountHolderName,
@@ -21,9 +26,6 @@ const registerVendor = asyncHandler(async (req, res, next) => {
     panNumber,
   } = req.body;
 
-  const { address, city, state, country, postalCode } = location;
-  // console.log(req.body);
-  // Validate input (all required fields, including nested location fields)
   if (
     !name ||
     !email ||
@@ -51,6 +53,23 @@ const registerVendor = asyncHandler(async (req, res, next) => {
     return next(new ApiError(400, "A vendor with this email already exists"));
   }
 
+  const imageFile = req.file;
+  if (!imageFile) throw new ApiError(404, "Image file not found!");
+
+  const image = await UploadImages(
+    imageFile.filename,
+    {
+      folderStructure: `all-vendor/${name.split(" ").join("-")}/GST-Image`,
+    },
+    [`${name.split(" ").join("-")}-GST-Id`, `${gstNumber}`]
+  );
+
+  if (!image)
+    throw new ApiError(
+      500,
+      "Failed to upload image due to internal error! Please try again"
+    );
+
   // Create new vendor instance
   const newVendor = new VendorUser({
     name,
@@ -73,6 +92,11 @@ const registerVendor = asyncHandler(async (req, res, next) => {
       accountNumber,
       bankName,
       ifscCode,
+    },
+    image: {
+      url: image.url,
+      fileId: image.fileId,
+      altText: name,
     },
     password, // Password will be hashed in the pre-save middleware
   });
@@ -372,5 +396,5 @@ export {
   getCurrentVendor,
   VendorBan,
   acceptVendor,
-  rejectVendor
+  rejectVendor,
 };
