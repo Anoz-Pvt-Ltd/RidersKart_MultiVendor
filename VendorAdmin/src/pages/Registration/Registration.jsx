@@ -81,6 +81,10 @@ const VendorRegistrationForm = ({ startLoading, stopLoading }) => {
 
       if (response.status === 201) {
         setSuccess("Vendor registered successfully!");
+        alert(
+          "Please wait until our team completes the verification process. Please try logging in again."
+        );
+        window.location.href = "/login";
         setFormData({
           name: "",
           email: "",

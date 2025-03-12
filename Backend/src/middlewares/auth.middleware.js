@@ -53,6 +53,12 @@ const VerifyVendorUser = asyncHandler(async (req, _, next) => {
       throw new ApiError(401, "Invalid Access Token");
     }
 
+    if (!user.isVerified)
+      throw new ApiError(
+        401,
+        "You are not verified yet! Please try after your verification"
+      );
+
     req.user = user;
     next();
   } catch (error) {

@@ -121,6 +121,8 @@ const loginVendor = asyncHandler(async (req, res, next) => {
     return next(new ApiError(401, "Invalid email or password"));
   }
 
+  if (!vendor.isVerified) throw new ApiError(401, "You are not verified yet!");
+
   // Generate access and refresh tokens
   const accessToken = vendor.generateAccessToken();
   const refreshToken = vendor.generateRefreshToken();
@@ -327,6 +329,31 @@ const VendorBan = asyncHandler(async (req, res) => {
   res.status(200).json(new ApiResponse(200, vendor, "vendor status updated"));
 });
 
+const rejectVendor = asyncHandler(async (req, res) => {
+  const { vendorId } = req.params;
+
+  if (!vendorId) throw new ApiError(404, "vendor Id not found");
+  const vendor = await VendorUser.findByIdAndDelete(vendorId);
+
+  if (!vendor) throw new ApiError(404, "Vendor not found");
+
+  res.status(200).json(new ApiResponse(200, null, "Vendor rejected!"));
+});
+
+const acceptVendor = asyncHandler(async (req, res) => {
+  const { vendorId } = req.params;
+  if (!vendorId) throw new ApiError(404, "Vendor Id is required!");
+
+  const vendor = await VendorUser.findByIdAndUpdate(
+    vendorId,
+    { isVerified: true },
+    { new: true }
+  );
+
+  if (!vendor) throw new ApiError(404, "Vendor not found");
+  res.status(200).json(new ApiResponse(200, vendor, "Vendor accepted!"));
+});
+
 export {
   registerVendor,
   loginVendor,
@@ -340,4 +367,6 @@ export {
   getUnverifiedVendors,
   getCurrentVendor,
   VendorBan,
+  acceptVendor,
+  rejectVendor
 };

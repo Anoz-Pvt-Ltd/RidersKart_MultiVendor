@@ -55,6 +55,46 @@ const CurrentVerifiedVendor = ({ startLoading, stopLoading }) => {
 
   const businessDetails = ` Business Name: ${currentVendorBusinessDetails?.businessName}, GST Number: ${currentVendorBusinessDetails?.gstNumber}`;
 
+  const RejectRequest = async (e) => {
+    e.preventDefault();
+
+    try {
+      startLoading();
+      const response = await FetchData(
+        `vendor/admin/reject-vendor/${vendorId}`,
+        "get"
+      );
+
+      console.log(response);
+      alert("Vendor rejected!");
+      window.location.href = "/home";
+    } catch (error) {
+      console.error(error);
+    } finally {
+      stopLoading();
+    }
+  };
+
+  const AcceptRequest = async (e) => {
+    e.preventDefault();
+
+    try {
+      startLoading();
+      const response = await FetchData(
+        `vendor/admin/accept-vendor/${vendorId}`,
+        "get"
+      );
+
+      console.log(response);
+      alert("Vendor Accepted!");
+      window.location.href = "/home";
+    } catch (error) {
+      console.error(error);
+    } finally {
+      stopLoading();
+    }
+  };
+
   return (
     <div>
       <h2 className="text-2xl font-semibold text-gray-800 mb-4">
@@ -67,7 +107,8 @@ const CurrentVerifiedVendor = ({ startLoading, stopLoading }) => {
       <div className="flex justify-center items-center gap-20 mt-10">
         <Button label={"Delete Vendor"} />
         <Button label={"Ban Vendor"} />
-        <Button label={"Edit Vendor"} />
+        <Button label={"Accept Vendor"} onClick={AcceptRequest} />
+        <Button label={"Reject Vendor"} onClick={RejectRequest} />
         {/* <Button label={"Cancel Order"} /> */}
       </div>
       <div className="p-6 mx-auto bg-white shadow-md rounded-lg mt-10">

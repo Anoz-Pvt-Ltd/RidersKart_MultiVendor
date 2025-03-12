@@ -91,6 +91,17 @@ const LoginForm = ({ startLoading, stopLoading }) => {
           </button>
         </div>
       </form>
+      <div>
+        <p className="text-sm text-gray-500">
+          Don't have an account?{" "}
+          <span
+            className="font-bold underline text-blue-500 cursor-pointer"
+            onClick={() => (window.location.href = "/register")}
+          >
+            Sign Up
+          </span>
+        </p>
+      </div>
     </div>
   );
 };
