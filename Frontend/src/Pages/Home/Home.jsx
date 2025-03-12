@@ -4,20 +4,22 @@ import { DemoImageBanner } from "../../Constants/DemoImages";
 import { FetchData } from "../../Utility/FetchFromApi";
 import ProductCard from "../../Components/ProductCard";
 import { Link } from "react-router";
-import { categories } from "../../Constants/Home/Home.Constants";
+// import { categories } from "../../Constants/Home/Home.Constants";
 import LoadingUI from "../../Components/Loading";
 
 const Home = ({ startLoading, stopLoading }) => {
+  const scrollContainer = useRef(null);
   const [products, setProducts] = useState([]);
   const [error, setError] = useState(null);
-  // console.log(products);
+  const [categories, setCategories] = useState([]);
+  const [subcategories, setSubcategories] = useState([]);
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         startLoading();
         const response = await FetchData("products/get-all-product", "get");
-        console.log(response);
+        // console.log(response);
         if (response.data.success) {
           setProducts(response.data.data.products);
         } else {
@@ -29,6 +31,36 @@ const Home = ({ startLoading, stopLoading }) => {
         stopLoading();
       }
     };
+
+    const fetchAllCategories = async () => {
+      try {
+        startLoading();
+        const response = await FetchData(
+          "categories/get-all-category-and-subcategories",
+          "get"
+        );
+        console.log(response);
+
+        if (response.data.success) {
+          const categoriesData = response.data.data.categories;
+          setCategories(categoriesData);
+
+          // Extract subcategories
+          const allSubcategories = categoriesData.flatMap(
+            (category) => category.subcategories
+          );
+          setSubcategories(allSubcategories);
+        } else {
+          setError("Failed to load categories.");
+        }
+      } catch (err) {
+        setError(err.response?.data?.message || "Failed to fetch categories.");
+      } finally {
+        stopLoading();
+      }
+    };
+
+    fetchAllCategories();
     fetchProducts();
   }, []);
 
@@ -99,8 +131,6 @@ const Home = ({ startLoading, stopLoading }) => {
 
       <div className="">
         {categories.map((category, index) => {
-          const scrollContainer = useRef(null);
-
           const scrollLeft = () => {
             if (scrollContainer.current) {
               scrollContainer.current.scrollBy({
@@ -121,13 +151,14 @@ const Home = ({ startLoading, stopLoading }) => {
 
           return (
             <motion.section
-              key={index}
+              key={category._id} // Use unique id for key
               className="mb-12"
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.2 }}
             >
-              <div className="flex justify-between items-center ">
+              {/* Category Title */}
+              <div className="flex justify-between items-center">
                 <h2 className="text-lg font-bold">{category.title}</h2>
                 <div className="flex gap-2">
                   <button
@@ -145,34 +176,44 @@ const Home = ({ startLoading, stopLoading }) => {
                 </div>
               </div>
 
+              {/* Subcategories */}
               <div
                 ref={scrollContainer}
-                className=" flex overflow-x-auto overflow-y-hidden scrollbar-hide gap-4 py-2 px-1 justify-start items-start "
+                className="flex overflow-x-auto overflow-y-hidden scrollbar-hide gap-4 py-2 px-1 justify-start items-start"
               >
-                {category.items.map((item, idx) => (
-                  <Link
-                    to={`/all-products/${category.title}/${item.name}`}
-                    key={idx}
-                  >
-                    <motion.div
-                      className="flex-none border border-gray-200 rounded-lg p-2 text-center shadow-md hover:shadow-lg w-48 h-fit"
-                      whileHover={{ scale: 1.05 }}
-                      whileInView={{ opacity: 1, x: 0 }}
-                      initial={{ opacity: 0, x: -100 }}
-                      transition={{ duration: 0.5 }}
+                {category.subcategories.length > 0 ? (
+                  category.subcategories.map((item) => (
+                    <Link
+                      to={`/all-products/${category.title}/${item.title}`} // Use `title` instead of `name`
+                      key={item._id}
                     >
-                      <div className="h-24 bg-gray-100 rounded-md mb-2 object-center flex justify-center items-center p-10 overflow-hidden">
-                        <img src={item.photo} alt={item.name} />
-                      </div>
-                      <p className="text-sm">{item.name}</p>
-                    </motion.div>
-                  </Link>
-                ))}
+                      <motion.div
+                        className="flex-none border border-gray-200 rounded-lg p-2 text-center shadow-md hover:shadow-lg w-48 h-fit"
+                        whileHover={{ scale: 1.05 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        initial={{ opacity: 0, x: -100 }}
+                        transition={{ duration: 0.5 }}
+                      >
+                        <div className="object-fill h-24 bg-gray-100 rounded-md mb-2 flex justify-center items-center p-10 overflow-hidden">
+                          <img
+                            src={item.image?.url}
+                            alt={item.title}
+                            className="object-fill"
+                          />
+                        </div>
+                        <p className="text-sm">{item.title}</p>
+                      </motion.div>
+                    </Link>
+                  ))
+                ) : (
+                  <p className="text-gray-500">No subcategories available</p>
+                )}
               </div>
             </motion.section>
           );
         })}
       </div>
+
       <div className="flex gap-4 bg-transparent justify-start items-center overflow-x-auto p-5 max-w-full">
         {products?.map((product) => (
           <ProductCard
