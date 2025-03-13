@@ -372,7 +372,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
       );
       console.log("Subcategory Added:", response);
       alert("Subcategory Added Successfully!");
-      window.location.reload();
+      // window.location.reload();
 
       setHandlePopup((prev) => ({
         ...prev,
