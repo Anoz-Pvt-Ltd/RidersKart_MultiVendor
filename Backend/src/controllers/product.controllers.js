@@ -1,3 +1,4 @@
+import { Brand } from "../models/brand.model.js";
 import { Category } from "../models/category.model.js";
 import { Product } from "../models/products.models.js";
 import { Subcategory } from "../models/sub-category.model.js";
@@ -19,6 +20,7 @@ const registerProduct = asyncHandler(async (req, res) => {
     sku,
     specifications,
     tags,
+    brand,
   } = req.body;
   console.log("Controller Reached");
 
@@ -32,6 +34,7 @@ const registerProduct = asyncHandler(async (req, res) => {
     !subcategory ||
     !price ||
     !stockQuantity ||
+    !brand ||
     !sku // Stock keeping unit => Provided to every unique type of products for keeping track of quantity.
   ) {
     throw new ApiError(400, "All required fields must be filled");
@@ -60,6 +63,9 @@ const registerProduct = asyncHandler(async (req, res) => {
   if (!vendor) {
     throw new ApiError(404, "Vendor not found");
   }
+
+  const checkBrand = await Brand.findById(brand);
+  if (!checkBrand) throw new ApiError(404, "Brand not found");
 
   const ImageFile = req.file;
   const UploadedImage = await UploadImages(
@@ -90,6 +96,7 @@ const registerProduct = asyncHandler(async (req, res) => {
     specifications,
     tags,
     vendor: vendorId,
+    brand,
   });
 
   // Save the product to the database
@@ -123,6 +130,7 @@ const getAllProducts = asyncHandler(async (req, res) => {
       .populate("category", "name")
       .populate("subcategory", "name")
       .populate("vendor", "name email")
+      .populate("brand")
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(parseInt(limit));
@@ -157,13 +165,15 @@ const getProductsOfVendor = asyncHandler(async (req, res) => {
   if (!vendorId) throw new ApiError(400, "Vendor ID is required");
 
   // Fetch the products of the given vendor ID
-  const vendor = await VendorUser.findById(vendorId).populate({
-    path: "products",
-    populate: [
-      { path: "category" }, // Populate category inside products
-      { path: "subcategory" }, // Populate subcategory inside products
-    ],
-  });
+  const vendor = await VendorUser.findById(vendorId)
+    .populate({
+      path: "products",
+      populate: [
+        { path: "category" }, // Populate category inside products
+        { path: "subcategory" }, // Populate subcategory inside products
+      ],
+    })
+    .populate("brand");
 
   if (!vendor) throw new ApiError(404, "Vendor not found");
 
@@ -179,7 +189,11 @@ const getProduct = asyncHandler(async (req, res) => {
   const { productId } = req.params;
 
   // Fetch the product by ID
-  const product = await Product.findById(productId);
+  const product = await Product.findById(productId)
+    .populate("category", "name")
+    .populate("subcategory", "name")
+    .populate("vendor", "name email")
+    .populate("brand");
 
   if (!product) {
     return res.status(404).json({
@@ -257,7 +271,7 @@ const getProductByCategory = asyncHandler(async (req, res) => {
   const products = await Product.find({
     category,
     subcategory,
-  });
+  }).populate("brand");
 
   // Check if products are found
   if (!products || products.length === 0) {

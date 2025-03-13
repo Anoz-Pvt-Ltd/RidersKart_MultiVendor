@@ -71,11 +71,261 @@ const Dashboard = ({ startLoading, stopLoading }) => {
   };
 
   useEffect(() => {
-    setFilteredBrands(allBrands);
-    // setFilteredOrders(allOrders);
-  }, [allBrands]);
+    setFilteredUsers(allUser);
+    setFilteredProducts(allProducts);
+    setFilteredOrders(allOrders);
+    setFilteredUnVerifiedVendors(allUnverifiedVendors);
+    setFilteredVerifiedVendors(allVerifiedVendors);
+  }, [
+    allUser,
+    allProducts,
+    allOrders,
+    allUnverifiedVendors,
+    allVerifiedVendors,
+  ]);
 
-  //fetching all data for all users,products,brands,orders,vendors(verified) and vendors(not-verified)
+  //fetching all data for all users,products,orders,vendors(verified) and vendors(not-verified)
+  useEffect(() => {
+    const fetchAllUsers = async () => {
+      if (user?.length > 0) {
+        try {
+          startLoading();
+          const response = await FetchData("users/admin/get-all-users", "get");
+          // console.log(response);
+          if (response.data.success) {
+            setAllUsers(response.data.data.users);
+          } else {
+            setError("Failed to load orders.");
+          }
+        } catch (err) {
+          setError(err.response?.data?.message || "Failed to fetch orders.");
+        } finally {
+          stopLoading();
+        }
+      }
+    };
+
+    const fetchAllProducts = async () => {
+      if (user?.length > 0) {
+        try {
+          startLoading();
+          const response = await FetchData(
+            "products/admin/get-all-products",
+            "get"
+          );
+          // console.log(response);
+          if (response.data.success) {
+            setAllProducts(response.data.data);
+          } else {
+            setError("Failed to Products.");
+          }
+        } catch (err) {
+          setError(err.response?.data?.message || "Failed to Products");
+        } finally {
+          stopLoading();
+        }
+      }
+    };
+
+    const fetchAllOrders = async () => {
+      if (user?.length > 0) {
+        try {
+          startLoading();
+          const response = await FetchData("orders/admin/all-orders", "get");
+          // console.log(response);
+          if (response.data.success) {
+            setAllOrders(response.data.data.orders);
+          } else {
+            setError("Failed to Products.");
+          }
+        } catch (err) {
+          setError(err.response?.data?.message || "Failed to Products");
+        } finally {
+          stopLoading();
+        }
+      }
+    };
+
+    const fetchAllUnVerifiedVendors = async () => {
+      if (user?.length > 0) {
+        try {
+          startLoading();
+          const response = await FetchData(
+            "vendor/admin/get-all-unverified-vendor",
+            "get"
+          );
+          // console.log(response);
+          if (response.data.success) {
+            setAllUnverifiedVendors(response.data.data.vendor);
+          } else {
+            setError("Failed to load vendors.");
+          }
+        } catch (err) {
+          setError(err.response?.data?.message || "Failed to fetch vendors.");
+        } finally {
+          stopLoading();
+        }
+      }
+    };
+    const fetchAllVerifiedVendors = async () => {
+      if (user?.length > 0) {
+        try {
+          startLoading();
+          const response = await FetchData(
+            "vendor/admin/get-all-verified-vendor",
+            "get"
+          );
+          console.log(response);
+          if (response.data.success) {
+            setAllVerifiedVendors(response.data.data.vendor);
+          } else {
+            setError("Failed to load vendors.");
+          }
+        } catch (err) {
+          setError(err.response?.data?.message || "Failed to fetch vendors.");
+        } finally {
+          stopLoading();
+        }
+      }
+    };
+
+    fetchAllUsers();
+    fetchAllProducts();
+    fetchAllOrders();
+    fetchAllUnVerifiedVendors();
+    fetchAllVerifiedVendors();
+  }, [user]);
+
+  // const formData = new FormData(formRef.current);
+  // console.log(formData);
+  const submitCategory = async (e) => {
+    e.preventDefault();
+    const formData = new FormData(categoryFormRef.current);
+    // formData.append("image", image);
+
+    for (let [key, value] of formData.entries()) {
+      console.log(`${key}: ${value}`);
+    }
+
+    try {
+      startLoading();
+      const response = await FetchData(
+        "categories/category/add",
+        "post",
+        formData,
+        true
+      );
+      console.log(response);
+      // setAddShowCategoryPopup(false);
+      setHandlePopup((prev) => ({
+        ...prev,
+        addCategoryPopup: false,
+      }));
+      alert("Your category has been added successfully");
+    } catch (err) {
+      console.log(err);
+    } finally {
+      stopLoading();
+    }
+  };
+
+  useEffect(() => {
+    const getAllMainSubcategories = async () => {
+      try {
+        startLoading();
+        const response = await FetchData(
+          "categories/get-all-category-and-subcategories",
+          "get"
+        );
+        // console.log(response);
+
+        // Ensure categories exist before setting state
+        setAllCategories(response.data?.data?.categories || []);
+      } catch (error) {
+        console.log("Error getting all main subcategories", error);
+      } finally {
+        stopLoading();
+      }
+    };
+
+    getAllMainSubcategories();
+  }, []);
+
+  const submitSubCategory = async (e, categoryId) => {
+    e.preventDefault();
+    const formData = new FormData(subcategoryFormRef.current);
+    // formData.append("image");
+    // formData.append("category", categoryId); // Attach category ID
+
+    // Debugging: Log form data before sending it
+    for (let [key, value] of formData.entries()) {
+      console.log(key, value);
+    }
+
+    try {
+      startLoading();
+      const response = await FetchData(
+        "categories/sub-category/add",
+        "post",
+        formData,
+        true
+      );
+      console.log("Subcategory Added:", response);
+      alert("Subcategory Added Successfully!");
+      window.location.reload();
+
+      setHandlePopup((prev) => ({
+        ...prev,
+        addSubCategory: false, // Close popup after submission
+      }));
+    } catch (error) {
+      console.error("Error adding subcategory:", error);
+    } finally {
+      stopLoading();
+    }
+  };
+
+  const handleEditSubcategory = async (e) => {
+    e.preventDefault(); // Prevent default form submission
+
+    try {
+      startLoading();
+      if (!handlePopup.selectedSubcategoryId) {
+        alert("Subcategory ID is missing!");
+        return;
+      }
+
+      const formData = new FormData(editSubcategoryFormRef.current);
+      // formData.append("image", image);
+
+      // Log form data for debugging
+      for (let [key, value] of formData.entries()) {
+        console.log(`${key}: ${value}`);
+      }
+
+      const response = await FetchData(
+        `categories/edit-sub-category/${handlePopup.selectedSubcategoryId}`,
+        "post",
+        formData,
+        true
+      );
+
+      console.log("Response:", response);
+      alert("Subcategory Edited Successfully!");
+      window.location.reload(); // Refresh page to reflect changes
+
+      // Close popup and reset state
+      setHandlePopup({
+        editSubcategory: false,
+        selectedSubcategoryId: null,
+      });
+    } catch (error) {
+      console.error("Error editing subcategory:", error);
+      alert("Failed to edit subcategory.");
+    } finally {
+      stopLoading();
+    }
+  };
 
   return (
     <div className="flex min-h-screen">

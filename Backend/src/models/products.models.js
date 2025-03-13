@@ -72,6 +72,11 @@ const productSchema = new mongoose.Schema({
     enum: ["active", "inactive", "out-of-stock"],
     default: "active",
   },
+  brand: {
+    type: Schema.Types.ObjectId,
+    ref: "Brand",
+    required: true,
+  },
   createdAt: {
     type: Date,
     default: Date.now,
