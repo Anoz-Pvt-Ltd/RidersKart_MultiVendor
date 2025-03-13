@@ -19,31 +19,18 @@ import Button from "../../Components/Button";
 import { useRef } from "react";
 import { ClipboardCopy } from "lucide-react";
 import LoadingUI from "../../Components/Loading";
+import Users from "../Users/Users";
+import VendorUnderReview from "../Vendor_UnderReview/VendorUnderReview";
+import VendorsVerified from "../Vendors_Verified/VendorsVerified";
+import Products from "../Products/Products";
+import Orders from "../Orders/Orders";
 
 const Dashboard = ({ startLoading, stopLoading }) => {
   const user = useSelector((store) => store.UserInfo.user);
   const [activeSection, setActiveSection] = useState("Users");
   const [error, setError] = useState("");
-  const [allUser, setAllUsers] = useState([]);
-  const [allProducts, setAllProducts] = useState([]);
-  const [allOrders, setAllOrders] = useState([]);
-  const [allVerifiedVendors, setAllVerifiedVendors] = useState([]);
-  const [allUnverifiedVendors, setAllUnverifiedVendors] = useState([]);
-  const [AllCategories, setAllCategories] = useState([]);
-  const [selectedCategoryId, setSelectedCategoryId] = useState(null);
-  const [handlePopup, setHandlePopup] = useState({
-    addCategoryPopup: false,
-    allCategoryPopup: false,
-    allSubCategoryPopup: false,
-    addSubCategory: false,
-    editSubcategory: false,
-    selectedSubcategoryId: null,
-    selectedSubcategoryTitle: null,
-  });
 
-  const categoryFormRef = useRef(null);
-  const subcategoryFormRef = useRef(null);
-  const editSubcategoryFormRef = useRef(null);
+  const [allBrands, setAllBrands] = useState([]);
 
   const sectionVariants = {
     hidden: { opacity: 0, x: -50 },
@@ -53,379 +40,42 @@ const Dashboard = ({ startLoading, stopLoading }) => {
     hidden: { opacity: 0, x: -100 },
     visible: { opacity: 1, x: 0, transition: { duration: 0.8 } },
   };
-  const tableHeadersUsers = ["ID", "Name", "Email", "Contact No."];
-  const tableHeadersProducts = [
-    "Product ID",
-    "Vendor ID",
-    "Category",
-    "Subcategory",
-  ];
-  const tableHeadersOrder = [
-    "Order ID",
-    "User ID",
-    "Price",
+
+  const tableHeadersBrands = [
+    "Brand ID",
+    "Brand name",
+    "Added by",
+    "Added On",
     "Status",
-    "Placed On",
-  ];
-  const tableHeadersVendors = [
-    "Vendor ID",
-    "Name",
-    "Email",
-    "Contact No.",
-    "Total Products",
   ];
 
-  const [searchTermUser, setSearchTermUser] = useState("");
-  const [filteredUsers, setFilteredUsers] = useState(allUser);
-
-  const [searchTermProduct, setSearchTermProduct] = useState("");
-  const [filteredProducts, setFilteredProducts] = useState(allProducts);
-
-  const [searchTermOrders, setSearchTermOrders] = useState("");
-  const [filteredOrders, setFilteredOrders] = useState(allOrders);
-
-  const [searchTermVerifiedVendors, setSearchTermVerifiedVendors] =
-    useState("");
-  const [filteredVerifiedVendors, setFilteredVerifiedVendors] =
-    useState(allVerifiedVendors);
-  const [searchTermUnVerifiedVendors, setSearchTermUnVerifiedVendors] =
-    useState("");
-  const [filteredUnVerifiedVendors, setFilteredUnVerifiedVendors] =
-    useState(allUnverifiedVendors);
+  const [searchTermBrands, setSearchTermBrands] = useState("");
+  const [filteredBrands, setFilteredBrands] = useState(allBrands);
 
   //filtering functions for each entities
-  const handleSearchUser = (e) => {
-    const searchValueUser = e.target.value;
-    setSearchTermUser(searchValueUser);
 
-    if (searchValueUser === "") {
-      setFilteredUsers(allUser);
-    } else {
-      const filtered = allUser.filter(
-        (user) =>
-          user._id.includes(searchValueUser) ||
-          user.phoneNumber.includes(searchValueUser)
-      );
-      setFilteredUsers(filtered);
-    }
-  };
-  const handleSearchProduct = (e) => {
-    const searchValueProduct = e.target.value;
-    setSearchTermProduct(searchValueProduct);
+  const handleSearchBrands = (e) => {
+    const searchValueBrands = e.target.value;
+    setSearchTermBrands(searchValueBrands);
 
-    if (searchValueProduct === "") {
-      setFilteredProducts(allProducts);
+    if (searchValueBrands === "") {
+      setFilteredBrands(allBrands);
     } else {
-      const filtered = allProducts?.filter(
-        (product) =>
-          product._id.includes(searchValueProduct) ||
-          product.vendor.includes(searchValueProduct)
-      );
-      setFilteredProducts(filtered);
-    }
-  };
-  const handleSearchOrder = (e) => {
-    const searchValueOrder = e.target.value;
-    setSearchTermOrders(searchValueOrder);
-
-    if (searchValueOrder === "") {
-      setFilteredOrders(allOrders);
-    } else {
-      const filtered = allOrders.filter(
+      const filtered = allBrands.filter(
         (order) =>
-          order._id.includes(searchValueOrder) ||
-          order.user.includes(searchValueOrder)
+          order._id.includes(searchValueBrands) ||
+          order.user.includes(searchValueBrands)
       );
-      setFilteredOrders(filtered);
-    }
-  };
-  const handleSearchUnVerifiedVendors = (e) => {
-    const searchValueUnVerifiedVendors = e.target.value;
-    setSearchTermUnVerifiedVendors(searchValueUnVerifiedVendors);
-
-    if (searchValueUnVerifiedVendors === "") {
-      setFilteredUnVerifiedVendors(allUnverifiedVendors);
-    } else {
-      const filtered = allUnverifiedVendors.filter(
-        (vendor) =>
-          vendor._id.includes(searchValueUnVerifiedVendors) ||
-          vendor.contactNumber.includes(searchValueUnVerifiedVendors)
-      );
-      setFilteredUnVerifiedVendors(filtered);
-    }
-  };
-  const handleSearchVerifiedVendors = (e) => {
-    const searchValueVerifiedVendors = e.target.value;
-    setSearchTermVerifiedVendors(searchValueVerifiedVendors);
-
-    if (searchValueVerifiedVendors === "") {
-      setFilteredVerifiedVendors(allVerifiedVendors);
-    } else {
-      const filtered = allVerifiedVendors.filter(
-        (vendor) =>
-          vendor._id.includes(searchValueVerifiedVendors) ||
-          vendor.contactNumber.includes(searchValueVerifiedVendors)
-      );
-      setFilteredVerifiedVendors(filtered);
+      setFilteredBrands(filtered);
     }
   };
 
   useEffect(() => {
-    setFilteredUsers(allUser);
-    setFilteredProducts(allProducts);
-    setFilteredOrders(allOrders);
-    setFilteredUnVerifiedVendors(allUnverifiedVendors);
-    setFilteredVerifiedVendors(allVerifiedVendors);
-  }, [
-    allUser,
-    allProducts,
-    allOrders,
-    allUnverifiedVendors,
-    allVerifiedVendors,
-  ]);
+    setFilteredBrands(allBrands);
+    // setFilteredOrders(allOrders);
+  }, [allBrands]);
 
-  //fetching all data for all users,products,orders,vendors(verified) and vendors(not-verified)
-  useEffect(() => {
-    const fetchAllUsers = async () => {
-      if (user?.length > 0) {
-        try {
-          startLoading();
-          const response = await FetchData("users/admin/get-all-users", "get");
-          // console.log(response);
-          if (response.data.success) {
-            setAllUsers(response.data.data.users);
-          } else {
-            setError("Failed to load orders.");
-          }
-        } catch (err) {
-          setError(err.response?.data?.message || "Failed to fetch orders.");
-        } finally {
-          stopLoading();
-        }
-      }
-    };
-
-    const fetchAllProducts = async () => {
-      if (user?.length > 0) {
-        try {
-          startLoading();
-          const response = await FetchData(
-            "products/admin/get-all-products",
-            "get"
-          );
-          // console.log(response);
-          if (response.data.success) {
-            setAllProducts(response.data.data);
-          } else {
-            setError("Failed to Products.");
-          }
-        } catch (err) {
-          setError(err.response?.data?.message || "Failed to Products");
-        } finally {
-          stopLoading();
-        }
-      }
-    };
-
-    const fetchAllOrders = async () => {
-      if (user?.length > 0) {
-        try {
-          startLoading();
-          const response = await FetchData("orders/admin/all-orders", "get");
-          // console.log(response);
-          if (response.data.success) {
-            setAllOrders(response.data.data.orders);
-          } else {
-            setError("Failed to Products.");
-          }
-        } catch (err) {
-          setError(err.response?.data?.message || "Failed to Products");
-        } finally {
-          stopLoading();
-        }
-      }
-    };
-
-    const fetchAllUnVerifiedVendors = async () => {
-      if (user?.length > 0) {
-        try {
-          startLoading();
-          const response = await FetchData(
-            "vendor/admin/get-all-unverified-vendor",
-            "get"
-          );
-          // console.log(response);
-          if (response.data.success) {
-            setAllUnverifiedVendors(response.data.data.vendor);
-          } else {
-            setError("Failed to load vendors.");
-          }
-        } catch (err) {
-          setError(err.response?.data?.message || "Failed to fetch vendors.");
-        } finally {
-          stopLoading();
-        }
-      }
-    };
-    const fetchAllVerifiedVendors = async () => {
-      if (user?.length > 0) {
-        try {
-          startLoading();
-          const response = await FetchData(
-            "vendor/admin/get-all-verified-vendor",
-            "get"
-          );
-          console.log(response);
-          if (response.data.success) {
-            setAllVerifiedVendors(response.data.data.vendor);
-          } else {
-            setError("Failed to load vendors.");
-          }
-        } catch (err) {
-          setError(err.response?.data?.message || "Failed to fetch vendors.");
-        } finally {
-          stopLoading();
-        }
-      }
-    };
-
-    fetchAllUsers();
-    fetchAllProducts();
-    fetchAllOrders();
-    fetchAllUnVerifiedVendors();
-    fetchAllVerifiedVendors();
-  }, [user]);
-
-  // const formData = new FormData(formRef.current);
-  // console.log(formData);
-  const submitCategory = async (e) => {
-    e.preventDefault();
-    const formData = new FormData(categoryFormRef.current);
-    // formData.append("image", image);
-
-    for (let [key, value] of formData.entries()) {
-      console.log(`${key}: ${value}`);
-    }
-
-    try {
-      startLoading();
-      const response = await FetchData(
-        "categories/category/add",
-        "post",
-        formData,
-        true
-      );
-      console.log(response);
-      // setAddShowCategoryPopup(false);
-      setHandlePopup((prev) => ({
-        ...prev,
-        addCategoryPopup: false,
-      }));
-      alert("Your category has been added successfully");
-    } catch (err) {
-      console.log(err);
-    } finally {
-      stopLoading();
-    }
-  };
-
-  useEffect(() => {
-    const getAllMainSubcategories = async () => {
-      try {
-        startLoading();
-        const response = await FetchData(
-          "categories/get-all-category-and-subcategories",
-          "get"
-        );
-        // console.log(response);
-
-        // Ensure categories exist before setting state
-        setAllCategories(response.data?.data?.categories || []);
-      } catch (error) {
-        console.log("Error getting all main subcategories", error);
-      } finally {
-        stopLoading();
-      }
-    };
-
-    getAllMainSubcategories();
-  }, []);
-
-  const submitSubCategory = async (e, categoryId) => {
-    e.preventDefault();
-    const formData = new FormData(subcategoryFormRef.current);
-    // formData.append("image");
-    // formData.append("category", categoryId); // Attach category ID
-
-    // Debugging: Log form data before sending it
-    for (let [key, value] of formData.entries()) {
-      console.log(key, value);
-    }
-
-    try {
-      startLoading();
-      const response = await FetchData(
-        "categories/sub-category/add",
-        "post",
-        formData,
-        true
-      );
-      console.log("Subcategory Added:", response);
-      alert("Subcategory Added Successfully!");
-      window.location.reload();
-
-      setHandlePopup((prev) => ({
-        ...prev,
-        addSubCategory: false, // Close popup after submission
-      }));
-    } catch (error) {
-      console.error("Error adding subcategory:", error);
-    } finally {
-      stopLoading();
-    }
-  };
-
-  const handleEditSubcategory = async (e) => {
-    e.preventDefault(); // Prevent default form submission
-
-    try {
-      startLoading();
-      if (!handlePopup.selectedSubcategoryId) {
-        alert("Subcategory ID is missing!");
-        return;
-      }
-
-      const formData = new FormData(editSubcategoryFormRef.current);
-      // formData.append("image", image);
-
-      // Log form data for debugging
-      for (let [key, value] of formData.entries()) {
-        console.log(`${key}: ${value}`);
-      }
-
-      const response = await FetchData(
-        `categories/edit-sub-category/${handlePopup.selectedSubcategoryId}`,
-        "post",
-        formData,
-        true
-      );
-
-      console.log("Response:", response);
-      alert("Subcategory Edited Successfully!");
-      window.location.reload(); // Refresh page to reflect changes
-
-      // Close popup and reset state
-      setHandlePopup({
-        editSubcategory: false,
-        selectedSubcategoryId: null,
-      });
-    } catch (error) {
-      console.error("Error editing subcategory:", error);
-      alert("Failed to edit subcategory.");
-    } finally {
-      stopLoading();
-    }
-  };
+  //fetching all data for all users,products,brands,orders,vendors(verified) and vendors(not-verified)
 
   return (
     <div className="flex min-h-screen">
@@ -469,6 +119,16 @@ const Dashboard = ({ startLoading, stopLoading }) => {
             </li>
             <li
               className={`p-4 rounded-md mb-2 cursor-pointer transition-all duration-300 ${
+                activeSection === "Brands"
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-300 text-black"
+              }`}
+              onClick={() => setActiveSection("Brands")}
+            >
+              {<Package />}Brands
+            </li>
+            <li
+              className={`p-4 rounded-md mb-2 cursor-pointer transition-all duration-300 ${
                 activeSection === "Products"
                   ? "bg-blue-600 text-white"
                   : "bg-gray-300 text-black"
@@ -507,573 +167,27 @@ const Dashboard = ({ startLoading, stopLoading }) => {
           variants={sectionVariants}
           transition={{ duration: 0.5 }}
         >
-          {activeSection === "Users" && (
-            <section className="">
-              {/* main component */}
-              <h2 className="text-2xl font-bold mb-4">Users</h2>
-              {/* sorting box */}
-              <div className="mb-4">
-                <InputBox
-                  Type="test"
-                  Value={searchTermUser}
-                  onChange={handleSearchUser}
-                  Placeholder={"Search by ID or Contact Number"}
-                />
-              </div>
-              <div className="overflow-x-auto">
-                <table className="min-w-full border-collapse border border-gray-300 rounded-xl">
-                  <thead>
-                    <tr>
-                      {tableHeadersUsers.map((header, index) => (
-                        <th
-                          key={index}
-                          className="border border-gray-500 px-4 py-2 bg-neutral-300"
-                        >
-                          {header}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredUsers.length > 0 ? (
-                      filteredUsers.map((user) => (
-                        <tr key={user.id}>
-                          <td className="border border-gray-500 px-4 py-2">
-                            <Link to={`/current-user/${user._id}`}>
-                              {user?._id}
-                            </Link>
-                          </td>
-                          <td className="border border-gray-500 px-4 py-2">
-                            {user?.name}
-                          </td>
-                          <td className="border border-gray-500 px-4 py-2">
-                            {user?.email}
-                          </td>
-                          <td className="border border-gray-500 px-4 py-2">
-                            {user?.phoneNumber}
-                          </td>
-                        </tr>
-                      ))
-                    ) : (
-                      <tr>
-                        <td
-                          colSpan={tableHeadersUsers.length}
-                          className="text-center py-4"
-                        >
-                          No users found.
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </section>
-          )}
-          {activeSection === "Vendors (Under review)" && (
+          {activeSection === "Users" && <Users />}
+          {activeSection === "Vendors (Under review)" && <VendorUnderReview />}
+          {activeSection === "Vendors (Verified)" && <VendorsVerified />}
+          {activeSection === "Products" && <Products />}
+          {activeSection === "Brands" && (
             <section>
-              <h2 className="text-2xl font-bold mb-4">Vendors (Verified)</h2>
-              {/* Vendors (Verified) content */}
-              <InputBox
-                Type="test"
-                Value={searchTermUnVerifiedVendors}
-                onChange={handleSearchUnVerifiedVendors}
-                Placeholder={"Search by Vendor ID"}
-              />
-              <div className="overflow-x-auto">
-                <table className="min-w-full border-collapse border border-gray-300 rounded-xl">
-                  <thead>
-                    <tr>
-                      {tableHeadersVendors.map((header, index) => (
-                        <th
-                          key={index}
-                          className="border border-gray-500 px-4 py-2 bg-neutral-300"
-                        >
-                          {header}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredUnVerifiedVendors?.length > 0 ? (
-                      filteredUnVerifiedVendors.map((vendor) => (
-                        <tr key={vendor.id}>
-                          <td className="border border-gray-500 px-4 py-2">
-                            <Link
-                              to={`/current-un-verified-vendor/${vendor?._id}`}
-                            >
-                              {vendor?._id}
-                            </Link>
-                          </td>
-                          <td className="border border-gray-500 px-4 py-2">
-                            {vendor?.name}
-                          </td>
-                          <td className="border border-gray-500 px-4 py-2">
-                            {vendor?.email}
-                          </td>
-                          <td className="border border-gray-500 px-4 py-2">
-                            {vendor?.contactNumber}
-                          </td>
-                          <td className="border border-gray-500 px-4 py-2">
-                            {vendor?.products?.length}
-                          </td>
-                        </tr>
-                      ))
-                    ) : (
-                      <tr>
-                        <td
-                          colSpan={tableHeadersProducts.length}
-                          className="text-center py-4"
-                        >
-                          No Vendors found.
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </section>
-          )}
-          {activeSection === "Vendors (Verified)" && (
-            <section>
-              <h2 className="text-2xl font-bold mb-4">Vendors (Verified)</h2>
-              {/* Vendors (Verified) content */}
-              <InputBox
-                Type="test"
-                Value={searchTermVerifiedVendors}
-                onChange={handleSearchVerifiedVendors}
-                Placeholder={"Search by Product ID or Vendor ID"}
-              />
-              <div className="overflow-x-auto">
-                <table className="min-w-full border-collapse border border-gray-300 rounded-xl">
-                  <thead>
-                    <tr>
-                      {tableHeadersVendors.map((header, index) => (
-                        <th
-                          key={index}
-                          className="border border-gray-500 px-4 py-2 bg-neutral-300"
-                        >
-                          {header}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredVerifiedVendors?.length > 0 ? (
-                      filteredVerifiedVendors.map((vendor) => (
-                        <tr key={vendor.id}>
-                          <td className="border border-gray-500 px-4 py-2">
-                            <Link
-                              to={`/current-verified-vendor/${vendor?._id}`}
-                            >
-                              {vendor?._id}
-                            </Link>
-                          </td>
-                          <td className="border border-gray-500 px-4 py-2">
-                            {vendor?.name}
-                          </td>
-                          <td className="border border-gray-500 px-4 py-2">
-                            {vendor?.email}
-                          </td>
-                          <td className="border border-gray-500 px-4 py-2">
-                            {vendor?.contactNumber}
-                          </td>
-                          <td className="border border-gray-500 px-4 py-2">
-                            {vendor?.products?.length}
-                          </td>
-                        </tr>
-                      ))
-                    ) : (
-                      <tr>
-                        <td
-                          colSpan={tableHeadersProducts.length}
-                          className="text-center py-4"
-                        >
-                          No Vendors found.
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </section>
-          )}
-          {activeSection === "Products" && (
-            <section>
-              <h2 className="text-2xl font-bold mb-4">Products</h2>
-              <InputBox
-                Type="test"
-                Value={searchTermProduct}
-                onChange={handleSearchProduct}
-                Placeholder={"Search by Product ID or Vendor ID"}
-              />
-              <div className="overflow-x-auto">
-                <div className="py-4 flex w-full justify-start items-center gap-5">
-                  <Button
-                    label={"Add Category"}
-                    onClick={() =>
-                      setHandlePopup((prev) => {
-                        return { ...prev, addCategoryPopup: true };
-                      })
-                    }
-                  />
-                  <Button
-                    label={"Show all available categories or subcategories"}
-                    onClick={() =>
-                      setHandlePopup((prev) => {
-                        return { ...prev, allCategoryPopup: true };
-                      })
-                    }
-                  />
-                </div>
-                {handlePopup.addCategoryPopup && (
-                  <div className="backdrop-blur-xl absolute top-0 w-full h-full flex justify-center items-center flex-col left-0">
-                    <div className="bg-white shadow-2xl rounded-xl w-fit h-fit px-10 py-10 flex justify-center items-center">
-                      <form
-                        ref={categoryFormRef}
-                        onSubmit={submitCategory}
-                        // onSubmit={(e) => {
-                        //   e.preventDefault();
-                        //   submitCategory;
-                        // }}
-                        className="flex flex-col gap-2 "
-                      >
-                        <h1>Add Main & Sub category</h1>
-                        <InputBox
-                          LabelName={"Category"}
-                          Placeholder={"Add Category"}
-                          Name={"category"}
-                          Required
-                        />
-                        <InputBox
-                          LabelName={"Sub Category"}
-                          Placeholder={"Add Sub Category"}
-                          Name={"subcategory"}
-                          Required
-                        />
-                        <div className="mt-4">
-                          <label className="block text-sm font-medium text-gray-700">
-                            Upload Image
-                          </label>
-                          <input
-                            name="image"
-                            type="file"
-                            accept="image/*"
-                            className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                            // onChange={(e) =>
-                            //   setImage(e.target.files[0])
-                            // }
-                          />
-                        </div>
-                        <Button label={"Confirm"} type={"submit"} />
-                        <Button
-                          label={"Cancel"}
-                          onClick={() =>
-                            setHandlePopup((prev) => {
-                              return { ...prev, addCategoryPopup: false };
-                            })
-                          }
-                          className={"hover:bg-red-500"}
-                        />
-                      </form>
-                    </div>
-                  </div>
-                )}
-                {handlePopup.allCategoryPopup && (
-                  <div className="backdrop-blur-3xl absolute top-0 h-full w-full left-0 px-10 py-5">
-                    <Button
-                      label={<X />}
-                      onClick={() =>
-                        setHandlePopup((prev) => {
-                          return { ...prev, allCategoryPopup: false };
-                        })
-                      }
-                    />
-                    {AllCategories.map((category) => (
-                      <div key={category._id} className="p-4 rounded ">
-                        <div className="flex justify-between items-center bg-white p-2 rounded-xl ">
-                          <div>
-                            <h2 className="text-sm font-semibold">
-                              Main category:{" "}
-                              <span className="text-xl">{category.title}</span>
-                            </h2>
-                            <p className="text-gray-600">
-                              Category ID: {category._id}
-                            </p>
-                          </div>
-
-                          {/* Toggle Dropdown Button */}
-                          <Button
-                            label={<ChevronDown />}
-                            onClick={() =>
-                              setHandlePopup((prev) => ({
-                                ...prev,
-                                [category._id]: !prev[category._id],
-                              }))
-                            }
-                          />
-                        </div>
-
-                        {/* Dropdown for Subcategories */}
-                        {handlePopup[category._id] && (
-                          <div className="mt-3 bg-white p-4 rounded-xl">
-                            {/* Add Subcategory Button */}
-                            <Button
-                              label={<h1>Add more in {category.title}</h1>}
-                              onClick={() => {
-                                setSelectedCategoryId(category._id); //current category ID
-                                setHandlePopup((prev) => ({
-                                  ...prev,
-                                  addSubCategory: true,
-                                }));
-                              }}
-                            />
-
-                            {/* Form Popup */}
-                            {handlePopup.addSubCategory &&
-                              selectedCategoryId === category._id && (
-                                <div className="h-full w-full bg-opacity-90 bg-neutral-300 absolute top-0 left-0 flex justify-center items-center">
-                                  <form
-                                    ref={subcategoryFormRef}
-                                    className="flex flex-col justify-center px-10 rounded-xl gap-2 bg-white py-10"
-                                    onSubmit={(e) => {
-                                      e.preventDefault();
-                                      submitSubCategory(e, category._id);
-                                    }}
-                                  >
-                                    <h2 className="text-sm font-semibold">
-                                      Main category:{" "}
-                                      <span className="text-xl">
-                                        {category.title}
-                                      </span>
-                                    </h2>
-
-                                    <InputBox
-                                      LabelName={"Add Sub Category"}
-                                      Placeholder={"Sub category"}
-                                      Name={"subcategory"}
-                                      Required
-                                    />
-                                    <InputBox
-                                      LabelName={
-                                        <h1>
-                                          Paste the main category ID below{" "}
-                                          <span className="text-blue-600 font-semibold">
-                                            {category._id}
-                                          </span>
-                                          <button
-                                            onClick={() => {
-                                              navigator.clipboard.writeText(
-                                                category._id
-                                              );
-                                              alert("Category ID copied!");
-                                            }}
-                                            className="ml-2 p-1 border rounded bg-gray-200 hover:bg-gray-300 transition"
-                                          >
-                                            <ClipboardCopy size={16} />
-                                          </button>
-                                        </h1>
-                                      }
-                                      Placeholder={"Paste the above ID"}
-                                      Name={"categoryId"}
-                                      Required
-                                    />
-                                    <div className="mt-4">
-                                      <label className="block text-sm font-medium text-gray-700">
-                                        Upload Image
-                                      </label>
-                                      <input
-                                        name="image"
-                                        type="file"
-                                        accept="image/*"
-                                        className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                                        onChange={(e) =>
-                                          console.log(e.target.files[0])
-                                        }
-                                      />
-                                    </div>
-
-                                    <Button label={"Add"} type="submit" />
-                                    <Button
-                                      className={"hover:bg-red-500"}
-                                      label={"Cancel"}
-                                      onClick={() =>
-                                        setHandlePopup((prev) => ({
-                                          ...prev,
-                                          addSubCategory: false,
-                                        }))
-                                      }
-                                    />
-                                  </form>
-                                </div>
-                              )}
-
-                            {/* Display Subcategories */}
-                            {category.subcategories.length > 0 ? (
-                              <>
-                                <h3 className="font-medium">Subcategories:</h3>
-                                <ul className="list-disc pl-5">
-                                  {category.subcategories.map((sub) => (
-                                    <div className="flex justify-start items-center">
-                                      <li
-                                        key={sub._id}
-                                        className="text-gray-700"
-                                      >
-                                        {sub.title} (ID: {sub._id})
-                                      </li>
-
-                                      <button
-                                        onClick={() =>
-                                          setHandlePopup((prev) => ({
-                                            ...prev,
-                                            editSubcategory: true,
-                                            selectedSubcategoryId: sub._id,
-                                            selectedSubcategoryTitle: sub.title,
-                                          }))
-                                        }
-                                      >
-                                        <PencilLine className="font-thin h-5 w-5" />
-                                      </button>
-                                    </div>
-                                  ))}
-                                </ul>
-                                {handlePopup.editSubcategory && (
-                                  <div className="absolute top-0 left-0 h-full w-full p-20 bg-white shadow-lg rounded-md">
-                                    {/* Close Button */}
-
-                                    {/* Edit Form */}
-                                    <form
-                                      ref={editSubcategoryFormRef}
-                                      onSubmit={handleEditSubcategory}
-                                    >
-                                      {/* Display Selected Subcategory ID */}
-                                      <p className="text-gray-700 font-medium">
-                                        Editing Subcategory Name:{" "}
-                                        {handlePopup.selectedSubcategoryTitle}
-                                        <span className="mx-5">
-                                          Editing Subcategory ID:
-                                          {handlePopup.selectedSubcategoryId}
-                                        </span>
-                                      </p>
-
-                                      {/* Input for Subcategory Title */}
-                                      <InputBox
-                                        Placeholder={
-                                          "Enter new Subcategory name"
-                                        }
-                                        LabelName="Edit Subcategory"
-                                        Name="newTitle"
-                                        Required
-                                      />
-
-                                      {/* Input for Image Upload */}
-                                      <div className="mt-4">
-                                        <label className="block text-sm font-medium text-gray-700">
-                                          Upload Image
-                                        </label>
-                                        <input
-                                          name="image"
-                                          type="file"
-                                          accept="image/*"
-                                          className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                                        />
-                                      </div>
-
-                                      {/* Submit Button */}
-                                      <div className="flex justify-start my-10 items-center w-full gap-20">
-                                        <Button
-                                          label={"Update"}
-                                          type={"submit"}
-                                        />
-                                        <Button
-                                          label={"Cancel"}
-                                          className={"hover:bg-red-500"}
-                                          onClick={() =>
-                                            setHandlePopup((prev) => ({
-                                              ...prev,
-                                              editSubcategory: false,
-                                              selectedSubcategoryId: null,
-                                              selectedSubcategoryTitle: null,
-                                            }))
-                                          }
-                                        />
-                                      </div>
-                                    </form>
-                                  </div>
-                                )}
-                              </>
-                            ) : (
-                              <p className="text-gray-500">
-                                No subcategories available
-                              </p>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                )}
-                <table className="min-w-full border-collapse border border-gray-300 rounded-xl">
-                  <thead>
-                    <tr>
-                      {tableHeadersProducts.map((header, index) => (
-                        <th
-                          key={index}
-                          className="border border-gray-500 px-4 py-2 bg-neutral-300"
-                        >
-                          {header}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredProducts.length > 0 ? (
-                      filteredProducts.map((product) => (
-                        <tr key={product.id}>
-                          <td className="border border-gray-500 px-4 py-2">
-                            <Link to={`/current-product/${product._id}`}>
-                              {product._id}
-                            </Link>
-                          </td>
-                          <td className="border border-gray-500 px-4 py-2">
-                            {product.vendor}
-                          </td>
-                          <td className="border border-gray-500 px-4 py-2">
-                            {product.category.main}
-                          </td>
-                          <td className="border border-gray-500 px-4 py-2">
-                            {product.category.sub}
-                          </td>
-                        </tr>
-                      ))
-                    ) : (
-                      <tr>
-                        <td
-                          colSpan={tableHeadersProducts.length}
-                          className="text-center py-4"
-                        >
-                          No products found.
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </section>
-          )}
-          {activeSection === "Orders" && (
-            <section>
-              <h2 className="text-2xl font-bold mb-4">Orders</h2>
+              <h2 className="text-2xl font-bold mb-4">Brands</h2>
               <div className="overflow-x-auto">
                 <InputBox
                   Type="text"
-                  Value={searchTermOrders}
-                  onChange={handleSearchOrder}
-                  Placeholder={"Search by Product ID or Vendor ID"}
+                  Value={searchTermBrands}
+                  onChange={handleSearchBrands}
+                  Placeholder={"Search by Brand ID or Brand name"}
                 />
+                <div>
+                  <Button label={"Add new Brand"} />
+                </div>
                 <table className="min-w-full border-collapse border border-gray-300 rounded-xl">
                   <thead>
                     <tr>
-                      {tableHeadersOrder.map((header, index) => (
+                      {tableHeadersBrands.map((header, index) => (
                         <th
                           key={index}
                           className="border border-gray-500 px-4 py-2 bg-neutral-300"
@@ -1084,25 +198,25 @@ const Dashboard = ({ startLoading, stopLoading }) => {
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredOrders.length > 0 ? (
-                      filteredOrders.map((order) => (
-                        <tr key={order.id}>
+                    {filteredBrands.length > 0 ? (
+                      filteredBrands.map((brand) => (
+                        <tr key={brand.id}>
                           <td className="border border-gray-500 px-4 py-2">
-                            <Link to={`/current-order/${order._id}`}>
-                              {order._id}
+                            <Link to={`/current-brand/${brand._id}`}>
+                              {brand._id}
                             </Link>
                           </td>
                           <td className="border border-gray-500 px-4 py-2">
-                            {order?.user}
+                            {brand?.title}
                           </td>
                           <td className="border border-gray-500 px-4 py-2">
-                            {order.totalAmount}
+                            {brand.adminName}
                           </td>
                           <td className="border border-gray-500 px-4 py-2">
-                            {order.orderStatus}
+                            {brand.registeredOn}
                           </td>
                           <td className="border border-gray-500 px-4 py-2">
-                            {order.bookingDate}
+                            {brand.status}
                           </td>
                         </tr>
                       ))
@@ -1112,7 +226,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
                           colSpan={tableHeadersOrder.length}
                           className="text-center py-4"
                         >
-                          No orders found.
+                          No brands found.
                         </td>
                       </tr>
                     )}
@@ -1121,6 +235,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
               </div>
             </section>
           )}
+          {activeSection === "Orders" && <Orders />}
           {activeSection === "Promotions" && (
             <section>
               <h2 className="text-2xl font-bold mb-4">Promotions</h2>
