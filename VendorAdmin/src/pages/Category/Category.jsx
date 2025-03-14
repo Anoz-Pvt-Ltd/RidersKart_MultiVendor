@@ -43,7 +43,7 @@ const Categories = ({ startLoading, stopLoading }) => {
     };
 
     getAllMainSubcategories();
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -62,7 +62,7 @@ const Categories = ({ startLoading, stopLoading }) => {
       }
     };
     fetchProducts();
-  }, []);
+  }, [user]);
 
   // Handle form submission
   const handleAddCategory = (e) => {

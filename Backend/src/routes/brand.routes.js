@@ -22,9 +22,6 @@ const router = Router();
 
 // admin routes
 router
-  .route("/admin/add-new-brand")
-  .post(VerifyAdminUser, upload.single("image"), AddNewBrand);
-router
   .route("/admin/get-all-non-verified-brands")
   .get(VerifyAdminUser, GetAllUnderReviewBrands);
 router
@@ -35,6 +32,9 @@ router
   .post(VerifyAdminUser, VerifyBrand);
 
 // vendor routes
+router
+  .route("/vendor/add-new-brand")
+  .post(VerifyVendorUser, upload.single("image"), AddNewBrand);
 router
   .route("/vendor/add-brand-request")
   .post(VerifyVendorUser, AddBrandRequest);
