@@ -37,7 +37,7 @@ app.use(cookieParser());
 
 //print function to ensure every step is executed
 app.use((req, res, next) => {
-  console.log("--------------------------------")
+  console.log("--------------------------------");
   console.log(`Received:`, req.method);
   console.log(`at:`, req.url);
   console.log(`with body:`, req.body);
@@ -66,6 +66,7 @@ import orderRouter from "./routes/order.routes.js";
 import userRouter from "./routes/user.routes.js";
 import adminRouter from "./routes/admin.routes.js";
 import categoryRouter from "./routes/category-and-subcategory.routes.js";
+import brandRouter from "./routes/brand.routes.js";
 
 //vendor routes
 app.use("/api/v1/vendor", vendorRouter);
@@ -84,5 +85,8 @@ app.use("/api/v1/admins", adminRouter);
 
 //category and subcategory routes
 app.use("/api/v1/categories", categoryRouter);
+
+//brand routes  
+app.use("/api/v1/brands", brandRouter);
 
 export { app };

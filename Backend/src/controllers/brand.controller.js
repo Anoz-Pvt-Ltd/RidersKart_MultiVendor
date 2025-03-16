@@ -2,9 +2,11 @@ import { Brand } from "../models/brand.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import { UploadImages } from "../utils/imageKit.io.js";
 
 const AddNewBrand = asyncHandler(async (req, res) => {
   const { brand } = req.body;
+  console.log(brand);
 
   if (!brand) throw new ApiError(400, "Brand name is required");
 
@@ -14,7 +16,7 @@ const AddNewBrand = asyncHandler(async (req, res) => {
   // Add logo for this new brand to database
   const imageFile = req.file;
   if (!imageFile) throw new ApiError(400, "No brand logo provided");
-  const logo = await uploadImages(
+  const logo = await UploadImages(
     imageFile.filename,
     {
       folderStructure: `all-brands/${brand.split(" ").join("-")}`,

@@ -1,25 +1,10 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import LoadingUI from "../../components/Loading";
-
-const initialBrandData = [
-  {
-    id: "1",
-    name: "Brand A",
-    description: "Description A",
-    products: 12,
-    logo: null,
-  },
-  {
-    id: "2",
-    name: "Brand B",
-    description: "Description B",
-    products: 8,
-    logo: null,
-  },
-];
+import { FetchData } from "../../utils/FetchFromApi";
 
 const Brands = ({ startLoading, stopLoading }) => {
-  const [brands, setBrands] = useState(initialBrandData);
+  const formRef = useRef(null);
+  const [brands, setBrands] = useState([]);
   const [newBrand, setNewBrand] = useState({
     id: "",
     name: "",
@@ -39,26 +24,48 @@ const Brands = ({ startLoading, stopLoading }) => {
   };
 
   // Handle form submission
-  const handleAddBrand = (e) => {
-    e.preventDefault();
-    if (!newBrand.name || !newBrand.description) {
-      alert("Please fill out all required fields.");
-      return;
+  // const handleAddBrand = (e) => {
+  //   e.preventDefault();
+  //   if (!newBrand.name || !newBrand.description) {
+  //     alert("Please fill out all required fields.");
+  //     return;
+  //   }
+
+  //   // Add or edit brand
+  //   const updatedBrands = newBrand.id
+  //     ? brands.map((brand) =>
+  //         brand.id === newBrand.id
+  //           ? { ...newBrand, products: brand.products }
+  //           : brand
+  //       )
+  //     : [...brands, { ...newBrand, id: String(Date.now()) }];
+  //   setBrands(updatedBrands);
+
+  //   // Reset the form
+  //   setNewBrand({ id: "", name: "", description: "", products: 0, logo: null });
+  //   setShowForm(false);
+  // };
+
+  const addBrand = async () => {
+    const formData = new FormData.current();
+    try {
+      startLoading();
+      const response = await FetchData(
+        "brands/vendor/add-brand-request",
+        "post",
+        formData,
+        true
+      );
+      console.log(response);
+      alert(
+        "Your Brand is sent for approval... It might take time to get reviewed"
+      );
+    } catch (error) {
+      alert("error");
+      console.log("Error getting all main subcategories", error);
+    } finally {
+      stopLoading();
     }
-
-    // Add or edit brand
-    const updatedBrands = newBrand.id
-      ? brands.map((brand) =>
-          brand.id === newBrand.id
-            ? { ...newBrand, products: brand.products }
-            : brand
-        )
-      : [...brands, { ...newBrand, id: String(Date.now()) }];
-    setBrands(updatedBrands);
-
-    // Reset the form
-    setNewBrand({ id: "", name: "", description: "", products: 0, logo: null });
-    setShowForm(false);
   };
 
   // Handle editing a brand
@@ -142,7 +149,8 @@ const Brands = ({ startLoading, stopLoading }) => {
       {/* Add/Edit Brand Form */}
       {showForm && (
         <form
-          onSubmit={handleAddBrand}
+          ref={formRef}
+          onSubmit={addBrand}
           className="bg-gray-100 p-4 rounded mb-6 shadow"
         >
           <div className="mb-4">
@@ -150,8 +158,8 @@ const Brands = ({ startLoading, stopLoading }) => {
             <input
               type="text"
               name="name"
-              value={newBrand.name}
-              onChange={handleInputChange}
+              // value={newBrand.name}
+              // onChange={handleInputChange}
               className="w-full px-3 py-2 border rounded"
               required
             />
@@ -160,8 +168,8 @@ const Brands = ({ startLoading, stopLoading }) => {
             <label className="block text-gray-700">Description</label>
             <textarea
               name="description"
-              value={newBrand.description}
-              onChange={handleInputChange}
+              // value={newBrand.description}
+              // onChange={handleInputChange}
               className="w-full px-3 py-2 border rounded"
               required
             />
@@ -171,7 +179,7 @@ const Brands = ({ startLoading, stopLoading }) => {
             <input
               type="file"
               name="logo"
-              onChange={handleInputChange}
+              // onChange={handleInputChange}
               className="w-full px-3 py-2 border rounded"
             />
             {newBrand.logo && (
