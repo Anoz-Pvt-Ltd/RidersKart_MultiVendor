@@ -3,8 +3,9 @@ import { useNavigate } from "react-router";
 import Button from "../../Components/Button";
 import InputBox from "../../Components/InputBox";
 import { FetchData } from "../../Utility/FetchFromApi";
+import LoadingUI from "../../Components/Loading";
 
-const AdminRegister = () => {
+const AdminRegister = ({ startLoading, stopLoading }) => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const navigate = useNavigate();
@@ -16,7 +17,7 @@ const AdminRegister = () => {
   });
 
   const HandleLogin = () => {
-    navigate("/home");
+    navigate("/");
   };
 
   const handleChange = (e) => {
@@ -29,6 +30,7 @@ const AdminRegister = () => {
     e.preventDefault();
     const formData = new FormData(formRef.current);
     try {
+      startLoading()
       const response = await FetchData(
         `admins/admin-register`,
         "post",
@@ -43,6 +45,8 @@ const AdminRegister = () => {
       }
     } catch (err) {
       setError(err.response?.data?.message || "Failed to register.");
+    } finally {
+      stopLoading()
     }
   };
 
@@ -98,4 +102,4 @@ const AdminRegister = () => {
   );
 };
 
-export default AdminRegister;
+export default LoadingUI(AdminRegister);

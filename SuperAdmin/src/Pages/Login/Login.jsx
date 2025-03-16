@@ -5,8 +5,9 @@ import InputBox from "../../Components/InputBox";
 import { FetchData } from "../../Utility/FetchFromApi";
 import { useDispatch } from "react-redux";
 import { addUser, clearUser } from "../../Utility/Slice/UserInfoSlice";
+import LoadingUI from "../../Components/Loading";
 
-const AdminLogin = () => {
+const AdminLogin = ({ startLoading, stopLoading }) => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const navigate = useNavigate();
@@ -28,6 +29,7 @@ const AdminLogin = () => {
     e.preventDefault();
     const formData = new FormData(formRef.current);
     try {
+      startLoading();
       const response = await FetchData(`admins/admin-login`, "post", formData);
       console.log(response);
       localStorage.clear(); // will clear the all the data from localStorage
@@ -47,6 +49,8 @@ const AdminLogin = () => {
       navigate("/home");
     } catch (err) {
       setError(err.response?.data?.message || "Failed to Login.");
+    } finally {
+      stopLoading(); // Stop loading once response is received
     }
   };
 
@@ -88,4 +92,4 @@ const AdminLogin = () => {
   );
 };
 
-export default AdminLogin;
+export default LoadingUI(AdminLogin);
