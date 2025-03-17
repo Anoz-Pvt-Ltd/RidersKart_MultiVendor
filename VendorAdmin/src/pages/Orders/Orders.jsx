@@ -18,6 +18,7 @@ const Orders = ({ startLoading, stopLoading }) => {
             `orders/all-products-of-vendor/${user?.[0]?._id}`,
             "get"
           );
+          console.log(response);
           if (response.data.success) {
             setAllOrders(response.data.orders);
           } else {
@@ -49,7 +50,7 @@ const Orders = ({ startLoading, stopLoading }) => {
               <tr>
                 <th className="py-2 px-4 border-b">Order ID</th>
                 <th className="py-2 px-4 border-b">Product Name</th>
-                <th className="py-2 px-4 border-b">Category</th>
+                <th className="py-2 px-4 border-b">Category ID / Subcategory ID</th>
                 <th className="py-2 px-4 border-b">Quantity</th>
                 <th className="py-2 px-4 border-b">Price</th>
                 <th className="py-2 px-4 border-b">Total Amount</th>
@@ -69,8 +70,8 @@ const Orders = ({ startLoading, stopLoading }) => {
                       {order.products[0]?.product.name || "N/A"}
                     </td>
                     <td className="py-2 px-4 border-b">
-                      {order.products[0]?.product.category.main || "N/A"} -{" "}
-                      {order.products[0]?.product.category.sub || "N/A"}
+                      {order.products[0]?.product.category || "N/A"} -----------------------------{" "}
+                      {order.products[0]?.product.subcategory || "N/A"}
                     </td>
                     <td className="py-2 px-4 border-b">
                       {order.products[0]?.quantity}

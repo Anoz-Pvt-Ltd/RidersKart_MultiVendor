@@ -360,8 +360,8 @@ const Products = ({ startLoading, stopLoading }) => {
               </h3>
               <p>{product?.description}</p>
               <p>
-                <strong>Category:</strong> {product?.category.title} -{" "}
-                {product?.subcategory.title}
+                <strong>Category:</strong> {product?.category?.title} -{" "}
+                {product?.subcategory?.title}
               </p>
               <p>
                 <strong>Price:</strong> ₹ {product?.price}

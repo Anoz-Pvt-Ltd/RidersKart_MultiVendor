@@ -7,7 +7,7 @@ import InputBox from "../../Components/InputBox";
 import Button from "../../Components/Button";
 import { useRef } from "react";
 import LoadingUI from "../../Components/Loading";
-import { ChevronDown, PencilLine, X } from "lucide-react";
+import { ChevronDown, PencilLine, X, ClipboardCopy } from "lucide-react";
 const Products = ({ startLoading, stopLoading }) => {
   const user = useSelector((store) => store.UserInfo.user);
   const [allProducts, setAllProducts] = useState([]);

@@ -13,6 +13,7 @@ import Button from "./Button";
 import InputBox from "./InputBox";
 import { useSelector } from "react-redux";
 import { motion } from "framer-motion";
+import logo from "../assets/Logo.png";
 
 const Header = () => {
   const navigate = useNavigate();
@@ -24,18 +25,15 @@ const Header = () => {
   return (
     <header className="flex justify-between items-center px-5 py-3  shadow-md relative">
       {/* Logo */}
-      <div className="flex items-center">
-        <Link to={"/"}>
-          <img
-            src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Flipkart_logo.png/800px-Flipkart_logo.png"
-            alt="Logo"
-            className="h-8"
-          />
+      <div className="flex items-center lg:pl-20 justify-center">
+        <Link to={"/"} className="flex items-center justify-center">
+          <img src={logo} alt="Logo" className="h-20" />
+          <h1>Rider's Kart</h1>
         </Link>
       </div>
 
       {/* Search Bar - Hidden in Mobile */}
-      <div className="hidden md:block w-[50%]">
+      <div className="hidden md:block w-[60%]">
         <InputBox Placeholder="Search for products..." className="w-full" />
       </div>
 

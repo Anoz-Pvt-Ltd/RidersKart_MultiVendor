@@ -6,7 +6,7 @@ import { UploadImages } from "../utils/imageKit.io.js";
 
 const AddNewBrand = asyncHandler(async (req, res) => {
   const { brand } = req.body;
-  console.log(brand);
+  // console.log("brand :", brand);
 
   if (!brand) throw new ApiError(400, "Brand name is required");
 

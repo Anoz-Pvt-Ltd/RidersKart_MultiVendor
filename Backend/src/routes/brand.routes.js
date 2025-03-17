@@ -21,12 +21,8 @@ import { upload } from "../middlewares/multer.middleware.js";
 const router = Router();
 
 //public routes
-router
-  .route("/get-all-brands")
-  .get(GetAllBrands);
-router
-  .route("/get-brand-by-id/:brandId")
-  .get(GetBrandById);
+router.route("/get-all-brands").get(GetAllBrands);
+router.route("/get-brand-by-id/:brandId").get(GetBrandById);
 
 // admin routes
 router
@@ -38,13 +34,13 @@ router
 router
   .route("/admin/verify-brand-request/:brandId")
   .post(VerifyAdminUser, VerifyBrand);
+router
+  .route("/admin/add-new-brand")
+  .post(VerifyAdminUser, upload.single("image"), AddNewBrand);
 
 // vendor routes
 router
   .route("/vendor/add-new-brand")
-  .post(VerifyVendorUser, upload.single("image"), AddNewBrand);
-router
-  .route("/vendor/add-brand-request")
-  .post(VerifyVendorUser, AddBrandRequest);
+  .post(VerifyVendorUser, upload.single("image"), AddBrandRequest);
 
 export default router;

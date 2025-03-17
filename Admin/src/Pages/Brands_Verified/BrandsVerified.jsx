@@ -71,6 +71,10 @@ const BrandsVerified = ({ startLoading, stopLoading }) => {
 
   const addBrand = async () => {
     const formData = new FormData(formRef.current);
+    for (var pair of formData.entries()) {
+      console.log(pair[0] + ", " + pair[1]);
+    }
+    // console.log(formData);
     try {
       startLoading();
       const response = await FetchData(
@@ -83,6 +87,7 @@ const BrandsVerified = ({ startLoading, stopLoading }) => {
       alert("Brand added successfully");
       window.location.reload();
     } catch (err) {
+      alert("Failed to add brand.");
       setError(err.response?.data?.message || "Failed to add brand.");
     } finally {
       stopLoading();
