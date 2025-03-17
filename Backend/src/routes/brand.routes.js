@@ -20,6 +20,14 @@ import { upload } from "../middlewares/multer.middleware.js";
 
 const router = Router();
 
+//public routes
+router
+  .route("/get-all-brands")
+  .get(GetAllBrands);
+router
+  .route("/get-brand-by-id/:brandId")
+  .get(GetBrandById);
+
 // admin routes
 router
   .route("/admin/get-all-non-verified-brands")

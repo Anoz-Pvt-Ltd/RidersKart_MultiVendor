@@ -540,6 +540,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
                 {console.log(allOrders)}
                 {allOrders?.map((product, index) => (
                   <ProductCard
+                    Image={product?.products?.[0]?.product?.images[0]?.url}
                     key={index}
                     ProductName={product?.products?.[0]?.product?.name}
                     CurrentPrice={product?.products?.[0]?.product?.price}
@@ -571,6 +572,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
               <div className="flex justify-start items-start gap-5 flex-wrap p-5">
                 {wishlistProducts?.map((product, index) => (
                   <ProductCard
+                    Image={product?.images[0]?.url}
                     key={index}
                     ProductName={product?.name}
                     CurrentPrice={product?.price}
@@ -586,6 +588,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
               <div className="flex justify-start items-start gap-5 flex-wrap lg:hidden">
                 {wishlistProducts?.map((product, index) => (
                   <ProductCardMobile
+                    Image={product?.images[0]?.url}
                     key={product._id}
                     ProductName={product.name}
                     CurrentPrice={product.price}

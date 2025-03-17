@@ -5,6 +5,7 @@ import Button from "../../components/Button";
 import { useSelector } from "react-redux";
 import SelectBox from "../../components/SelectionBox";
 import LoadingUI from "../../components/Loading";
+import TextArea from "../../components/TextWrapper";
 // import { categories } from "../../constants/AllProducts.Vendor";
 
 const Products = ({ startLoading, stopLoading }) => {
@@ -17,9 +18,12 @@ const Products = ({ startLoading, stopLoading }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [categories, setCategories] = useState([]);
   const [subcategories, setSubcategories] = useState([]);
+  const [brands, setBrands] = useState([]);
   const [imagePreview, setImagePreview] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState();
 
   const [products, setProducts] = useState([]);
+  console.log(subcategories);
   console.log(products);
 
   const handleImageFileChange = (e) => {
@@ -81,7 +85,7 @@ const Products = ({ startLoading, stopLoading }) => {
     setSuccess("");
 
     const formData = new FormData(formRef.current);
-    console.log(images);
+    // console.log(images);
     // formData.append("image", images);
 
     for (var pair of formData.entries()) {
@@ -157,7 +161,19 @@ const Products = ({ startLoading, stopLoading }) => {
       }
     };
 
+    const GetAllBrands = async () => {
+      try {
+        startLoading();
+        const response = await FetchData("brands/get-all-brands", "get");
+        console.log(response);
+        if (response.data.success) setBrands(response.data.data);
+      } catch {
+        setError("Failed to fetch brands.");
+      }
+    };
+
     getAllMainSubcategories();
+    GetAllBrands();
   }, []);
 
   return (
@@ -177,111 +193,124 @@ const Products = ({ startLoading, stopLoading }) => {
       />
 
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50 p-4 h-screen w-screen overflow-auto">
-          <div className="bg-white flex flex-col rounded-lg shadow-lg w-full h-fit mt-96 lg:mt-0 overflow-auto">
+        <div className="fixed inset-0 flex items-center justify-center  backdrop-blur-xl p-4 h-screen w-screen overflow-auto top-0 left-0">
+          <div className="bg-white flex flex-col rounded-lg shadow-lg w-fit h-fit px-20 py-10">
             <h2 className="text-lg font-semibold text-gray-800 lg:mb-4 pl-5">
               Add New Product
             </h2>
             <form
               ref={formRef}
               onSubmit={handleAddProduct}
-              className="flex flex-col lg:flex-row overscroll-scroll w-full justify-evenly items-center"
+              className="flex flex-col overscroll-scroll w-full justify-evenly items-center"
             >
-              <div className="flex flex-col justify-start items-center">
-                <InputBox
-                  LabelName="Product Name"
-                  Name="name"
-                  Placeholder="Enter product name"
-                />
-                <InputBox
-                  LabelName="Description"
-                  Name="description"
-                  Placeholder="Enter product description"
-                />
-                <SelectBox
-                  LabelName="Main Category"
-                  Name="category"
-                  Placeholder="Select main category"
-                  Options={categories?.map((cat) => ({
-                    label: cat.title,
-                    value: cat._id, // Correctly linking ID for selection
-                  }))}
-                />
+              <div className="flex flex-row justify-start items-start gap-10">
+                {" "}
+                <div className="flex flex-col justify-start items-center">
+                  <InputBox
+                    LabelName="Product Name"
+                    Name="name"
+                    Placeholder="Enter product name"
+                  />
 
-                {subcategories.length > 0 && (
                   <SelectBox
-                    LabelName="Subcategory"
-                    Name="subcategory"
-                    Placeholder="Select subcategory"
-                    Options={subcategories.map((sub) => ({
-                      label: sub.title,
-                      value: sub._id, // Ensure unique key
+                    LabelName="Brand"
+                    Name="brand"
+                    Placeholder="Select main category"
+                    Options={brands?.map((brand) => ({
+                      label: brand.title,
+                      value: brand._id, // Correctly linking ID for selection
                     }))}
                   />
-                )}
-              </div>
-              <div className="flex flex-col justify-start items-center">
-                <InputBox
-                  LabelName="Price"
-                  Type="number"
-                  Name="price"
-                  Placeholder="Enter price"
-                />
-                <InputBox
-                  LabelName="Stock Quantity"
-                  Type="number"
-                  Name="stockQuantity"
-                  Placeholder="Enter stock quantity"
-                />
-                <InputBox LabelName="SKU" Name="sku" Placeholder="Enter SKU" />
-              </div>
-              <div>
-                <h3>Images</h3>
-                {/* {newProduct.images.map((image, index) => (
-                  <div key={index} className="flex flex-col gap-2 sm:flex-row">
-                    <InputBox
-                      LabelName="Upload Image"
-                      Name={`images.${index}.url`}
-                      Value={image.url}
-                      Placeholder="Enter image URL"
-                      onChange={handleInputChange}
-                    />
-                    <InputBox
-                      LabelName="Alt Text"
-                      Name={`images.${index}.altText`}
-                      Value={image.altText}
-                      Placeholder="Enter image alt text"
-                      onChange={handleInputChange}
-                    />
-                  </div>
-                ))} */}
-                <InputBox
-                  LabelName="Upload Image"
-                  Type="file"
-                  Name={`image`}
-                  Placeholder="Enter image URL"
-                  onChange={(e) => {
-                    handleImageFileChange(e);
-                  }}
-                />
-                {imagePreview && (
-                  <div className="flex items-center gap-3">
-                    <img
-                      src={imagePreview}
-                      alt="Preview"
-                      className="w-16 h-16 object-cover rounded-md border"
-                    />
 
-                    {/* Cancel Button */}
-                    <button
-                      onClick={handleImageCancel}
-                      className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                )}
-                {/* <Button
+                  <SelectBox
+                    LabelName="Main Category"
+                    Name="category"
+                    onChange={(e) => setSelectedCategory(e.target.value)}
+                    Placeholder="Select main category"
+                    Options={categories?.map((cat) => ({
+                      label: cat.title,
+                      value: cat._id, // Correctly linking ID for selection
+                    }))}
+                  />
+
+                  {subcategories.length > 0 && (
+                    <SelectBox
+                      LabelName="Subcategory"
+                      Name="subcategory"
+                      Placeholder="Select subcategory"
+                      Options={subcategories
+                        .filter(
+                          (subs) => subs.category._id === selectedCategory
+                        )
+                        .map((sub) => ({
+                          label: sub.title,
+                          value: sub._id, // Ensure unique key
+                        }))}
+                    />
+                  )}
+                </div>
+                <div className="flex flex-col justify-start items-center">
+                  <InputBox
+                    LabelName="Price"
+                    Type="number"
+                    Name="price"
+                    Placeholder="Enter price"
+                  />
+                  <InputBox
+                    LabelName="Stock Quantity"
+                    Type="number"
+                    Name="stockQuantity"
+                    Placeholder="Enter stock quantity"
+                  />
+                  <InputBox
+                    LabelName="Stock keeping unit (SKU)"
+                    Name="sku"
+                    Placeholder="Enter SKU"
+                  />
+                </div>
+                <div>
+                  <InputBox
+                    LabelName="Upload Image"
+                    Type="file"
+                    Name={`image`}
+                    Placeholder="Enter image URL"
+                    onChange={(e) => {
+                      handleImageFileChange(e);
+                    }}
+                  />
+                  {imagePreview && (
+                    <div className="flex items-center gap-3">
+                      <img
+                        src={imagePreview}
+                        alt="Preview"
+                        className="w-16 h-16 object-cover rounded-md border"
+                      />
+
+                      {/* Cancel Button */}
+                      <button
+                        onClick={handleImageCancel}
+                        className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  )}
+                  <TextArea
+                    LabelName="Description"
+                    Name="description"
+                    Placeholder="Enter product description"
+                  />
+                  <TextArea
+                    LabelName="Specification"
+                    Name="specifications"
+                    Placeholder="Enter Specification"
+                  />
+                  <TextArea
+                    LabelName="Tags"
+                    Name="tags"
+                    Placeholder="Enter Tags"
+                  />
+                  {/* <Button
                   label="Add Image"
                   Type="button"
                   onClick={() =>
@@ -292,8 +321,9 @@ const Products = ({ startLoading, stopLoading }) => {
                   }
                   className="mt-2"
                 /> */}
+                </div>
               </div>
-              <div className="flex justify-end gap-2">
+              <div className="button flex justify-end gap-2">
                 <Button
                   label="Cancel"
                   Type="button"

@@ -178,7 +178,7 @@ const Brands = ({ startLoading, stopLoading }) => {
             <label className="block text-gray-700">Brand Logo</label>
             <input
               type="file"
-              name="logo"
+              name="image"
               // onChange={handleInputChange}
               className="w-full px-3 py-2 border rounded"
             />
@@ -192,6 +192,7 @@ const Brands = ({ startLoading, stopLoading }) => {
           </div>
           <button
             type="submit"
+            // onClick={addBrand}
             className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
           >
             {newBrand.id ? "Update Brand" : "Add Brand"}

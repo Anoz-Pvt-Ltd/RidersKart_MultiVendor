@@ -18,8 +18,8 @@ const Home = ({ startLoading, stopLoading }) => {
     const fetchProducts = async () => {
       try {
         startLoading();
-        const response = await FetchData("products/get-all-product", "get");
-        // console.log(response);
+        const response = await FetchData("products/get-all-products", "get");
+        console.log(response);
         if (response.data.success) {
           setProducts(response.data.data.products);
         } else {
@@ -116,7 +116,7 @@ const Home = ({ startLoading, stopLoading }) => {
   };
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto py-4">
       <motion.div
         whileInView={{ opacity: 1, x: 0 }}
         initial={{ opacity: 0, x: 100 }}
@@ -184,7 +184,7 @@ const Home = ({ startLoading, stopLoading }) => {
                 {category.subcategories.length > 0 ? (
                   category.subcategories.map((item) => (
                     <Link
-                      to={`/all-products/${category.title}/${item.title}`} // Use `title` instead of `name`
+                      to={`/all-products/${category._id}/${item._id}/${category.title}/${item.title}`}
                       key={item._id}
                     >
                       <motion.div

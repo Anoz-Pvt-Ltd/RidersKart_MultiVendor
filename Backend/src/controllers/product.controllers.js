@@ -23,6 +23,18 @@ const registerProduct = asyncHandler(async (req, res) => {
     brand,
   } = req.body;
   console.log("Controller Reached");
+  console.log([
+    name,
+    description,
+    category,
+    subcategory,
+    price,
+    stockQuantity,
+    sku,
+    specifications,
+    tags,
+    brand,
+  ]);
 
   const vendorId = req.user._id;
 
@@ -39,6 +51,9 @@ const registerProduct = asyncHandler(async (req, res) => {
   ) {
     throw new ApiError(400, "All required fields must be filled");
   }
+
+  const allTags = tags.split(",");
+  console.log("allTags: ", allTags, typeof allTags);
 
   // Validate main category
   const existingCategory = await Category.findById(category);
@@ -93,8 +108,10 @@ const registerProduct = asyncHandler(async (req, res) => {
       altText: name,
       fileId: UploadedImage.fileId,
     },
-    specifications,
-    tags,
+    specifications: {
+      details: `${specifications}`,
+    },
+    tags: allTags,
     vendor: vendorId,
     brand,
   });
@@ -165,15 +182,14 @@ const getProductsOfVendor = asyncHandler(async (req, res) => {
   if (!vendorId) throw new ApiError(400, "Vendor ID is required");
 
   // Fetch the products of the given vendor ID
-  const vendor = await VendorUser.findById(vendorId)
-    .populate({
-      path: "products",
-      populate: [
-        { path: "category" }, // Populate category inside products
-        { path: "subcategory" }, // Populate subcategory inside products
-      ],
-    })
-    .populate("brand");
+  const vendor = await VendorUser.findById(vendorId).populate({
+    path: "products",
+    populate: [
+      { path: "category" }, // Populate category inside products
+      { path: "subcategory" }, // Populate subcategory inside products
+      { path: "brand" }, // Populate subcategory inside products
+    ],
+  });
 
   if (!vendor) throw new ApiError(404, "Vendor not found");
 

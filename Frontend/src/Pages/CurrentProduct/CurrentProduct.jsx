@@ -114,7 +114,7 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
       <div className="flex justify-between items-start p-4">
         <section>
           <img
-            src="https://static-assets-web.flixcart.com/www/linchpin/fk-cp-zion/img/fk-cp-zion/2023/11_11/xmas/pc-banner/pc-banner-1.png" // Replace with the actual image URL
+            src={products?.images[0]?.url}
             alt={products?.name}
             className="bg-neutral-200 h-96 w-96 mx-20"
           />
@@ -195,6 +195,7 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
         >
           {AllProducts?.map((product, index) => (
             <ProductCard
+              Image={product?.images[0]?.url}
               key={index}
               ProductName={product?.name}
               CurrentPrice={product?.price}

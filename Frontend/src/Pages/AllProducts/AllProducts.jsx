@@ -11,7 +11,8 @@ const AllProducts = ({ startLoading, stopLoading }) => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  const { category, subcategory } = useParams();
+  const { category, subcategory, category_title, subcategory_title } =
+    useParams();
 
   const fetchProducts = async (page = 1) => {
     startLoading();
@@ -38,6 +39,7 @@ const AllProducts = ({ startLoading, stopLoading }) => {
         setError("Failed to load products.");
       }
     } catch (err) {
+      console.log(err);
       setError(err.response?.data?.message || "Failed to fetch products.");
     } finally {
       stopLoading();
@@ -52,37 +54,35 @@ const AllProducts = ({ startLoading, stopLoading }) => {
     <div className="flex flex-col flex-wrap justify-center gap-6 p-4">
       <div>
         <h1 className="text-3xl font-bold">
-          {category || "All Products"}{" "}
-          {subcategory && (
-            <span className="text-xl font-medium ml-4"> - {subcategory}</span>
+          {category_title || "All Products"}{" "}
+          {subcategory_title && (
+            <span className="text-xl font-medium ml-4">
+              {" "}
+              - {subcategory_title}
+            </span>
           )}
         </h1>
       </div>
 
-      {loading ? (
-        <p className="text-center text-gray-600">Loading products...</p>
-      ) : error ? (
-        <p className="text-center text-red-500">{error}</p>
-      ) : (
-        <div className="flex flex-wrap justify-start items-center gap-6 p-4">
-          {products.length > 0 ? (
-            products.map((product, index) => (
-              <ProductCard
-                key={product._id}
-                ProductName={product.name}
-                CurrentPrice={product.price}
-                Mrp={product.price}
-                Rating={product.Rating}
-                Offer={product.off}
-                Description={product.description}
-                productId={product._id}
-              />
-            ))
-          ) : (
-            <p className="text-center text-gray-500">No products found.</p>
-          )}
-        </div>
-      )}
+      <div className="flex flex-wrap justify-start items-center gap-6 p-4">
+        {products.length > 0 ? (
+          products.map((product, index) => (
+            <ProductCard
+              Image={product?.images[0]?.url}
+              key={product._id}
+              ProductName={product.name}
+              CurrentPrice={product.price}
+              Mrp={product.price}
+              Rating={product.Rating}
+              Offer={product.off}
+              Description={product.description}
+              productId={product._id}
+            />
+          ))
+        ) : (
+          <p className="text-center text-gray-500">No products found.</p>
+        )}
+      </div>
 
       {/* Pagination Controls */}
       {totalPages > 1 && (

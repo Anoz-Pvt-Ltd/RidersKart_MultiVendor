@@ -20,7 +20,7 @@ const router = Router();
 router
   .route("/register-product/:vendorId")
   .post(VerifyVendorUser, upload.single("image"), registerProduct);
-router.route("/get-all-product").get(getAllProducts);
+router.route("/get-all-products").get(getAllProducts);
 router.route("/get-single-product/:productId").get(getProduct);
 
 //routes with authorization (private)

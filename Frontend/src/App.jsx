@@ -107,7 +107,7 @@ const App = () => {
             element={<Dashboard />}
           />
           <Route
-            path="/all-products/:category/:subcategory"
+            path="/all-products/:category/:subcategory/:category_title/:subcategory_title"
             element={<AllProducts />}
           />
           <Route

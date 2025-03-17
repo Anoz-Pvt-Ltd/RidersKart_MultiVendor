@@ -140,6 +140,7 @@ const BuyNow = ({ startLoading, stopLoading }) => {
       {product && (
         <div className="w-fit">
           <ProductCard
+            Image={product?.images[0]?.url}
             ProductName={product?.name}
             Description={product?.description}
             productId={product?._id}

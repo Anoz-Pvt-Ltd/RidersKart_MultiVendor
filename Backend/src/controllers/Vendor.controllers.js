@@ -209,14 +209,13 @@ const regenerateRefreshToken = asyncHandler(async (req, res) => {
 
     if (!token) throw new ApiError(401, "Unauthorized request");
 
-    console.log(token, process.env.REFRESH_TOKEN_SECRET);
-
+   
     const DecodedToken = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
 
     const user = await VendorUser.findById(DecodedToken._id).select(
       "-password -refreshToken"
     );
-    console.log(user);
+    // console.log(user);
 
     if (!user) throw new ApiError(400, "Invalid Token");
 
