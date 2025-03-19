@@ -86,7 +86,7 @@ const CartPage = ({ startLoading, stopLoading }) => {
 
   const calculateTotal = () => {
     return cartProducts.reduce(
-      (total, item) => total + item.price * item.quantity,
+      (total, item) => total + item.price.sellingPrice * item.quantity,
       0
     );
   };
@@ -113,7 +113,9 @@ const CartPage = ({ startLoading, stopLoading }) => {
                     />
                     <div className="flex-1 px-4">
                       <h2 className="font-medium text-lg">{item.name}</h2>
-                      <p className="text-gray-600">₹ {item.price}</p>
+                      <p className="text-gray-600">
+                        ₹ {item.price.sellingPrice}
+                      </p>
                     </div>
                     <div className="flex items-center space-x-2">
                       <button
@@ -131,7 +133,7 @@ const CartPage = ({ startLoading, stopLoading }) => {
                       </button>
                     </div>
                     <p className="font-medium">
-                      ₹ {item.price * item.quantity}
+                      ₹ {item.price.sellingPrice * item.quantity}
                     </p>
                     <Button
                       onClick={() => removeProduct(item._id)}
@@ -182,8 +184,8 @@ const CartPage = ({ startLoading, stopLoading }) => {
               <ProductCard
                 key={product._id}
                 ProductName={product.name}
-                CurrentPrice={product.price}
-                Mrp={product.price}
+                CurrentPrice={product.price.sellingPrice}
+                Mrp={product.price.MRP}
                 Rating={product.rating || "No rating"}
                 Offer="No offer"
                 Category={product.category.main}
@@ -197,8 +199,8 @@ const CartPage = ({ startLoading, stopLoading }) => {
               <ProductCardMobile
                 key={product._id}
                 ProductName={product.name}
-                CurrentPrice={product.price}
-                Mrp={product.price}
+                CurrentPrice={product.price.sellingPrice}
+                Mrp={product.price.MRP}
                 Rating={product.rating || "No rating"}
                 Offer="No offer"
                 Category={product.category.main}

@@ -144,8 +144,8 @@ const BuyNow = ({ startLoading, stopLoading }) => {
             ProductName={product?.name}
             Description={product?.description}
             productId={product?._id}
-            CurrentPrice={product?.price}
-            Mrp={product?.mrp}
+            CurrentPrice={product?.price.sellingPrice}
+            Mrp={product?.price.MRP}
           />
         </div>
       )}
