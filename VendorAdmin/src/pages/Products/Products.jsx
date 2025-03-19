@@ -23,8 +23,8 @@ const Products = ({ startLoading, stopLoading }) => {
   const [selectedCategory, setSelectedCategory] = useState();
 
   const [products, setProducts] = useState([]);
-  console.log(subcategories);
-  console.log(products);
+  // console.log(subcategories);
+  // console.log(products);
 
   const handleImageFileChange = (e) => {
     const file = e.target.files[0];
@@ -102,9 +102,9 @@ const Products = ({ startLoading, stopLoading }) => {
       );
       console.log(response);
       setSuccess("Product added successfully!");
-      setProducts((prev) => [...prev, response.data.product]);
+      setProducts((prev) => [...prev, response.data.data.product]);
       alert("Product added successfully!");
-      window.location.reload();
+      // window.location.reload();
       setIsModalOpen(false);
     } catch (err) {
       console.log(err);
@@ -251,10 +251,22 @@ const Products = ({ startLoading, stopLoading }) => {
                 </div>
                 <div className="flex flex-col justify-start items-center">
                   <InputBox
-                    LabelName="Price"
+                    LabelName="MRP"
                     Type="number"
-                    Name="price"
+                    Name="MRP"
                     Placeholder="Enter price"
+                  />
+                  <InputBox
+                    LabelName="Selling Price (Optional)"
+                    Type="number"
+                    Name="SP"
+                    Placeholder="Enter selling price if different from MRP"
+                  />
+                  <InputBox
+                    LabelName="Discount(%)"
+                    Type="number"
+                    Name="discount"
+                    Placeholder="Enter Discount percentage"
                   />
                   <InputBox
                     LabelName="Stock Quantity"
@@ -364,7 +376,7 @@ const Products = ({ startLoading, stopLoading }) => {
                 {product?.subcategory?.title}
               </p>
               <p>
-                <strong>Price:</strong> ₹ {product?.price}
+                <strong>Price:</strong> ₹ {product?.price?.sellingPrice}
               </p>
               <p>
                 <strong>Stock:</strong> {product?.stockQuantity}

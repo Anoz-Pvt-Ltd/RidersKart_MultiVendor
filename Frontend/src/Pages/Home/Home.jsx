@@ -129,7 +129,7 @@ const Home = ({ startLoading, stopLoading }) => {
         <div className="bg-red-500 text-white p-4 rounded">{error}</div>
       )}
 
-      <div className="">
+      <div className="mx-10">
         {categories.map((category, index) => {
           const scrollLeft = () => {
             if (scrollContainer.current) {
@@ -220,8 +220,8 @@ const Home = ({ startLoading, stopLoading }) => {
             Image={product?.images[0]?.url}
             key={product?._id}
             ProductName={product?.name}
-            CurrentPrice={product?.price}
-            Mrp={product?.price}
+            CurrentPrice={product?.price.sellingPrice}
+            Mrp={product?.price.MRP}
             Rating={product?.rating || "No rating"}
             Offer={"No offer"}
             Category={product?.category}

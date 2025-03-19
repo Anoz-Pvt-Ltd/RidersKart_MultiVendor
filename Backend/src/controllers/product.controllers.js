@@ -8,6 +8,27 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { UploadImages } from "../utils/imageKit.io.js";
 
+const updateOldData = asyncHandler(async () => {
+  const result = await Product.updateMany(
+    { price: { $type: "number" } }, // Select only old-format documents
+    [
+      {
+        $set: {
+          price: {
+            MRP: "$price",
+            sellingPrice: "$price",
+            discount: 0,
+            discountedPrice: "$price", // Initially same as MRP
+          },
+        },
+      },
+    ]
+  );
+
+  console.log("Updated old data: ", result);
+  return;
+});
+
 // Controller to register a new product
 const registerProduct = asyncHandler(async (req, res) => {
   const {
@@ -15,12 +36,14 @@ const registerProduct = asyncHandler(async (req, res) => {
     description,
     category,
     subcategory,
-    price,
     stockQuantity,
     sku,
     specifications,
     tags,
     brand,
+    MRP,
+    SP,
+    discount,
   } = req.body;
   console.log("Controller Reached");
   console.log([
@@ -28,12 +51,14 @@ const registerProduct = asyncHandler(async (req, res) => {
     description,
     category,
     subcategory,
-    price,
     stockQuantity,
     sku,
     specifications,
     tags,
     brand,
+    MRP,
+    SP,
+    discount,
   ]);
 
   const vendorId = req.user._id;
@@ -44,10 +69,12 @@ const registerProduct = asyncHandler(async (req, res) => {
     !description ||
     !category ||
     !subcategory ||
-    !price ||
     !stockQuantity ||
     !brand ||
-    !sku // Stock keeping unit => Provided to every unique type of products for keeping track of quantity.
+    !sku || // Stock keeping unit => Provided to every unique type of products for keeping track of quantity.
+    !MRP || // Maximum Retail Price
+    !SP || // Selling Price
+    !discount // Discount percentage
   ) {
     throw new ApiError(400, "All required fields must be filled");
   }
@@ -100,7 +127,12 @@ const registerProduct = asyncHandler(async (req, res) => {
     description,
     category,
     subcategory,
-    price,
+    price: {
+      MRP,
+      sellingPrice: SP,
+      discount,
+      discountedPrice: MRP - (MRP * discount) / 100,
+    },
     stockQuantity,
     sku,
     images: {

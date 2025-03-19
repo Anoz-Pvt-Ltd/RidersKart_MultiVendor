@@ -23,9 +23,32 @@ const productSchema = new mongoose.Schema({
     required: true,
   },
   price: {
-    type: Number,
-    required: true,
-    min: 0,
+    MRP: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
+    sellingPrice: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
+    discount: {
+      type: Number,
+      min: 0,
+      max: 100, // Maximum discount percentage allowed
+    },
+    discountedPrice: {
+      type: Number,
+      // required: true,
+      min: 0, // Calculated discounted price based on MRP and discount percentage
+      get: function () {
+        return this.MRP - (this.MRP * this.discount) / 100;
+      },
+      set: function (value) {
+        this.discountedPrice = value;
+      },
+    },
   },
   stockQuantity: {
     type: Number,

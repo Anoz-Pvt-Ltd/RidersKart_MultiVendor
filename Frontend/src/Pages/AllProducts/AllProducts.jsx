@@ -68,12 +68,11 @@ const AllProducts = ({ startLoading, stopLoading }) => {
         {products.length > 0 ? (
           products.map((product, index) => (
             <ProductCard
-              
               Image={product?.images[0]?.url}
               key={product._id}
               ProductName={product.name}
-              CurrentPrice={product.price}
-              Mrp={product.price}
+              CurrentPrice={product.price.sellingPrice}
+              Mrp={product.price.MRP}
               Rating={product.Rating}
               Offer={product.off}
               Description={product.description}

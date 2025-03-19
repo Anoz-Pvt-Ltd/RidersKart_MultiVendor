@@ -9,13 +9,18 @@ import { useRef } from "react";
 import { useSelector } from "react-redux";
 import { Heart } from "lucide-react";
 import LoadingUI from "../../Components/Loading";
+import PopUp from "../../Components/PopUpWrapper";
 
 const CurrentProduct = ({ startLoading, stopLoading }) => {
   const navigate = useNavigate();
+  const [error, setError] = useState();
   const { productId } = useParams();
   const HandleBuyNow = () => {
     navigate(`/checkout/${productId}/${user?.[0]?._id}`);
   };
+  const [isLiked, setIsLiked] = useState(false);
+  const [imgPopup, setImgPopup] = useState(false);
+  const [currentImg, setCurrentImg] = useState(0);
   const [products, setProducts] = useState();
   const [AllProducts, setAllProducts] = useState();
   const user = useSelector((store) => store.UserInfo.user);
@@ -110,29 +115,73 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
   };
 
   return (
-    <div>
+    <div className="mt-2">
       <div className="flex justify-between items-start p-4">
-        <section>
-          <img
-            src={products?.images[0]?.url}
-            alt={products?.name}
-            className="bg-neutral-200 h-96 w-96 mx-20"
-          />
-          <div className="flex gap-52 justify-center items-center mt-20 ">
-            <Button label={"Buy Now"} onClick={HandleBuyNow} />
+        <section className="ImageSection w-[55vw] h-[70vh]  ">
+          <div className="flex h-5/6  ">
+            {/* Image Array */}
+            <div className="w-20 h-full  ">
+              <div className="overflow-x-auto flex flex-col justify-center items-center mt-2  gap-2">
+                {products?.images.map((image, index) => (
+                  <img
+                    key={index}
+                    onClick={() => setCurrentImg(index)}
+                    src={image.url}
+                    alt={products?.name}
+                    className="h-16 w-16 cursor-pointer"
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* Current Image */}
+            <div className="relative bg-neutral-200 h-full p-3 m-2 ">
+              <img
+                src={products?.images[currentImg]?.url}
+                alt={products?.name}
+                className="h-full"
+                onClick={() => setImgPopup(true)}
+              />
+              <div className="absolute top-0 right-0">
+                <Button
+                  label={
+                    <Heart className="hover:text-red-500 overflow-hidden" />
+                  }
+                  className={`hover:bg-transparent rounded-full`}
+                  onClick={addProductToWishlist}
+                />
+              </div>
+            </div>
+          </div>
+          {imgPopup && (
+            <PopUp
+              onClose={() => setImgPopup(false)}
+            >
+              <div>
+                <img
+                  src={products?.images[currentImg]?.url}
+                  alt=""
+                  className="w-[80vw]"
+                />
+              </div>
+            </PopUp>
+          )}
+
+          {/* Buttons */}
+          <div className="flex  justify-evenly items-center h-1/6  ">
             <Button
-              label={"Add to Cart"}
-              className={`hover:bg-orange-500`}
-              onClick={addProductToCart}
+              label={"Buy Now"}
+              className={"bg-[#ff741b] hover:bg-[#cc5c15] text-white w-36 h-12"}
+              onClick={HandleBuyNow}
             />
             <Button
-              label={<Heart className="hover:text-red-500 overflow-hidden" />}
-              className={`hover:bg-transparent rounded-full`}
-              onClick={addProductToWishlist}
+              label={"Add to Cart"}
+              className={`bg-[#ff9f00] hover:bg-[#cc7f00] text-white w-36 h-12`}
+              onClick={addProductToCart}
             />
           </div>
         </section>
-        <div className="flex-1 px-40 py-20">
+        <div className="flex-1 px-4 py-20">
           <h3 className="text-2xl font-semibold mb-2">{products?.name}</h3>
           <p className="text-gray-600 mb-4">{products?.description}</p>
           <div className="flex items-center mb-4">
@@ -140,11 +189,17 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
             <span className="text-gray-500">4,486 Ratings & 494 Reviews</span>
           </div>
           <div className="flex items-baseline mb-4">
-            <span className="text-3xl font-bold mr-4">{products?.price}</span>
-            <span className="text-gray-500 line-through mr-4">₹14,600</span>
-            <span className="bg-green-500 text-white px-2 py-1 rounded-sm">
-              40% off
+            <span className="text-3xl font-bold mr-4">
+              {products?.price.sellingPrice}
             </span>
+            <span className="text-gray-500 line-through mr-4">
+              ₹{products?.price.MRP}
+            </span>
+            {products?.price.discount > 0 && (
+              <span className="bg-green-500 text-white px-2 py-1 rounded-sm">
+                {products?.price.discount}% off
+              </span>
+            )}
           </div>
           <h4 className="text-lg font-semibold mb-2">Available offers</h4>
           <ul className="list-disc list-inside">

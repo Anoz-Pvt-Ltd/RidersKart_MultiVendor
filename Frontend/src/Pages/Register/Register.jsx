@@ -105,9 +105,10 @@ const UserRegister = ({ startLoading, stopLoading }) => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg">
+    <div className="max-w-4xl mx-auto p-6 bg-white drop-shadow-2xl my-5 rounded-lg">
       <h1 className="text-2xl font-bold text-gray-800 mb-6">
-        Welcome, register your account here and get started
+        Welcome!
+        <br /> Register your account here and get started
       </h1>
 
       {error && <div className="text-red-500 mb-4">{error}</div>}
@@ -115,7 +116,7 @@ const UserRegister = ({ startLoading, stopLoading }) => {
 
       <form
         onSubmit={handleSubmit}
-        className="grid grid-cols-1 md:grid-cols-2 lg:gap-6"
+        className="grid grid-cols-1 md:grid-cols-2 lg:gap-x-5"
       >
         <InputBox
           LabelName="Name"
