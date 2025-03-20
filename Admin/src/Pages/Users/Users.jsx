@@ -88,7 +88,7 @@ const Users = ({ startLoading, stopLoading }) => {
           <tbody>
             {filteredUsers.length > 0 ? (
               filteredUsers.map((user) => (
-                <tr key={user.id}>
+                <tr key={user._id}>
                   <td className="border border-gray-500 px-4 py-2">
                     <Link to={`/current-user/${user._id}`}>{user?._id}</Link>
                   </td>

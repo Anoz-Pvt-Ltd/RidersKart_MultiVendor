@@ -11,7 +11,10 @@ import { ChevronDown, PencilLine, X, ClipboardCopy } from "lucide-react";
 const Products = ({ startLoading, stopLoading }) => {
   const user = useSelector((store) => store.UserInfo.user);
   const [allProducts, setAllProducts] = useState([]);
-  const [AllCategories, setAllCategories] = useState([]);
+  // const [AllCategories, setAllCategories] = useState([]);
+  const { categories, status, error } = useSelector(
+    (state) => state.categoryList
+  );
   const [selectedCategoryId, setSelectedCategoryId] = useState(null);
   const [handlePopup, setHandlePopup] = useState({
     addCategoryPopup: false,
@@ -72,6 +75,7 @@ const Products = ({ startLoading, stopLoading }) => {
             setError("Failed to Products.");
           }
         } catch (err) {
+          console.log(err);
           setError(err.response?.data?.message || "Failed to Products");
         } finally {
           stopLoading();
@@ -113,27 +117,27 @@ const Products = ({ startLoading, stopLoading }) => {
     }
   };
 
-  useEffect(() => {
-    const getAllMainSubcategories = async () => {
-      try {
-        startLoading();
-        const response = await FetchData(
-          "categories/get-all-category-and-subcategories",
-          "get"
-        );
-        // console.log(response);
+  // useEffect(() => {
+  //   const getAllMainSubcategories = async () => {
+  //     try {
+  //       startLoading();
+  //       const response = await FetchData(
+  //         "categories/get-all-category-and-subcategories",
+  //         "get"
+  //       );
+  //       // console.log(response);
 
-        // Ensure categories exist before setting state
-        setAllCategories(response.data?.data?.categories || []);
-      } catch (error) {
-        console.log("Error getting all main subcategories", error);
-      } finally {
-        stopLoading();
-      }
-    };
+  //       // Ensure categories exist before setting state
+  //       setAllCategories(response.data?.data?.categories || []);
+  //     } catch (error) {
+  //       console.log("Error getting all main subcategories", error);
+  //     } finally {
+  //       stopLoading();
+  //     }
+  //   };
 
-    getAllMainSubcategories();
-  }, []);
+  //   getAllMainSubcategories();
+  // }, []);
 
   const submitSubCategory = async (e, categoryId) => {
     e.preventDefault();
@@ -156,12 +160,12 @@ const Products = ({ startLoading, stopLoading }) => {
       );
       console.log("Subcategory Added:", response);
       alert("Subcategory Added Successfully!");
-      window.location.reload();
+      // window.location.reload();
 
-      setHandlePopup((prev) => ({
-        ...prev,
-        addSubCategory: false, // Close popup after submission
-      }));
+      // setHandlePopup((prev) => ({
+      //   ...prev,
+      //   addSubCategory: false, // Close popup after submission
+      // }));
     } catch (error) {
       console.error("Error adding subcategory:", error);
     } finally {
@@ -302,173 +306,96 @@ const Products = ({ startLoading, stopLoading }) => {
                 })
               }
             />
-            {AllCategories.map((category) => (
-              <div key={category._id} className="p-4 rounded ">
-                <div className="flex justify-between items-center bg-white p-2 rounded-xl ">
-                  <div>
-                    <h2 className="text-sm font-semibold">
-                      Main category:{" "}
-                      <span className="text-xl">{category.title}</span>
-                    </h2>
-                    <p className="text-gray-600">Category ID: {category._id}</p>
-                  </div>
+            {status === "succeeded" &&
+              categories.map((category) => (
+                <div key={category._id} className="p-4 rounded ">
+                  <div className="flex justify-between items-center bg-white p-2 rounded-xl ">
+                    <div>
+                      <h2 className="text-sm font-semibold">
+                        Main category:{" "}
+                        <span className="text-xl">{category.title}</span>
+                      </h2>
+                      <p className="text-gray-600">
+                        Category ID: {category._id}
+                      </p>
+                    </div>
 
-                  {/* Toggle Dropdown Button */}
-                  <Button
-                    label={<ChevronDown />}
-                    onClick={() =>
-                      setHandlePopup((prev) => ({
-                        ...prev,
-                        [category._id]: !prev[category._id],
-                      }))
-                    }
-                  />
-                </div>
-
-                {/* Dropdown for Subcategories */}
-                {handlePopup[category._id] && (
-                  <div className="mt-3 bg-white p-4 rounded-xl">
-                    {/* Add Subcategory Button */}
+                    {/* Toggle Dropdown Button */}
                     <Button
-                      label={<h1>Add more in {category.title}</h1>}
-                      onClick={() => {
-                        setSelectedCategoryId(category._id); //current category ID
+                      label={<ChevronDown />}
+                      onClick={() =>
                         setHandlePopup((prev) => ({
                           ...prev,
-                          addSubCategory: true,
-                        }));
-                      }}
+                          [category._id]: !prev[category._id],
+                        }))
+                      }
                     />
+                  </div>
 
-                    {/* Form Popup */}
-                    {handlePopup.addSubCategory &&
-                      selectedCategoryId === category._id && (
-                        <div className="h-full w-full bg-opacity-90 bg-neutral-300 absolute top-0 left-0 flex justify-center items-center">
-                          <form
-                            ref={subcategoryFormRef}
-                            className="flex flex-col justify-center px-10 rounded-xl gap-2 bg-white py-10"
-                            onSubmit={(e) => {
-                              e.preventDefault();
-                              submitSubCategory(e, category._id);
-                            }}
-                          >
-                            <h2 className="text-sm font-semibold">
-                              Main category:{" "}
-                              <span className="text-xl">{category.title}</span>
-                            </h2>
+                  {/* Dropdown for Subcategories */}
+                  {handlePopup[category._id] && (
+                    <div className="mt-3 bg-white p-4 rounded-xl">
+                      {/* Add Subcategory Button */}
+                      <Button
+                        label={<h1>Add more in {category.title}</h1>}
+                        onClick={() => {
+                          setSelectedCategoryId(category._id); //current category ID
+                          setHandlePopup((prev) => ({
+                            ...prev,
+                            addSubCategory: true,
+                          }));
+                        }}
+                      />
 
-                            <InputBox
-                              LabelName={"Add Sub Category"}
-                              Placeholder={"Sub category"}
-                              Name={"subcategory"}
-                              Required
-                            />
-                            <InputBox
-                              LabelName={
-                                <h1>
-                                  Paste the main category ID below{" "}
-                                  <span className="text-blue-600 font-semibold">
-                                    {category._id}
-                                  </span>
-                                  <button
-                                    onClick={() => {
-                                      navigator.clipboard.writeText(
-                                        category._id
-                                      );
-                                      alert("Category ID copied!");
-                                    }}
-                                    className="ml-2 p-1 border rounded bg-gray-200 hover:bg-gray-300 transition"
-                                  >
-                                    <ClipboardCopy size={16} />
-                                  </button>
-                                </h1>
-                              }
-                              Placeholder={"Paste the above ID"}
-                              Name={"categoryId"}
-                              Required
-                            />
-                            <div className="mt-4">
-                              <label className="block text-sm font-medium text-gray-700">
-                                Upload Image
-                              </label>
-                              <input
-                                name="image"
-                                type="file"
-                                accept="image/*"
-                                className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                                onChange={(e) => console.log(e.target.files[0])}
-                              />
-                            </div>
-
-                            <Button label={"Add"} type="submit" />
-                            <Button
-                              className={"hover:bg-red-500"}
-                              label={"Cancel"}
-                              onClick={() =>
-                                setHandlePopup((prev) => ({
-                                  ...prev,
-                                  addSubCategory: false,
-                                }))
-                              }
-                            />
-                          </form>
-                        </div>
-                      )}
-
-                    {/* Display Subcategories */}
-                    {category.subcategories.length > 0 ? (
-                      <>
-                        <h3 className="font-medium">Subcategories:</h3>
-                        <ul className="list-disc pl-5">
-                          {category.subcategories.map((sub) => (
-                            <div className="flex justify-start items-center">
-                              <li key={sub._id} className="text-gray-700">
-                                {sub.title} (ID: {sub._id})
-                              </li>
-
-                              <button
-                                onClick={() =>
-                                  setHandlePopup((prev) => ({
-                                    ...prev,
-                                    editSubcategory: true,
-                                    selectedSubcategoryId: sub._id,
-                                    selectedSubcategoryTitle: sub.title,
-                                  }))
-                                }
-                              >
-                                <PencilLine className="font-thin h-5 w-5" />
-                              </button>
-                            </div>
-                          ))}
-                        </ul>
-                        {handlePopup.editSubcategory && (
-                          <div className="absolute top-0 left-0 h-full w-full p-20 bg-white shadow-lg rounded-md">
-                            {/* Close Button */}
-
-                            {/* Edit Form */}
+                      {/* Form Popup */}
+                      {handlePopup.addSubCategory &&
+                        selectedCategoryId === category._id && (
+                          <div className="h-full w-full bg-opacity-90 bg-neutral-300 absolute top-0 left-0 flex justify-center items-center">
                             <form
-                              ref={editSubcategoryFormRef}
-                              onSubmit={handleEditSubcategory}
+                              ref={subcategoryFormRef}
+                              className="flex flex-col justify-center px-10 rounded-xl gap-2 bg-white py-10"
+                              onSubmit={(e) => {
+                                e.preventDefault();
+                                submitSubCategory(e, category._id);
+                              }}
                             >
-                              {/* Display Selected Subcategory ID */}
-                              <p className="text-gray-700 font-medium">
-                                Editing Subcategory Name:{" "}
-                                {handlePopup.selectedSubcategoryTitle}
-                                <span className="mx-5">
-                                  Editing Subcategory ID:
-                                  {handlePopup.selectedSubcategoryId}
+                              <h2 className="text-sm font-semibold">
+                                Main category:{" "}
+                                <span className="text-xl">
+                                  {category.title}
                                 </span>
-                              </p>
+                              </h2>
 
-                              {/* Input for Subcategory Title */}
                               <InputBox
-                                Placeholder={"Enter new Subcategory name"}
-                                LabelName="Edit Subcategory"
-                                Name="newTitle"
+                                LabelName={"Add Sub Category"}
+                                Placeholder={"Sub category"}
+                                Name={"subcategory"}
                                 Required
                               />
-
-                              {/* Input for Image Upload */}
+                              <InputBox
+                                LabelName={
+                                  <h1>
+                                    Paste the main category ID below{" "}
+                                    <span className="text-blue-600 font-semibold">
+                                      {category._id}
+                                    </span>
+                                    <button
+                                      onClick={() => {
+                                        navigator.clipboard.writeText(
+                                          category._id
+                                        );
+                                        alert("Category ID copied!");
+                                      }}
+                                      className="ml-2 p-1 border rounded bg-gray-200 hover:bg-gray-300 transition"
+                                    >
+                                      <ClipboardCopy size={16} />
+                                    </button>
+                                  </h1>
+                                }
+                                Placeholder={"Paste the above ID"}
+                                Name={"categoryId"}
+                                Required
+                              />
                               <div className="mt-4">
                                 <label className="block text-sm font-medium text-gray-700">
                                   Upload Image
@@ -478,38 +405,122 @@ const Products = ({ startLoading, stopLoading }) => {
                                   type="file"
                                   accept="image/*"
                                   className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                                />
-                              </div>
-
-                              {/* Submit Button */}
-                              <div className="flex justify-start my-10 items-center w-full gap-20">
-                                <Button label={"Update"} type={"submit"} />
-                                <Button
-                                  label={"Cancel"}
-                                  className={"hover:bg-red-500"}
-                                  onClick={() =>
-                                    setHandlePopup((prev) => ({
-                                      ...prev,
-                                      editSubcategory: false,
-                                      selectedSubcategoryId: null,
-                                      selectedSubcategoryTitle: null,
-                                    }))
+                                  onChange={(e) =>
+                                    console.log(e.target.files[0])
                                   }
                                 />
                               </div>
+
+                              <Button label={"Add"} type="submit" />
+                              <Button
+                                className={"hover:bg-red-500"}
+                                label={"Cancel"}
+                                onClick={() =>
+                                  setHandlePopup((prev) => ({
+                                    ...prev,
+                                    addSubCategory: false,
+                                  }))
+                                }
+                              />
                             </form>
                           </div>
                         )}
-                      </>
-                    ) : (
-                      <p className="text-gray-500">
-                        No subcategories available
-                      </p>
-                    )}
-                  </div>
-                )}
-              </div>
-            ))}
+
+                      {/* Display Subcategories */}
+                      {category.subcategories.length > 0 ? (
+                        <>
+                          <h3 className="font-medium">Subcategories:</h3>
+                          <ul className="list-disc pl-5">
+                            {category.subcategories.map((sub) => (
+                              <div className="flex justify-start items-center">
+                                <li key={sub._id} className="text-gray-700">
+                                  {sub.title} (ID: {sub._id})
+                                </li>
+
+                                <button
+                                  onClick={() =>
+                                    setHandlePopup((prev) => ({
+                                      ...prev,
+                                      editSubcategory: true,
+                                      selectedSubcategoryId: sub._id,
+                                      selectedSubcategoryTitle: sub.title,
+                                    }))
+                                  }
+                                >
+                                  <PencilLine className="font-thin h-5 w-5" />
+                                </button>
+                              </div>
+                            ))}
+                          </ul>
+                          {handlePopup.editSubcategory && (
+                            <div className="absolute top-0 left-0 h-full w-full p-20 bg-white shadow-lg rounded-md">
+                              {/* Close Button */}
+
+                              {/* Edit Form */}
+                              <form
+                                ref={editSubcategoryFormRef}
+                                onSubmit={handleEditSubcategory}
+                              >
+                                {/* Display Selected Subcategory ID */}
+                                <p className="text-gray-700 font-medium">
+                                  Editing Subcategory Name:{" "}
+                                  {handlePopup.selectedSubcategoryTitle}
+                                  <span className="mx-5">
+                                    Editing Subcategory ID:
+                                    {handlePopup.selectedSubcategoryId}
+                                  </span>
+                                </p>
+
+                                {/* Input for Subcategory Title */}
+                                <InputBox
+                                  Placeholder={"Enter new Subcategory name"}
+                                  LabelName="Edit Subcategory"
+                                  Name="newTitle"
+                                  Required
+                                />
+
+                                {/* Input for Image Upload */}
+                                <div className="mt-4">
+                                  <label className="block text-sm font-medium text-gray-700">
+                                    Upload Image
+                                  </label>
+                                  <input
+                                    name="image"
+                                    type="file"
+                                    accept="image/*"
+                                    className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                                  />
+                                </div>
+
+                                {/* Submit Button */}
+                                <div className="flex justify-start my-10 items-center w-full gap-20">
+                                  <Button label={"Update"} type={"submit"} />
+                                  <Button
+                                    label={"Cancel"}
+                                    className={"hover:bg-red-500"}
+                                    onClick={() =>
+                                      setHandlePopup((prev) => ({
+                                        ...prev,
+                                        editSubcategory: false,
+                                        selectedSubcategoryId: null,
+                                        selectedSubcategoryTitle: null,
+                                      }))
+                                    }
+                                  />
+                                </div>
+                              </form>
+                            </div>
+                          )}
+                        </>
+                      ) : (
+                        <p className="text-gray-500">
+                          No subcategories available
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </div>
+              ))}
           </div>
         )}
         <table className="min-w-full border-collapse border border-gray-300 rounded-xl">
@@ -526,22 +537,23 @@ const Products = ({ startLoading, stopLoading }) => {
             </tr>
           </thead>
           <tbody>
-            {filteredProducts.length > 0 ? (
-              filteredProducts.map((product) => (
-                <tr key={product.id}>
+            {console.log(filteredProducts)}
+            {filteredProducts?.products?.length > 0 ? (
+              filteredProducts?.products.map((product) => (
+                <tr key={product._id}>
                   <td className="border border-gray-500 px-4 py-2">
                     <Link to={`/current-product/${product._id}`}>
                       {product._id}
                     </Link>
                   </td>
                   <td className="border border-gray-500 px-4 py-2">
-                    {product.vendor}
+                    {product.vendor?.name}
                   </td>
                   <td className="border border-gray-500 px-4 py-2">
-                    {product.category.main}
+                    {product.category?._id}
                   </td>
                   <td className="border border-gray-500 px-4 py-2">
-                    {product.category.sub}
+                    {product.subcategory?._id}
                   </td>
                 </tr>
               ))
