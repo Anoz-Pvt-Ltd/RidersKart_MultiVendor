@@ -5,16 +5,21 @@ import { FetchData } from "../FetchFromApi";
 export const fetchCategories = createAsyncThunk(
   "categoryList/fetchCategories",
   async () => {
-    const response = await FetchData(
-      "categories/get-all-category-and-subcategories",
-      "get"
-    ); // Replace with your API URL
+    try {
+      const response = await FetchData(
+        "categories/get-all-category-and-subcategories",
+        "get"
+      ); // Replace with your API URL
 
-    // console.log(response);
-    if (response.statusText != "OK") {
-      throw new Error("Failed to fetch categories");
+      // console.log(response);
+      // if (response.statusText != "OK") {
+      //   throw new Error("Failed to fetch categories");
+      // }
+      return response.data.data.categories; // Assuming the API returns a list of categories
+    } catch (err) {
+      console.error(err);
+      return ["got an error"];
     }
-    return response.data.data.categories; // Assuming the API returns a list of categories
   }
 );
 

@@ -74,7 +74,8 @@ const BrandsVerified = ({ startLoading, stopLoading }) => {
     fetchBrands();
   }, [user]);
 
-  const addBrand = async () => {
+  const addBrand = async (e) => {
+    e.preventDefault();
     const formData = new FormData(formRef.current);
     for (var pair of formData.entries()) {
       console.log(pair[0] + ", " + pair[1]);
@@ -133,7 +134,7 @@ const BrandsVerified = ({ startLoading, stopLoading }) => {
           <tbody>
             {filteredBrands?.length > 0 ? (
               filteredBrands?.map((brand) => (
-                <tr key={brand.id}>
+                <tr key={brand._id}>
                   <td className="border border-gray-500 px-4 py-2">
                     <Link to={`/current-brand/${brand._id}`}>{brand._id}</Link>
                   </td>
