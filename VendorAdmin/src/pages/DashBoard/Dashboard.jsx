@@ -79,6 +79,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
     navigate("/vendor-profile");
   };
   const [products, setProducts] = useState([]);
+  console.log(products);
   const [pieData, setPieData] = useState({
     labels: [],
     datasets: [
@@ -101,7 +102,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
 
   const fetchProducts = async () => {
     try {
-      startLoading()
+      startLoading();
       const response = await FetchData(
         `products/get-all-product-of-vendor/${user?.[0]?._id}`,
         "get"
@@ -173,9 +174,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
               </div>
               <div className="p-4 bg-white shadow rounded">
                 <h3 className="text-gray-500">Products</h3>
-                <p className="text-2xl font-bold">
-                  {user?.[0]?.products?.length}
-                </p>
+                <p className="text-2xl font-bold">{products?.length}</p>
               </div>
               <div className="p-4 bg-white shadow rounded">
                 <h3 className="text-gray-500">Rating</h3>

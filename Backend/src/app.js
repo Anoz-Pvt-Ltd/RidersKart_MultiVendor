@@ -9,6 +9,9 @@ const allowedOrigins = [
   process.env.ORIGIN_2,
   process.env.ORIGIN_3,
   process.env.ORIGIN_4,
+  process.env.ORIGIN_UI,
+  process.env.ORIGIN_VA,
+  process.env.ORIGIN_A,
 ];
 
 const app = express();
