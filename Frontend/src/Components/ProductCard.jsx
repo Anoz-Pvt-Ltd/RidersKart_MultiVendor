@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const ProductCard = ({
   ProductName,
@@ -15,7 +15,7 @@ const ProductCard = ({
   return (
     <Link to={`/current-product/${productId}`} className={`w-fit ${className}`}>
       <div className="whiteSoftBG shadow-md hover:shadow-lg h-auto w-72 overflow-hidden rounded-lg hover:scale-105 duration-300 ease-in-out">
-        <div className="text-2xl p-2 bg-neutral-200 m-2 w-64 h-52 overflow-hidden object-center flex justify-center items-center">
+        <div className="text-2xl p-2 m-2 w-64 h-52 overflow-hidden object-center flex justify-center items-center">
           <img src={Image} alt="No Image found" />
         </div>
         <div className="h-1/3 px-4 py-3 gap-2 flex flex-col">

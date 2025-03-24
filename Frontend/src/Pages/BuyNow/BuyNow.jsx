@@ -15,6 +15,8 @@ const BuyNow = ({ startLoading, stopLoading }) => {
   const [productVendor, setProductVendor] = useState("");
   const [error, setError] = useState("");
   const user = useSelector((store) => store.UserInfo.user);
+  const [addAmount, setAddAmount] = useState("");
+
   const Navigate = useNavigate();
   const HandleHome = () => {
     Navigate("/");
@@ -130,6 +132,66 @@ const BuyNow = ({ startLoading, stopLoading }) => {
     }
   };
 
+  const handleAddFunds = async () => {
+    const order = await FetchData("payment/create-new-paymentId", "post", {
+      options: {
+        amount: addAmount,
+        currency: "INR",
+        receipt: "qwerty1234",
+      },
+    });
+
+    console.log(order);
+
+    var options = {
+      key: process.env.razorpay_key_id,
+      subscription_id: order.id,
+      name: "Acme Corp.",
+      description: "Monthly Test Plan",
+      image: "/Logo.png",
+      handler: async function (response) {
+        // alert(response.razorpay_payment_id),
+        //   alert(response.razorpay_subscription_id),
+        //   alert(response.razorpay_signature);
+
+        console.log(response);
+        const body = {
+          ...response,
+          amount: addAmount,
+          paymentMethod: "UPI",
+        };
+
+        const isValidated = await FetchData(
+          "payment/validate-payment",
+          "post",
+          body
+        );
+
+        if (isValidated.status === 450) {
+          alert("Payment Failed");
+          alert("False Payment");
+        } else if (isValidated.status === 201) {
+          alert("Payment Successful");
+        }
+      },
+      prefill: {
+        name: "Vivek",
+        email: "Dev@gmail.com",
+        contact: "6202089501",
+      },
+      notes: {
+        note_key_1: "Tea. Earl Grey. Hot",
+        note_key_2: "Make it so.",
+      },
+      theme: {
+        color: "#F37254",
+      },
+    };
+    var rzp1 = new window.Razorpay(options);
+    rzp1.open();
+    e.preventDefault();
+  };
+
   return (
     <div className="buy-now-page flex flex-col lg:flex-row justify-center items-center gap-20 mt-10">
       {product && (
@@ -184,11 +246,16 @@ const BuyNow = ({ startLoading, stopLoading }) => {
             <option value="" disabled>
               Select a payment method
             </option>
-            <option value="upi">UPI</option>
-            <option value="card">Card</option>
-            <option value="cash">Cash</option>
-            <option value="wallet">Wallet</option>
+            <option value="online">Online</option>
+            <option value="card">Cash on delivery</option>
           </select>
+          {paymentMethod === "online" && (
+            <Button
+              className={`mt-5 bg-white text-blue-600 hover:bg-green-500 hover:text-black`}
+              onClick={handleAddFunds}
+              label={"Proceed to payment"}
+            />
+          )}
         </div>
       </div>
 

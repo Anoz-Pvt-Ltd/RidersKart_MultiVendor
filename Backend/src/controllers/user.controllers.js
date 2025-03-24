@@ -220,7 +220,11 @@ const addProductToCart = asyncHandler(async (req, res) => {
     // Save the user document
     await user.save();
 
-    return res.status(200).json({ message: "Product added to cart", user });
+    const updatedUser = await User.findById(user._id).populate("CartProducts");
+
+    return res
+      .status(200)
+      .json({ message: "Product added to cart", user: updatedUser });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: "Server error" });
