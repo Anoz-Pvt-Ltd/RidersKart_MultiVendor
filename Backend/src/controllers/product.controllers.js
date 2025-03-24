@@ -166,6 +166,21 @@ const registerProduct = asyncHandler(async (req, res) => {
     );
 });
 
+const getAllProductForAdmin = asyncHandler(async (req, res) => {
+  const products = await Product.find();
+
+  if (!products || products.length === 0) {
+    throw new ApiError(404, "No products found");
+  }
+
+  const response = new ApiResponse(
+    200,
+    products,
+    "Products fetched successfully"
+  );
+  res.status(response.statusCode).json(response);
+});
+
 const getAllProducts = asyncHandler(async (req, res) => {
   try {
     const { category, subcategory, vendor, page = 1, limit = 10 } = req.query;
@@ -338,6 +353,7 @@ const getProductByCategory = asyncHandler(async (req, res) => {
 
 export {
   registerProduct,
+  getAllProductForAdmin,
   getAllProducts,
   getProduct,
   editProduct,
