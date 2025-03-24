@@ -15,6 +15,7 @@ import { clearUser, addUser } from "./Utility/Slice/UserInfoSlice";
 import BuyNow from "./Pages/BuyNow/BuyNow";
 import Dashboard from "./Pages/Profile/ProfileDashboard";
 import VendorRegistrationForm from "../src/Pages/VendorRegister/Registration";
+import { fetchCart } from "./Utility/Slice/CartSlice";
 // import { io } from "socket.io-client";
 
 const App = () => {
@@ -22,7 +23,6 @@ const App = () => {
   const [notifications, setNotifications] = useState([]);
 
   const user = useSelector((store) => store.UserInfo.user);
-  // console.log(user);
 
   const dispatch = useDispatch();
   useEffect(() => {
@@ -56,6 +56,10 @@ const App = () => {
 
     reLogin();
   }, []); // Empty dependency array ensures this runs once on component mount
+
+  useEffect(() => {
+    dispatch(fetchCart(user[0]?._id)); // Fetch categories when the component mounts
+  }, [dispatch, user]);
 
   // Socket connection
   // useEffect(() => {

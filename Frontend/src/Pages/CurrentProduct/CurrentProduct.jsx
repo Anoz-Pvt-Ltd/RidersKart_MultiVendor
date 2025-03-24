@@ -6,21 +6,19 @@ import { useState } from "react";
 import Button from "../../Components/Button";
 import ProductCard from "../../Components/ProductCard";
 import { useRef } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Heart } from "lucide-react";
 import LoadingUI from "../../Components/Loading";
 import PopUp from "../../Components/PopUpWrapper";
+import { addCart } from "../../Utility/Slice/CartSlice";
 
 const CurrentProduct = ({ startLoading, stopLoading }) => {
   const user = useSelector((store) => store.UserInfo.user);
-  console.log(user);
+  // console.log(user);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const [error, setError] = useState();
   const { productId } = useParams();
-  const HandleBuyNow = () => {
-    
-    navigate(`/checkout/${productId}/${user?.[0]?._id}`);
-  };
   const [isLiked, setIsLiked] = useState(false);
   const [imgPopup, setImgPopup] = useState(false);
   const [currentImg, setCurrentImg] = useState(0);
@@ -64,6 +62,10 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
     fetchProducts();
   }, []);
 
+  const HandleBuyNow = () => {
+    navigate(`/checkout/${productId}/${user?.[0]?._id}`);
+  };
+
   const addProductToCart = async () => {
     try {
       startLoading();
@@ -72,7 +74,9 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
         "post"
       );
       console.log(response);
+
       alert(response.data.message);
+      dispatch(addCart(response.data.user.CartProducts));
     } catch (err) {
       console.log(err);
       alert(err.response?.data?.message || "Failed to add product to cart.");

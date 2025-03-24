@@ -23,7 +23,7 @@ const Home = ({ startLoading, stopLoading }) => {
       try {
         startLoading();
         const response = await FetchData("products/get-all-products", "get");
-        console.log(response);
+        // console.log(response);
         if (response.data.success) {
           setProducts(response.data.data.products);
         } else {
@@ -43,7 +43,7 @@ const Home = ({ startLoading, stopLoading }) => {
           "categories/get-all-category-and-subcategories",
           "get"
         );
-        console.log(response);
+        // console.log(response);
 
         if (response.data.success) {
           const categoriesData = response.data.data.categories;
