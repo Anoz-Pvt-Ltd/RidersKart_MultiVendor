@@ -32,6 +32,7 @@ const Products = ({ startLoading, stopLoading }) => {
   const tableHeadersProducts = [
     "Product ID",
     "Vendor ID",
+    "Product Name",
     "Category",
     "Subcategory",
   ];
@@ -65,10 +66,10 @@ const Products = ({ startLoading, stopLoading }) => {
         try {
           startLoading();
           const response = await FetchData(
-            "products/admin/get-all-products",
+            "products/admin/get-all-products-admin",
             "get"
           );
-          // console.log(response);
+          console.log(response);
           if (response.data.success) {
             setAllProducts(response.data.data);
           } else {

@@ -166,6 +166,21 @@ const registerProduct = asyncHandler(async (req, res) => {
     );
 });
 
+const getAllProductForAdmin = asyncHandler(async (req, res) => {
+  const products = await Product.find().populate("");
+
+  if (!products || products.length === 0) {
+    throw new ApiError(404, "No products found");
+  }
+
+  const response = new ApiResponse(
+    200,
+    products,
+    "Products fetched successfully"
+  );
+  res.status(response.statusCode).json(response);
+});
+
 const getAllProducts = asyncHandler(async (req, res) => {
   try {
     const { category, subcategory, vendor, page = 1, limit = 10 } = req.query;
@@ -238,9 +253,9 @@ const getProduct = asyncHandler(async (req, res) => {
 
   // Fetch the product by ID
   const product = await Product.findById(productId)
-    .populate("category", "name")
-    .populate("subcategory", "name")
-    .populate("vendor", "name email")
+    .populate("category")
+    .populate("subcategory")
+    .populate("vendor")
     .populate("brand");
 
   if (!product) {
@@ -338,6 +353,7 @@ const getProductByCategory = asyncHandler(async (req, res) => {
 
 export {
   registerProduct,
+  getAllProductForAdmin,
   getAllProducts,
   getProduct,
   editProduct,
