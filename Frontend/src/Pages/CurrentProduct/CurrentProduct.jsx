@@ -65,9 +65,7 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
     fetchProducts();
   }, []);
 
-  const HandleBuyNow = () => {
-    navigate(`/checkout/${productId}/${user?.[0]?._id}`);
-  };
+  
 
   const addProductToCart = async () => {
     try {
