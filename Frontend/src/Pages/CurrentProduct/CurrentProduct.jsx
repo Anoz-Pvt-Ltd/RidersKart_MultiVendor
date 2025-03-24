@@ -116,11 +116,11 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
 
   return (
     <div className="mt-2">
-      <div className="flex justify-between items-start p-4">
-        <section className="ImageSection w-[55vw] h-[70vh]  ">
-          <div className="flex h-5/6  ">
+      <div className="flex flex-col lg:flex-row justify-between items-start p-4">
+        <section className="ImageSection w-full lg:w-[40vw] lg:h-[70vh]  ">
+          <div className="flex flex-col-reverse lg:flex-row h-5/6 lg:mb-10 ">
             {/* Image Array */}
-            <div className="w-20 h-full  ">
+            <div className="lg:w-20 lg:h-full  ">
               <div className="overflow-x-auto flex flex-col justify-center items-center mt-2  gap-2">
                 {products?.images.map((image, index) => (
                   <img
@@ -128,14 +128,14 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
                     onClick={() => setCurrentImg(index)}
                     src={image.url}
                     alt={products?.name}
-                    className="h-16 w-16 cursor-pointer"
+                    className="h-20 w-20 cursor-pointer"
                   />
                 ))}
               </div>
             </div>
 
             {/* Current Image */}
-            <div className="relative bg-neutral-200 h-full p-3 m-2 ">
+            <div className="relative bg-neutral-200 h-full p-3 m-2  ">
               <img
                 src={products?.images[currentImg]?.url}
                 alt={products?.name}
@@ -154,9 +154,7 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
             </div>
           </div>
           {imgPopup && (
-            <PopUp
-              onClose={() => setImgPopup(false)}
-            >
+            <PopUp onClose={() => setImgPopup(false)}>
               <div>
                 <img
                   src={products?.images[currentImg]?.url}
@@ -168,20 +166,22 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
           )}
 
           {/* Buttons */}
-          <div className="flex  justify-evenly items-center h-1/6  ">
+          {/* <div className="flex  justify-evenly items-center h-1/6  ">
             <Button
               label={"Buy Now"}
-              className={"bg-[#ff741b] hover:bg-[#cc5c15] text-white w-36 h-12"}
+              className={
+                "bg-[#ff741b]  hover:bg-[#ff924e] text-white w-36 h-12"
+              }
               onClick={HandleBuyNow}
             />
             <Button
               label={"Add to Cart"}
-              className={`bg-[#ff9f00] hover:bg-[#cc7f00] text-white w-36 h-12`}
+              className={`bg-[#ff9f00] hover:bg-[#ffbb4e] text-white w-36 h-12`}
               onClick={addProductToCart}
             />
-          </div>
+          </div> */}
         </section>
-        <div className="flex-1 px-4 py-20">
+        <div className="flex-1 px-4 py-10 lg:py-20">
           <h3 className="text-2xl font-semibold mb-2">{products?.name}</h3>
           <p className="text-gray-600 mb-4">{products?.description}</p>
           <div className="flex items-center mb-4">
@@ -220,11 +220,17 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
               cashback/coupon) T&C
             </li>
           </ul>
-          <div className="flex gap-52 justify-center items-center mt-20 ">
-            <Button label={"Buy Now"} onClick={HandleBuyNow} />
+          <div className="flex gap-10 lg:gap-52 justify-center items-center mt-20 ">
+            <Button
+              label={"Buy Now"}
+              className={
+                "bg-[#ff741b]  hover:bg-[#ff924e] text-white w-36 h-12"
+              }
+              onClick={HandleBuyNow}
+            />
             <Button
               label={"Add to Cart"}
-              className={`hover:bg-orange-500`}
+              className={`bg-[#ff9f00] hover:bg-[#ffbb4e] text-white w-36 h-12`}
               onClick={addProductToCart}
             />
           </div>

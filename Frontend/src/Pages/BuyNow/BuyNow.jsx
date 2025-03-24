@@ -20,8 +20,6 @@ const BuyNow = ({ startLoading, stopLoading }) => {
     Navigate("/");
   };
 
-  console.log(addresses[selectedAddress]);
-
   useEffect(() => {
     const fetchProductDetails = async () => {
       if (user?.length > 0) {
@@ -54,11 +52,8 @@ const BuyNow = ({ startLoading, stopLoading }) => {
             `users/${user?.[0]?._id}/addresses`,
             "get"
           );
-          if (response.statusText === "OK") {
-            setAddresses(response.data);
-          } else {
-            setError("Failed to load addresses.");
-          }
+          console.log(response);
+          setAddresses(response.data);
         } catch (err) {
           setError(err.response?.data?.message || "Failed to fetch addresses.");
         } finally {
@@ -136,7 +131,7 @@ const BuyNow = ({ startLoading, stopLoading }) => {
   };
 
   return (
-    <div className="buy-now-page flex justify-center items-center gap-20">
+    <div className="buy-now-page flex flex-col lg:flex-row justify-center items-center gap-20 mt-10">
       {product && (
         <div className="w-fit">
           <ProductCard
@@ -154,19 +149,23 @@ const BuyNow = ({ startLoading, stopLoading }) => {
         <div>
           <h1 className="font-semibold text-2xl">Hello, {user?.[0]?.name}</h1>
         </div>
-        <div>
+        <div className="w-4/5  border">
           <h2 className="mb-5 font-semibold">Select Shipping Address</h2>
           {addresses?.length > 0 ? (
             <select
               value={selectedAddress}
               onChange={handleAddressChange}
-              className="bg-gray-400 p-5 rounded-xl outline-none"
+              className="bg-gray-400 p-5 rounded-xl outline-none w-full"
             >
               <option value="" selected disabled>
                 Select an address
               </option>
               {addresses?.map((address, index) => (
-                <option key={address?._id} value={index} className="bg-white">
+                <option
+                  key={address?._id}
+                  value={index}
+                  className="bg-white max-w-40"
+                >
                   {`${address?.street}, ${address?.city}, ${address?.state}, ${address?.country}, ${address?.postalCode}`}
                 </option>
               ))}
@@ -175,7 +174,7 @@ const BuyNow = ({ startLoading, stopLoading }) => {
             <p>No addresses available. Please add one in your profile.</p>
           )}
         </div>
-        <div className="w-full">
+        <div className="w-4/5">
           <h2 className="mb-5 font-semibold">Select Payment Method</h2>
           <select
             value={paymentMethod}
@@ -194,6 +193,7 @@ const BuyNow = ({ startLoading, stopLoading }) => {
       </div>
 
       <Button
+        className={` bg-white text-blue-600 hover:bg-green-500 hover:text-black`}
         onClick={handleBuyNow}
         Disabled={!selectedAddress || !paymentMethod}
         label={"Proceed to Checkout"}
