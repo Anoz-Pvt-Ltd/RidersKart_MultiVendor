@@ -6,7 +6,7 @@ const Button = ({ onClick, className, label, type, Disabled }) => {
       type={type}
       onClick={onClick}
       disabled={Disabled}
-      className={`bg-white text-blue-600 px-4 py-2 rounded hover:bg-green-500 hover:text-black duration-300 ease-in-out hover:shadow-md shadow-neutral-600 hover:translate-y-1 border border-neutral-300 hover:border-none ${className}`}
+      className={`${className}  text-blue-600 px-4 py-2 rounded  duration-300 ease-in-out hover:shadow-md shadow-neutral-600 hover:translate-y-1 border border-neutral-300 hover:border-none `}
     >
       {label}
     </button>

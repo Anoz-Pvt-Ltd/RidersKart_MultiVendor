@@ -11,6 +11,7 @@ import {
   GetAllUnderReviewBrands,
   GetBrandById,
   VerifyBrand,
+  LinkSubcategoryToBrands,
 } from "../controllers/brand.controller.js";
 import {
   VerifyAdminUser,
@@ -21,7 +22,7 @@ import { upload } from "../middlewares/multer.middleware.js";
 const router = Router();
 
 //public routes
-router.route("/get-all-brands").get(GetAllBrands);
+router.route("/get-all-brands").get(GetAllVerifiedBrands);
 router.route("/get-brand-by-id/:brandId").get(GetBrandById);
 
 // admin routes
@@ -37,6 +38,13 @@ router
 router
   .route("/admin/add-new-brand")
   .post(VerifyAdminUser, upload.single("image"), AddNewBrand);
+
+router
+  .route("/admin/link-brand-to-subcategory")
+  .post(VerifyAdminUser, LinkSubcategoryToBrands);
+
+router.route("/admin/delete-brand").post(VerifyAdminUser, DeleteBrand);
+router.route("/admin/deactivate-brand").post(VerifyAdminUser, DeactivateBrand);
 
 // vendor routes
 router

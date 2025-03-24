@@ -231,9 +231,9 @@ const VendorRegistrationForm = ({ startLoading, stopLoading }) => {
 
         <div className="md:col-span-2">
           <Button
+            className={`w-full bg-white text-blue-600 hover:bg-green-500 hover:text-black`}
             label={"Register Vendor"}
             Type={"submit"}
-            className={"w-full"}
           />
         </div>
       </form>

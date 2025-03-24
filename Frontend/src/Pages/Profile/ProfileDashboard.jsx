@@ -312,6 +312,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
                 <div className="flex flex-col gap-5 justify-center items-center mt-10 lg:mt-0">
                   <div className="button flex flex-col lg:flex-row justify-evenly items-center gap-5">
                     <Button
+                      className={` bg-white text-blue-600 hover:bg-green-500 hover:text-black`}
                       onClick={navigateHome}
                       // label={<ShoppingBag/>"Continue Shopping"}
                       label={
@@ -324,6 +325,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
                       }
                     />
                     <Button
+                      className={` bg-white text-blue-600 hover:bg-orange-500  hover:text-black`}
                       onClick={() => {
                         Dispatch(clearUser());
                         localStorage.removeItem("AccessToken");
@@ -332,7 +334,6 @@ const Dashboard = ({ startLoading, stopLoading }) => {
                         setTimeout(() => navigate("/login"), 100);
                         console.log(localStorage.getItem("RefreshToken"));
                       }}
-                      className={"hover:bg-orange-500"}
                       label={
                         <h1 className="flex justify-start gap-2">
                           <span>
@@ -346,6 +347,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
                   </div>
                   <div className="button flex flex-col lg:flex-row justify-evenly items-center gap-5">
                     <Button
+                      className={` bg-white text-blue-600 hover:bg-green-500 hover:text-black`}
                       onClick={openModal}
                       label={
                         <h1 className="flex justify-start gap-2">
@@ -404,8 +406,14 @@ const Dashboard = ({ startLoading, stopLoading }) => {
                         State: <span>{address.state}</span>
                       </li>
                     </span>
-                    <Button label={<PencilLine />} />
-                    <Button label={<Trash />} />
+                    <Button
+                      className={` bg-white text-blue-600 hover:bg-green-500 hover:text-black`}
+                      label={<PencilLine />}
+                    />
+                    <Button
+                      className={` bg-white text-blue-600 hover:bg-green-500 hover:text-black`}
+                      label={<Trash />}
+                    />
                   </div>
                 ))}
 
@@ -458,10 +466,10 @@ const Dashboard = ({ startLoading, stopLoading }) => {
                           onChange={handleAddressInputChange}
                         />
                         <Button
+                          className={`mt-4 bg-white text-blue-600 hover:bg-green-500 hover:text-black`}
                           type="button"
                           onClick={addAddress}
                           label="Add Address"
-                          className="mt-4"
                         />
                       </form>
                       {error && <p className="text-red-500">{error}</p>}
@@ -513,9 +521,9 @@ const Dashboard = ({ startLoading, stopLoading }) => {
                             onChange={handleAddressInputChange2}
                           />
                           <Button
+                            className={`mt-4 bg-white text-blue-600 hover:bg-green-500 hover:text-black`}
                             type="submit"
                             label="Update Profile"
-                            className="mt-4"
                           />
                         </form>
                       </div>

@@ -38,6 +38,7 @@ const Header = () => {
         {user.length > 0 ? (
           <div>
             <Button
+              className={` bg-white text-blue-600 hover:bg-green-500 hover:text-black`}
               label={
                 <h1 className="flex justify-start gap-2">
                   <span>
@@ -49,6 +50,7 @@ const Header = () => {
               onClick={NavigateToProfile}
             />
             <Button
+              className={` bg-white text-blue-600 hover:bg-green-500 hover:text-black`}
               label={
                 <h1 className="flex  justify-start gap-2">
                   <span>
@@ -63,6 +65,7 @@ const Header = () => {
         ) : (
           <div>
             <Button
+              className={` bg-white text-blue-600 hover:bg-green-500 hover:text-black`}
               label={
                 <h1 className="flex  justify-start gap-2">
                   <span>

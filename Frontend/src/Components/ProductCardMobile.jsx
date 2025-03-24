@@ -42,6 +42,7 @@ const ProductCard = ({
             </div>
           </div>
           <Button
+            className={` bg-white text-blue-600 hover:bg-green-500 hover:text-black`}
             label={
               <h1>
                 <ShoppingCart className="w-5 h-5 mr-2" />{" "}

@@ -6,6 +6,8 @@ import ProductCard from "../../Components/ProductCard";
 import { Link } from "react-router";
 // import { categories } from "../../Constants/Home/Home.Constants";
 import LoadingUI from "../../Components/Loading";
+import { ThreeProductGrid } from "../../Components/Product-Grid";
+import { truncateString } from "../../Utility/TruncateString";
 
 const Home = ({ startLoading, stopLoading }) => {
   const scrollContainer = useRef(null);
@@ -13,6 +15,8 @@ const Home = ({ startLoading, stopLoading }) => {
   const [error, setError] = useState(null);
   const [categories, setCategories] = useState([]);
   const [subcategories, setSubcategories] = useState([]);
+
+  const arrayOfGridItems = [];
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -63,6 +67,21 @@ const Home = ({ startLoading, stopLoading }) => {
     fetchAllCategories();
     fetchProducts();
   }, []);
+
+  // console.log(subcategories);
+
+  const suggestedItems = products && products.slice(0, 3);
+  const topSelection = products && products.slice(3, 6);
+  const youMayLike = products && products.slice(6, 9);
+  const recommendation = products && products.slice(6, 10);
+
+  arrayOfGridItems.push(
+    { products: suggestedItems, title: "Suggested Products" },
+    { products: recommendation, title: "Recommended Products" },
+    { products: youMayLike, title: "You May Like" },
+    { products: topSelection, title: "Top Selection" }
+  );
+  const FamousSubcategory = subcategories.slice(0, 9);
 
   const BannerSlider = () => {
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -117,6 +136,26 @@ const Home = ({ startLoading, stopLoading }) => {
 
   return (
     <div className="container mx-auto py-4">
+      <div className="lg:w-fit flex gap-10 p-5 lg:m-auto lg:my-5 w-full  overflow-x-auto flex-nowrap whitespace-nowrap no-scrollbar">
+        {FamousSubcategory.map((subcategory) => (
+          <div
+            key={subcategory._id}
+            className="w-24 flex flex-col justify-center items-center  "
+          >
+            <div className="w-16 h-16 overflow-hidden rounded-full drop-shadow-xl border-4 border-gray-100">
+              <img
+                src={subcategory.image.url}
+                alt={subcategory.title}
+                className="w-full h-full "
+              />
+            </div>
+            <span className="text-sm">
+              {truncateString(subcategory.title, 10)}
+            </span>
+          </div>
+        ))}
+      </div>
+
       <motion.div
         whileInView={{ opacity: 1, x: 0 }}
         initial={{ opacity: 0, x: 100 }}
@@ -128,6 +167,14 @@ const Home = ({ startLoading, stopLoading }) => {
       {error && (
         <div className="bg-red-500 text-white p-4 rounded">{error}</div>
       )}
+
+      <div className="lg:h-[35vw] h-fit w-full p-2 lg:p-5 my-10 lg:my-0 flex flex-col lg:flex-row gap-10 lg:overflow-x-auto flex-nowrap whitespace-nowrap   ">
+        {arrayOfGridItems.map((item, index) => (
+          <div key={index} className="flex-none w-fit">
+            <ThreeProductGrid products={item.products} heading={item.title} />
+          </div>
+        ))}
+      </div>
 
       <div className="mx-10">
         {categories.map((category, index) => {
@@ -179,7 +226,7 @@ const Home = ({ startLoading, stopLoading }) => {
               {/* Subcategories */}
               <div
                 ref={scrollContainer}
-                className="flex overflow-x-auto overflow-y-hidden scrollbar-hide gap-4 py-2 px-1 justify-start items-start"
+                className="flex overflow-x-auto overflow-y-hidden scrollbar-hide gap-4 py-2 px-1 justify-start items-start "
               >
                 {category.subcategories.length > 0 ? (
                   category.subcategories.map((item) => (
@@ -188,20 +235,20 @@ const Home = ({ startLoading, stopLoading }) => {
                       key={item._id}
                     >
                       <motion.div
-                        className="flex-none border border-gray-200 rounded-lg p-2 text-center shadow-md hover:shadow-lg w-48 h-fit"
+                        className="flex-none border border-gray-200 bg-white rounded-lg p-2 text-center shadow-md hover:shadow-lg w-48 h-fit "
                         whileHover={{ scale: 1.05 }}
                         whileInView={{ opacity: 1, x: 0 }}
                         initial={{ opacity: 0, x: -100 }}
                         transition={{ duration: 0.5 }}
                       >
-                        <div className="object-fill h-24 bg-gray-100 rounded-md mb-2 flex justify-center items-center p-10 overflow-hidden">
+                        <div className="object-fill h-24 bg-white rounded-md mb-2 flex justify-center items-center p-10 overflow-hidden">
                           <img
                             src={item.image?.url}
                             alt={item.title}
                             className="object-fill"
                           />
                         </div>
-                        <p className="text-sm">{item.title}</p>
+                        <p className="text-sm ">{item.title}</p>
                       </motion.div>
                     </Link>
                   ))

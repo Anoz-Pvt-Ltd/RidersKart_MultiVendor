@@ -98,54 +98,60 @@ const CartPage = ({ startLoading, stopLoading }) => {
 
       {cartProducts.length > 0 ? (
         <div className="flex flex-col w-full gap-4 justify-between items-center">
-          <div className="flex w-full justify-around items-center ">
-            <div className="lg:col-span-2 w-1/2">
+          <div className="flex flex-col lg:flex-row w-full justify-around items-center ">
+            <div className="lg:col-span-2 lg:w-1/2 w-full  border">
               <div className="bg-white shadow-md rounded-md p-4">
                 {cartProducts?.map((item) => (
                   <div
                     key={item._id}
-                    className="flex items-center justify-between border-b pb-4 mb-4"
+                    className="flex flex-col gap-5 md:flex-row items-center justify-between border-b pb-4 mb-4"
                   >
-                    <img
-                      src={item.image}
-                      alt={item.name}
-                      className="w-16 h-16 object-cover rounded"
-                    />
-                    <div className="flex-1 px-4">
-                      <h2 className="font-medium text-lg">{item.name}</h2>
-                      <p className="text-gray-600">
-                        ₹ {item.price.sellingPrice}
+                    {/* {console.log("Item : ", item)} */}
+                    <div className="flex justify-between gap-10 mt-5 w-full ">
+                      <img
+                        src={item.images[0].url}
+                        alt={item.name}
+                        className="w-16 h-16 object-cover rounded"
+                      />
+                      <div className="flex-1 px-4">
+                        <h2 className="font-medium text-lg">{item.name}</h2>
+                        <p className="text-gray-600">
+                          ₹ {item.price.sellingPrice}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex gap-10 ">
+                      <div className="flex items-center space-x-2">
+                        <button
+                          onClick={() => updateQuantity(item._id, "decrease")}
+                          className="px-2 py-1 bg-gray-200 rounded"
+                        >
+                          -
+                        </button>
+                        <span>{item.quantity}</span>
+                        <button
+                          onClick={() => updateQuantity(item._id, "increase")}
+                          className="px-2 py-1 bg-gray-200 rounded"
+                        >
+                          +
+                        </button>
+                      </div>
+                      <p className="font-medium">
+                        ₹ {item.price.sellingPrice * item.quantity}
                       </p>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <button
-                        onClick={() => updateQuantity(item._id, "decrease")}
-                        className="px-2 py-1 bg-gray-200 rounded"
-                      >
-                        -
-                      </button>
-                      <span>{item.quantity}</span>
-                      <button
-                        onClick={() => updateQuantity(item._id, "increase")}
-                        className="px-2 py-1 bg-gray-200 rounded"
-                      >
-                        +
-                      </button>
-                    </div>
-                    <p className="font-medium">
-                      ₹ {item.price.sellingPrice * item.quantity}
-                    </p>
                     <Button
                       onClick={() => removeProduct(item._id)}
                       label="Remove"
-                      className="hover:bg-orange-500"
+                      className="bg-white hover:bg-orange-500"
                     />
                   </div>
                 ))}
               </div>
             </div>
 
-            <div className="bg-white shadow-md rounded-md p-4 w-1/4">
+            {/* Order summery */}
+            <div className="bg-white shadow-md rounded-md p-4 lg:w-1/4 w-full">
               <h2 className="text-xl font-bold mb-4">Order Summary</h2>
               <div className="flex justify-between mb-2">
                 <p>Subtotal</p>
@@ -178,7 +184,6 @@ const CartPage = ({ startLoading, stopLoading }) => {
         </div>
       ) : (
         <>
-          {console.log("Products : ", products)}
           <div className="flex flex-row gap-4 bg-transparent justify-start items-center overflow-x-auto p-5 w-full">
             {products?.map((product) => (
               <ProductCard

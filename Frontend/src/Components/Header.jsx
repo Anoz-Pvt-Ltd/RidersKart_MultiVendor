@@ -41,6 +41,7 @@ const Header = () => {
       <div className="hidden md:flex items-center gap-5">
         {user.length ? (
           <Button
+            className={` bg-white text-blue-600 hover:bg-green-500 hover:text-black`}
             label={
               <h1 className="flex gap-2">
                 <User2 /> {user?.[0]?.name}
@@ -52,6 +53,7 @@ const Header = () => {
           />
         ) : (
           <Button
+            className={` bg-white text-blue-600 hover:bg-green-500 hover:text-black`}
             label={
               <h1 className="flex gap-2">
                 <LogIn /> Login
@@ -101,6 +103,7 @@ const Header = () => {
           </button>
           {user.length ? (
             <Button
+              className={` bg-white text-blue-600 hover:bg-green-500 hover:text-black`}
               label={
                 <h1 className="flex gap-2">
                   <User2 /> {user?.[0]?.name}
@@ -113,6 +116,7 @@ const Header = () => {
             />
           ) : (
             <Button
+              className={` bg-white text-blue-600 hover:bg-green-500 hover:text-black`}
               label={
                 <h1 className="flex gap-2">
                   <LogIn /> Login

@@ -7,11 +7,13 @@ import InputBox from "../../Components/InputBox";
 import Button from "../../Components/Button";
 import { useRef } from "react";
 import LoadingUI from "../../Components/Loading";
+import SelectBox from "../../Components/SelectionBox";
 
 const BrandsVerified = ({ startLoading, stopLoading }) => {
   const user = useSelector((store) => store.UserInfo.user);
   const formRef = useRef(null);
   const [showPopup, setShowPopup] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState(null);
   const [allBrands, setAllBrands] = useState([]);
   const tableHeadersBrands = [
     "Brand ID",
@@ -22,6 +24,9 @@ const BrandsVerified = ({ startLoading, stopLoading }) => {
   ];
   const [searchTermBrands, setSearchTermBrands] = useState("");
   const [filteredBrands, setFilteredBrands] = useState(allBrands);
+  const { categories, status, error } = useSelector(
+    (state) => state.categoryList
+  );
 
   const handleSearchBrands = (e) => {
     const searchValueBrands = e.target.value;
@@ -69,7 +74,8 @@ const BrandsVerified = ({ startLoading, stopLoading }) => {
     fetchBrands();
   }, [user]);
 
-  const addBrand = async () => {
+  const addBrand = async (e) => {
+    e.preventDefault();
     const formData = new FormData(formRef.current);
     for (var pair of formData.entries()) {
       console.log(pair[0] + ", " + pair[1]);
@@ -83,9 +89,9 @@ const BrandsVerified = ({ startLoading, stopLoading }) => {
         formData,
         true
       );
-      // console.log(response);
+      console.log(response);
       alert("Brand added successfully");
-      window.location.reload();
+      // window.location.reload();
     } catch (err) {
       alert("Failed to add brand.");
       setError(err.response?.data?.message || "Failed to add brand.");
@@ -128,7 +134,7 @@ const BrandsVerified = ({ startLoading, stopLoading }) => {
           <tbody>
             {filteredBrands?.length > 0 ? (
               filteredBrands?.map((brand) => (
-                <tr key={brand.id}>
+                <tr key={brand._id}>
                   <td className="border border-gray-500 px-4 py-2">
                     <Link to={`/current-brand/${brand._id}`}>{brand._id}</Link>
                   </td>
@@ -176,6 +182,31 @@ const BrandsVerified = ({ startLoading, stopLoading }) => {
                 LabelName="Logo "
                 Placeholder="Enter Logo URL"
               />
+              <SelectBox
+                LabelName="Main Category"
+                Name="category"
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                Placeholder="Select main category"
+                Options={categories?.map((cat) => ({
+                  label: cat.title,
+                  value: cat._id, // Correctly linking ID for selection
+                }))}
+              />
+
+              {selectedCategory !== null && (
+                <SelectBox
+                  LabelName="subcategory"
+                  Name="subcategoryId"
+                  Placeholder="Select subcategory"
+                  Options={categories
+                    ?.find((cat) => cat._id === selectedCategory)
+                    ?.subcategories.map((subcat) => ({
+                      label: subcat.title,
+                      value: subcat._id, // Correctly linking ID for selection
+                    }))}
+                />
+              )}
+
               <div className="flex flex-col gap-3">
                 <Button label={"Add brand"} type={"submit"} />
                 <Button

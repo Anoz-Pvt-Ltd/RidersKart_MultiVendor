@@ -1,17 +1,21 @@
 import { Brand } from "../models/brand.model.js";
+import { Subcategory } from "../models/sub-category.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { UploadImages } from "../utils/imageKit.io.js";
 
 const AddNewBrand = asyncHandler(async (req, res) => {
-  const { brand } = req.body;
+  const { brand, subcategoryId } = req.body;
   // console.log("brand :", brand);
 
   if (!brand) throw new ApiError(400, "Brand name is required");
 
   const ifExists = await Brand.findOne({ title: brand });
   if (ifExists) throw new ApiError(400, "Brand already exists");
+
+  const subcategory = await Subcategory.findById(subcategoryId);
+  if (!subcategory) throw new ApiError(404, "Subcategory not found");
 
   // Add logo for this new brand to database
   const imageFile = req.file;
@@ -29,6 +33,7 @@ const AddNewBrand = asyncHandler(async (req, res) => {
     title: brand,
     logo: { url: logo.url, fileId: logo.fileId },
     status: "verified",
+    subcategory: [subcategoryId],
   });
 
   if (!newBrand)
@@ -225,6 +230,31 @@ const GetAllBrands = asyncHandler(async (req, res) => {
       .json(new ApiResponse(201, brands, "Brands fetched successfully"));
 });
 
+const LinkSubcategoryToBrands = asyncHandler(async (req, res) => {
+  const { brandId, subcategoryId } = req.body;
+
+  if (!brandId) throw new ApiError(400, "Brand ID is required");
+  if (!subcategoryId) throw new ApiError(400, "Subcategory ID is required");
+
+  const subcategory = await Subcategory.findById(subcategoryId);
+  if (!subcategory) throw new ApiError(404, "Subcategory not found");
+
+  const brand = await Brand.findByIdAndUpdate(
+    brandId,
+    {
+      $push: { subcategory: subcategoryId },
+    },
+    { new: true }
+  );
+  if (!brand) throw new ApiError(404, "Brand not found");
+
+  res
+    .status(200)
+    .json(
+      new ApiResponse(200, brand, "brand linked to Subcategory successfully")
+    );
+});
+
 export {
   AddNewBrand,
   AddBrandRequest,
@@ -237,4 +267,5 @@ export {
   GetAllVerifiedBrands,
   GetAllUnderReviewBrands,
   GetAllBrands,
+  LinkSubcategoryToBrands,
 };
