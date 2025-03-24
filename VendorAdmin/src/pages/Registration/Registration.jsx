@@ -262,7 +262,7 @@ const VendorRegistrationForm = ({ startLoading, stopLoading, onClose }) => {
               <InputBox
                 LabelName="Pan Number"
                 Name="panNumber"
-                Placeholder="Enter GST Number"
+                Placeholder="Enter PAN Number"
               />
               <InputBox
                 LabelName="GST Number"

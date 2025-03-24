@@ -370,7 +370,7 @@ const Products = ({ startLoading, stopLoading }) => {
                   />
                 </span>
               </h3>
-              <p>{product?.description}</p>
+              <p className="truncate">{product?.description}</p>
               <p>
                 <strong>Category:</strong> {product?.category?.title} -{" "}
                 {product?.subcategory?.title}
