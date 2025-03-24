@@ -12,10 +12,13 @@ import LoadingUI from "../../Components/Loading";
 import PopUp from "../../Components/PopUpWrapper";
 
 const CurrentProduct = ({ startLoading, stopLoading }) => {
+  const user = useSelector((store) => store.UserInfo.user);
+  console.log(user);
   const navigate = useNavigate();
   const [error, setError] = useState();
   const { productId } = useParams();
   const HandleBuyNow = () => {
+    
     navigate(`/checkout/${productId}/${user?.[0]?._id}`);
   };
   const [isLiked, setIsLiked] = useState(false);
@@ -23,7 +26,6 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
   const [currentImg, setCurrentImg] = useState(0);
   const [products, setProducts] = useState();
   const [AllProducts, setAllProducts] = useState();
-  const user = useSelector((store) => store.UserInfo.user);
 
   useEffect(() => {
     async function getCurrentProduct(productId) {
