@@ -253,9 +253,9 @@ const getProduct = asyncHandler(async (req, res) => {
 
   // Fetch the product by ID
   const product = await Product.findById(productId)
-    .populate("category", "name")
-    .populate("subcategory", "name")
-    .populate("vendor", "name email")
+    .populate("category")
+    .populate("subcategory")
+    .populate("vendor")
     .populate("brand");
 
   if (!product) {
