@@ -19,6 +19,9 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
   const navigate = useNavigate();
   const [error, setError] = useState();
   const { productId } = useParams();
+  const HandleBuyNow = () => {
+    navigate(`/checkout/${productId}/${user?.[0]?._id}`);
+  };
   const [isLiked, setIsLiked] = useState(false);
   const [imgPopup, setImgPopup] = useState(false);
   const [currentImg, setCurrentImg] = useState(0);
@@ -62,9 +65,7 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
     fetchProducts();
   }, []);
 
-  const HandleBuyNow = () => {
-    navigate(`/checkout/${productId}/${user?.[0]?._id}`);
-  };
+  
 
   const addProductToCart = async () => {
     try {
@@ -79,7 +80,10 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
       dispatch(addCart(response.data.user.CartProducts));
     } catch (err) {
       console.log(err);
-      alert(err.response?.data?.message || "Failed to add product to cart.");
+      alert(
+        err.response?.data?.message ||
+          "Please Login first!, Failed to add product to cart."
+      );
     } finally {
       stopLoading();
     }
@@ -97,7 +101,8 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
     } catch (err) {
       console.log(err);
       alert(
-        err.response?.data?.message || "Failed to add product to Wishlist."
+        err.response?.data?.message ||
+          "Please Login first! , Failed to add product to Wishlist."
       );
     } finally {
       stopLoading();
@@ -196,7 +201,7 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
           </div>
           <div className="flex items-baseline mb-4">
             <span className="text-3xl font-bold mr-4">
-              {products?.price.sellingPrice}
+              ₹ {products?.price.sellingPrice}
             </span>
             <span className="text-gray-500 line-through mr-4">
               ₹{products?.price.MRP}

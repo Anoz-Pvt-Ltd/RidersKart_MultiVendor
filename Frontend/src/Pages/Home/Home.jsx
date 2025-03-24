@@ -104,7 +104,7 @@ const Home = ({ startLoading, stopLoading }) => {
     }, []);
 
     return (
-      <div className="relative w-full lg:h-96 h-64 mx-auto overflow-hidden rounded-lg lg:mb-20">
+      <div className="relative w-full lg:h-96 h-64 mx-auto overflow-hidden rounded-lg">
         <div
           className="transition-transform duration-500 ease-in-out flex items-top object-center"
           style={{ transform: `translateX(-${currentIndex * 100}%)` }}
@@ -136,7 +136,7 @@ const Home = ({ startLoading, stopLoading }) => {
 
   return (
     <div className="container mx-auto py-4">
-      <div className="lg:w-fit flex gap-10 p-5 lg:m-auto lg:my-5 w-full  overflow-x-auto flex-nowrap whitespace-nowrap no-scrollbar">
+      <div className="lg:w-fit flex gap-10 p-5 lg:m-auto  w-full  overflow-x-auto flex-nowrap whitespace-nowrap no-scrollbar">
         {FamousSubcategory.map((subcategory) => (
           <div
             key={subcategory._id}
@@ -168,7 +168,7 @@ const Home = ({ startLoading, stopLoading }) => {
         <div className="bg-red-500 text-white p-4 rounded">{error}</div>
       )}
 
-      <div className="lg:h-[35vw] h-fit w-full p-2 lg:p-5 my-10 lg:my-0 flex flex-col lg:flex-row gap-10 lg:overflow-x-auto flex-nowrap whitespace-nowrap   ">
+      <div className="lg:h-[35vw] h-fit w-full p-2 lg:p-5 my-10 lg:my-0 flex flex-col lg:flex-row gap-10 lg:overflow-x-auto flex-nowrap whitespace-nowrap  scroll-smooth no-scrollbar">
         {arrayOfGridItems.map((item, index) => (
           <div key={index} className="flex-none w-fit">
             <ThreeProductGrid products={item.products} heading={item.title} />

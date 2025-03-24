@@ -282,9 +282,9 @@ const Dashboard = ({ startLoading, stopLoading }) => {
         >
           {activeSection === "profile" && (
             <section className="flex justify-center items-center flex-col">
-              <div className="flex lg:flex-row flex-col w-full justify-evenly items-center mb-20 lg:shadow py-10 rounded-xl">
+              <div className="flex lg:flex-row flex-col w-full justify-evenly items-center lg:shadow py-2 rounded-xl">
                 <div className="name">
-                  <h2 className="text-2xl font-bold mb-4 flex justify-center items-center hidden lg:block">
+                  <h2 className="text-2xl font-bold lg:flex justify-center items-center hidden">
                     <span>
                       <UserCheck className="mr-5" />
                     </span>
@@ -310,9 +310,9 @@ const Dashboard = ({ startLoading, stopLoading }) => {
                   </p>
                 </div>
                 <div className="flex flex-col gap-5 justify-center items-center mt-10 lg:mt-0">
-                  <div className="button flex flex-col lg:flex-row justify-evenly items-center gap-5">
+                  <div className="button flex flex-col justify-evenly items-center gap-5 w-full">
                     <Button
-                      className={` bg-white text-blue-600 hover:bg-green-500 hover:text-black`}
+                      className={` bg-white text-blue-600 hover:bg-green-500 hover:text-black w-full`}
                       onClick={navigateHome}
                       // label={<ShoppingBag/>"Continue Shopping"}
                       label={
@@ -325,7 +325,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
                       }
                     />
                     <Button
-                      className={` bg-white text-blue-600 hover:bg-orange-500  hover:text-black`}
+                      className={` bg-white text-blue-600 hover:bg-orange-500  hover:text-black w-full`}
                       onClick={() => {
                         Dispatch(clearUser());
                         localStorage.removeItem("AccessToken");
@@ -345,9 +345,9 @@ const Dashboard = ({ startLoading, stopLoading }) => {
                     />
                     {/* <Button label={"Add Address"} /> */}
                   </div>
-                  <div className="button flex flex-col lg:flex-row justify-evenly items-center gap-5">
+                  <div className="button flex flex-col justify-evenly items-center gap-5 w-full">
                     <Button
-                      className={` bg-white text-blue-600 hover:bg-green-500 hover:text-black`}
+                      className={` bg-white text-blue-600 hover:bg-green-500 hover:text-black w-full`}
                       onClick={openModal}
                       label={
                         <h1 className="flex justify-start gap-2">
@@ -359,9 +359,10 @@ const Dashboard = ({ startLoading, stopLoading }) => {
                       }
                     />
                     <Button
+                      className={` bg-white text-blue-600 hover:bg-green-500 hover:text-black w-full`}
                       onClick={openModal2}
                       label={
-                        <h1 className="flex justify-start gap-2">
+                        <h1 className="flex justify-start gap-2 w-full">
                           <span>
                             <Edit />
                           </span>
@@ -374,48 +375,52 @@ const Dashboard = ({ startLoading, stopLoading }) => {
                 </div>
               </div>
               <div className="address flex flex-wrap flex-col">
-                <p className="m-10 font-bold text-xl">
+                <p className=" font-bold text-xl lg:hidden block">Address:</p>
+                <p className=" font-bold text-xl hidden lg:block">
                   Select a Default Address:
                 </p>
-                {user?.[0]?.address?.map((address, index) => (
-                  <div
-                    key={address._id}
-                    className="gap-5 flex justify-center items-center  flex-wrap"
-                  >
-                    <input
-                      type="radio"
-                      name="address"
-                      value={index}
-                      checked={selectedAddressIndex === index}
-                      onChange={() => handleAddressChange(index)}
-                    />
-                    <span className="shadow m-2 p-4 rounded-xl">
-                      <li className="ml-4 font-semibold list-none">
-                        Street: <span>{address.street}</span>
-                      </li>
-                      <li className="ml-4 font-semibold list-none">
-                        City: <span>{address.city}</span>
-                      </li>
-                      <li className="ml-4 font-semibold list-none">
-                        Country: <span>{address.country}</span>
-                      </li>
-                      <li className="ml-4 font-semibold list-none">
-                        Postal Code: <span>{address.postalCode}</span>
-                      </li>
-                      <li className="ml-4 font-semibold list-none">
-                        State: <span>{address.state}</span>
-                      </li>
-                    </span>
-                    <Button
-                      className={` bg-white text-blue-600 hover:bg-green-500 hover:text-black`}
-                      label={<PencilLine />}
-                    />
-                    <Button
-                      className={` bg-white text-blue-600 hover:bg-green-500 hover:text-black`}
-                      label={<Trash />}
-                    />
-                  </div>
-                ))}
+                <div className="flex lg:flex-row flex-col">
+                  {user?.[0]?.address?.map((address, index) => (
+                    <div
+                      key={address._id}
+                      className="gap-5 flex justify-center items-center flex-row flex-wrap"
+                    >
+                      <input
+                        className="hidden lg:block"
+                        type="radio"
+                        name="address"
+                        value={index}
+                        checked={selectedAddressIndex === index}
+                        onChange={() => handleAddressChange(index)}
+                      />
+                      <span className="shadow m-2 p-4 rounded-xl">
+                        <li className="ml-4 font-semibold list-none">
+                          Street: <span className="font-thin font-serif">{address.street}</span>
+                        </li>
+                        <li className="ml-4 font-semibold list-none">
+                          City: <span className="font-thin font-serif">{address.city}</span>
+                        </li>
+                        <li className="ml-4 font-semibold list-none">
+                          Country: <span className="font-thin font-serif">{address.country}</span>
+                        </li>
+                        <li className="ml-4 font-semibold list-none">
+                          Postal Code: <span className="font-thin font-serif">{address.postalCode}</span>
+                        </li>
+                        <li className="ml-4 font-semibold list-none">
+                          State: <span className="font-thin font-serif">{address.state}</span>
+                        </li>
+                      </span>
+                      <Button
+                        className={` bg-white text-blue-600 hover:bg-green-500 hover:text-black`}
+                        label={<PencilLine />}
+                      />
+                      <Button
+                        className={` bg-white text-blue-600 hover:bg-green-500 hover:text-black`}
+                        label={<Trash />}
+                      />
+                    </div>
+                  ))}
+                </div>
 
                 {/* <button onClick={openModal}>Add Address</button> */}
 
