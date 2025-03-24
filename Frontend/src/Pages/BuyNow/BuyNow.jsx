@@ -132,10 +132,10 @@ const BuyNow = ({ startLoading, stopLoading }) => {
     }
   };
 
-  const handleAddFunds = async () => {
+  const Payment = async (e) => {
     const order = await FetchData("payment/create-new-paymentId", "post", {
       options: {
-        amount: addAmount,
+        amount: 100,
         currency: "INR",
         receipt: "qwerty1234",
       },
@@ -252,7 +252,7 @@ const BuyNow = ({ startLoading, stopLoading }) => {
           {paymentMethod === "online" && (
             <Button
               className={`mt-5 bg-white text-blue-600 hover:bg-green-500 hover:text-black`}
-              onClick={handleAddFunds}
+              onClick={Payment}
               label={"Proceed to payment"}
             />
           )}

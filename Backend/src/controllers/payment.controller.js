@@ -8,24 +8,40 @@ import mongoose from "mongoose";
 
 const CreatePaymentId = asyncHandler(async (req, res) => {
   const { options } = req.body;
-  // options = {
-  //   amount: number,
-  //   currency: string, // e.g., "INR"
-  //   receipt: string, // e.g.,
-  // }
 
   if (!options) throw new ApiError(401, "Options must be provided");
+
+  // Ensure amount is in paise (multiply by 100)
+  const paymentOptions = {
+    amount: options.amount * 100, // Convert to paise
+    currency: options.currency,
+    receipt: `receipt_${Date.now()}`, // Ensure a receipt is always there
+    payment_capture: 1, // Auto-capture payment
+  };
+
+  console.log("Creating Razorpay Order with options:", paymentOptions);
 
   const razorpay = new Razorpay({
     key_id: process.env.RAZORPAY_KEY_ID,
     key_secret: process.env.RAZORPAY_SECRET,
   });
 
-  const order = await razorpay.orders.create(options);
-  if (!order) throw new ApiError(500, "Order not created");
+  try {
+    const order = await razorpay.orders.create(paymentOptions);
 
-  res.status(200).json(new ApiResponse(200, order, "order created"));
+    console.log("Razorpay Order Created:", order);
+
+    if (!order || !order.id) throw new ApiError(500, "Order not created");
+
+    res
+      .status(200)
+      .json(new ApiResponse(200, order, "Order created successfully"));
+  } catch (error) {
+    console.error("Error Creating Order:", error);
+    throw new ApiError(500, "Failed to create order");
+  }
 });
+
 
 // const ValidatePayment = asyncHandler(async (req, res) => {
 //   const { razorpay_payment_id, razorpay_order_id, razorpay_signature } =
