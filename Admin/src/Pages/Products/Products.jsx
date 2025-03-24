@@ -29,6 +29,7 @@ const Products = ({ startLoading, stopLoading }) => {
   const tableHeadersProducts = [
     "Product ID",
     "Vendor ID",
+    "Product Name",
     "Category",
     "Subcategory",
   ];
@@ -62,10 +63,10 @@ const Products = ({ startLoading, stopLoading }) => {
         try {
           startLoading();
           const response = await FetchData(
-            "products/admin/get-all-products",
+            "products/admin/get-all-products-admin",
             "get"
           );
-          // console.log(response);
+          console.log(response);
           if (response.data.success) {
             setAllProducts(response.data.data);
           } else {
@@ -538,10 +539,13 @@ const Products = ({ startLoading, stopLoading }) => {
                     {product.vendor}
                   </td>
                   <td className="border border-gray-500 px-4 py-2">
-                    {product.category.main}
+                    {product.name}
                   </td>
                   <td className="border border-gray-500 px-4 py-2">
-                    {product.category.sub}
+                    {product.category}
+                  </td>
+                  <td className="border border-gray-500 px-4 py-2">
+                    {product.subcategory}
                   </td>
                 </tr>
               ))
