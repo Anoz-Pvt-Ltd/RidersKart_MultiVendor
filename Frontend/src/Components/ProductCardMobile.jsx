@@ -25,7 +25,9 @@ const ProductCard = ({
           />
         </div>
         <div className="h-1/3 px-4 py-3 gap-2 flex flex-col w-1/2">
-          <h1 className="text-xl sm:text-2xl font-semibold">{ProductName}</h1>
+          <h1 className="text-xl sm:text-2xl font-semibold truncate">
+            {ProductName}
+          </h1>
           <div className="flex w-full justify-start items-center gap-4 sm:gap-10">
             <h1 className=" ">₹ {CurrentPrice}</h1>
             <h1 className="line-through text-gray-500">₹{Mrp}</h1>

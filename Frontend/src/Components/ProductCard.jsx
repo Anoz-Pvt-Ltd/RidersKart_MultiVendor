@@ -19,7 +19,7 @@ const ProductCard = ({
           <img src={Image} alt="No Image found" />
         </div>
         <div className="h-1/3 px-4 py-3 gap-2 flex flex-col">
-          <h1 className="text-xl sm:text-2xl font-semibold">{ProductName}</h1>
+          <h1 className="text-xl sm:text-2xl font-semibold truncate">{ProductName}</h1>
           <div className="flex w-full justify-start items-center gap-4 sm:gap-10">
             <h1 className="text-lg sm:text-xl">₹ {CurrentPrice}</h1>
             <h1 className="text-sm sm:text-base line-through text-gray-500">

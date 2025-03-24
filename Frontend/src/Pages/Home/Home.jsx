@@ -261,7 +261,7 @@ const Home = ({ startLoading, stopLoading }) => {
         })}
       </div>
 
-      <div className="flex gap-4 bg-transparent justify-start items-center overflow-x-auto p-5 max-w-full">
+      <div className="flex gap-4 bg-transparent justify-start items-center overflow-x-auto p-5 max-w-full no-scrollbar">
         {products?.map((product) => (
           <ProductCard
             Image={product?.images[0]?.url}
