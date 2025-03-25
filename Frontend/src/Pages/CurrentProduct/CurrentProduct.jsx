@@ -13,6 +13,15 @@ import PopUp from "../../Components/PopUpWrapper";
 import { addCart } from "../../Utility/Slice/CartSlice";
 
 const CurrentProduct = ({ startLoading, stopLoading }) => {
+  const [isReadMoreDescription, setIsReadMoreDescription] = useState(false);
+  const [isReadMoreSpecification, setIsReadMoreSpecification] = useState(false);
+  const maxLength = 100; //100 word limit for description and specification
+  const toggleReadMore = () => {
+    setIsReadMoreDescription(!isReadMoreDescription);
+  };
+  const toggleReadMoreSpecification = () => {
+    setIsReadMoreSpecification(!isReadMoreSpecification);
+  };
   const user = useSelector((store) => store.UserInfo.user);
   // console.log(user);
   const dispatch = useDispatch();
@@ -27,6 +36,8 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
   const [currentImg, setCurrentImg] = useState(0);
   const [products, setProducts] = useState();
   const [AllProducts, setAllProducts] = useState();
+  const [specifications, setSpecifications] = useState("");
+  console.log(specifications);
 
   useEffect(() => {
     async function getCurrentProduct(productId) {
@@ -37,6 +48,7 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
       );
       console.log(Product);
       setProducts(Product?.data?.data);
+      setSpecifications(Product?.data?.data?.specifications);
       stopLoading();
       return Product;
     }
@@ -64,8 +76,6 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
   useEffect(() => {
     fetchProducts();
   }, []);
-
-  
 
   const addProductToCart = async () => {
     try {
@@ -128,7 +138,7 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
   return (
     <div className="mt-2">
       <div className="flex flex-col lg:flex-row justify-between items-start p-4">
-        <section className="ImageSection w-full lg:w-[40vw] lg:h-[70vh]  ">
+        <section className="ImageSection w-full lg:w-[40vw] lg:h-[70vh] ">
           <div className="flex flex-col-reverse lg:flex-row h-5/6 lg:mb-10 ">
             {/* Image Array */}
             <div className="lg:w-20 lg:h-full  ">
@@ -192,10 +202,11 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
             />
           </div> */}
         </section>
-        <div className="flex-1 px-4 py-10 lg:py-20">
+        <div className="flex-1 px-4 py-10 ">
           <h3 className="text-2xl font-semibold mb-2">{products?.name}</h3>
-          <p className="text-gray-600 mb-4">{products?.description}</p>
-          <div className="flex items-center mb-4">
+          {/* <p className="text-gray-600 mb-4">{products?.description}</p> */}
+
+          <div className="flex items-center mt-4 mb-4">
             <span className="text-lg font-semibold mr-2">4.3</span>
             <span className="text-gray-500">4,486 Ratings & 494 Reviews</span>
           </div>
@@ -244,6 +255,42 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
               className={`bg-[#ff9f00] hover:bg-[#ffbb4e] text-white w-36 h-12`}
               onClick={addProductToCart}
             />
+          </div>
+          <div className="mt-5">
+            <div>
+              <h1 className="font-semibold">Product Description</h1>
+              <span>
+                <p className="text-gray-600">
+                  {isReadMoreDescription
+                    ? products?.description
+                    : `${products?.description.substring(0, maxLength)}...`}
+                </p>
+                {products?.description.length > maxLength && (
+                  <button className="text-blue-500" onClick={toggleReadMore}>
+                    {isReadMoreDescription ? "Read Less.." : "Read More..."}
+                  </button>
+                )}
+              </span>
+            </div>
+
+            <div>
+              <h1 className="font-semibold">Product Specifications</h1>
+              <span>
+                <p className="text-gray-600">
+                  {isReadMoreSpecification
+                    ? specifications?.details
+                    : `${specifications?.details?.substring(0, maxLength)}...`}
+                </p>
+                {specifications?.details?.length > maxLength && (
+                  <button
+                    className="text-blue-500"
+                    onClick={toggleReadMoreSpecification}
+                  >
+                    {isReadMoreSpecification ? "Read Less.." : "Read More..."}
+                  </button>
+                )}
+              </span>
+            </div>
           </div>
         </div>
       </div>

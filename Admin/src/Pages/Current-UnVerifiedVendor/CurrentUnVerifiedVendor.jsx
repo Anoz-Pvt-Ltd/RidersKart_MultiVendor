@@ -4,6 +4,7 @@ import { FetchData } from "../../Utility/FetchFromApi";
 import { useSelector } from "react-redux";
 import Button from "../../Components/Button";
 import LoadingUI from "../../Components/Loading";
+import { ArrowDownToLine } from "lucide-react";
 
 const CurrentUnVerifiedVendor = ({ startLoading, stopLoading }) => {
   const { vendorId } = useParams();
@@ -16,6 +17,7 @@ const CurrentUnVerifiedVendor = ({ startLoading, stopLoading }) => {
   const [currentVendorAddressDetails, setCurrentVendorAddressDetails] =
     useState([]);
   const [currentVendorProducts, setCurrentVendorProducts] = useState([]);
+  const [currentVendorGST, setCurrentVendorGST] = useState();
 
   useEffect(() => {
     const fetchVendor = async () => {
@@ -29,6 +31,7 @@ const CurrentUnVerifiedVendor = ({ startLoading, stopLoading }) => {
           console.log(response);
           if (response.data.success) {
             setCurrentVendor(response.data.data.vendor);
+            setCurrentVendorGST(response.data.data.vendor.image);
             setCurrentVendorBankDetails(response.data.data.vendor.bankDetails);
             setCurrentVendorBusinessDetails(
               response.data.data.vendor.businessDetails
@@ -112,6 +115,15 @@ const CurrentUnVerifiedVendor = ({ startLoading, stopLoading }) => {
         </div>
       ),
     },
+    {
+      label: "GST Certificate",
+      value: (
+        <div className="flex justify-center items-start">
+          <img src={currentVendorGST?.url} />
+          <Button label={<ArrowDownToLine />} />
+        </div>
+      ),
+    },
   ];
 
   const RejectRequest = async (e) => {
@@ -166,7 +178,11 @@ const CurrentUnVerifiedVendor = ({ startLoading, stopLoading }) => {
         </h1>
 
         <Button label={"Accept Vendor"} onClick={AcceptRequest} />
-        <Button label={"Reject Vendor"} onClick={RejectRequest} className={"hover:bg-red-500"} />
+        <Button
+          label={"Reject Vendor"}
+          onClick={RejectRequest}
+          className={"hover:bg-red-500"}
+        />
       </div>
       <div className="p-6 mx-auto bg-white shadow-md rounded-lg mt-10">
         <div className="overflow-x-auto">
