@@ -33,8 +33,8 @@ const Products = ({ startLoading, stopLoading }) => {
     "Product ID",
     "Vendor ID",
     "Product Name",
-    "Category",
-    "Subcategory",
+    "Category ID",
+    "Subcategory ID",
   ];
 
   const [searchTermProduct, setSearchTermProduct] = useState("");
@@ -539,8 +539,8 @@ const Products = ({ startLoading, stopLoading }) => {
           </thead>
           <tbody>
             {console.log(filteredProducts)}
-            {filteredProducts?.products?.length > 0 ? (
-              filteredProducts?.products.map((product) => (
+            {filteredProducts?.length > 0 ? (
+              filteredProducts?.map((product) => (
                 <tr key={product._id}>
                   <td className="border border-gray-500 px-4 py-2">
                     <Link to={`/current-product/${product._id}`}>
@@ -548,13 +548,16 @@ const Products = ({ startLoading, stopLoading }) => {
                     </Link>
                   </td>
                   <td className="border border-gray-500 px-4 py-2">
-                    {product.vendor?.name}
+                    {product.vendor}
                   </td>
                   <td className="border border-gray-500 px-4 py-2">
-                    {product.category?._id}
+                    {product.name}
                   </td>
                   <td className="border border-gray-500 px-4 py-2">
-                    {product.subcategory?._id}
+                    {product.category}
+                  </td>
+                  <td className="border border-gray-500 px-4 py-2">
+                    {product.subcategory}
                   </td>
                 </tr>
               ))
