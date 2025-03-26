@@ -315,7 +315,6 @@ const removeProductFromCart = asyncHandler(async (req, res) => {
   user.products = user.products.filter(
     (product) => product.toString() !== productId
   );
-
   // Save the user document
   await user.save();
 
