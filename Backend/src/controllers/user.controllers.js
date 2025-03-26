@@ -307,13 +307,17 @@ const removeProductFromCart = asyncHandler(async (req, res) => {
   }
 
   // Check if the product is in the user's cart
-  if (!user.products.includes(productId)) {
+  if (
+    !user.CartProducts.some(
+      (item) => item.product && item.product.toString() === productId
+    )
+  ) {
     return res.status(400).json({ message: "Product not in cart" });
   }
 
   // Remove the product from the user's cart
-  user.products = user.products.filter(
-    (product) => product.toString() !== productId
+  user.CartProducts = user.CartProducts.filter(
+    (item) => item.product.toString() !== productId
   );
   // Save the user document
   await user.save();

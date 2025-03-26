@@ -69,7 +69,7 @@ const CartPage = ({ startLoading, stopLoading }) => {
       console.log("user", user[0]._id);
       const response = await FetchData(
         `users/${user[0]._id}/${productId}/cart/remove`,
-        "post"
+        "delete"
       );
       console.log(response);
 
@@ -80,7 +80,7 @@ const CartPage = ({ startLoading, stopLoading }) => {
       console.log(err);
       alert(
         err.response?.data?.message ||
-          "Please Login first!, Failed to add product to cart."
+          "Failed to remove product from cart. Please try again."
       );
     } finally {
       stopLoading();
