@@ -99,22 +99,22 @@ const Home = ({ startLoading, stopLoading }) => {
     };
 
     useEffect(() => {
-      const intervalId = setInterval(nextImage, 3000);
+      const intervalId = setInterval(nextImage, 2000);
       return () => clearInterval(intervalId);
     }, []);
 
     return (
       <div className="relative w-full lg:h-96 h-64 mx-auto overflow-hidden rounded-lg">
         <div
-          className="transition-transform duration-500 ease-in-out flex items-top object-center"
+          className=" sm:h-60 w-screen h-[44%] transition-transform duration-500 ease-in-out flex object-center  "
           style={{ transform: `translateX(-${currentIndex * 100}%)` }}
         >
-          {DemoImageBanner.map((image) => (
+          {DemoImageBanner.map((image, index) => (
             <img
-              key={image.id}
+              key={index}
               src={image.src}
               alt={`Slide ${image.id}`}
-              className="w-full object-center"
+              className="min-w-full min-h-[44vh] "
             />
           ))}
         </div>

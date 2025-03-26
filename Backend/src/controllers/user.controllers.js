@@ -9,7 +9,6 @@ import { Order } from "../models/order.models.js";
 import bcrypt from "bcrypt";
 import SendMail from "../utils/Nodemailer.js";
 
-
 const generateAccessAndRefreshTokens = async (userId) => {
   try {
     const user = await User.findById(userId);
@@ -297,31 +296,31 @@ const addProductToCart = asyncHandler(async (req, res) => {
     return res.status(500).json({ message: "Server error" });
   }
 });
-const removeProductFromCart = async (req, res) => {
+const removeProductFromCart = asyncHandler(async (req, res) => {
   const { userId, productId } = req.params; // Get userId from the URL parameter
 
-    // Find the user
-    const user = await User.findById(userId);
+  // Find the user
+  const user = await User.findById(userId);
 
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
+  if (!user) {
+    return res.status(404).json({ message: "User not found" });
+  }
 
-    // Check if the product is in the user's cart
-    if (!user.products.includes(productId)) {
-      return res.status(400).json({ message: "Product not in cart" });
-    }
+  // Check if the product is in the user's cart
+  if (!user.products.includes(productId)) {
+    return res.status(400).json({ message: "Product not in cart" });
+  }
 
-    // Remove the product from the user's cart
-    user.products = user.products.filter(
-      (product) => product.toString() !== productId
-    );
+  // Remove the product from the user's cart
+  user.products = user.products.filter(
+    (product) => product.toString() !== productId
+  );
 
-    // Save the user document
-    await user.save();
+  // Save the user document
+  await user.save();
 
-    return res.status(200).json({ message: "Product removed from cart", user });
-};
+  return res.status(200).json({ message: "Product removed from cart", user });
+});
 const EditProductQuantity = asyncHandler(async (req, res) => {
   const { productId } = req.params; // Get userId and productId from the URL parameters
   const { quantity } = req.body; // Get the quantity to increase from the request body
