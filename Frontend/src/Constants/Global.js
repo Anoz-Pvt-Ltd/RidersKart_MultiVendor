@@ -1,0 +1,1 @@
+export const PlatformName = "RIDER'S KART"

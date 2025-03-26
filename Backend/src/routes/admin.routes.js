@@ -3,6 +3,7 @@ import {
   loginAdmin,
   regenerateRefreshToken,
   registerAdmin,
+  updateData,
 } from "../controllers/admin.controllers.js";
 import { VerifyAdminUser } from "../middlewares/auth.middleware.js";
 import {
@@ -26,5 +27,7 @@ router.route("/category/add-subcategory").post(VerifyAdminUser, AddSubcategory);
 router
   .route("/category/delete-subcategory")
   .delete(VerifyAdminUser, AddCategory);
+
+router.route("/update-data").get(updateData);
 
 export default router;

@@ -143,50 +143,35 @@ const BuyNow = ({ startLoading, stopLoading }) => {
 
     console.log(order);
 
-    var options = {
-      key: process.env.razorpay_key_id,
-      subscription_id: order.id,
-      name: "Acme Corp.",
-      description: "Monthly Test Plan",
-      image: "/Logo.png",
-      handler: async function (response) {
-        // alert(response.razorpay_payment_id),
-        //   alert(response.razorpay_subscription_id),
-        //   alert(response.razorpay_signature);
+   var options = {
+     key: process.env.razorpay_key_id, // Enter the Key ID generated from the Dashboard
+     order_id: order.data.data.id, // ✅ Correct key for order-based payments
+     name: "Acme Corp.",
+     description: "Monthly Test Plan",
+     image: "/Logo.png",
+     handler: async function (response) {
+       console.log(response); // Check response
 
-        console.log(response);
-        const body = {
-          ...response,
-          amount: addAmount,
-          paymentMethod: "UPI",
-        };
+       const body = {
+         ...response,
+         amount: order.data.data.amount, // Pass correct amount
+         paymentMethod: "UPI",
+       };
 
-        const isValidated = await FetchData(
-          "payment/validate-payment",
-          "post",
-          body
-        );
+       const isValidated = await FetchData(
+         "payment/validate-payment",
+         "post",
+         body
+       );
 
-        if (isValidated.status === 450) {
-          alert("Payment Failed");
-          alert("False Payment");
-        } else if (isValidated.status === 201) {
-          alert("Payment Successful");
-        }
-      },
-      prefill: {
-        name: "Vivek",
-        email: "Dev@gmail.com",
-        contact: "6202089501",
-      },
-      notes: {
-        note_key_1: "Tea. Earl Grey. Hot",
-        note_key_2: "Make it so.",
-      },
-      theme: {
-        color: "#F37254",
-      },
-    };
+       if (isValidated.status === 450) {
+         alert("Payment Failed");
+       } else if (isValidated.status === 201) {
+         alert("Payment Successful");
+       }
+     },
+   };
+
     var rzp1 = new window.Razorpay(options);
     rzp1.open();
     e.preventDefault();

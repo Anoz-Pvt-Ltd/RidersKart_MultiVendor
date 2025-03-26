@@ -190,13 +190,75 @@ const regenerateRefreshToken = asyncHandler(async (req, res) => {
   }
 });
 
+const editUserDetails = async (req, res) => {
+  const { name, email, phoneNumber, password } = req.body;
+
+  // Get the user ID from the token
+  // const userId = req.user._id;
+  const { userId } = req.params;
+
+  try {
+    // Find the user by ID
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Check if password needs to be updated
+    if (password) {
+      const hashedPassword = await bcrypt.hash(password, 10);
+      user.password = hashedPassword;
+    }
+
+    // Update user fields (name, email, phoneNumber, address)
+    if (name) user.name = name;
+    if (email) user.email = email;
+    if (phoneNumber) user.phoneNumber = phoneNumber;
+
+    // Update the updatedAt timestamp
+    user.updatedAt = Date.now();
+
+    // Save the updated user to the database
+    await user.save();
+
+    return res.status(200).json({
+      message: "User details updated successfully",
+      user: {
+        name: user.name,
+        email: user.email,
+        phoneNumber: user.phoneNumber,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+      },
+    });
+  } catch (error) {
+    console.error("Error updating user details:", error);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+
+const getCurrentUser = asyncHandler(async (req, res) => {
+  const { userId } = req.params;
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      throw new ApiError(404, "User not found");
+    }
+    res.json(new ApiResponse(200, { user }, "User fetched successfully"));
+  } catch (error) {
+    throw new ApiError(500, error.message || "Something went wrong");
+  }
+});
+
+// cart controllers------------------------------------
 const addProductToCart = asyncHandler(async (req, res) => {
   const { userId } = req.params; // Get userId from the URL parameter
   const { productId } = req.params; // Get productId from the request body
 
   try {
     // Find the user and populate CartProducts
-    const user = await User.findById(userId).populate("CartProducts");
+    const user = await User.findById(userId).populate("CartProducts.product");
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -210,12 +272,16 @@ const addProductToCart = asyncHandler(async (req, res) => {
     }
 
     // Check if the product is already in the user's cart
-    if (user.CartProducts.some((item) => item._id.toString() === productId)) {
+    if (
+      user.CartProducts.some(
+        (item) => item.product._id.toString() === productId
+      )
+    ) {
       return res.status(400).json({ message: "Product already in cart" });
     }
 
     // Add the product to the user's cart
-    user.CartProducts.push(productId);
+    user.CartProducts.push({ product: productId });
 
     // Save the user document
     await user.save();
@@ -230,6 +296,85 @@ const addProductToCart = asyncHandler(async (req, res) => {
     return res.status(500).json({ message: "Server error" });
   }
 });
+const removeProductFromCart = asyncHandler(async (req, res) => {
+  const { userId, productId } = req.params; // Get userId from the URL parameter
+
+  // Find the user
+  const user = await User.findById(userId);
+
+  if (!user) {
+    return res.status(404).json({ message: "User not found" });
+  }
+
+  // Check if the product is in the user's cart
+  if (
+    !user.CartProducts.some(
+      (item) => item.product && item.product.toString() === productId
+    )
+  ) {
+    return res.status(400).json({ message: "Product not in cart" });
+  }
+
+  // Remove the product from the user's cart
+  user.CartProducts = user.CartProducts.filter(
+    (item) => item.product.toString() !== productId
+  );
+  // Save the user document
+  await user.save();
+
+  return res.status(200).json({ message: "Product removed from cart", user });
+});
+const EditProductQuantity = asyncHandler(async (req, res) => {
+  const { productId } = req.params; // Get userId and productId from the URL parameters
+  const { quantity } = req.body; // Get the quantity to increase from the request body
+
+  if (!productId) throw new ApiError(404, "User ID or Product ID not found!");
+  if (!quantity || quantity <= 0) throw new ApiError(400, "Invalid quantity!");
+
+  const user = await User.findById(req.user._id).populate(
+    "CartProducts.product"
+  );
+  if (!user) throw new ApiError(404, "User authentication failed");
+
+  const productInCart = user.CartProducts.find(
+    (item) => item.product._id.toString() === productId
+  );
+
+  if (!productInCart) throw new ApiError(404, "Product not found in cart");
+
+  productInCart.quantity = quantity; // Increase the quantity
+  await user.save();
+
+  res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        user.CartProducts,
+        "Product quantity updated successfully"
+      )
+    );
+});
+const getCartProducts = asyncHandler(async (req, res) => {
+  const { userId } = req.params; // Get userId from the URL parameter
+
+  try {
+    // Find the user and populate the CartProducts field
+    const user = await User.findById(userId).populate("CartProducts.product");
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Send back the cart products
+    return res.status(200).json({ success: true, data: user.CartProducts });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Server error" });
+  }
+});
+
+// wishlist controllers------------------------------------
 const addProductToWishlist = asyncHandler(async (req, res) => {
   const { userId } = req.params; // Get userId from the URL parameter
   const { productId } = req.params; // Get productId from the request body
@@ -266,24 +411,32 @@ const addProductToWishlist = asyncHandler(async (req, res) => {
     return res.status(500).json({ message: "Server error" });
   }
 });
+const removeProductFromWishlist = asyncHandler(async (req, res) => {
+  const { userId, productId } = req.params; // Get userId from the URL parameter
 
-const getCartProducts = asyncHandler(async (req, res) => {
-  const { userId } = req.params; // Get userId from the URL parameter
+  // Find the user
+  const user = await User.findById(userId);
 
-  try {
-    // Find the user and populate the CartProducts field
-    const user = await User.findById(userId).populate("CartProducts");
-
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    // Send back the cart products
-    return res.status(200).json({ success: true, data: user.CartProducts });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Server error" });
+  if (!user) {
+    return res.status(404).json({ message: "User not found" });
   }
+
+  // Check if the product is in the user's cart
+  if (!user.WishList.includes(productId)) {
+    return res.status(400).json({ message: "Product not in Wishlist" });
+  }
+
+  // Remove the product from the user's cart
+  user.WishList = user.WishList.filter(
+    (product) => product.toString() !== productId
+  );
+
+  // Save the user document
+  await user.save();
+
+  return res
+    .status(200)
+    .json({ message: "Product removed from Wishlist", user });
 });
 const getWishlistProducts = asyncHandler(async (req, res) => {
   const { userId } = req.params; // Get userId from the URL parameter
@@ -304,73 +457,7 @@ const getWishlistProducts = asyncHandler(async (req, res) => {
   }
 });
 
-// Controller to remove a product from the user's cart
-const removeProductFromCart = async (req, res) => {
-  const { userId } = req.params; // Get userId from the URL parameter
-  const { productId } = req.body; // Get productId from the request body
-
-  try {
-    // Find the user
-    const user = await User.findById(userId);
-
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    // Check if the product is in the user's cart
-    if (!user.products.includes(productId)) {
-      return res.status(400).json({ message: "Product not in cart" });
-    }
-
-    // Remove the product from the user's cart
-    user.products = user.products.filter(
-      (product) => product.toString() !== productId
-    );
-
-    // Save the user document
-    await user.save();
-
-    return res.status(200).json({ message: "Product removed from cart", user });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Server error" });
-  }
-};
-
-// Controller to update product quantity in the cart (optional)
-const updateProductQuantityInCart = async (req, res) => {
-  const { userId } = req.params; // Get userId from the URL parameter
-  const { productId, quantity } = req.body; // Get productId and quantity from the request body
-
-  try {
-    // Find the user
-    const user = await User.findById(userId);
-
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    // Find the product
-    const product = await Product.findById(productId);
-
-    if (!product) {
-      return res.status(404).json({ message: "Product not found" });
-    }
-
-    // Check if the product is in the cart
-    const productIndex = user.products.indexOf(productId);
-
-    if (productIndex === -1) {
-      return res.status(400).json({ message: "Product not in cart" });
-    }
-
-    return res.status(200).json({ message: "Product quantity updated", user });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Server error" });
-  }
-};
-
+// Order controller ------------------------------------
 const bookProduct = asyncHandler(async (req, res) => {
   const { userId, productId, vendorId } = req.params;
   const { quantity, shippingAddress, orderStatus } = req.body;
@@ -433,6 +520,7 @@ const bookProduct = asyncHandler(async (req, res) => {
   }
 });
 
+// Address controller ------------------------------------
 // Controller to add a new address
 const addAddress = asyncHandler(async (req, res, next) => {
   const { userId } = req.params;
@@ -456,7 +544,53 @@ const addAddress = asyncHandler(async (req, res, next) => {
     .status(200)
     .json(new ApiResponse(200, user, "Address added successfully"));
 });
+// Controller to edit an existing address
+const editAddress = asyncHandler(async (req, res, next) => {
+  const { userId, addressId } = req.params;
+  const updatedAddress = req.body;
 
+  if (!updatedAddress || Object.keys(updatedAddress).length === 0) {
+    throw new ApiError(400, "Updated address details are required");
+  }
+
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+  const address = user.address.id(addressId);
+  if (!address) {
+    throw new ApiError(404, "Address not found");
+  }
+
+  Object.assign(address, updatedAddress);
+  await user.save();
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, user, "Address updated successfully"));
+});
+// Controller to delete an address
+const deleteAddress = asyncHandler(async (req, res, next) => {
+  const { userId, addressId } = req.params;
+
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+  const address = user.address.id(addressId);
+  if (!address) {
+    throw new ApiError(404, "Address not found");
+  }
+
+  address.remove();
+  await user.save();
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, user, "Address deleted successfully"));
+});
 const getUserAddresses = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -494,120 +628,11 @@ const AdminGetUserAddresses = async (req, res) => {
   }
 };
 
-// Controller to edit an existing address
-const editAddress = asyncHandler(async (req, res, next) => {
-  const { userId, addressId } = req.params;
-  const updatedAddress = req.body;
-
-  if (!updatedAddress || Object.keys(updatedAddress).length === 0) {
-    throw new ApiError(400, "Updated address details are required");
-  }
-
-  const user = await User.findById(userId);
-  if (!user) {
-    throw new ApiError(404, "User not found");
-  }
-
-  const address = user.address.id(addressId);
-  if (!address) {
-    throw new ApiError(404, "Address not found");
-  }
-
-  Object.assign(address, updatedAddress);
-  await user.save();
-
-  res
-    .status(200)
-    .json(new ApiResponse(200, user, "Address updated successfully"));
-});
-
-// Controller to delete an address
-const deleteAddress = asyncHandler(async (req, res, next) => {
-  const { userId, addressId } = req.params;
-
-  const user = await User.findById(userId);
-  if (!user) {
-    throw new ApiError(404, "User not found");
-  }
-
-  const address = user.address.id(addressId);
-  if (!address) {
-    throw new ApiError(404, "Address not found");
-  }
-
-  address.remove();
-  await user.save();
-
-  res
-    .status(200)
-    .json(new ApiResponse(200, user, "Address deleted successfully"));
-});
-
-const editUserDetails = async (req, res) => {
-  const { name, email, phoneNumber, password } = req.body;
-
-  // Get the user ID from the token
-  // const userId = req.user._id;
-  const { userId } = req.params;
-
-  try {
-    // Find the user by ID
-    const user = await User.findById(userId);
-
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    // Check if password needs to be updated
-    if (password) {
-      const hashedPassword = await bcrypt.hash(password, 10);
-      user.password = hashedPassword;
-    }
-
-    // Update user fields (name, email, phoneNumber, address)
-    if (name) user.name = name;
-    if (email) user.email = email;
-    if (phoneNumber) user.phoneNumber = phoneNumber;
-
-    // Update the updatedAt timestamp
-    user.updatedAt = Date.now();
-
-    // Save the updated user to the database
-    await user.save();
-
-    return res.status(200).json({
-      message: "User details updated successfully",
-      user: {
-        name: user.name,
-        email: user.email,
-        phoneNumber: user.phoneNumber,
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt,
-      },
-    });
-  } catch (error) {
-    console.error("Error updating user details:", error);
-    return res.status(500).json({ message: "Server error" });
-  }
-};
-
+// Admin controller ------------------------------------
 const getAllUsers = asyncHandler(async (req, res) => {
   try {
     const users = await User.find({});
     res.json(new ApiResponse(200, { users }, "All users fetched successfully"));
-  } catch (error) {
-    throw new ApiError(500, error.message || "Something went wrong");
-  }
-});
-
-const getCurrentUser = asyncHandler(async (req, res) => {
-  const { userId } = req.params;
-  try {
-    const user = await User.findById(userId);
-    if (!user) {
-      throw new ApiError(404, "User not found");
-    }
-    res.json(new ApiResponse(200, { user }, "User fetched successfully"));
   } catch (error) {
     throw new ApiError(500, error.message || "Something went wrong");
   }
@@ -635,7 +660,8 @@ export {
   getCartProducts,
   getWishlistProducts,
   removeProductFromCart,
-  updateProductQuantityInCart,
+  removeProductFromWishlist,
+  EditProductQuantity,
   bookProduct,
   addAddress,
   getUserAddresses,
