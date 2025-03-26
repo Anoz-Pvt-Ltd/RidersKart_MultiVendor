@@ -6,8 +6,12 @@ import {
   DeleteSubcategory,
   editSubcategory,
   getAllMainSubcategories,
+  AddCategoryRequest,
 } from "../controllers/category-and-subcategory.controller.js";
-import { VerifyAdminUser } from "../middlewares/auth.middleware.js";
+import {
+  VerifyAdminUser,
+  VerifyVendorUser,
+} from "../middlewares/auth.middleware.js";
 import { upload } from "../middlewares/multer.middleware.js";
 
 const router = Router();
@@ -15,6 +19,9 @@ const router = Router();
 router
   .route("/category/add")
   .post(VerifyAdminUser, upload.single("image"), AddCategory);
+router
+  .route("/category-request-vendor/add")
+  .post(VerifyVendorUser, upload.single("image"), AddCategoryRequest);
 router.route("/category/delete").delete(VerifyAdminUser, DeleteCategory);
 router
   .route("/sub-category/add")

@@ -8,6 +8,7 @@ import {
   getProductsOfVendor,
   getProductByCategory,
   getAllProductForAdmin,
+  addStockQuantity,
 } from "../controllers/product.controllers.js";
 import {
   VerifyUser,
@@ -28,6 +29,9 @@ router.route("/get-single-product/:productId").get(getProduct);
 router
   .route("/get-all-product-of-vendor/:vendorId")
   .get(VerifyVendorUser, getProductsOfVendor);
+router
+  .route("/add-stock-quantity/:productId")
+  .post(VerifyVendorUser, addStockQuantity);
 router
   .route("/get-all-product/:category/:subcategory")
   .get(getProductByCategory);

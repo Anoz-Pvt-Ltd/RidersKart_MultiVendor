@@ -58,6 +58,51 @@ const AddCategory = asyncHandler(async (req, res) => {
     );
 });
 
+const AddCategoryRequest = asyncHandler(async (req, res) => {
+  const { category, subcategory } = req.body;
+
+  if (!category || !subcategory)
+    throw new ApiError(404, "Category or Subcategory not found!");
+
+  if (typeof category !== "string" || typeof subcategory !== "string")
+    throw new ApiError(400, "Invalid input type for category or subcategory!");
+
+  const existingCategoryRequest = await Category.findOne({
+    title: category,
+    subcategories: { $elemMatch: { title: subcategory } },
+  });
+  if (existingCategoryRequest)
+    throw new ApiError(400, "Category request already exists!");
+
+  const imageFile = req.file;
+  if (!imageFile) throw new ApiError(404, "Image file not found!");
+  const image = await UploadImages(imageFile.filename, {
+    folderStructure: `images-Of-Subcategory/${subcategory.split(" ").join("-")}`,
+  });
+  if (!image)
+    throw new ApiError(500, "Failed to upload image! Please try again");
+
+  const newCategoryRequest = await Category.create({
+    title: category,
+  });
+  if (!newCategoryRequest) throw new ApiError(404, "Category not found!");
+  const newSubCategoryRequest = await Subcategory.create({
+    title: subcategory,
+    category: newCategoryRequest._id,
+    image: { url: image.url, fileId: image.fileId },
+  });
+  if (!newSubCategoryRequest)
+    throw new ApiError(404, "Sub Category not found!");
+
+  res
+    .status(201)
+    .json(
+      201,
+      { category: newCategoryRequest, subCategory: newSubCategoryRequest },
+      "Successfully requested a new category"
+    );
+});
+
 const DeleteCategory = asyncHandler(async (req, res) => {
   const { categoryId } = req.params;
   if (!categoryId) throw new ApiError(404, "Category ID not found!");
@@ -212,6 +257,7 @@ const editSubcategory = asyncHandler(async (req, res) => {
 
 export {
   AddCategory,
+  AddCategoryRequest,
   DeleteCategory,
   AddSubcategory,
   DeleteSubcategory,

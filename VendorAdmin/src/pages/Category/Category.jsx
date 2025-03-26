@@ -1,8 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { categoryData as initialData } from "../../constants/VendorDashboard.Categories";
 import { FetchData } from "../../utils/FetchFromApi";
 import { useSelector } from "react-redux";
 import LoadingUI from "../../components/Loading";
+import Button from "../../components/Button";
+import InputBox from "../../components/InputBox";
 
 const Categories = ({ startLoading, stopLoading }) => {
   const user = useSelector((store) => store.UserInfo.user);
@@ -15,6 +17,16 @@ const Categories = ({ startLoading, stopLoading }) => {
     products: 0,
     status: "Active",
     image: null,
+  });
+  const categoryFormRef = useRef(null);
+  const [handlePopup, setHandlePopup] = useState({
+    addCategoryPopup: false,
+    allCategoryPopup: false,
+    allSubCategoryPopup: false,
+    addSubCategory: false,
+    editSubcategory: false,
+    selectedSubcategoryId: null,
+    selectedSubcategoryTitle: null,
   });
   const [showForm, setShowForm] = useState(false);
   const [sortBy, setSortBy] = useState("name");
@@ -53,7 +65,7 @@ const Categories = ({ startLoading, stopLoading }) => {
           `products/get-all-product-of-vendor/${user?.[0]?._id}`,
           "get"
         );
-        // console.log(response);
+        console.log(response);
         if (response.data.success) setProducts(response.data.data);
       } catch (err) {
         setError(err.response?.data?.message || "Failed to fetch products.");
@@ -65,29 +77,34 @@ const Categories = ({ startLoading, stopLoading }) => {
   }, [user]);
 
   // Handle form submission
-  const handleAddCategory = (e) => {
+  const submitCategory = async (e) => {
     e.preventDefault();
-    if (!newCategory.id || !newCategory.name || !newCategory.description) {
-      alert("Please fill out all required fields.");
-      return;
+    const formData = new FormData(categoryFormRef.current);
+
+    for (let [key, value] of formData.entries()) {
+      console.log(`${key}: ${value}`);
     }
 
-    const updatedCategories = [...categories, newCategory];
-    setCategories(updatedCategories);
-    initialData.push(newCategory);
-
-    setNewCategory({
-      id: "",
-      name: "",
-      description: "",
-      parent: "",
-      products: 0,
-      status: "Active",
-      image: null,
-    });
-    setShowForm(false);
+    try {
+      startLoading();
+      const response = await FetchData(
+        "categories/category-request-vendor/add",
+        "post",
+        formData,
+        true
+      );
+      console.log(response);
+      setHandlePopup((prev) => ({
+        ...prev,
+        addCategoryPopup: false,
+      }));
+      alert("Your category request has been added successfully");
+    } catch (err) {
+      console.log(err);
+    } finally {
+      stopLoading();
+    }
   };
-
   // Handle sorting
   const handleSortChange = (e) => {
     setSortBy(e.target.value);
@@ -118,8 +135,23 @@ const Categories = ({ startLoading, stopLoading }) => {
   return (
     <div className="bg-white p-6 rounded-lg shadow-lg">
       <h2 className="text-2xl font-bold text-gray-700 mb-4">
-        Active categories
+        Active products under category{" "}
+        <span className="font-thin text-sm">
+          (Total active products:{" "}
+          <span className="font-bold">{products?.length}</span>)
+        </span>
       </h2>
+
+      <div className="py-2">
+        <Button
+          label={"Request to add for new category"}
+          onClick={() =>
+            setHandlePopup((prev) => {
+              return { ...prev, addCategoryPopup: true };
+            })
+          }
+        />
+      </div>
 
       {/* selling Category Table */}
       <div className="overflow-x-auto">
@@ -128,6 +160,7 @@ const Categories = ({ startLoading, stopLoading }) => {
             <tr className="bg-gray-100 text-gray-600 text-left text-sm font-medium">
               <th className="py-3 px-4 border-b">Category ID</th>
               <th className="py-3 px-4 border-b">Category Name</th>
+              <th className="py-3 px-4 border-b">Product Name</th>
               <th className="py-3 px-4 border-b">Number of Products</th>
               <th className="py-3 px-4 border-b">Status</th>
             </tr>
@@ -142,6 +175,7 @@ const Categories = ({ startLoading, stopLoading }) => {
                 <td className="py-3 px-4 font-semibold">
                   {elements?.category?.title}
                 </td>
+                <td className="py-3 px-4 font-semibold">{elements?.name}</td>
                 <td className="py-3 px-4 text-center">
                   {elements?.stockQuantity}
                 </td>
@@ -159,8 +193,61 @@ const Categories = ({ startLoading, stopLoading }) => {
           </tbody>
         </table>
       </div>
+      {handlePopup.addCategoryPopup && (
+        <div className="backdrop-blur-xl absolute top-0 w-full h-full flex justify-center items-center flex-col left-0">
+          <div className="bg-white shadow-2xl rounded-xl w-fit h-fit px-10 py-10 flex justify-center items-center">
+            <form
+              ref={categoryFormRef}
+              onSubmit={submitCategory}
+              // onSubmit={(e) => {
+              //   e.preventDefault();
+              //   submitCategory;
+              // }}
+              className="flex flex-col gap-2 "
+            >
+              <h1>Add Main & Sub category</h1>
+              <InputBox
+                LabelName={"Category"}
+                Placeholder={"Add Category"}
+                Name={"category"}
+                Required
+              />
+              <InputBox
+                LabelName={"Sub Category"}
+                Placeholder={"Add Sub Category"}
+                Name={"subcategory"}
+                Required
+              />
+              <div className="mt-4">
+                <label className="block text-sm font-medium text-gray-700">
+                  Upload Image
+                </label>
+                <input
+                  name="image"
+                  type="file"
+                  accept="image/*"
+                  className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                  // onChange={(e) =>
+                  //   setImage(e.target.files[0])
+                  // }
+                />
+              </div>
+              <Button label={"Confirm"} type={"submit"} />
+              <Button
+                label={"Cancel"}
+                onClick={() =>
+                  setHandlePopup((prev) => {
+                    return { ...prev, addCategoryPopup: false };
+                  })
+                }
+                className={"hover:bg-red-500"}
+              />
+            </form>
+          </div>
+        </div>
+      )}
       {/* all available category table */}
-      <div className="overflow-x-auto my-20">
+      {/* <div className="overflow-x-auto my-20">
         <h2 className="text-2xl font-bold text-gray-700 mb-4">
           All available categories
         </h2>
@@ -189,20 +276,12 @@ const Categories = ({ startLoading, stopLoading }) => {
                 >
                   Active
                 </td>
-                {/* <td
-                  className={`py-3 px-4 font-bold ${
-                    category.status === "Active"
-                      ? "text-green-600"
-                      : "text-red-600"
-                  }`}
-                >
-                  {category.status}
-                </td> */}
+               
               </tr>
             ))}
           </tbody>
         </table>
-      </div>
+      </div> */}
     </div>
   );
 };

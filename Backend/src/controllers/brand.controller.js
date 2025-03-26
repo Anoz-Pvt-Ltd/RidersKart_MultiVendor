@@ -58,7 +58,7 @@ const AddBrandRequest = asyncHandler(async (req, res) => {
   // Add logo for this new brand to database
   const imageFile = req.file;
   if (!imageFile) throw new ApiError(400, "No brand logo provided");
-  const logo = await uploadImages(
+  const logo = await UploadImages(
     imageFile.filename,
     {
       folderStructure: `all-brands/${brand.split(" ").join("-")}`,
@@ -129,7 +129,7 @@ const EditBrandLogo = asyncHandler(async (req, res) => {
   // Add new logo for this brand to database
   const imageFile = req.file;
   if (!imageFile) throw new ApiError(400, "No brand logo provided");
-  const logo = await uploadImages(
+  const logo = await UploadImages(
     imageFile.filename,
     {
       folderStructure: `all-brands/${existingBrand.title.split(" ").join("-")}`,

@@ -9,6 +9,12 @@ const categorySchema = new Schema(
         ref: "Subcategory",
       },
     ],
+    status: {
+      type: String,
+      required: true,
+      default: "under-review",
+      enum: ["verified", "under-review"],
+    },
   },
   { timestamps: true }
 );

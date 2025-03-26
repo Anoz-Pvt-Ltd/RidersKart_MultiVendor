@@ -351,6 +351,85 @@ const getProductByCategory = asyncHandler(async (req, res) => {
   });
 });
 
+const addStockQuantity = asyncHandler(async (req, res) => {
+  const { productId } = req.params;
+  const { quantityToAdd } = req.body;
+  console.log("Hello from controller line 357", productId, quantityToAdd);
+
+  if (!productId) throw new ApiError(400, "Product ID is required");
+  if (quantityToAdd <= 0)
+    throw new ApiError(400, "Quantity to add must be greater than zero");
+
+  // Find the product by ID
+  const product = await Product.findById(productId);
+
+  if (!product) throw new ApiError(404, "Product not found");
+
+  // Add the quantity to the stock
+  product.stockQuantity = product.stockQuantity + quantityToAdd;
+  await product.save();
+
+  const response = new ApiResponse(
+    200,
+    { stockQuantity: product.stockQuantity },
+    "Stock quantity updated successfully"
+  );
+  res.status(response.statusCode).json(response);
+});
+
+// Controller to remove quantity from a product's stock
+const removeStockQuantity = asyncHandler(async (req, res) => {
+  const { productId } = req.params;
+  const { quantityToRemove } = req.body;
+
+  if (!productId) throw new ApiError(400, "Product ID is required");
+  if (quantityToRemove <= 0)
+    throw new ApiError(400, "Quantity to remove must be greater than zero");
+
+  // Find the product by ID
+  const product = await Product.findById(productId);
+
+  if (!product) throw new ApiError(404, "Product not found");
+
+  // Ensure the quantity to remove is not more than the available stock
+  if (product.stockQuantity < quantityToRemove) {
+    throw new ApiError(
+      400,
+      "Insufficient stock to remove the specified quantity"
+    );
+  }
+
+  // Remove the quantity from the stock
+  product.stockQuantity -= quantityToRemove;
+  await product.save();
+
+  const response = new ApiResponse(
+    200,
+    { stockQuantity: product.stockQuantity },
+    "Stock quantity updated successfully"
+  );
+  res.status(response.statusCode).json(response);
+});
+
+// Controller to show the current stock quantity of a product
+const showAllStockQuantity = asyncHandler(async (req, res) => {
+  const { productId } = req.params;
+
+  if (!productId) throw new ApiError(400, "Product ID is required");
+
+  // Find the product by ID
+  const product = await Product.findById(productId);
+
+  if (!product) throw new ApiError(404, "Product not found");
+
+  const response = new ApiResponse(
+    200,
+    { stockQuantity: product.stockQuantity },
+    "Stock quantity fetched successfully"
+  );
+  res.status(response.statusCode).json(response);
+});
+
 export {
   registerProduct,
   getAllProductForAdmin,
@@ -360,4 +439,6 @@ export {
   deleteProduct,
   getProductsOfVendor,
   getProductByCategory,
+  addStockQuantity,
+  removeStockQuantity,
 };
