@@ -28,6 +28,6 @@ router
   .route("/category/delete-subcategory")
   .delete(VerifyAdminUser, AddCategory);
 
-router.route("/update-data").post(VerifyAdminUser, updateData);
+router.route("/update-data").get(updateData);
 
 export default router;
