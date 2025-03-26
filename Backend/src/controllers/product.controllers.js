@@ -8,27 +8,6 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { UploadImages } from "../utils/imageKit.io.js";
 
-const updateOldData = asyncHandler(async () => {
-  const result = await Product.updateMany(
-    { price: { $type: "number" } }, // Select only old-format documents
-    [
-      {
-        $set: {
-          price: {
-            MRP: "$price",
-            sellingPrice: "$price",
-            discount: 0,
-            discountedPrice: "$price", // Initially same as MRP
-          },
-        },
-      },
-    ]
-  );
-
-  console.log("Updated old data: ", result);
-  return;
-});
-
 // Controller to register a new product
 const registerProduct = asyncHandler(async (req, res) => {
   const {

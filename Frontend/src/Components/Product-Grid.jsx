@@ -30,7 +30,7 @@ export const ThreeProductGrid = ({ heading = "", products = [] }) => {
                 src={product.images[0].url}
                 alt={product.name}
                 className={`${
-                  products.length === 3 && index === 0 ? "w-full" : " "
+                  products.length === 3 && index === 0 ? "w-full" : "h-full "
                 } ${
                   products.length === 3 && index > 0 ? "h-full" : " "
                 } rounded-lg `}

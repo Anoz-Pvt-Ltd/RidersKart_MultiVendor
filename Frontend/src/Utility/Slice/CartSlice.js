@@ -16,35 +16,79 @@ export const fetchCart = createAsyncThunk(
   }
 );
 
+export const updateCartQuantity = createAsyncThunk(
+  "CartList/updateQuantity",
+  async ({ productId, quantity }, { rejectWithValue }) => {
+    try {
+      const response = await FetchData(
+        `users/${productId}/cart/edit-quantity`,
+        "post",
+        { quantity }
+      );
+      if (response.status === 200) {
+        return { productId, quantity };
+      }
+    } catch (error) {
+      return rejectWithValue(error.response?.data || "Failed to update cart");
+    }
+  }
+);
+
+
 const CartList = createSlice({
   name: "cartList",
   initialState: {
-    cart: [],
+    cart: [
+    ],
     status: "idle", // 'idle' | 'loading' | 'succeeded' | 'failed'
     error: null,
   },
   reducers: {
     addCart: (state, action) => {
-      const exists = state.cart.some((item) => item._id === action.payload._id);
+      const exists = state.cart.some(
+        (item) => item.product._id === action.payload._id
+      );
       if (!exists) {
-        state.cart.push(action.payload);
+        console.log("Adding to cart");
+        state.cart.push({ product: action.payload, quantity: 1 });
+      } else {
+        console.log("Item already exists in cart");
       }
     },
     removeCart: (state, action) => {
-      state.cart = state.cart.filter((item) => item._id !== action.payload);
+      state.cart = state.cart.filter(
+        (item) => item.product._id !== action.payload
+      );
     },
-    updateCart: (state, action) => {
-      const { _id, newData } = action.payload;
-      const index = state.cart.findIndex((item) => item._id === _id);
+    addQuantity: (state, action) => {
+      console.log("payload", action.payload);
+      console.log("state.cart:", state);
+      const index = state.cart.findIndex((item) => {
+        console.log("item", item.product);
+        return item.product._id === action.payload;
+      });
+      console.log(index);
       if (index !== -1) {
-        state.cart[index] = { ...state.cart[index], ...newData };
+        state.cart[index].quantity += 1;
+      } else {
+        console.log("failed in adding quantity");
+      }
+    },
+    subtractQuantity: (state, action) => {
+      const index = state.cart.findIndex(
+        (item) => item.product._id === action.payload
+      );
+      if (index !== -1) {
+        state.cart[index].quantity -= 1;
+      } else {
+        console.log("failed in adding quantity");
       }
     },
     resetCart: (state) => {
       state.cart = [];
     },
     isExist: (state, action) => {
-      return state.cart.some((item) => item._id === action.payload);
+      return state.cart.some((item) => item.product._id === action.payload);
     },
   },
   extraReducers: (builder) => {
@@ -59,9 +103,22 @@ const CartList = createSlice({
       .addCase(fetchCart.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.error.message;
+      })
+      .addCase(updateCartQuantity.fulfilled, (state, action) => {
+        const { productId, quantity } = action.payload;
+        const index = state.cart.findIndex(
+          (item) => item.product._id === productId
+        );
+        if (index !== -1) {
+          state.cart[index].quantity = quantity;
+        }
+      })
+      .addCase(updateCartQuantity.rejected, (state, action) => {
+        alert(action.payload || "Failed to update cart");
       });
   },
 });
 
-export const { addCart, removeCart, updateCart, resetCart } = CartList.actions;
+export const { addCart, removeCart, addQuantity, subtractQuantity, resetCart } =
+  CartList.actions;
 export default CartList.reducer;

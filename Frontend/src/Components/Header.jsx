@@ -14,6 +14,7 @@ import InputBox from "./InputBox";
 import { useSelector } from "react-redux";
 import { motion } from "framer-motion";
 import logo from "../assets/Logo.png";
+import { PlatformName } from "../Constants/Global";
 
 const Header = () => {
   const navigate = useNavigate();
@@ -28,7 +29,7 @@ const Header = () => {
       <div className="flex items-center lg:pl-20 justify-center">
         <Link to={"/"} className="flex items-center justify-center">
           <img src={logo} alt="Logo" className="h-20" />
-          <h1 className="text-xl font-bold">Rider's Kart</h1>
+          <h1 className="text-xl font-bold">{PlatformName}</h1>
         </Link>
       </div>
 

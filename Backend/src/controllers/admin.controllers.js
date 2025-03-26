@@ -1,4 +1,5 @@
 import { Admin } from "../models/admin.models.js";
+import { User } from "../models/user.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
@@ -140,4 +141,28 @@ const regenerateRefreshToken = asyncHandler(async (req, res) => {
   }
 });
 
-export { registerAdmin, loginAdmin, regenerateRefreshToken };
+const updateData = asyncHandler(async (req, res) => {
+  const result = await User.updateMany(
+    { CartProducts: { $type: "array" } }, // Ensure we target only old-format documents
+    [
+      {
+        $set: {
+          CartProducts: {
+            $map: {
+              input: "$CartProducts",
+              as: "productId",
+              in: { product: "$$productId", quantity: 1 }, // Convert to new format
+            },
+          },
+        },
+      },
+    ]
+  );
+
+  console.log("Updated cart products: ", result);
+  res
+    .status(200)
+    .json(new ApiResponse(200, result, "Data updated successfully"));
+});
+
+export { registerAdmin, loginAdmin, regenerateRefreshToken, updateData };

@@ -37,8 +37,9 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
   const [products, setProducts] = useState();
   const [AllProducts, setAllProducts] = useState();
   const [specifications, setSpecifications] = useState("");
-  console.log(specifications);
+  // console.log(specifications);
 
+  // Fetching the current product
   useEffect(() => {
     async function getCurrentProduct(productId) {
       startLoading();
@@ -56,24 +57,24 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
     getCurrentProduct(productId);
   }, []);
 
-  const fetchProducts = async () => {
-    try {
-      startLoading();
-      const response = await FetchData("products/get-all-product", "get");
-      console.log(response);
-      if (response.data.success) {
-        setAllProducts(response.data.data);
-      } else {
-        setError("Failed to load products.");
-      }
-    } catch (err) {
-      setError(err.response?.data?.message || "Failed to fetch products.");
-    } finally {
-      stopLoading();
-    }
-  };
-
+  // Fetching all products
   useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        startLoading();
+        const response = await FetchData("products/get-all-product", "get");
+        console.log(response);
+        if (response.data.success) {
+          setAllProducts(response.data.data);
+        } else {
+          setError("Failed to load products.");
+        }
+      } catch (err) {
+        setError(err.response?.data?.message || "Failed to fetch products.");
+      } finally {
+        stopLoading();
+      }
+    };
     fetchProducts();
   }, []);
 
@@ -87,7 +88,8 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
       console.log(response);
 
       alert(response.data.message);
-      dispatch(addCart(response.data.user.CartProducts));
+      console.log(products);
+      dispatch(addCart(products));
     } catch (err) {
       console.log(err);
       alert(

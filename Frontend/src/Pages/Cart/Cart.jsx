@@ -1,16 +1,20 @@
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { FetchData } from "../../Utility/FetchFromApi";
 import ProductCard from "../../Components/ProductCard";
 import Button from "../../Components/Button";
 import ProductCardMobile from "../../Components/ProductCardMobile";
 import LoadingUI from "../../Components/Loading";
+import { addQuantity, subtractQuantity } from "../../Utility/Slice/CartSlice";
 
 const CartPage = ({ startLoading, stopLoading }) => {
   const [cartProducts, setCartProducts] = useState([]);
   const [error, setError] = useState("");
   const [products, setProducts] = useState([]);
   const user = useSelector((store) => store.UserInfo.user);
+  const cart = useSelector((store) => store.CartList.cart);
+  // console.log(cart);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const fetchCartProducts = async () => {
@@ -60,28 +64,27 @@ const CartPage = ({ startLoading, stopLoading }) => {
     fetchProducts();
   }, []);
 
-  const updateQuantity = (productId, operation) => {
-    setCartProducts(
-      (prevCartProducts) =>
-        prevCartProducts.length > 0 &&
-        prevCartProducts?.map((item) =>
-          item._id === productId
-            ? {
-                ...item,
-                quantity:
-                  operation === "increase"
-                    ? item.quantity + 1
-                    : Math.max(item.quantity - 1, 1),
-              }
-            : item
-        )
-    );
-  };
+  const removeFromCart = async (productId) => {
+    try {
+      startLoading();
+      const response = await FetchData(
+        `users/${user[0]._id}/${productId}/cart/remove`,
+        "post"
+      );
+      console.log(response);
 
-  const removeProduct = (productId) => {
-    setCartProducts((prevCartProducts) =>
-      prevCartProducts.filter((item) => item._id !== productId)
-    );
+      alert(response.data.message);
+      console.log(productId);
+      dispatch(addCart(productId));
+    } catch (err) {
+      console.log(err);
+      alert(
+        err.response?.data?.message ||
+          "Please Login first!, Failed to add product to cart."
+      );
+    } finally {
+      stopLoading();
+    }
   };
 
   const calculateTotal = () => {
@@ -101,7 +104,7 @@ const CartPage = ({ startLoading, stopLoading }) => {
           <div className="flex flex-col lg:flex-row w-full justify-around items-center ">
             <div className="lg:col-span-2 lg:w-1/2 w-full  border">
               <div className="bg-white shadow-md rounded-md p-4">
-                {cartProducts?.map((item) => (
+                {cart?.map((item) => (
                   <div
                     key={item._id}
                     className="flex flex-col gap-5 md:flex-row items-center justify-between border-b pb-4 mb-4"
@@ -123,14 +126,14 @@ const CartPage = ({ startLoading, stopLoading }) => {
                     <div className="flex gap-10 ">
                       <div className="flex items-center space-x-2">
                         <button
-                          onClick={() => updateQuantity(item._id, "decrease")}
+                          onClick={() => dispatch(subtractQuantity(item._id))}
                           className="px-2 py-1 bg-gray-200 rounded"
                         >
                           -
                         </button>
                         <span>{item.quantity}</span>
                         <button
-                          onClick={() => updateQuantity(item._id, "increase")}
+                          onClick={() => dispatch(addQuantity(item._id))}
                           className="px-2 py-1 bg-gray-200 rounded"
                         >
                           +
@@ -141,9 +144,9 @@ const CartPage = ({ startLoading, stopLoading }) => {
                       </p>
                     </div>
                     <Button
-                      onClick={() => removeProduct(item._id)}
+                      onClick={() => removeFromCart(item._id)}
                       label="Remove"
-                      className="bg-white hover:bg-orange-500"
+                      className="bg-white hover:bg-orange-500 hover:text-white"
                     />
                   </div>
                 ))}
