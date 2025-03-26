@@ -300,7 +300,6 @@ const addProductToCart = asyncHandler(async (req, res) => {
 const removeProductFromCart = async (req, res) => {
   const { userId, productId } = req.params; // Get userId from the URL parameter
 
-  try {
     // Find the user
     const user = await User.findById(userId);
 
@@ -322,10 +321,6 @@ const removeProductFromCart = async (req, res) => {
     await user.save();
 
     return res.status(200).json({ message: "Product removed from cart", user });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Server error" });
-  }
 };
 const EditProductQuantity = asyncHandler(async (req, res) => {
   const { productId } = req.params; // Get userId and productId from the URL parameters
