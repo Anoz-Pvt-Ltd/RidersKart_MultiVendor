@@ -36,7 +36,7 @@ router.route("/re-login").post(VerifyUser, regenerateRefreshToken);
 router.route("/:userId/:productId/cart/add").post(VerifyUser, addProductToCart);
 router
   .route("/:userId/:productId/cart/remove")
-  .delete( removeProductFromCart);
+  .delete(VerifyUser, removeProductFromCart);
 router
   .route("/:productId/cart/edit-quantity")
   .post(VerifyUser, EditProductQuantity);
