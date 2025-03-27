@@ -13,7 +13,62 @@ const CartPage = ({ startLoading, stopLoading }) => {
   const [products, setProducts] = useState([]);
   const user = useSelector((store) => store.UserInfo.user);
   const cart = useSelector((store) => store.CartList.cart);
+  const [addresses, setAddresses] = useState([]);
+  const [selectedAddress, setSelectedAddress] = useState();
+  const [paymentMethod, setPaymentMethod] = useState("");
+
   const dispatch = useDispatch();
+
+  const handleAddressChange = (e) => {
+    setSelectedAddress(e.target.value);
+  };
+  const handlePaymentChange = (e) => {
+    setPaymentMethod(e.target.value);
+  };
+  const Payment = async (e) => {
+      const order = await FetchData("payment/create-new-paymentId", "post", {
+        options: {
+          amount: 100,
+          currency: "INR",
+          receipt: "qwerty1234",
+        },
+      });
+  
+      console.log(order);
+  
+     var options = {
+       key: process.env.razorpay_key_id, // Enter the Key ID generated from the Dashboard
+       order_id: order.data.data.id, // ✅ Correct key for order-based payments
+       name: "Acme Corp.",
+       description: "Monthly Test Plan",
+       image: "/Logo.png",
+       handler: async function (response) {
+         console.log(response); // Check response
+  
+         const body = {
+           ...response,
+           amount: order.data.data.amount, // Pass correct amount
+           paymentMethod: "UPI",
+         };
+  
+         const isValidated = await FetchData(
+           "payment/validate-payment",
+           "post",
+           body
+         );
+  
+         if (isValidated.status === 450) {
+           alert("Payment Failed");
+         } else if (isValidated.status === 201) {
+           alert("Payment Successful");
+         }
+       },
+     };
+  
+      var rzp1 = new window.Razorpay(options);
+      rzp1.open();
+      e.preventDefault();
+    };
 
   useEffect(() => {
     const fetchCartProducts = async () => {
@@ -39,7 +94,26 @@ const CartPage = ({ startLoading, stopLoading }) => {
       }
     };
 
+    const fetchUserAddresses = async () => {
+      if (user?.length > 0) {
+        startLoading();
+        try {
+          const response = await FetchData(
+            `users/${user?.[0]?._id}/addresses`,
+            "get"
+          );
+          console.log(response);
+          setAddresses(response.data);
+        } catch (err) {
+          setError(err.response?.data?.message || "Failed to fetch addresses.");
+        } finally {
+          stopLoading();
+        }
+      }
+    };
+
     fetchCartProducts();
+    fetchUserAddresses();
   }, [user]);
 
   const fetchProducts = async () => {
@@ -102,7 +176,7 @@ const CartPage = ({ startLoading, stopLoading }) => {
         <div className="flex flex-col w-full gap-4 justify-between items-center">
           <div className="flex flex-col lg:flex-row w-full justify-around items-start ">
             <div className="lg:col-span-2 lg:w-1/2 w-full  border">
-              <div className="bg-white shadow-md rounded-md p-4">
+              <div className="bg-white shadow-md rounded-md p-4 h-96 overflow-y-scroll">
                 {cart?.map((item) =>
                   item.product === null ? (
                     <></>
@@ -164,29 +238,79 @@ const CartPage = ({ startLoading, stopLoading }) => {
             </div>
 
             {/* Order summery */}
-            <div className="bg-white shadow-md rounded-md p-4 lg:w-1/4 w-full">
-              <h2 className="text-xl font-bold mb-4">Order Summary</h2>
-              <div className="flex justify-between mb-2">
-                <p>Subtotal</p>
-                <p>₹ {getTotalPayablePrice()}</p>
+            <div className="w-1/4 flex flex-col justify-center items-center p-10 gap-5">
+              <div className="bg-white shadow-md rounded-md p-4 w-full">
+                <h2 className="text-xl font-bold mb-4">Order Summary</h2>
+                <div className="flex justify-between mb-2">
+                  <p>Subtotal</p>
+                  <p>₹ {getTotalPayablePrice()}</p>
+                </div>
+                <div className="flex justify-between mb-2">
+                  <p>Tax</p>
+                  <p>₹ {(getTotalPayablePrice() * 0.1).toFixed(2)}</p>
+                </div>
+                <div className="flex justify-between font-bold mb-4">
+                  <p>Total</p>
+                  <p>₹ {(getTotalPayablePrice() * 1.1).toFixed(2)}</p>
+                </div>
+                <Button
+                  label={"Proceed to Checkout"}
+                  className="bg-white hover:bg-orange-500 hover:text-white"
+                />
               </div>
-              <div className="flex justify-between mb-2">
-                <p>Tax</p>
-                <p>₹ {(getTotalPayablePrice() * 0.1).toFixed(2)}</p>
+              <div className="addresses">
+                <h2 className="mb-5 font-semibold">Select Shipping Address</h2>
+                {addresses?.length > 0 ? (
+                  <select
+                    value={selectedAddress}
+                    onChange={handleAddressChange}
+                    className="bg-gray-400 p-5 rounded-xl outline-none w-full"
+                  >
+                    <option value="" selected disabled>
+                      Select an address
+                    </option>
+                    {addresses?.map((address, index) => (
+                      <option
+                        key={address?._id}
+                        value={index}
+                        className="bg-white max-w-40"
+                      >
+                        {`${address?.street}, ${address?.city}, ${address?.state}, ${address?.country}, ${address?.postalCode}`}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <p>No addresses available. Please add one in your profile.</p>
+                )}
               </div>
-              <div className="flex justify-between font-bold mb-4">
-                <p>Total</p>
-                <p>₹ {(getTotalPayablePrice() * 1.1).toFixed(2)}</p>
+              <div className="w-4/5">
+                <h2 className="mb-5 font-semibold">Select Payment Method</h2>
+                <select
+                  value={paymentMethod}
+                  onChange={handlePaymentChange}
+                  className="bg-gray-400 p-5 rounded-xl outline-none w-full"
+                >
+                  <option value="" disabled>
+                    Select a payment method
+                  </option>
+                  <option value="online">Online</option>
+                  <option value="card">Cash on delivery</option>
+                </select>
+                {paymentMethod === "online" && (
+                  <Button
+                    className={`mt-5 bg-white text-blue-600 hover:bg-green-500 hover:text-black`}
+                    onClick={Payment}
+                    label={"Proceed to payment"}
+                  />
+                )}
               </div>
-              <button className="w-full py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
-                Proceed to Checkout
-              </button>
             </div>
           </div>
         </div>
       ) : (
         <p className="text-gray-600">Your cart is empty.</p>
       )}
+
       <h1 className="text-xl mx-4 my-10 w-full text-center border-t border-neutral-400 font-bold">
         Recommendations
       </h1>
