@@ -1,5 +1,5 @@
 import React from "react";
-import { truncateString } from "../Utility/TruncateString";
+import { truncateString } from "../Utility/Utility-functions";
 import { Link } from "react-router";
 
 export const ThreeProductGrid = ({ heading = "", products = [] }) => {

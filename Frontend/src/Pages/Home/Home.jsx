@@ -7,7 +7,7 @@ import { Link } from "react-router";
 // import { categories } from "../../Constants/Home/Home.Constants";
 import LoadingUI from "../../Components/Loading";
 import { ThreeProductGrid } from "../../Components/Product-Grid";
-import { truncateString } from "../../Utility/TruncateString";
+import { truncateString } from "../../Utility/Utility-functions";
 
 const Home = ({ startLoading, stopLoading }) => {
   const scrollContainer = useRef(null);

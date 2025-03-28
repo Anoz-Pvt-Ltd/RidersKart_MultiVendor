@@ -332,7 +332,7 @@ const getProductByCategory = asyncHandler(async (req, res) => {
 
 const addStockQuantity = asyncHandler(async (req, res) => {
   const { productId } = req.params;
-  const { quantityToAdd } = req.body;
+  const quantityToAdd = Number(req.body.quantityToAdd); // Quantity to add to the stock
   console.log("Hello from controller line 357", productId, quantityToAdd);
 
   if (!productId) throw new ApiError(400, "Product ID is required");
@@ -359,7 +359,7 @@ const addStockQuantity = asyncHandler(async (req, res) => {
 // Controller to remove quantity from a product's stock
 const removeStockQuantity = asyncHandler(async (req, res) => {
   const { productId } = req.params;
-  const { quantityToRemove } = req.body;
+  const quantityToRemove = Number(req.body.quantityToRemove);
 
   if (!productId) throw new ApiError(400, "Product ID is required");
   if (quantityToRemove <= 0)

@@ -1,66 +1,46 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { FetchData } from "../../Utility/FetchFromApi";
 import ProductCard from "../../Components/ProductCard";
 import Button from "../../Components/Button";
 import ProductCardMobile from "../../Components/ProductCardMobile";
 import LoadingUI from "../../Components/Loading";
-import { addQuantity, subtractQuantity } from "../../Utility/Slice/CartSlice";
+import {
+  addQuantity,
+  deleteFromCart,
+  subtractQuantity,
+} from "../../Utility/Slice/CartSlice";
+import { useDebounce } from "../../Utility/Utility-functions";
+import { debounce } from "lodash";
 
 const CartPage = ({ startLoading, stopLoading }) => {
-  const [cartProducts, setCartProducts] = useState([]);
   const [error, setError] = useState("");
   const [products, setProducts] = useState([]);
   const user = useSelector((store) => store.UserInfo.user);
   const cart = useSelector((store) => store.CartList.cart);
   const dispatch = useDispatch();
 
+  // Fetch all products
   useEffect(() => {
-    const fetchCartProducts = async () => {
-      if (user?.length > 0) {
-        try {
-          startLoading();
-          const response = await FetchData(
-            `users/${user?.[0]._id}/cart-products`,
-            "get"
-          );
-          if (response.data.success) {
-            setCartProducts(response.data.data);
-          } else {
-            setError("Failed to load cart products.");
-          }
-        } catch (err) {
-          setError(
-            err.response?.data?.message || "Failed to fetch cart products."
-          );
-        } finally {
-          stopLoading();
+    const fetchProducts = async () => {
+      try {
+        startLoading();
+        const response = await FetchData("products/get-all-product", "get");
+        if (response.data.success) {
+          setProducts(response.data.data.products);
+        } else {
+          setError("Failed to load products.");
         }
+      } catch (err) {
+        setError(err.response?.data?.message || "Failed to fetch products.");
+      } finally {
+        stopLoading();
       }
     };
-
-    fetchCartProducts();
-  }, [user]);
-
-  const fetchProducts = async () => {
-    try {
-      startLoading();
-      const response = await FetchData("products/get-all-product", "get");
-      if (response.data.success) {
-        setProducts(response.data.data.products);
-      } else {
-        setError("Failed to load products.");
-      }
-    } catch (err) {
-      setError(err.response?.data?.message || "Failed to fetch products.");
-    } finally {
-      stopLoading();
-    }
-  };
-
-  useEffect(() => {
     fetchProducts();
   }, []);
+
+  console.log(cart?.[0]?.quantity);
 
   const removeFromCart = async (productId) => {
     try {
@@ -74,18 +54,40 @@ const CartPage = ({ startLoading, stopLoading }) => {
       console.log(response);
 
       alert(response.data.message);
-      console.log(productId);
-      dispatch(addCart(productId));
+      dispatch(deleteFromCart(productId));
     } catch (err) {
       console.log(err);
-      alert(
-        err.response?.data?.message ||
-          "Failed to remove product from cart. Please try again."
-      );
+      // alert(
+      //   err.response?.data?.message ||
+      //     "Failed to remove product from cart. Please try again."
+      // );
     } finally {
       stopLoading();
     }
   };
+
+  const updateQuantity = async (productId, quantity) => {
+    try {
+      startLoading();
+      const response = await FetchData(
+        `users/${productId}/cart/edit-quantity`,
+        "post",
+        { quantity }
+      );
+      console.log(response);
+      alert("Quantity updated successfully");
+    } catch (err) {
+      console.log(err);
+      // alert(
+      //   err.response?.data?.message ||
+      //     "Failed to update quantity. Please try again."
+      // );
+    } finally {
+      stopLoading();
+    }
+  };
+
+  const handelAddQuantity = useDebounce(updateQuantity, 1000);
 
   function getTotalPayablePrice() {
     return cart.reduce((total, item) => {
@@ -105,7 +107,7 @@ const CartPage = ({ startLoading, stopLoading }) => {
               <div className="bg-white shadow-md rounded-md p-4">
                 {cart?.map((item) =>
                   item.product === null ? (
-                    <></>
+                    <div key={item._id}></div>
                   ) : (
                     <div
                       key={item._id}
@@ -131,18 +133,26 @@ const CartPage = ({ startLoading, stopLoading }) => {
                       <div className="flex gap-10 ">
                         <div className="flex items-center space-x-2">
                           <button
-                            onClick={() =>
-                              dispatch(subtractQuantity(item.product._id))
-                            }
+                            onClick={() => {
+                              dispatch(subtractQuantity(item.product._id));
+                              handelAddQuantity(
+                                item.product._id,
+                                item.quantity - 1
+                              );
+                            }}
                             className="px-2 py-1 bg-gray-200 rounded"
                           >
                             -
                           </button>
                           <span>{item.quantity}</span>
                           <button
-                            onClick={() =>
-                              dispatch(addQuantity(item.product._id))
-                            }
+                            onClick={() => {
+                              dispatch(addQuantity(item.product._id));
+                              handelAddQuantity(
+                                item.product._id,
+                                item.quantity + 1
+                              );
+                            }}
                             className="px-2 py-1 bg-gray-200 rounded"
                           >
                             +

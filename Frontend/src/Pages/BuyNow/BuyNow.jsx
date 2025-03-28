@@ -126,6 +126,7 @@ const BuyNow = ({ startLoading, stopLoading }) => {
         alert("Failed to place order.");
       }
     } catch (err) {
+      console.log(err);
       alert(err.response?.data?.message || "Failed to place order.");
     } finally {
       stopLoading();
@@ -143,34 +144,34 @@ const BuyNow = ({ startLoading, stopLoading }) => {
 
     console.log(order);
 
-   var options = {
-     key: process.env.razorpay_key_id, // Enter the Key ID generated from the Dashboard
-     order_id: order.data.data.id, // ✅ Correct key for order-based payments
-     name: "Acme Corp.",
-     description: "Monthly Test Plan",
-     image: "/Logo.png",
-     handler: async function (response) {
-       console.log(response); // Check response
+    var options = {
+      key: process.env.razorpay_key_id, // Enter the Key ID generated from the Dashboard
+      order_id: order.data.data.id, // ✅ Correct key for order-based payments
+      name: "Acme Corp.",
+      description: "Monthly Test Plan",
+      image: "/Logo.png",
+      handler: async function (response) {
+        console.log(response); // Check response
 
-       const body = {
-         ...response,
-         amount: order.data.data.amount, // Pass correct amount
-         paymentMethod: "UPI",
-       };
+        const body = {
+          ...response,
+          amount: order.data.data.amount, // Pass correct amount
+          paymentMethod: "UPI",
+        };
 
-       const isValidated = await FetchData(
-         "payment/validate-payment",
-         "post",
-         body
-       );
+        const isValidated = await FetchData(
+          "payment/validate-payment",
+          "post",
+          body
+        );
 
-       if (isValidated.status === 450) {
-         alert("Payment Failed");
-       } else if (isValidated.status === 201) {
-         alert("Payment Successful");
-       }
-     },
-   };
+        if (isValidated.status === 450) {
+          alert("Payment Failed");
+        } else if (isValidated.status === 201) {
+          alert("Payment Successful");
+        }
+      },
+    };
 
     var rzp1 = new window.Razorpay(options);
     rzp1.open();

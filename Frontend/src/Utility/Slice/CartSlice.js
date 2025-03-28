@@ -34,12 +34,10 @@ export const updateCartQuantity = createAsyncThunk(
   }
 );
 
-
 const CartList = createSlice({
   name: "cartList",
   initialState: {
-    cart: [
-    ],
+    cart: [],
     status: "idle", // 'idle' | 'loading' | 'succeeded' | 'failed'
     error: null,
   },
@@ -55,19 +53,20 @@ const CartList = createSlice({
         console.log("Item already exists in cart");
       }
     },
-    removeCart: (state, action) => {
-      state.cart = state.cart.filter(
-        (item) => item.product._id !== action.payload
-      );
+    deleteFromCart: (state, action) => {
+      console.log("Before removing:", state.cart);
+      if (!Array.isArray(state.cart))
+        console.error("Cart is not an array", state.cart);
+
+      state.cart = state.cart.filter((item) => {
+        return item.product._id !== action.payload;
+      });
     },
     addQuantity: (state, action) => {
-      console.log("payload", action.payload);
-      console.log("state.cart:", state);
+      
       const index = state.cart.findIndex((item) => {
-        console.log("item", item.product);
         return item.product._id === action.payload;
       });
-      console.log(index);
       if (index !== -1) {
         state.cart[index].quantity += 1;
       } else {
@@ -119,6 +118,11 @@ const CartList = createSlice({
   },
 });
 
-export const { addCart, removeCart, addQuantity, subtractQuantity, resetCart } =
-  CartList.actions;
+export const {
+  addCart,
+  deleteFromCart,
+  addQuantity,
+  subtractQuantity,
+  resetCart,
+} = CartList.actions;
 export default CartList.reducer;
