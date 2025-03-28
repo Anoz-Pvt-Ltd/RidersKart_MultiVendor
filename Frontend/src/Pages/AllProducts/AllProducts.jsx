@@ -30,7 +30,7 @@ const AllProducts = ({ startLoading, stopLoading }) => {
         `products/get-all-products?${queryParams}`,
         "get"
       );
-      console.log(response);
+      // console.log(response);
 
       if (response.data.success) {
         setProducts(response.data.data.products);
@@ -49,6 +49,7 @@ const AllProducts = ({ startLoading, stopLoading }) => {
   useEffect(() => {
     fetchProducts(page);
   }, [category, subcategory, page]);
+  console.log(products);
 
   return (
     <div className="flex flex-col flex-wrap justify-center gap-6 p-4">
@@ -77,6 +78,8 @@ const AllProducts = ({ startLoading, stopLoading }) => {
               Offer={product.off}
               Description={product.description}
               productId={product._id}
+              Discount={product.price.discount}
+              Stock={product.stockQuantity}
             />
           ))
         ) : (

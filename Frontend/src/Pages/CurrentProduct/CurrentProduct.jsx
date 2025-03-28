@@ -15,7 +15,7 @@ import { addCart } from "../../Utility/Slice/CartSlice";
 const CurrentProduct = ({ startLoading, stopLoading }) => {
   const [isReadMoreDescription, setIsReadMoreDescription] = useState(false);
   const [isReadMoreSpecification, setIsReadMoreSpecification] = useState(false);
-  const maxLength = 100; //100 word limit for description and specification
+  const maxLength = 100; 
   const toggleReadMore = () => {
     setIsReadMoreDescription(!isReadMoreDescription);
   };
@@ -47,7 +47,7 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
         `products/get-single-product/${productId}`,
         "get"
       );
-      console.log(Product);
+      // console.log(Product);
       setProducts(Product?.data?.data);
       setSpecifications(Product?.data?.data?.specifications);
       stopLoading();
@@ -62,13 +62,9 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
     const fetchProducts = async () => {
       try {
         startLoading();
-        const response = await FetchData("products/get-all-product", "get");
+        const response = await FetchData("products/get-all-products", "get");
         console.log(response);
-        if (response.data.success) {
-          setAllProducts(response.data.data);
-        } else {
-          setError("Failed to load products.");
-        }
+        setAllProducts(response.data.data.products);
       } catch (err) {
         setError(err.response?.data?.message || "Failed to fetch products.");
       } finally {
@@ -111,11 +107,20 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
       console.log(response);
       alert(response.data.message);
     } catch (err) {
-      console.log(err);
-      alert(
-        err.response?.data?.message ||
-          "Please Login first! , Failed to add product to Wishlist."
-      );
+      // console.log(err);
+      // alert(
+      //   err.response?.data?.message ||
+      //     "Please Login first! , Failed to add product to Wishlist."
+      // );
+      if (user.length > 0) {
+        alert(err.response?.data?.message || "Internal Server Error");
+      }
+      if (user.length === 0) {
+        alert(
+          err.response?.data?.message ||
+            "Please Login first! , Failed to add product to Wishlist."
+        );
+      }
     } finally {
       stopLoading();
     }
@@ -140,7 +145,7 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
   return (
     <div className="mt-2">
       <div className="flex flex-col lg:flex-row justify-between items-start p-4">
-        <section className="ImageSection w-full lg:w-[40vw] lg:h-[70vh] ">
+        <section className="ImageSection w-full lg:w-[40vw] lg:h-[70vh]">
           <div className="flex flex-col-reverse lg:flex-row h-5/6 lg:mb-10 ">
             {/* Image Array */}
             <div className="lg:w-20 lg:h-full  ">
@@ -176,6 +181,20 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
               </div>
             </div>
           </div>
+          <div className="flex gap-10 lg:gap-52 justify-center items-center lg:ml-20 ">
+            <Button
+              label={"Buy Now"}
+              className={
+                "bg-[#ff741b]  hover:bg-[#ff924e] text-white w-36 h-12"
+              }
+              onClick={HandleBuyNow}
+            />
+            <Button
+              label={"Add to Cart"}
+              className={`bg-[#ff9f00] hover:bg-[#ffbb4e] text-white w-36 h-12`}
+              onClick={addProductToCart}
+            />
+          </div>
           {imgPopup && (
             <PopUp onClose={() => setImgPopup(false)}>
               <div>
@@ -204,7 +223,7 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
             />
           </div> */}
         </section>
-        <div className="flex-1 px-4 py-10 ">
+        <div className="flex-1 px-4 py-10">
           <h3 className="text-2xl font-semibold mb-2">{products?.name}</h3>
           {/* <p className="text-gray-600 mb-4">{products?.description}</p> */}
 
@@ -244,7 +263,7 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
               cashback/coupon) T&C
             </li>
           </ul>
-          <div className="flex gap-10 lg:gap-52 justify-center items-center mt-20 ">
+          {/* <div className="flex gap-10 lg:gap-52 justify-center items-center mt-20 ">
             <Button
               label={"Buy Now"}
               className={
@@ -257,7 +276,7 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
               className={`bg-[#ff9f00] hover:bg-[#ffbb4e] text-white w-36 h-12`}
               onClick={addProductToCart}
             />
-          </div>
+          </div> */}
           <div className="mt-5">
             <div>
               <h1 className="font-semibold">Product Description</h1>
@@ -296,6 +315,7 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
           </div>
         </div>
       </div>
+
       <section>
         <h1 className="text-2xl font-semibold mb-2 ml-10">
           People Also visited
@@ -311,20 +331,22 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
         </button>
 
         <div
-          className="flex overflow-x-scroll justify-start items-center gap-6 py-10 px-10"
+          className="flex overflow-x-scroll no-scrollbar justify-start items-center gap-6 py-10 px-10"
           ref={sliderRef}
         >
           {AllProducts?.map((product, index) => (
             <ProductCard
               Image={product?.images[0]?.url}
-              key={index}
-              ProductName={product?.name}
-              CurrentPrice={product?.price}
-              Mrp={product?.price}
-              Rating={product?.Rating}
-              Offer={product?.off}
-              Description={product?.description}
-              productId={product?._id}
+              key={product._id}
+              ProductName={product.name}
+              CurrentPrice={product.price.sellingPrice}
+              Mrp={product.price.MRP}
+              Rating={product.Rating}
+              Offer={product.off}
+              Description={product.description}
+              productId={product._id}
+              Discount={product.price.discount}
+              Stock={product.stockQuantity}
             />
           ))}
         </div>
