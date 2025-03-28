@@ -163,7 +163,7 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
             </div>
 
             {/* Current Image */}
-            <div className="relative bg-neutral-200 h-full p-3 m-2  ">
+            <div className="relative h-full p-3 m-2  ">
               <img
                 src={products?.images[currentImg]?.url}
                 alt={products?.name}

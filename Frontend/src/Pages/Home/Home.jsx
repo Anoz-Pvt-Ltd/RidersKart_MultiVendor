@@ -265,14 +265,16 @@ const Home = ({ startLoading, stopLoading }) => {
         {products?.map((product) => (
           <ProductCard
             Image={product?.images[0]?.url}
-            key={product?._id}
-            ProductName={product?.name}
-            CurrentPrice={product?.price.sellingPrice}
-            Mrp={product?.price.MRP}
-            Rating={product?.rating || "No rating"}
-            Offer={"No offer"}
-            Category={product?.category}
-            StockQuantity={product?.stockQuantity}
+            key={product._id}
+            ProductName={product.name}
+            CurrentPrice={product.price.sellingPrice}
+            Mrp={product.price.MRP}
+            Rating={product.Rating}
+            Offer={product.off}
+            Description={product.description}
+            productId={product._id}
+            Discount={product.price.discount}
+            Stock={product.stockQuantity}
           />
         ))}
       </div>

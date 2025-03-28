@@ -7,7 +7,7 @@ export const ThreeProductGrid = ({ heading = "", products = [] }) => {
 
   return (
     <div className="product-grid lg:h-[30vw] lg:w-[30vw] flex flex-col justify-evenly bg-white rounded-xl drop-shadow-2xl">
-      <h2 className="text-3xl font-semibold text-gray-800 p-2">{heading}</h2>
+      <h2 className="text-lg font-semibold text-gray-800 p-2">{heading}</h2>
       <div className="grid grid-cols-2 grid-rows-2 h-5/6 ">
         {products.map((product, index) => (
           <Link

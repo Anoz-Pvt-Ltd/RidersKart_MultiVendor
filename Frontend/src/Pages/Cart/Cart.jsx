@@ -116,7 +116,7 @@ const CartPage = ({ startLoading, stopLoading }) => {
   const fetchProducts = async () => {
     try {
       startLoading();
-      const response = await FetchData("products/get-all-product", "get");
+      const response = await FetchData("products/get-all-products", "get");
       if (response.data.success) {
         setProducts(response.data.data.products);
       } else {
@@ -267,7 +267,7 @@ const CartPage = ({ startLoading, stopLoading }) => {
             </div>
 
             {/* Order summery */}
-            <div className="w-1/4 flex flex-col justify-center items-center p-10 gap-5">
+            <div className="lg:w-1/2 w-full  flex flex-col justify-center items-center lg:p-10 lg:pt-0 gap-5">
               <div className="bg-white shadow-md rounded-md p-4 w-full">
                 <h2 className="text-xl font-bold mb-4">Order Summary</h2>
                 <div className="flex justify-between mb-2">
@@ -293,7 +293,7 @@ const CartPage = ({ startLoading, stopLoading }) => {
                   <select
                     value={selectedAddress}
                     onChange={handleAddressChange}
-                    className="bg-gray-400 p-5 rounded-xl outline-none w-full"
+                    className="bg-white border border-neutral-400 p-5 rounded-xl outline-none w-full"
                   >
                     <option value="" selected disabled>
                       Select an address
@@ -312,12 +312,12 @@ const CartPage = ({ startLoading, stopLoading }) => {
                   <p>No addresses available. Please add one in your profile.</p>
                 )}
               </div>
-              <div className="w-4/5">
+              <div className=" w-full">
                 <h2 className="mb-5 font-semibold">Select Payment Method</h2>
                 <select
                   value={paymentMethod}
                   onChange={handlePaymentChange}
-                  className="bg-gray-400 p-5 rounded-xl outline-none w-full"
+                  className="bg-white border border-neutral-400 p-5 rounded-xl outline-none w-full"
                 >
                   <option value="" disabled>
                     Select a payment method
@@ -349,17 +349,20 @@ const CartPage = ({ startLoading, stopLoading }) => {
         </div>
       ) : (
         <>
-          <div className="flex flex-row gap-4 bg-transparent justify-start items-center overflow-x-auto p-5 w-full">
+          <div className="flex flex-row gap-4 bg-transparent justify-start items-center overflow-x-auto p-5 w-full no-scrollbar">
             {products?.map((product) => (
               <ProductCard
+                Image={product?.images[0]?.url}
                 key={product._id}
                 ProductName={product.name}
                 CurrentPrice={product.price.sellingPrice}
                 Mrp={product.price.MRP}
-                Rating={product.rating || "No rating"}
-                Offer="No offer"
-                Category={product.category.main}
-                StockQuantity={product.stockQuantity}
+                Rating={product.Rating}
+                Offer={product.off}
+                Description={product.description}
+                productId={product._id}
+                Discount={product.price.discount}
+                Stock={product.stockQuantity}
                 className={`hidden lg:block`}
               />
             ))}
