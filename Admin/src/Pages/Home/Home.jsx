@@ -26,6 +26,7 @@ import Products from "../Products/Products";
 import Orders from "../Orders/Orders";
 import Brandsverified from "../Brands_Verified/Brandsverified";
 import BrandsUnderReview from "../Brands_UnderReview/BrandsUnderReview";
+import Promotion from "../Promotions/promotion";
 
 const Dashboard = ({ startLoading, stopLoading }) => {
   const user = useSelector((store) => store.UserInfo.user);
@@ -159,12 +160,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
           {activeSection === "Brands (Verified)" && <Brandsverified />}
           {activeSection === "Brands (Under review)" && <BrandsUnderReview />}
           {activeSection === "Orders" && <Orders />}
-          {activeSection === "Promotions" && (
-            <section>
-              <h2 className="text-2xl font-bold mb-4">Promotions</h2>
-              {/* Promotions content */}
-            </section>
-          )}
+          {activeSection === "Promotions" && <Promotion />}
         </motion.div>
       </main>
     </div>

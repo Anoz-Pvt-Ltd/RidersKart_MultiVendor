@@ -11,7 +11,6 @@ export const UploadImages = async (
   imageName,
   folderDetails,
   tags = [],
-  description
 ) => {
   try {
     // Read file asynchronously

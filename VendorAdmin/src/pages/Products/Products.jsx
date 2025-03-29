@@ -13,6 +13,9 @@ const Products = ({ startLoading, stopLoading }) => {
 
   const [images, setImages] = useState(null);
   const formRef = useRef(null);
+  const mrpRef = useRef(null);
+  const discountRef = useRef(null);
+  const spRef = useRef(null);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -58,6 +61,19 @@ const Products = ({ startLoading, stopLoading }) => {
     setImages(null);
     setImagePreview(null);
     document.getElementById("imageInput").value = "";
+  };
+
+  // Function to calculate and update Selling Price
+  const updateSellingPrice = () => {
+    const mrp = parseFloat(mrpRef.current?.value) || 0;
+    const discount = parseFloat(discountRef.current?.value) || 0;
+
+    if (mrp > 0 && discount >= 0 && discount <= 100) {
+      const sellingPrice = mrp - (mrp * discount) / 100;
+      spRef.current.value = sellingPrice.toFixed(2); // Update the Selling Price field
+    } else {
+      spRef.current.value = ""; // Clear if invalid input
+    }
   };
 
   useEffect(() => {
@@ -258,18 +274,25 @@ const Products = ({ startLoading, stopLoading }) => {
                     Type="number"
                     Name="MRP"
                     Placeholder="Enter price"
+                    Ref={mrpRef}
+                    OnInput={updateSellingPrice}
                   />
-                  {/* <InputBox
-                    LabelName="Selling Price (Optional)"
-                    Type="number"
-                    Name="SP"
-                    Placeholder="Enter selling price if different from MRP"
-                  /> */}
                   <InputBox
                     LabelName="Discount(%)"
                     Type="number"
                     Name="discount"
                     Placeholder="Enter Discount percentage"
+                    Ref={discountRef}
+                    OnInput={updateSellingPrice}
+                  />
+                  <InputBox
+                    LabelName="Selling Price (Optional)"
+                    Type="number"
+                    Name="SP"
+                    Value={""}
+                    Placeholder="0"
+                    Disabled={true}
+                    Ref={spRef}
                   />
                   <InputBox
                     LabelName="Stock Quantity"

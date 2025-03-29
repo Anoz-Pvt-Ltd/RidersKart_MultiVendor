@@ -10,6 +10,8 @@ const InputBox = ({
   onChange,
   DisableRequired = false, // Default: Input is enabled
   Required = true,
+  Min,
+  Max,
 }) => {
   return (
     <div className="flex justify-center items-center w-full">
@@ -29,6 +31,8 @@ const InputBox = ({
           placeholder={Placeholder}
           required={Required}
           disabled={DisableRequired} // Disables input if required
+          min={Min}
+          max={Max}
           className={`w-full px-4 py-2 border rounded-md outline-none transition duration-200 ease-in-out 
             ${
               DisableRequired

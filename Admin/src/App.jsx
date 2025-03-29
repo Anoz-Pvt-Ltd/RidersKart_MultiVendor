@@ -15,6 +15,7 @@ import CurrentOrder from "./Pages/CurrentOrder/CurrentOrder";
 import CurrentUnVerifiedVendor from "./Pages/Current-UnVerifiedVendor/CurrentUnVerifiedVendor";
 import CurrentVerifiedVendor from "./Pages/Current-VerifiedVendor/CurrentVerifiedVendor";
 import { fetchCategories } from "./Utility/Slice/CategorySlice";
+import Promotion from "./Pages/Promotions/promotion";
 
 const App = () => {
   const user = useSelector((store) => store.UserInfo.user);
@@ -77,6 +78,8 @@ const App = () => {
             path="/current-un-verified-vendor/:vendorId"
             element={<CurrentUnVerifiedVendor />}
           />
+          <Route path="/promotions" element={<Promotion />} />
+          <Route path="*" element={<h1>Not Found</h1>} />
         </Routes>
       </div>
     </div>

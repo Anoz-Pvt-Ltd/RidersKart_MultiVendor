@@ -71,6 +71,7 @@ import adminRouter from "./routes/admin.routes.js";
 import categoryRouter from "./routes/category-and-subcategory.routes.js";
 import brandRouter from "./routes/brand.routes.js";
 import paymentRouter from "./routes/payment.routes.js";
+import promotionRouter from "./routes/promotion.routes.js";
 
 //vendor routes
 app.use("/api/v1/vendor", vendorRouter);
@@ -90,10 +91,13 @@ app.use("/api/v1/admins", adminRouter);
 //category and subcategory routes
 app.use("/api/v1/categories", categoryRouter);
 
-//brand routes  
+//brand routes
 app.use("/api/v1/brands", brandRouter);
 
 // Payment routes
 app.use("/api/v1/payment", paymentRouter);
+
+// promotions routes
+app.use("/api/v1/promotion", promotionRouter);
 
 export { app };

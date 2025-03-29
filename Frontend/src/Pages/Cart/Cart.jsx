@@ -371,6 +371,7 @@ const CartPage = ({ startLoading, stopLoading }) => {
             {products?.map((product) => (
               <ProductCardMobile
                 key={product._id}
+                Image={product?.images[0]?.url}
                 ProductName={product.name}
                 CurrentPrice={product.price.sellingPrice}
                 Mrp={product.price.MRP}
