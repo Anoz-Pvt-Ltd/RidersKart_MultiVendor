@@ -21,7 +21,7 @@ const registerProduct = asyncHandler(async (req, res) => {
     tags,
     brand,
     MRP,
-    SP,
+    // SP,
     discount,
   } = req.body;
   console.log("Controller Reached");
@@ -36,7 +36,7 @@ const registerProduct = asyncHandler(async (req, res) => {
     tags,
     brand,
     MRP,
-    SP,
+    // SP,
     discount,
   ]);
 
@@ -52,7 +52,6 @@ const registerProduct = asyncHandler(async (req, res) => {
     !brand ||
     !sku || // Stock keeping unit => Provided to every unique type of products for keeping track of quantity.
     !MRP || // Maximum Retail Price
-    !SP || // Selling Price
     !discount // Discount percentage
   ) {
     throw new ApiError(400, "All required fields must be filled");
@@ -108,7 +107,7 @@ const registerProduct = asyncHandler(async (req, res) => {
     subcategory,
     price: {
       MRP,
-      sellingPrice: SP,
+      sellingPrice: MRP - (MRP * discount) / 100,
       discount,
       discountedPrice: MRP - (MRP * discount) / 100,
     },

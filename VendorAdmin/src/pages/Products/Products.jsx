@@ -193,9 +193,9 @@ const Products = ({ startLoading, stopLoading }) => {
       />
 
       {isModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center  backdrop-blur-xl p-4 h-screen w-screen overflow-auto top-0 left-0">
-          <div className="bg-white flex flex-col rounded-lg shadow-lg w-fit h-fit px-20 py-10">
-            <h2 className="text-lg font-semibold text-gray-800 lg:mb-4 pl-5">
+        <div className="fixed inset-0 flex items-start lg:items-center justify-center  backdrop-blur-xl p-4 h-screen w-screen overflow-auto top-0 left-0">
+          <div className="bg-white flex flex-col rounded-lg shadow-lg w-fit h-fit lg:px-20 lg:py-10 py-4">
+            <h2 className="text-lg font-semibold text-gray-800 lg:mb-4 w-full text-center">
               Add New Product
             </h2>
             <form
@@ -203,9 +203,9 @@ const Products = ({ startLoading, stopLoading }) => {
               onSubmit={handleAddProduct}
               className="flex flex-col overscroll-scroll w-full justify-evenly items-center"
             >
-              <div className="flex flex-row justify-start items-start gap-10">
+              <div className="flex lg:flex-row flex-col justify-start items-start lg:gap-10">
                 {" "}
-                <div className="flex flex-col justify-start items-center">
+                <div className="flex flex-col justify-start items-center lg:w-fit w-full px-2">
                   <InputBox
                     LabelName="Product Name"
                     Name="name"
@@ -213,6 +213,7 @@ const Products = ({ startLoading, stopLoading }) => {
                   />
 
                   <SelectBox
+                    className2="w-full"
                     LabelName="Brand"
                     Name="brand"
                     Placeholder="Select main category"
@@ -223,6 +224,7 @@ const Products = ({ startLoading, stopLoading }) => {
                   />
 
                   <SelectBox
+                    className2="w-full"
                     LabelName="Main Category"
                     Name="category"
                     onChange={(e) => setSelectedCategory(e.target.value)}
@@ -235,6 +237,7 @@ const Products = ({ startLoading, stopLoading }) => {
 
                   {subcategories.length > 0 && (
                     <SelectBox
+                      className2="w-full"
                       LabelName="Subcategory"
                       Name="subcategory"
                       Placeholder="Select subcategory"
@@ -249,19 +252,19 @@ const Products = ({ startLoading, stopLoading }) => {
                     />
                   )}
                 </div>
-                <div className="flex flex-col justify-start items-center">
+                <div className="flex flex-col justify-start items-center w-full lg:w-fit px-2">
                   <InputBox
                     LabelName="MRP"
                     Type="number"
                     Name="MRP"
                     Placeholder="Enter price"
                   />
-                  <InputBox
+                  {/* <InputBox
                     LabelName="Selling Price (Optional)"
                     Type="number"
                     Name="SP"
                     Placeholder="Enter selling price if different from MRP"
-                  />
+                  /> */}
                   <InputBox
                     LabelName="Discount(%)"
                     Type="number"
@@ -280,7 +283,7 @@ const Products = ({ startLoading, stopLoading }) => {
                     Placeholder="Enter SKU"
                   />
                 </div>
-                <div>
+                <div className="px-2">
                   <InputBox
                     LabelName="Upload Image"
                     Type="file"
@@ -335,7 +338,7 @@ const Products = ({ startLoading, stopLoading }) => {
                 /> */}
                 </div>
               </div>
-              <div className="button flex justify-end gap-2">
+              <div className="button flex lg:flex-row flex-col w-full lg:w-fit px-2 justify-end gap-2">
                 <Button
                   label="Cancel"
                   Type="button"

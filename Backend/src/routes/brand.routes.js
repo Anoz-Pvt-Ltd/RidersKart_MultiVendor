@@ -24,6 +24,7 @@ const router = Router();
 //public routes
 router.route("/get-all-brands").get(GetAllVerifiedBrands);
 router.route("/get-brand-by-id/:brandId").get(GetBrandById);
+router.route("/get-all-brands-for-vendor").get(GetAllVerifiedBrands);
 
 // admin routes
 router

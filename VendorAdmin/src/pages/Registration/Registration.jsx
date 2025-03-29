@@ -116,7 +116,7 @@ const VendorRegistrationForm = ({ startLoading, stopLoading, onClose }) => {
   };
 
   return (
-    <div className="p-6 h-[80vh] w-full bg-white shadow-lg rounded-lg flex flex-col justify-around">
+    <div className="p-6 lg:h-[80vh] w-full bg-white shadow-lg rounded-lg flex flex-col justify-around">
       <h1 className="text-2xl font-bold text-gray-800 mb-4 text-center">
         Vendor Registration
       </h1>
@@ -131,7 +131,7 @@ const VendorRegistrationForm = ({ startLoading, stopLoading, onClose }) => {
               } transition-all duration-500 rounded-full`}
             />
             <div
-              className={`mt-2 px-4 py-1 rounded-full text-sm font-semibold 
+              className={`mt-2 px-4 py-1 rounded-full lg:text-sm text-xs font-semibold 
               ${
                 index <= step
                   ? "bg-green-600 text-white"
@@ -158,7 +158,7 @@ const VendorRegistrationForm = ({ startLoading, stopLoading, onClose }) => {
         <form
           ref={formRef}
           onSubmit={handleSubmit}
-          className="grid grid-cols-1 md:grid-cols-2 gap-6"
+          className="grid grid-cols-1 md:grid-cols-2 lg:gap-6"
         >
           {step === 0 && (
             <>

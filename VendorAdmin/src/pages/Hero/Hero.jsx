@@ -8,23 +8,34 @@ const Hero = () => {
   const [showPopup, setShowPopup] = useState(false);
   return (
     <div className="">
-      <div className="absolute h-screen w-screen object-fill overflow-hidden">
+      <div className="absolute h-screen w-screen object-fill overflow-hidden hidden lg:block">
         <img src={background} />
       </div>
-      <div className="flex justify-center items-center text-black text-4xl font-bold font-sans absolute backdrop-blur h-20 w-full ">
-        <h1>Welcome to Rider's Kart Vendor Hub</h1>
+      <div className="lg:flex justify-center items-center text-black lg:text-4xl text-base font-bold font-sans lg:absolute relative backdrop-blur lg:h-20 w-full">
+        <h1 className="w-full text-center">
+          Welcome to Rider's Kart Vendor Hub
+        </h1>
       </div>
-      {/* Login Component */}
-      <section className="flex">
-        <div className=" lg:w-1/2 h-screen flex lg:justify-center lg:items-center items-start justify-start relative">
+
+      <section className="flex lg:flex-row flex-col ">
+        {/* Login Component */}
+        <div className="login lg:w-1/2 lg:h-screen flex lg:justify-center lg:items-center items-start justify-start relative">
           <Login openRegister={() => setShowPopup(true)} />
         </div>
-        <div className=" lg:w-1/2 h-screen flex lg:justify-center lg:items-center items-start justify-start relative">
-          <div className="flex flex-col justify-center items-start gap-10 px-5 py-10 mr-5 shadow-xl rounded-xl  text-black backdrop-blur-sm">
-            <h1 className="text-2xl font-bold my-8">
+        {/* register Component */}
+        <div className="register lg:w-1/2 w-full lg:h-screen flex lg:justify-center lg:items-center items-start justify-start relative">
+          <div className="flex flex-col justify-center items-start gap-10 lg:px-5 lg:py-10 lg:mr-5 p-2 shadow-xl rounded-xl text-black backdrop-blur-sm">
+            <h1 className="lg:text-2xl text-base font-bold lg:my-8">
               New to Rider's Kart Ecom service<br></br>Register your self with
               simple steps and <br></br>Sell and grow your business online
             </h1>
+            <Button
+              label={"Register Here"}
+              onClick={() => {
+                setShowPopup(true);
+              }}
+              className={"lg:hidden block"}
+            />
 
             <div className="max-w-3xl mx-auto px-6">
               <ol className="list-decimal pl-5 space-y-4">
@@ -52,16 +63,24 @@ const Hero = () => {
               onClick={() => {
                 setShowPopup(true);
               }}
+              className={"hidden lg:block"}
             />
           </div>
           {/* <VendorRegistrationForm /> */}
         </div>
         {showPopup && (
-          <div className="absolute top-0 left-0 flex justify-center items-center h-screen w-screen bg-opacity-90 bg-neutral-500">
-            <div className="flex flex-col justify-center items-center gap-10 w-3/4">
+          <div className="fixed top-0 left-0 flex lg:justify-center lg:items-center h-screen w-screen bg-opacity-90 bg-neutral-500 overflow-scroll">
+            <div className="flex flex-col lg:justify-center lg:items-center lg:gap-10 lg:w-3/4">
               <Button
                 label={"Close"}
-                className={"hover:bg-red-500"}
+                className={"hover:bg-red-500 hidden lg:block"}
+                onClick={() => {
+                  setShowPopup(false);
+                }}
+              />
+              <Button
+                label={"Cancel "}
+                className={"hover:bg-red-500 lg:hidden block"}
                 onClick={() => {
                   setShowPopup(false);
                 }}

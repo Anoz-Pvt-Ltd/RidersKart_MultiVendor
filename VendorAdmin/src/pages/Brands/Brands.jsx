@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import LoadingUI from "../../components/Loading";
 import { FetchData } from "../../utils/FetchFromApi";
 
@@ -23,28 +23,24 @@ const Brands = ({ startLoading, stopLoading }) => {
     setNewBrand({ ...newBrand, [name]: files ? files[0] : value });
   };
 
-  // Handle form submission
-  // const handleAddBrand = (e) => {
-  //   e.preventDefault();
-  //   if (!newBrand.name || !newBrand.description) {
-  //     alert("Please fill out all required fields.");
-  //     return;
-  //   }
-
-  //   // Add or edit brand
-  //   const updatedBrands = newBrand.id
-  //     ? brands.map((brand) =>
-  //         brand.id === newBrand.id
-  //           ? { ...newBrand, products: brand.products }
-  //           : brand
-  //       )
-  //     : [...brands, { ...newBrand, id: String(Date.now()) }];
-  //   setBrands(updatedBrands);
-
-  //   // Reset the form
-  //   setNewBrand({ id: "", name: "", description: "", products: 0, logo: null });
-  //   setShowForm(false);
-  // };
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        startLoading();
+        const response = await FetchData(
+          `brands/get-all-brands-for-vendor`,
+          "get"
+        );
+        // console.log(response);
+        setBrands(response.data.data);
+      } catch (err) {
+        setError(err.response?.data?.message || "Failed to fetch products.");
+      } finally {
+        stopLoading();
+      }
+    };
+    fetchProducts();
+  }, []);
 
   const addBrand = async () => {
     const formData = new FormData.current();
@@ -56,7 +52,7 @@ const Brands = ({ startLoading, stopLoading }) => {
         formData,
         true
       );
-      console.log(response);
+      // console.log(response);
       alert(
         "Your Brand is sent for approval... It might take time to get reviewed"
       );
@@ -102,8 +98,9 @@ const Brands = ({ startLoading, stopLoading }) => {
 
   // Handle filtering
   const filteredBrands = brands.filter((brand) =>
-    brand.name.toLowerCase().includes(searchQuery.toLowerCase())
+    brand?.title?.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-lg">
@@ -217,34 +214,36 @@ const Brands = ({ startLoading, stopLoading }) => {
               </th>
               <th className="py-3 px-4 border-b">Brand Name</th>
               <th className="py-3 px-4 border-b">Description</th>
-              <th className="py-3 px-4 border-b">Products</th>
-              <th className="py-3 px-4 border-b">Actions</th>
+              <th className="py-3 px-4 border-b">Brand Logo</th>
+              <th className="py-3 px-4 border-b">Status</th>
             </tr>
           </thead>
           <tbody>
             {filteredBrands.map((brand) => (
               <tr
-                key={brand.id}
+                key={brand._id}
                 className="text-sm text-gray-700 border-b hover:bg-gray-50"
               >
                 <td className="py-3 px-4">
                   <input
                     type="checkbox"
-                    checked={selectedBrands.includes(brand.id)}
+                    checked={selectedBrands.includes(brand._id)}
                     onChange={(e) =>
                       setSelectedBrands((prev) =>
                         e.target.checked
-                          ? [...prev, brand.id]
-                          : prev.filter((id) => id !== brand.id)
+                          ? [...prev, brand._id]
+                          : prev.filter((id) => id !== brand._id)
                       )
                     }
                   />
                 </td>
-                <td className="py-3 px-4 font-semibold">{brand.name}</td>
+                <td className="py-3 px-4 font-semibold">{brand.title}</td>
                 <td className="py-3 px-4">{brand.description}</td>
-                <td className="py-3 px-4 text-center">{brand.products}</td>
-                <td className="py-3 px-4">
-                  <button
+                <td className="py-3 px-4 text-center w-10 h-10">
+                  <img src={brand.logo.url} />
+                </td>
+                <td className="py-3 px-4 text-green-500 font-bold">
+                  {/* <button
                     className="text-blue-600 hover:underline mr-2"
                     onClick={() => handleEditBrand(brand)}
                   >
@@ -255,7 +254,8 @@ const Brands = ({ startLoading, stopLoading }) => {
                     onClick={() => handleDeleteBrand(brand.id)}
                   >
                     Delete
-                  </button>
+                  </button> */}
+                  {brand.status}
                 </td>
               </tr>
             ))}

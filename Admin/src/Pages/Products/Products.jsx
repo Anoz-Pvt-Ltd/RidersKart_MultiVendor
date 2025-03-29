@@ -50,7 +50,8 @@ const Products = ({ startLoading, stopLoading }) => {
       const filtered = allProducts?.filter(
         (product) =>
           product._id.includes(searchValueProduct) ||
-          product.vendor.includes(searchValueProduct)
+          product.vendor.includes(searchValueProduct) ||
+          product.name.includes(searchValueProduct)
       );
       setFilteredProducts(filtered);
     }
@@ -223,7 +224,7 @@ const Products = ({ startLoading, stopLoading }) => {
         Type="test"
         Value={searchTermProduct}
         onChange={handleSearchProduct}
-        Placeholder={"Search by Product ID or Vendor ID"}
+        Placeholder={"Search by Product Name, Product ID, Vendor ID"}
       />
       <div className="overflow-x-auto">
         <div className="py-4 flex w-full justify-start items-center gap-5">
@@ -298,7 +299,7 @@ const Products = ({ startLoading, stopLoading }) => {
           </div>
         )}
         {handlePopup.allCategoryPopup && (
-          <div className="backdrop-blur-3xl absolute top-0 h-full w-full left-0 px-10 py-5">
+          <div className="backdrop-blur-3xl absolute top-0 h-screen w-full left-0 px-10 py-5 overflow-scroll">
             <Button
               label={<X />}
               onClick={() =>
@@ -524,7 +525,7 @@ const Products = ({ startLoading, stopLoading }) => {
               ))}
           </div>
         )}
-        <table className="min-w-full border-collapse border border-gray-300 rounded-xl">
+        <table className="min-w-full border-collapse border border-gray-300 rounded-xl ">
           <thead>
             <tr>
               {tableHeadersProducts.map((header, index) => (
@@ -550,7 +551,7 @@ const Products = ({ startLoading, stopLoading }) => {
                   <td className="border border-gray-500 px-4 py-2">
                     {product.vendor}
                   </td>
-                  <td className="border border-gray-500 px-4 py-2">
+                  <td className="border border-gray-500 px-4 py-2 ">
                     {product.name}
                   </td>
                   <td className="border border-gray-500 px-4 py-2">

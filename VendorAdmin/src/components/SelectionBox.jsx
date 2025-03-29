@@ -6,9 +6,10 @@ const SelectBox = ({
   Options = [], // Ensure it's always an array
   onChange,
   className = "",
+  className2 = "",
 }) => {
   return (
-    <div className="mb-4 py-4">
+    <div className={`mb-4 py-4 ${className2}`}>
       <label
         htmlFor={Name}
         className="block text-sm font-medium text-gray-700 mb-2"

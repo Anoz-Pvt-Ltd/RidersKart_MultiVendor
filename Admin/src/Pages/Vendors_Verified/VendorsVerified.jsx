@@ -5,7 +5,6 @@ import { FetchData } from "../../Utility/FetchFromApi";
 import { Link } from "react-router-dom";
 import InputBox from "../../Components/InputBox";
 import Button from "../../Components/Button";
-// import { useRef } from "react";
 import LoadingUI from "../../Components/Loading";
 
 const VendorsVerified = ({ startLoading, stopLoading }) => {
@@ -32,7 +31,8 @@ const VendorsVerified = ({ startLoading, stopLoading }) => {
       const filtered = allVerifiedVendors.filter(
         (vendor) =>
           vendor._id.includes(searchValueVerifiedVendors) ||
-          vendor.contactNumber.includes(searchValueVerifiedVendors)
+          vendor.contactNumber.includes(searchValueVerifiedVendors) ||
+          vendor.name.includes(searchValueVerifiedVendors)
       );
       setFilteredVerifiedVendors(filtered);
     }
@@ -75,7 +75,7 @@ const VendorsVerified = ({ startLoading, stopLoading }) => {
         Type="test"
         Value={searchTermVerifiedVendors}
         onChange={handleSearchVerifiedVendors}
-        Placeholder={"Search by Product ID or Vendor ID"}
+        Placeholder={"Search by Vendor Name, Vendor ID, Mobile number"}
       />
       <div className="overflow-x-auto">
         <table className="min-w-full border-collapse border border-gray-300 rounded-xl">

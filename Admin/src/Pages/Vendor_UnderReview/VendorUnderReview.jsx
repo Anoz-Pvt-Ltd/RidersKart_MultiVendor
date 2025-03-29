@@ -35,7 +35,8 @@ const VendorUnderReview = ({ startLoading, stopLoading }) => {
       const filtered = allUnverifiedVendors.filter(
         (vendor) =>
           vendor._id.includes(searchValueUnVerifiedVendors) ||
-          vendor.contactNumber.includes(searchValueUnVerifiedVendors)
+          vendor.contactNumber.includes(searchValueUnVerifiedVendors) ||
+          vendor.name.includes(searchValueUnVerifiedVendors)
       );
       setFilteredUnVerifiedVendors(filtered);
     }
@@ -74,12 +75,11 @@ const VendorUnderReview = ({ startLoading, stopLoading }) => {
   return (
     <section>
       <h2 className="text-2xl font-bold mb-4">Vendors (UnVerified)</h2>
-      {/* Vendors (Verified) content */}
       <InputBox
         Type="test"
         Value={searchTermUnVerifiedVendors}
         onChange={handleSearchUnVerifiedVendors}
-        Placeholder={"Search by Vendor ID or mobile number"}
+        Placeholder={"Search by Vendor Name, Vendor ID, Mobile number"}
       />
       <div className="overflow-x-auto">
         <table className="min-w-full border-collapse border border-gray-300 rounded-xl">

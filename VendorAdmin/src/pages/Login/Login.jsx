@@ -93,7 +93,7 @@ const LoginForm = ({ startLoading, stopLoading, openRegister }) => {
           </button> */}
         </div>
       </form>
-      <div>
+      <div className="lg:block hidden">
         <p className="text-sm text-gray-500">
           Don't have an account?{" "}
           <span
