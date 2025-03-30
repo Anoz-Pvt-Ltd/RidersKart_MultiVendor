@@ -25,7 +25,7 @@ export const FetchData = async (url, method, data, file = false) => {
     const response = await axios.delete(`${Base_URL}/${url}`, options);
     return response;
   } else if (method === "patch") {
-    const response = await axios.patch(`${Base_URL}/${url}`, options);
+    const response = await axios.patch(`${Base_URL}/${url}`, data, options);
     return response;
   } else {
     console.log(method);

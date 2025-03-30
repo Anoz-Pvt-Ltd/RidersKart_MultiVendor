@@ -8,6 +8,7 @@ import { Link } from "react-router";
 import LoadingUI from "../../Components/Loading";
 import { ThreeProductGrid } from "../../Components/Product-Grid";
 import { truncateString } from "../../Utility/Utility-functions";
+import { useSelector } from "react-redux";
 
 const Home = ({ startLoading, stopLoading }) => {
   const scrollContainer = useRef(null);
@@ -15,6 +16,9 @@ const Home = ({ startLoading, stopLoading }) => {
   const [error, setError] = useState(null);
   const [categories, setCategories] = useState([]);
   const [subcategories, setSubcategories] = useState([]);
+  const { promotions, status } = useSelector((store) => store.PromotionList);
+
+  // console.log(promotions, status);
 
   const arrayOfGridItems = [];
 
@@ -109,14 +113,19 @@ const Home = ({ startLoading, stopLoading }) => {
           className=" sm:h-60 w-screen h-[44%] transition-transform duration-500 ease-in-out flex object-center  "
           style={{ transform: `translateX(-${currentIndex * 100}%)` }}
         >
-          {DemoImageBanner.map((image, index) => (
-            <img
-              key={index}
-              src={image.src}
-              alt={`Slide ${image.id}`}
-              className="min-w-full min-h-[44vh] "
-            />
-          ))}
+          {console.log(promotions)}
+          {status === "succeeded" &&
+            promotions.map((promo, index) => {
+              // console.log(promo);
+              return (
+                <img
+                  key={promo?._id}
+                  src={promo?.images?.url.lg}
+                  alt={`Slide ${promo?._id}`}
+                  className="min-w-full min-h-[44vh] "
+                />
+              );
+            })}
         </div>
         <button
           onClick={prevImage}

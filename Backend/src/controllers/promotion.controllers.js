@@ -12,6 +12,8 @@ import { UploadImages } from "../utils/imageKit.io.js";
 export const createPromotion = asyncHandler(async (req, res) => {
   const { title, type, discountValue, startDate, endDate } = req.body;
 
+  console.log({ title, type, discountValue, startDate, endDate });
+
   if (!title || !type || !discountValue || !startDate || !endDate) {
     throw new ApiError(400, "All required fields must be filled.");
   }

@@ -16,6 +16,7 @@ import BuyNow from "./Pages/BuyNow/BuyNow";
 import Dashboard from "./Pages/Profile/ProfileDashboard";
 import VendorRegistrationForm from "../src/Pages/VendorRegister/Registration";
 import { fetchCart } from "./Utility/Slice/CartSlice";
+import { fetchPromotions } from "./Utility/Slice/PromotionsSlice";
 // import { io } from "socket.io-client";
 
 const App = () => {
@@ -59,6 +60,7 @@ const App = () => {
 
   useEffect(() => {
     dispatch(fetchCart(user[0]?._id)); // Fetch categories when the component mounts
+    dispatch(fetchPromotions()); // Fetch categories when the component mounts
   }, [dispatch, user]);
 
   // Socket connection

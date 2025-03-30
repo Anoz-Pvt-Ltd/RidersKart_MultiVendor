@@ -5,6 +5,7 @@ import { useState, useRef } from "react";
 import InputBox from "../../Components/InputBox";
 import { FetchData } from "../../Utility/FetchFromApi";
 import LoadingUI from "../../Components/Loading";
+import SelectBox from "../../Components/SelectionBox";
 
 const Promotion = ({ startLoading, stopLoading }) => {
   const [popup, setPopup] = useState({
@@ -16,16 +17,26 @@ const Promotion = ({ startLoading, stopLoading }) => {
     e.preventDefault();
     const formData = new FormData(formRef.current);
 
+    // for (let [key, value] of formData.entries()) {
+    //   console.log(key, value);
+    // }
+
+    startLoading();
+
     try {
       // startLoading();
       const response = await FetchData("promotion/", "post", formData, true);
 
       console.log(response);
-      alert("Added");
+      alert(response.data.message);
+      setPopup((prev) => {
+        return { ...prev, addPromotion: false };
+      });
     } catch (err) {
       console.log(err);
+      alert("Failed to Add the promotion! Please try again");
     } finally {
-      // stopLoading();
+      stopLoading();
     }
   };
 
@@ -56,63 +67,84 @@ const Promotion = ({ startLoading, stopLoading }) => {
               <InputBox
                 LabelName="Title"
                 Type="text"
-                Name="Title"
+                Name="title"
                 Placeholder="Enter promotion title"
                 Required={true}
               />
               <InputBox
                 LabelName="Description"
                 Type="text"
-                Name="Description"
+                Name="description"
                 Placeholder="Enter description"
                 Required={true}
               />
               <InputBox
-                LabelName="Discount (%)"
+                LabelName="Discount (In terms of Rs)"
                 Type="number"
-                Name="Discount"
+                Name="discountValue"
                 Placeholder="Enter discount percentage"
+                Required={true}
+              />
+              <SelectBox
+                LabelName="Select Type"
+                Name="type"
+                Options={[
+                  { title: "flat_discount", value: "flat_discount" },
+                  {
+                    title: "percentage_discount",
+                    value: "percentage_discount",
+                  },
+                  { title: "buy_x_get_y", value: "buy_x_get_y" },
+                ]}
+                Placeholder="Select one option"
                 Required={true}
               />
               <InputBox
                 LabelName="Start Date"
                 Type="date"
-                Name="StartDate"
+                Name="startDate"
                 Required={true}
                 Min={new Date().toISOString().split("T")[0]} // Restricts past dates
               />
               <InputBox
                 LabelName="End Date"
                 Type="date"
-                Name="EndDate"
+                Name="endDate"
                 Required={true}
                 Min={new Date().toISOString().split("T")[0]} // Restricts past dates
               />
               <InputBox
                 LabelName="Promo Code"
                 Type="text"
-                Name="PromoCode"
+                Name="promoCode"
                 Placeholder="Enter promo code"
                 Required={true}
               />
               <InputBox
                 LabelName="Minimum Purchase Amount"
                 Type="number"
-                Name="MinPurchase"
+                Name="minPurchase"
                 Placeholder="Enter min purchase amount"
                 Required={false}
               />
               <InputBox
                 LabelName="Usage Limit"
                 Type="number"
-                Name="UsageLimit"
+                Name="usageLimit"
                 Placeholder="No. of time users can use"
                 Required={false}
               />
-              <InputBox
+              <SelectBox
                 LabelName="User Eligibility"
-                Type="text"
-                Name="UserEligibility"
+                Name="userEligibility"
+                Options={[
+                  { title: "all", value: "all" },
+                  {
+                    title: "new_users",
+                    value: "new_users",
+                  },
+                  { title: "specific_users", value: "specific_users" },
+                ]}
                 Placeholder="Enter user eligibility"
                 Required={false}
               />
