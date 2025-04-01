@@ -12,7 +12,6 @@ const allowedOrigins = [
   process.env.ORIGIN_UI,
   process.env.ORIGIN_VA,
   process.env.ORIGIN_A,
-  //
   process.env.AMIT_SIR_HOST,
   process.env.AMIT_SIR_HOST_VENDOR,
   process.env.AMIT_SIR_HOST_SUPER_ADMIN,
