@@ -12,6 +12,8 @@ const allowedOrigins = [
   process.env.ORIGIN_UI,
   process.env.ORIGIN_VA,
   process.env.ORIGIN_A,
+  //
+  process.env.AMIT_SIR_HOST,
 ];
 
 const app = express();
