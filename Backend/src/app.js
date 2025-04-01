@@ -14,6 +14,9 @@ const allowedOrigins = [
   process.env.ORIGIN_A,
   //
   process.env.AMIT_SIR_HOST,
+  process.env.AMIT_SIR_HOST_VENDOR,
+  process.env.AMIT_SIR_HOST_SUPER_ADMIN,
+  process.env.AMIT_SIR_HOST_ADMIN,
 ];
 
 const app = express();
