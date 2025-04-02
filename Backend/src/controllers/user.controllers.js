@@ -8,6 +8,7 @@ import { Product } from "../models/products.models.js";
 import { Order } from "../models/order.models.js";
 import bcrypt from "bcrypt";
 import SendMail from "../utils/Nodemailer.js";
+import { register_ui } from "../utils/Email_UI/Register_ui.js";
 
 const generateAccessAndRefreshTokens = async (userId) => {
   try {
@@ -48,6 +49,12 @@ const registerUser = asyncHandler(async (req, res, next) => {
   if (!newUser) throw new ApiError(500, "Internal server error");
   const { RefreshToken, AccessToken } = await generateAccessAndRefreshTokens(
     newUser._id
+  );
+  SendMail(
+    email,
+    "Welcome to our platform",
+    "Hello, welcome to our platform!",
+    register_ui
   );
 
   res
