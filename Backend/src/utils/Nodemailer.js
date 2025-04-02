@@ -1,8 +1,36 @@
 import nodemailer from "nodemailer";
+import path from "path";
+import fs from "fs";
 
-function SendMail(receivers, subject, text, html) {
+function SendMail(
+  receivers,
+  subject = "",
+  text = "",
+  html_templateName,
+  replacements
+) {
   // async..await is not allowed in global scope, must use a wrapper
-  async function main(receivers, subject, text, html) {
+  async function main(
+    receivers,
+    subject = "",
+    text = "",
+    html_templateName,
+    replacements
+  ) {
+    // Read the HTML template
+    const templatePath = path.join(
+      __dirname,
+      "./Email_Templates",
+      html_templateName
+    );
+    let emailHtml = fs.readFileSync(templatePath, "utf8");
+
+    // Replace dynamic values in the template
+    Object.keys(replacements).forEach((key) => {
+      const regex = new RegExp(`{{${key}}}`, "g"); // Replace all occurrences
+      emailHtml = emailHtml.replace(regex, replacements[key]);
+    });
+
     // send mail with defined transport object
     const transporter = nodemailer.createTransport({
       //  host: "smtp.ethereal.email",
@@ -20,7 +48,7 @@ function SendMail(receivers, subject, text, html) {
       to: receivers, // list of receivers
       subject: subject, // Subject line
       text: text, // plain text body
-      html: html, // html body
+      html: emailHtml, // html body
     });
 
     console.log("Message sent: %s", info.messageId);
@@ -29,7 +57,13 @@ function SendMail(receivers, subject, text, html) {
     return info;
   }
 
-  const MailDetails = main(receivers, subject, text, html).catch(console.error);
+  const MailDetails = main(
+    receivers,
+    subject,
+    text,
+    html_templateName,
+    replacements
+  ).catch(console.error);
 
   return MailDetails;
 }
