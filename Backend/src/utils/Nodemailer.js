@@ -1,26 +1,26 @@
 import nodemailer from "nodemailer";
 
-function SendMail() {
+function SendMail(receivers, subject, text, html) {
   // async..await is not allowed in global scope, must use a wrapper
-  async function main() {
+  async function main(receivers, subject, text, html) {
     // send mail with defined transport object
     const transporter = nodemailer.createTransport({
       //  host: "smtp.ethereal.email",
-      service: "gmail",
+      service: process.env.EMAIL_SERVICE,
       port: 465,
       secure: true, // true for port 465, false for other ports
       auth: {
-        user: "",
-        pass: "",
+        user: process.env.SENDER_EMAIL, // generated ethereal user
+        pass: process.env.SENDER_APP_PASSWORD, // generated ethereal password
       },
     });
 
     const info = await transporter.sendMail({
-      from: "vivekkrishan440@gmail.com", // sender address
-      to: "kshitijsaxena9@gmail.com", // list of receivers
-      subject: "Hello ✔, For testing", // Subject line
-      text: "Wow, It's working fine!", // plain text body
-      html: "<b><h1>Holy fuck! It's working</h1></b>", // html body
+      from: process.env.SENDER_EMAIL, // sender address
+      to: receivers, // list of receivers
+      subject: subject, // Subject line
+      text: text, // plain text body
+      html: html, // html body
     });
 
     console.log("Message sent: %s", info.messageId);
@@ -29,7 +29,7 @@ function SendMail() {
     return info;
   }
 
-  const MailDetails = main().catch(console.error);
+  const MailDetails = main(receivers, subject, text, html).catch(console.error);
 
   return MailDetails;
 }
