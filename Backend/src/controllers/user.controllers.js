@@ -9,6 +9,7 @@ import { Order } from "../models/order.models.js";
 import bcrypt from "bcrypt";
 import SendMail from "../utils/Nodemailer.js";
 import { register_ui } from "../utils/Email_UI/Register_ui.js";
+import { FetchData } from "../utils/Fetch_Ex_API.js";
 
 const generateAccessAndRefreshTokens = async (userId) => {
   try {
@@ -85,6 +86,9 @@ const loginUser = asyncHandler(async (req, res) => {
   const { AccessToken, RefreshToken } = await generateAccessAndRefreshTokens(
     user?._id
   );
+
+  const response = await FetchData("order/", "get");
+  console.log("console form login", response);
 
   // const mailSent = await SendMail();
   // console.log(mailSent);
