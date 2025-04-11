@@ -87,9 +87,6 @@ const loginUser = asyncHandler(async (req, res) => {
     user?._id
   );
 
-  const response = await FetchData("order/", "get");
-  console.log("console form login", response);
-
   // const mailSent = await SendMail();
   // console.log(mailSent);
 
@@ -471,7 +468,7 @@ const getWishlistProducts = asyncHandler(async (req, res) => {
 // Order controller ------------------------------------
 const bookProduct = asyncHandler(async (req, res) => {
   const { userId, productId, vendorId } = req.params;
-  const { quantity, shippingAddress, orderStatus } = req.body;
+  const { quantity, shippingAddress, orderStatus, paymentMethod } = req.body;
 
   try {
     // Find the user
@@ -513,7 +510,8 @@ const bookProduct = asyncHandler(async (req, res) => {
           price: product.price,
         },
       ],
-      totalAmount: product.price * quantity,
+      // totalAmount: product.price * quantity,
+      paymentMethod,
       shippingAddress, // Ensure this field is provided in the request body
       orderStatus, // Ensure this is a valid enum value in the Order model
     });

@@ -107,24 +107,18 @@ const GetVendorOrders = asyncHandler(async (req, res) => {
 const getUserAllOrders = asyncHandler(async (req, res) => {
   const { userId } = req.params;
 
-  try {
-    // Fetch all orders for the specified user
-    const orders = await Order.find({ user: userId }).populate(
-      "products.product"
-    );
+  const orders = await Order.find({ user: userId }).populate(
+    "products.product"
+  );
 
-    if (!orders || orders.length === 0) {
-      return res.status(404).json({ message: "No orders found for this user" });
-    }
-
-    return res.status(200).json({
-      success: true,
-      orders,
-    });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Server error" });
+  if (!orders || orders.length === 0) {
+    return res.status(404).json({ message: "No orders found for this user" });
   }
+
+  return res.status(200).json({
+    success: true,
+    orders,
+  });
 });
 
 const getVendorAllOrders = asyncHandler(async (req, res) => {
@@ -136,7 +130,7 @@ const getVendorAllOrders = asyncHandler(async (req, res) => {
       "products.product"
     );
 
-    console.log(orders)
+    console.log(orders);
 
     if (!orders || orders.length === 0) {
       return res.status(404).json({ message: "No orders found for this user" });
@@ -188,4 +182,4 @@ export {
   getCurrentOrder,
 };
 
-//fetch data fn in utils; set domain url; 
+//fetch data fn in utils; set domain url;

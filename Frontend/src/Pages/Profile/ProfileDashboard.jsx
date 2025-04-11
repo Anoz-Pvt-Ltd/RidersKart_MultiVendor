@@ -132,7 +132,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
   const handleAddressChange = (index) => {
     setSelectedAddressIndex(index);
   };
-
+  // console.log(user?.[0]?._id);
   useEffect(() => {
     const fetchAllOrders = async () => {
       if (user?.length > 0) {
@@ -142,7 +142,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
             `orders/all-products-of/${user?.[0]?._id}`,
             "get"
           );
-          // console.log(response);
+          console.log(response);
           if (response.data.success) {
             setAllOrders(response.data.orders);
           } else {
@@ -395,19 +395,34 @@ const Dashboard = ({ startLoading, stopLoading }) => {
                       />
                       <span className="shadow m-2 p-4 rounded-xl">
                         <li className="ml-4 font-semibold list-none">
-                          Street: <span className="font-thin font-serif">{address.street}</span>
+                          Street:{" "}
+                          <span className="font-thin font-serif">
+                            {address.street}
+                          </span>
                         </li>
                         <li className="ml-4 font-semibold list-none">
-                          City: <span className="font-thin font-serif">{address.city}</span>
+                          City:{" "}
+                          <span className="font-thin font-serif">
+                            {address.city}
+                          </span>
                         </li>
                         <li className="ml-4 font-semibold list-none">
-                          Country: <span className="font-thin font-serif">{address.country}</span>
+                          Country:{" "}
+                          <span className="font-thin font-serif">
+                            {address.country}
+                          </span>
                         </li>
                         <li className="ml-4 font-semibold list-none">
-                          Postal Code: <span className="font-thin font-serif">{address.postalCode}</span>
+                          Postal Code:{" "}
+                          <span className="font-thin font-serif">
+                            {address.postalCode}
+                          </span>
                         </li>
                         <li className="ml-4 font-semibold list-none">
-                          State: <span className="font-thin font-serif">{address.state}</span>
+                          State:{" "}
+                          <span className="font-thin font-serif">
+                            {address.state}
+                          </span>
                         </li>
                       </span>
                       <Button
@@ -553,11 +568,13 @@ const Dashboard = ({ startLoading, stopLoading }) => {
                 {console.log(allOrders)}
                 {allOrders?.map((product, index) => (
                   <ProductCard
-                    Image={product?.products?.[0]?.product?.images[0]?.url}
+                    Image={product?.products[0]?.product?.images[0]?.url}
                     key={index}
-                    ProductName={product?.products?.[0]?.product?.name}
-                    CurrentPrice={product?.products?.[0]?.product?.price}
-                    Mrp={product?.products?.[0]?.product?.price}
+                    ProductName={product?.products[0]?.product?.name}
+                    CurrentPrice={
+                      product?.products?.[0]?.price[0]?.sellingPrice
+                    }
+                    Mrp={product?.products?.[0]?.price[0]?.MRP}
                     Rating={product?.products?.[0]?.product?.Rating}
                     Offer={product?.products?.[0]?.product?.off}
                     Description={product?.products?.[0]?.product?.description}

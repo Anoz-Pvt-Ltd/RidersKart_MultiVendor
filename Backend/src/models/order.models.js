@@ -24,14 +24,26 @@ const orderSchema = new mongoose.Schema({
         min: 1,
       },
       price: {
-        type: Number,
-        required: true, // Price at the time of order
+        // type: Number,
+        // required: true, // Price at the time of order
+        MRP: {
+          type: String,
+          required: true,
+        },
+        sellingPrice: {
+          type: String,
+          required: true,
+        },
+        discount: {
+          type: String,
+          required: true,
+        },
       },
     },
   ],
   totalAmount: {
     type: Number,
-    required: true, // Total cost of the order
+    // Total cost of the order
   },
   orderStatus: {
     type: String,
@@ -49,6 +61,10 @@ const orderSchema = new mongoose.Schema({
     type: String,
     enum: ["pending", "completed", "failed", "refunded"],
     default: "pending", // Payment status
+  },
+  paymentMethod: {
+    type: String,
+    enum: ["online", "cash"],
   },
   shippingAddress: {
     street: {

@@ -100,7 +100,9 @@ const BuyNow = ({ startLoading, stopLoading }) => {
   const handlePaymentChange = (e) => {
     setPaymentMethod(e.target.value);
   };
-  // console.log(product);
+  // console.log(user?.[0]?._id);
+  // console.log(product?._id);
+  // console.log(productVendor?._id);
   const handleBuyNow = async () => {
     try {
       startLoading();
@@ -114,10 +116,10 @@ const BuyNow = ({ startLoading, stopLoading }) => {
           quantity,
           paymentMethod,
           shippingAddress: addresses[selectedAddress],
-          orderStatus: "booked", // Ensure this is a valid enum value in your model
+          orderStatus: "confirmed", // Ensure this is a valid enum value in your model
         }
       );
-      // console.log(response);
+      console.log(response);
 
       if (response.data.success) {
         alert("Order placed successfully!");
@@ -197,13 +199,13 @@ const BuyNow = ({ startLoading, stopLoading }) => {
         <div>
           <h1 className="font-semibold text-2xl">Hello, {user?.[0]?.name}</h1>
         </div>
-        <div className="w-4/5  border">
+        <div className="w-4/5 ">
           <h2 className="mb-5 font-semibold">Select Shipping Address</h2>
           {addresses?.length > 0 ? (
             <select
               value={selectedAddress}
               onChange={handleAddressChange}
-              className="bg-gray-400 p-5 rounded-xl outline-none w-full"
+              className="bg-white p-5 rounded-xl outline-none w-full shadow-xl border"
             >
               <option value="" selected disabled>
                 Select an address
@@ -227,30 +229,32 @@ const BuyNow = ({ startLoading, stopLoading }) => {
           <select
             value={paymentMethod}
             onChange={handlePaymentChange}
-            className="bg-gray-400 p-5 rounded-xl outline-none w-full"
+            className="bg-white p-5 rounded-xl outline-none w-full shadow-xl border"
           >
             <option value="" disabled>
               Select a payment method
             </option>
             <option value="online">Online</option>
-            <option value="card">Cash on delivery</option>
+            <option value="cash">Cash on delivery</option>
           </select>
-          {paymentMethod === "online" && (
-            <Button
-              className={`mt-5 bg-white text-blue-600 hover:bg-green-500 hover:text-black`}
-              onClick={Payment}
-              label={"Proceed to payment"}
-            />
-          )}
         </div>
       </div>
 
-      <Button
-        className={` bg-white text-blue-600 hover:bg-green-500 hover:text-black`}
-        onClick={handleBuyNow}
-        Disabled={!selectedAddress || !paymentMethod}
-        label={"Proceed to Checkout"}
-      />
+      {paymentMethod === "online" && (
+        <Button
+          className={`mt-5 bg-white text-blue-600 hover:bg-green-500 hover:text-black`}
+          onClick={Payment}
+          label={"Proceed for payment"}
+        />
+      )}
+      {paymentMethod === "cash" && (
+        <Button
+          className={` bg-white text-blue-600 hover:bg-green-500 hover:text-black`}
+          onClick={handleBuyNow}
+          Disabled={!selectedAddress || !paymentMethod}
+          label={"Place order"}
+        />
+      )}
     </div>
   );
 };

@@ -175,7 +175,7 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
                   label={
                     <Heart className="hover:text-red-500 overflow-hidden" />
                   }
-                  className={`hover:bg-transparent rounded-full`}
+                  className={`bg-white rounded-full`}
                   onClick={addProductToWishlist}
                 />
               </div>
