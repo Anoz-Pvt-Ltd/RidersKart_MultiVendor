@@ -7,16 +7,12 @@ const imageKit = new ImageKit({
   urlEndpoint: process.env.imageKit_Url_Endpoint, // Fixed incorrect key here
 });
 
-export const UploadImages = async (
-  imageName,
-  folderDetails,
-  tags = [],
-) => {
+export const UploadImages = async (imageName, folderDetails, tags = []) => {
   try {
     // Read file asynchronously
     const data = await fs.readFile(`./public/tmp/productImages/${imageName}`);
 
-    console.log(folderDetails)
+    console.log(folderDetails);
     // Upload image to ImageKit
     const uploadedImg = await imageKit.upload({
       file: data, // required

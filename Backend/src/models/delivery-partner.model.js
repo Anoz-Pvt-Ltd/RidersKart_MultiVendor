@@ -42,8 +42,14 @@ const deliveryPartnerSchema = new Schema(
         trim: true,
       },
       image: {
-        type: String,
-        required: true,
+        url: {
+          type: String,
+          required: true,
+        },
+        fileId: {
+          type: String,
+          required: true,
+        },
       },
     },
     aadhar: {
@@ -54,8 +60,14 @@ const deliveryPartnerSchema = new Schema(
         trim: true,
       },
       image: {
-        type: String,
-        required: true,
+        url: {
+          type: String,
+          required: true,
+        },
+        fileId: {
+          type: String,
+          required: true,
+        },
       },
     },
     pan: {
@@ -66,8 +78,14 @@ const deliveryPartnerSchema = new Schema(
         trim: true,
       },
       image: {
-        type: String,
-        required: true,
+        url: {
+          type: String,
+          required: true,
+        },
+        fileId: {
+          type: String,
+          required: true,
+        },
       },
     },
     physicallyDisabled: {
@@ -92,17 +110,35 @@ const deliveryPartnerSchema = new Schema(
       },
       RAC: {
         front: {
-          type: String,
-          required: true,
+          url: {
+            type: String,
+            required: true,
+          },
+          fileId: {
+            type: String,
+            required: true,
+          },
         },
         back: {
-          type: String,
-          required: true,
+          url: {
+            type: String,
+            required: true,
+          },
+          fileId: {
+            type: String,
+            required: true,
+          },
         },
       },
       insurance: {
-        type: String,
-        required: true,
+        url: {
+          type: String,
+          required: true,
+        },
+        fileId: {
+          type: String,
+          required: true,
+        },
       },
       insurance: {
         number: {
@@ -115,24 +151,31 @@ const deliveryPartnerSchema = new Schema(
           required: true,
         },
         image: {
-          type: String,
-          required: true,
+          url: {
+            type: String,
+            required: true,
+          },
+          fileId: {
+            type: String,
+            required: true,
+          },
         },
       },
       pollution: {
-        type: String,
+        url: {
+          type: String,
+          required: true,
+        },
+        fileId: {
+          type: String,
+          required: true,
+        },
       },
     },
 
     // Additional Information
 
     allOrders: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Order",
-      },
-    ],
-    allAppointments: [
       {
         type: Schema.Types.ObjectId,
         ref: "Order",
@@ -170,12 +213,13 @@ const deliveryPartnerSchema = new Schema(
 
     isAvailable: {
       type: Boolean,
-      default: true,
+      default: false,
     },
 
-    currentLocation: {
-      type: { type: String, enum: ["Point"], default: "Point" },
-      coordinates: { type: [Number] }, // [longitude, latitude]
+    vendorId: {
+      type: Schema.Types.ObjectId,
+      ref: "VendorUser",
+      required: true,
     },
 
     // allReviews: [
@@ -224,8 +268,6 @@ deliveryPartnerSchema.methods.generateRefreshToken = function () {
     }
   );
 };
-
-deliveryPartnerSchema.index({ currentLocation: "2dsphere" }); // Geospatial index
 
 export const DeliveryPartner = mongoose.model(
   "DeliveryPartner",

@@ -17,6 +17,7 @@ import Dashboard from "./Pages/Profile/ProfileDashboard";
 import VendorRegistrationForm from "../src/Pages/VendorRegister/Registration";
 import { fetchCart } from "./Utility/Slice/CartSlice";
 import { fetchPromotions } from "./Utility/Slice/PromotionsSlice";
+import RegisterDriver from "./Pages/DriverRegister/driverRegister";
 // import { io } from "socket.io-client";
 
 const App = () => {
@@ -123,6 +124,10 @@ const App = () => {
           <Route path="/cart/:userId" element={<CartPage />} />
           {/* <Route path="/cart/:userId/buy-now-product" element={<BuyNow />} /> */}
           <Route path="/checkout/:productId/:userId" element={<BuyNow />} />
+          <Route
+            path="/register-delivery-partner"
+            element={<RegisterDriver />}
+          />
         </Routes>
       </div>
     </div>

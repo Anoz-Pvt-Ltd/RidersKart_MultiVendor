@@ -1,14 +1,10 @@
 import { DeliveryPartner } from "../models/delivery-partner.model.js";
-import { Order } from "../models/order.model.js";
-import { User } from "../models/user.model.js";
 import { DriverVerificationStatus } from "../utils/AllStatus.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
-import jwt from "jsonwebtoken";
-import { NotificationStructure } from "../utils/NotificationClass.js";
-import { io } from "../app.js";
-import { FindNearbyDrivers } from "./Order.controller.js";
+import { VendorUser } from "../models/vendorUser.models.js";
+import { UploadImages } from "../utils/imageKit.io.js";
 
 const generateAccessAndRefreshTokens = async (userId) => {
   try {
@@ -33,21 +29,15 @@ const RegisterDriver = asyncHandler(async (req, res) => {
     address,
     password,
     licenseNumber,
-    licenseImage,
     aadharNumber,
-    aadharImage,
     panNumber,
-    panImage,
     physicallyDisabled,
     vehicleType,
     vehicleDescription,
     plateNumber,
-    racFrontImage,
-    racBackImage,
-    insuranceImage,
     insuranceNumber,
     insuranceExpiry,
-    pollutionImage,
+    vendorId,
   } = req.body;
 
   // Validate required fields
@@ -58,47 +48,50 @@ const RegisterDriver = asyncHandler(async (req, res) => {
       address,
       password,
       licenseNumber,
-      licenseImage,
       aadharNumber,
-      aadharImage,
       panNumber,
-      panImage,
       vehicleType,
       vehicleDescription,
       plateNumber,
-      racFrontImage,
-      racBackImage,
-      insuranceImage,
       insuranceNumber,
       insuranceExpiry,
-      pollutionImage,
+      vendorId,
     ].some((field) => field === undefined || field.toString().trim() === "")
   )
     throw new ApiError(400, "Required fields are missing.");
 
-  // Validate phone number (must be 10 digits)
-  const phoneRegex = /^[6-9]\d{9}$/;
-  if (!phoneRegex.test(phone)) {
-    throw new ApiError(401, "Invalid phone number format.");
+  const vendor = await VendorUser.findById(vendorId);
+
+  if (!vendor) throw new ApiError(404, "Vendor not found");
+
+  if (!req.files || Object.keys(req.files).length < 7) {
+    throw new ApiError(400, "Please upload all the images");
   }
 
-  // Validate Aadhar number (12 digits)
-  const aadharRegex = /^\d{12}$/;
-  if (!aadharRegex.test(aadharNumber)) {
-    throw new ApiError(401, "Invalid Aadhar number format.");
-  }
+  const uploadPromises = Object.entries(req.files).map(
+    async ([fieldName, files]) => {
+      // Assuming maxCount is 1, so files[0]
+      const file = files[0];
 
-  // Validate PAN number (10 characters, alphanumeric, specific format)
-  const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
-  if (!panRegex.test(panNumber)) {
-    throw new ApiError(401, "Invalid PAN number format.");
-  }
+      console.log(fieldName, files);
+      const uploadedResult = await UploadImages(
+        file.fileName,
+        {
+          folderStructure: `all-delivery-partners/${vendor.name.split(" ").join("-")}/${name.split(" ").join("-")}`,
+        },
+        [name, "delivery-partner", phone]
+      ); // your cloud upload function
+      return { [fieldName]: uploadedResult }; // return key-value pair
+    }
+  );
 
-  // Validate Driving License number (adjust based on local rules, typically alphanumeric)
-  const dlRegex = /^[A-Z]{2}\d{13}$/; // Adjust this regex as per the regional format
-  if (!dlRegex.test(licenseNumber)) {
-    throw new ApiError(401, "Invalid Driving License number format.");
-  }
+  // Wait for all uploads to complete
+  const uploadedImagesArray = await Promise.all(uploadPromises).catch((error) =>
+    console.error(error)
+  );
+
+  // Convert array of objects to a single merged object
+  const uploadedImages = Object.assign({}, ...uploadedImagesArray);
 
   // Create a new driver object with validated data
   const newDriver = new DeliveryPartner({
@@ -108,15 +101,24 @@ const RegisterDriver = asyncHandler(async (req, res) => {
     password,
     drivingLicense: {
       number: licenseNumber,
-      image: licenseImage,
+      image: {
+        url: uploadedImages.licenseImage.url,
+        fileId: uploadedImages.licenseImage.fileId,
+      },
     },
     aadhar: {
       number: aadharNumber,
-      image: aadharImage,
+      image: {
+        url: uploadedImages.aadharImage.url,
+        fileId: uploadedImages.aadharImage.fileId,
+      },
     },
     pan: {
       number: panNumber,
-      image: panImage,
+      image: {
+        url: uploadedImages.panImage.url,
+        fileId: uploadedImages.panImage.fileId,
+      },
     },
 
     physicallyDisabled: physicallyDisabled === "on" ? true : false || false,
@@ -125,17 +127,29 @@ const RegisterDriver = asyncHandler(async (req, res) => {
       plateNumber,
       vehicleDescription,
       RAC: {
-        front: racFrontImage,
-        back: racBackImage,
+        front: {
+          url: uploadedImages.racFrontImage.url,
+          fileId: uploadedImages.racFrontImage.fileId,
+        },
+        back: {
+          url: uploadedImages.racBackImage.url,
+          fileId: uploadedImages.racBackImage.fileId,
+        },
       },
       insurance: {
         number: insuranceNumber,
         expiry: insuranceExpiry,
-        image: insuranceImage,
+        image: {
+          url: uploadedImages.insuranceImage.url,
+          fileId: uploadedImages.insuranceImage.fileId,
+        },
       },
-      pollution: pollutionImage,
+      pollution: {
+        url: uploadedImages.pollutionImage.url,
+        fileId: uploadedImages.pollutionImage.fileId,
+      },
     },
-
+    vendorId: vendor._id,
     verificationStatus: DriverVerificationStatus[0],
   });
 
@@ -228,14 +242,14 @@ const GetActiveOrder = asyncHandler(async (req, res) => {
         new ApiResponse(200, "No active order found", "No active order found")
       );
 
-  io.emit(
-    "allAppointments",
-    new NotificationStructure(
-      "All Appointments",
-      `${driver?.name}, Here is your all appointments`,
-      { allAppointments: "Vivek" }
-    )
-  );
+  // io.emit(
+  //   "allAppointments",
+  //   new NotificationStructure(
+  //     "All Appointments",
+  //     `${driver?.name}, Here is your all appointments`,
+  //     { allAppointments: "Vivek" }
+  //   )
+  // );
 
   res.status(200).json(new ApiResponse(200, driver.activeOrder, "Got it"));
 });
@@ -250,56 +264,6 @@ const GetDriver = asyncHandler(async (req, res) => {
   if (!driver) throw new ApiError(404, "Driver not found");
 
   res.status(200).json(new ApiResponse(200, driver, "Got it"));
-});
-
-const RegenerateRefreshToken = asyncHandler(async (req, res) => {
-  const token = req.cookies.RefreshToken || req.body.RefreshToken;
-
-  if (!token) throw new ApiError(401, "Unauthorized request");
-
-  const DecodedToken = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
-  // console.log(DecodedToken);
-  const user = await DeliveryPartner.findById(DecodedToken._id).select(
-    "-password -refreshToken"
-  );
-
-  if (!user) throw new ApiError(400, "Invalid Token");
-  if (user.verificationStatus === DriverVerificationStatus[3])
-    res
-      .status(200)
-      .json(new ApiResponse(200, {}, "You are Banned from our platform! 😤"));
-
-  const { RefreshToken, AccessToken } = await generateAccessAndRefreshTokens(
-    user._id
-  );
-
-  if (user.verificationStatus === DriverVerificationStatus[2]) {
-    user.isActive = true;
-    await user.save();
-  }
-
-  const options = {
-    httpOnly: true,
-    secure: true,
-  };
-
-  return res
-    .status(201)
-    .cookie("RefreshToken", RefreshToken, options)
-    .cookie("AccessToken", AccessToken, options)
-    .json(
-      new ApiResponse(
-        201,
-        {
-          user,
-          tokens: {
-            AccessToken,
-            RefreshToken,
-          },
-        },
-        "Refresh token regenerated successfully"
-      )
-    );
 });
 
 const GetAllRegistrationRequests = asyncHandler(async (req, res) => {
@@ -373,20 +337,6 @@ const AcceptRequest = asyncHandler(async (req, res) => {
   res.status(200).json(new ApiResponse(200, driver, "Driver status updated"));
 });
 
-const Subscribe = asyncHandler(async (req, res) => {
-  const { deliveryPartnerId, subscription } = req.body;
-  try {
-    // Update the delivery partner's subscription
-    await DeliveryPartner.findByIdAndUpdate(deliveryPartnerId, {
-      subscription,
-    });
-    res.status(201).json({ message: "Subscription saved successfully" });
-  } catch (error) {
-    console.error("Error saving subscription:", error);
-    res.status(500).json({ error: "Failed to save subscription" });
-  }
-});
-
 const PartnerBan = asyncHandler(async (req, res) => {
   const { partnerId } = req.params;
 
@@ -439,7 +389,7 @@ const ToggleActiveDriver = asyncHandler(async (req, res) => {
   if (!driver) throw new ApiError(404, "Driver not found");
 
   if (driver.verificationStatus === DriverVerificationStatus[2]) {
-    console.log("Driver Active status: ",driver.isActive); 
+    console.log("Driver Active status: ", driver.isActive);
     driver.isActive = !driver.isActive;
     await driver.save();
 
@@ -475,55 +425,14 @@ const ToggleActiveDriver = asyncHandler(async (req, res) => {
       );
 });
 
-// const UpdateDriverAddress = asyncHandler(async (req, res) => {
-//   const { driverId } = req.params;
-//   const { address } = req.body;
-
-//   if (!driverId || !address)
-//     throw new ApiError(400, "Driver ID and Address are required");
-
-//   if (!Array.isArray(address)) {
-//     throw new ApiError(400, "Address must be an array of coordinates");
-//   }
-
-//   const driver = await DeliveryPartner.findByIdAndUpdate(
-//     driverId,
-//     {
-//       currentLocation: {
-//         type: "Point",
-//         coordinates: address,
-//       },
-//     },
-//     { new: true }
-//   );
-//   if (!driver) throw new ApiError(404, "Driver not found!");
-
-//   if (driver.activeOrder) {
-//     const order = await Order.findByIdAndUpdate(driver.activeOrder, {
-//       tracking: {
-//         current: {
-//           type: "Point",
-//           coordinates: address,
-//         },
-//       },
-//     });
-//     if (!order)
-//       throw new ApiError(404, "Your current order not found! Please check.");
-//   }
-
-//   res.status(200).json(new ApiResponse(200, driver, "Driver address updated"));
-// });
-
 export {
   RegisterDriver,
   LoginDriver,
   GetActiveOrder,
   GetDriver,
-  RegenerateRefreshToken,
   GetAllRegistrationRequests,
   GetAllVerifiedDrivers,
   AcceptRequest,
-  Subscribe,
   GetRegistrationRequests,
   GetVerifiedPartner,
   PartnerBan,
