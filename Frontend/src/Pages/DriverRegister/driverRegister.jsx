@@ -1,10 +1,10 @@
 import { useRef, useState } from "react";
 import Button from "../../Components/Button";
-import { FetchData } from "../../../utility/fetchFromAPI";
+import { FetchData } from "../../Utility/FetchFromApi";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { alertError, alertSuccess } from "../../../utility/Alert";
-import { parseErrorMessage } from "../../../utility/ErrorMessageParser";
+// import { alertError, alertSuccess } from "../../Utility/";
+// import { parseErrorMessage } from "../../../utility/ErrorMessageParser";
 import InputBox from "../../Components/InputBox";
 import SelectBox from "../../Components/SelectionBox";
 
@@ -14,11 +14,9 @@ export default function RegisterDriver() {
   const navigate = useNavigate();
   const Dispatch = useDispatch();
 
-  // function ----------------------------------------------------------------
-
   // Handel submission
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    e.preventDefault(); 
 
     const formData = new FormData(FormRef.current);
 
