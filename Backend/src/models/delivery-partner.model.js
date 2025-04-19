@@ -193,7 +193,8 @@ const deliveryPartnerSchema = new Schema(
 
     verificationStatus: {
       type: String,
-      required: true,
+      enum: ["pending", "verified", "rejected", "banned", "suspended"],
+      default: "pending",
     },
 
     activeOrder: {

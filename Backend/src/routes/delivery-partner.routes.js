@@ -1,9 +1,23 @@
 import { Router } from "express";
-import { VerifyUser } from "../middlewares/auth.middleware.js";
-import { RegisterDriver } from "../controllers/driver.controller.js";
+import { VerifyVendorUser } from "../middlewares/auth.middleware.js";
+import {
+  AcceptRequest,
+  BanDriver,
+  DeleteDriver,
+  GetActiveOrder,
+  GetAllRegistrationRequests,
+  GetAllVerifiedDrivers,
+  GetDriver,
+  RegisterDriver,
+  RejectRequest,
+  ToggleActiveDriver,
+  ToggleSuspendDriver,
+} from "../controllers/driver.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
 
 const router = Router();
+
+router.use(VerifyVendorUser);
 
 router.route("/register").post(
   upload.fields([
@@ -17,5 +31,21 @@ router.route("/register").post(
   ]),
   RegisterDriver
 );
+
+router.route("/active-order/:driverId").get(GetActiveOrder);
+router.route("/driver/:driverId").get(GetDriver).delete(DeleteDriver);
+
+router.route("/registration-request").get(GetAllRegistrationRequests);
+router.route("/verified-drivers").get(GetAllVerifiedDrivers);
+
+router
+  .route("/driver-request/:requestId")
+  .patch(AcceptRequest)
+  .delete(RejectRequest);
+
+router.route("/ban-driver/:driverId").post(BanDriver);
+
+router.route("/toggle-suspension/:driverId").patch(ToggleSuspendDriver);
+router.route("/toggle-active/:driverId").patch(ToggleActiveDriver);
 
 export default router;

@@ -6,22 +6,6 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { VendorUser } from "../models/vendorUser.models.js";
 import { UploadImages } from "../utils/imageKit.io.js";
 
-const generateAccessAndRefreshTokens = async (userId) => {
-  try {
-    const user = await DeliveryPartner.findById(userId);
-    const AccessToken = await user.generateAccessToken();
-    const RefreshToken = await user.generateRefreshToken();
-
-    return { AccessToken, RefreshToken };
-  } catch (error) {
-    console.log(error);
-    throw new ApiError(
-      500,
-      "Something went wrong while generating access and refresh tokens"
-    );
-  }
-};
-
 const RegisterDriver = asyncHandler(async (req, res) => {
   const {
     name,
@@ -176,57 +160,6 @@ const RegisterDriver = asyncHandler(async (req, res) => {
     );
 });
 
-const LoginDriver = asyncHandler(async (req, res) => {
-  const { phone, password } = req.body;
-
-  if (!phone || !password)
-    throw new ApiError(401, "phone and password are required");
-
-  const user = await DeliveryPartner.findOne({ number: phone });
-
-  if (!user) throw new ApiError(404, "Provided phone is not found");
-
-  const isValid = await user.isPasswordCorrect(password);
-  if (!isValid) throw new ApiError(401, "Entered Credential is not correct");
-
-  if (user.verificationStatus === DriverVerificationStatus[3])
-    res
-      .status(200)
-      .json(new ApiResponse(200, {}, "You are Banned from our platform! 😤"));
-
-  const { AccessToken, RefreshToken } = await generateAccessAndRefreshTokens(
-    user?._id
-  );
-
-  if (user.verificationStatus === DriverVerificationStatus[2]) {
-    user.isActive = true;
-    await user.save();
-  }
-
-  const options = {
-    httpOnly: true,
-    secure: true,
-  };
-
-  return res
-    .status(201)
-    .cookie("RefreshToken", RefreshToken, options)
-    .cookie("AccessToken", AccessToken, options)
-    .json(
-      new ApiResponse(
-        201,
-        {
-          user,
-          tokens: {
-            AccessToken,
-            RefreshToken,
-          },
-        },
-        "User Logged In successfully"
-      )
-    );
-});
-
 const GetActiveOrder = asyncHandler(async (req, res) => {
   const { driverId } = req.params;
 
@@ -268,8 +201,8 @@ const GetDriver = asyncHandler(async (req, res) => {
 
 const GetAllRegistrationRequests = asyncHandler(async (req, res) => {
   const requests = await DeliveryPartner.find({
-    verificationStatus: DriverVerificationStatus[0],
-  });
+    verificationStatus: "pending",
+  }).populate("vendorId");
 
   if (!requests)
     res
@@ -281,19 +214,12 @@ const GetAllRegistrationRequests = asyncHandler(async (req, res) => {
   res.status(200).json(new ApiResponse(200, requests, "Got all the requests"));
 });
 
-const GetRegistrationRequests = asyncHandler(async (req, res) => {
-  const { verificationId } = req.params;
-  if (!verificationId) throw new ApiError(400, "Verification ID is required");
-
-  const request = await DeliveryPartner.findById(verificationId);
-  if (!request) throw new ApiError(404, "Request not found");
-  res.status(200).json(new ApiResponse(200, request, "Got the request"));
-});
-
 const GetAllVerifiedDrivers = asyncHandler(async (req, res) => {
   const drivers = await DeliveryPartner.find({
-    verificationStatus: DriverVerificationStatus[2],
-  });
+    verificationStatus: "verified",
+  })
+    .populate("vendorId")
+    .populate("activeOrder");
 
   if (!drivers)
     res
@@ -311,24 +237,15 @@ const GetAllVerifiedDrivers = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, drivers, "Got all the verified drivers"));
 });
 
-const GetVerifiedPartner = asyncHandler(async (req, res) => {
-  const { partnerId } = req.params;
-  if (!partnerId) throw new ApiError(400, "Partner ID is required");
-
-  const partner = await DeliveryPartner.findById(partnerId);
-  if (!partner) throw new ApiError(404, "Request not found");
-  res.status(200).json(new ApiResponse(200, partner, "Got the Partner ID"));
-});
-
 const AcceptRequest = asyncHandler(async (req, res) => {
-  const { verificationId } = req.params;
-  // console.log(verificationId);
-  if (!verificationId)
+  const { requestId } = req.params;
+  // console.log(requestId);
+  if (!requestId)
     throw new ApiError(400, "Driver ID and Verification Status are required");
 
   const driver = await DeliveryPartner.findByIdAndUpdate(
-    verificationId,
-    { verificationStatus: DriverVerificationStatus[2] },
+    requestId,
+    { verificationStatus: "verified" },
     { new: true }
   );
 
@@ -337,39 +254,61 @@ const AcceptRequest = asyncHandler(async (req, res) => {
   res.status(200).json(new ApiResponse(200, driver, "Driver status updated"));
 });
 
-const PartnerBan = asyncHandler(async (req, res) => {
-  const { partnerId } = req.params;
+const RejectRequest = asyncHandler(async (req, res) => {
+  const { requestId } = req.params;
+  if (!requestId)
+    throw new ApiError(400, "Driver ID and Verification Status are required");
+  const driver = await DeliveryPartner.findByIdAndUpdate(
+    requestId,
+    { verificationStatus: "rejected" },
+    { new: true }
+  );
 
-  const Partner = await DeliveryPartner.findById(partnerId);
+  if (!driver) throw new ApiError(404, "Driver not found!");
+  res.status(200).json(new ApiResponse(200, driver, "Driver status updated"));
+});
+
+const BanDriver = asyncHandler(async (req, res) => {
+  const { driverId } = req.params;
+
+  const Partner = await DeliveryPartner.findByIdAndUpdate(
+    driverId,
+    {
+      verificationStatus: "banned",
+    },
+    { new: true }
+  );
   if (!Partner) throw new ApiError(404, "Partner not found");
 
-  Partner.isBanned = !Partner.isBanned;
-  Partner.save();
   res.status(200).json(new ApiResponse(200, Partner, "User status updated"));
 });
 
-const DeletePartner = asyncHandler(async (req, res) => {
-  const { partnerId } = req.params;
-  if (!partnerId) throw new ApiError(400, "Partner ID is required");
-  const Partner = await DeliveryPartner.findByIdAndDelete(partnerId);
+const DeleteDriver = asyncHandler(async (req, res) => {
+  const { driverId } = req.params;
+  if (!driverId) throw new ApiError(400, "Partner ID is required");
+  const Partner = await DeliveryPartner.findByIdAndDelete(driverId);
   if (!Partner) throw new ApiError(404, "Partner not found");
   res.status(200).json(new ApiResponse(200, "Partner deleted successfully"));
 });
 
-const ToggleSuspendPartner = asyncHandler(async (req, res) => {
-  const { partnerId } = req.params;
-  if (!partnerId) throw new ApiError(400, "Partner ID is required");
+const ToggleSuspendDriver = asyncHandler(async (req, res) => {
+  const { driverId } = req.params;
+  if (!driverId) throw new ApiError(400, "Partner ID is required");
 
-  const partner = await DeliveryPartner.findById(partnerId);
+  const partner = await DeliveryPartner.findById(driverId);
   if (!partner) throw new ApiError(404, "Partner not found");
 
-  if (partner.verificationStatus === DriverVerificationStatus[4]) {
-    partner.verificationStatus = DriverVerificationStatus[2];
+  if (partner.verificationStatus === "suspended") {
+    partner.verificationStatus = "verified";
+    partner.isActive = true;
     await partner.save();
     res
       .status(200)
       .json(new ApiResponse(200, partner, "Partner Retrieved successfully"));
-  } else partner.verificationStatus = DriverVerificationStatus[4];
+  } else {
+    partner.verificationStatus = "suspended";
+    partner.isActive = false;
+  }
 
   await partner.save();
 
@@ -378,66 +317,34 @@ const ToggleSuspendPartner = asyncHandler(async (req, res) => {
 
 const ToggleActiveDriver = asyncHandler(async (req, res) => {
   const { driverId } = req.params;
-  const { coordinates } = req.body;
-  if (!driverId || !coordinates)
-    throw new ApiError(400, "Driver ID and coordinates are required!!!");
+  if (!driverId) throw new ApiError(400, "Partner ID is required");
 
-  if (!Array.isArray(coordinates))
-    throw new ApiError(400, "Address must be an array of coordinates");
+  const partner = await DeliveryPartner.findById(driverId);
+  if (!partner) throw new ApiError(404, "Partner not found");
 
-  const driver = await DeliveryPartner.findById(driverId);
-  if (!driver) throw new ApiError(404, "Driver not found");
-
-  if (driver.verificationStatus === DriverVerificationStatus[2]) {
-    console.log("Driver Active status: ", driver.isActive);
-    driver.isActive = !driver.isActive;
-    await driver.save();
-
-    driver.currentLocation = {
-      type: "Point",
-      coordinates,
-    };
-    await driver.save();
-
-    res.status(200).json(new ApiResponse(200, driver, "Driver status updated"));
-  } else if (
-    driver.verificationStatus === DriverVerificationStatus[0] ||
-    driver.verificationStatus === DriverVerificationStatus[1]
-  ) {
+  if (partner.verificationStatus === "verified") {
+    partner.isActive = !partner.isActive;
+    await partner.save();
+  } else {
     res
-      .status(200)
-      .json(
-        new ApiResponse(
-          200,
-          driver,
-          "You are not verified yet! Please try to login again after verification"
-        )
-      );
-  } else if (driver.verificationStatus === DriverVerificationStatus[4])
-    res
-      .status(200)
-      .json(
-        new ApiResponse(
-          200,
-          driver,
-          "You id is suspended! Please try to login again after verification"
-        )
-      );
+      .status(301)
+      .json(new ApiResponse(301, "Driver is not eligible to be active"));
+  }
+
+  res.status(200).json(new ApiResponse(200, partner, "Partner status updated"));
 });
 
 export {
   RegisterDriver,
-  LoginDriver,
   GetActiveOrder,
   GetDriver,
   GetAllRegistrationRequests,
   GetAllVerifiedDrivers,
   AcceptRequest,
-  GetRegistrationRequests,
-  GetVerifiedPartner,
-  PartnerBan,
-  DeletePartner,
+  RejectRequest,
+  BanDriver,
+  DeleteDriver,
   ToggleActiveDriver,
-  ToggleSuspendPartner,
+  ToggleSuspendDriver,
   // UpdateDriverAddress,
 };

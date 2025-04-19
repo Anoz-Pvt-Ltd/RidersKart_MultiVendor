@@ -161,6 +161,8 @@ const Dashboard = ({ startLoading, stopLoading }) => {
         return <ManageStocks />;
       case "Products":
         return <Products />;
+      case "Delivery-partner":
+        return <Products />;
       case "Wallet Transactions":
         return <WalletTransactions />;
       case "Home":
