@@ -1,5 +1,5 @@
 import { DeliveryPartner } from "../models/delivery-partner.model.js";
-import { DriverVerificationStatus } from "../utils/AllStatus.js";
+// import { DriverVerificationStatus } from "../utils/AllStatus.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";

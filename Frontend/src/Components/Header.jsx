@@ -20,6 +20,8 @@ const Header = () => {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const user = useSelector((store) => store.UserInfo.user);
+  const cart = useSelector((store) => store.CartList.cart);
+  const cartCount = cart.length;
 
   const toggleMenu = () => setIsOpen(!isOpen);
 
@@ -41,17 +43,30 @@ const Header = () => {
       {/* Desktop Navigation */}
       <div className="hidden md:flex items-center gap-5">
         {user.length ? (
-          <Button
-            className={` bg-white text-blue-600 hover:bg-green-500 hover:text-black`}
-            label={
-              <h1 className="flex gap-2">
-                <User2 /> {user?.[0]?.name}
-              </h1>
-            }
-            onClick={() =>
-              navigate(`/user-profile/dashboard/${user?.[0]?._id}`)
-            }
-          />
+          <div className="flex items-center gap-5">
+            <Button
+              className={` bg-white text-blue-600 hover:bg-green-500 hover:text-black`}
+              label={
+                <h1 className="flex gap-2">
+                  <User2 /> {user?.[0]?.name}
+                </h1>
+              }
+              onClick={() =>
+                navigate(`/user-profile/dashboard/${user?.[0]?._id}`)
+              }
+            />
+            <motion.div whileHover={{ scale: 1.1 }}>
+              <Link
+                to={`/cart/${user?.[0]?._id}`}
+                className="text-blue-600 px-4 py-2 rounded  duration-300 ease-in-out hover:shadow-md shadow-neutral-600 hover:translate-y-1 border border-neutral-300 hover:border-none flex  bg-white hover:bg-green-500 hover:text-black"
+              >
+                <ShoppingCart />{" "}
+                <span className="bg-red-400 px-2 rounded-full text-black">
+                  {cartCount}
+                </span>
+              </Link>
+            </motion.div>
+          </div>
         ) : (
           <Button
             className={` bg-white text-blue-600 hover:bg-green-500 hover:text-black`}
@@ -63,22 +78,6 @@ const Header = () => {
             onClick={() => navigate("/login")}
           />
         )}
-        {/* <Button
-          label={
-            <h1 className="flex gap-2">
-              <Store /> Become a Seller
-            </h1>
-          }
-          onClick={() => navigate("/vendor-register")}
-        /> */}
-        <motion.div whileHover={{ scale: 1.1 }}>
-          <Link
-            to={`/cart/${user?.[0]?._id}`}
-            className="flex items-center gap-2"
-          >
-            <ShoppingCart /> <span>Cart</span>
-          </Link>
-        </motion.div>
       </div>
 
       {/* Mobile Hamburger Button */}
