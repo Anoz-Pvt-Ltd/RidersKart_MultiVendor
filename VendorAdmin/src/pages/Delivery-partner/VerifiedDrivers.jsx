@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { FetchData } from "../../utils/FetchFromApi";
 import LoadingUI from "../../components/Loading";
-import Button from "../../Components/Button";
+import Button from "../../components/Button";
 import RegisterDriver from "./driverRegister";
 import { X } from "lucide-react";
 import PendingDrivers from "./PendingDrivers";
