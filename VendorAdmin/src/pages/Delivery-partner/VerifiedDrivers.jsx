@@ -1,10 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { FetchData } from "../../utils/FetchFromApi";
 import LoadingUI from "../../components/Loading";
+import Button from "../../Components/Button";
+import RegisterDriver from "./driverRegister";
+import { X } from "lucide-react";
+import PendingDrivers from "./PendingDrivers";
 
 const VerifiedDrivers = ({ startLoading, stopLoading }) => {
   const [error, setError] = useState(null);
   const [allDrivers, setAllDrivers] = useState([]);
+  const [isOpen, setIsOpen] = useState(false);
 
   // Fetching all verified drivers from the API
   useEffect(() => {
@@ -33,7 +38,19 @@ const VerifiedDrivers = ({ startLoading, stopLoading }) => {
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-lg">
-      <h2 className="text-2xl font-bold text-gray-700 mb-4">Orders</h2>
+      <h2 className="text-2xl font-bold text-gray-700 mb-4">
+        Verified Drivers
+      </h2>
+      <Button
+        label={"Add new delivery partner"}
+        onClick={() => setIsOpen(true)}
+      />
+      {isOpen && (
+        <div className="flex justify-centre items-start absolute top-0 left-0 w-full backdrop-blur-xl">
+          <Button label={<X />} onClick={() => setIsOpen(false)} />
+          <RegisterDriver />
+        </div>
+      )}
       {/* Detailed Driver List */}
       <div className="container mx-auto p-4">
         <div className="overflow-x-auto">
@@ -53,7 +70,7 @@ const VerifiedDrivers = ({ startLoading, stopLoading }) => {
               </tr>
             </thead>
             <tbody>
-              {allDrivers.length > 0 ? (
+              {allDrivers?.length > 0 ? (
                 allDrivers.map((driver) => (
                   <tr key={driver._id} className="hover:bg-gray-100">
                     <td className="py-2 px-4 border-b">{driver?._id}</td>
@@ -91,6 +108,7 @@ const VerifiedDrivers = ({ startLoading, stopLoading }) => {
           </table>
         </div>
       </div>
+      <div><PendingDrivers/></div>
     </div>
   );
 };

@@ -33,7 +33,9 @@ const VerifiedDrivers = ({ startLoading, stopLoading }) => {
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-lg">
-      <h2 className="text-2xl font-bold text-gray-700 mb-4">Orders</h2>
+      <h2 className="text-2xl font-bold text-gray-700 mb-4">
+        Un-Verified partners
+      </h2>
       {/* Detailed Driver List */}
       <div className="container mx-auto p-4">
         <div className="overflow-x-auto">
@@ -50,7 +52,7 @@ const VerifiedDrivers = ({ startLoading, stopLoading }) => {
               </tr>
             </thead>
             <tbody>
-              {allDrivers.length > 0 ? (
+              {allDrivers?.length > 0 ? (
                 allDrivers.map((driver) => (
                   <tr key={driver._id} className="hover:bg-gray-100">
                     <td className="py-2 px-4 border-b">{driver?._id}</td>

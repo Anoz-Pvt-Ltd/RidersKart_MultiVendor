@@ -16,6 +16,7 @@ import { FetchData } from "../../utils/FetchFromApi";
 import { motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import LoadingUI from "../../components/Loading";
+import VerifiedDrivers from "../Delivery-partner/VerifiedDrivers";
 
 const Dashboard = ({ startLoading, stopLoading }) => {
   const user = useSelector((store) => store.UserInfo.user);
@@ -162,7 +163,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
       case "Products":
         return <Products />;
       case "Delivery-partner":
-        return <Products />;
+        return <VerifiedDrivers />;
       case "Wallet Transactions":
         return <WalletTransactions />;
       case "Home":
@@ -259,6 +260,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
                 "Brands",
                 "Manage Stock",
                 "Products",
+                "Delivery-partner",
                 "Wallet Transactions",
               ].map((menu) => (
                 <li
@@ -319,6 +321,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
             "Brands",
             "Manage Stock",
             "Products",
+            "Delivery-partner",
             "Wallet Transactions",
           ].map((menu) => (
             <li
