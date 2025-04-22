@@ -44,7 +44,6 @@ app.use(cookieParser());
 
 //print function to ensure every step is executed
 app.use((req, res, next) => {
-  console.log("--------------------------------");
   console.log(`Received:`, req.method);
   console.log(`at:`, req.url);
   console.log(`with body:`, req.body);
