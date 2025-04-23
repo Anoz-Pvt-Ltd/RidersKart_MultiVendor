@@ -572,9 +572,10 @@ const Dashboard = ({ startLoading, stopLoading }) => {
                     key={index}
                     ProductName={product?.products[0]?.product?.name}
                     CurrentPrice={
-                      product?.products?.[0]?.price[0]?.sellingPrice
+                      product?.products?.[0]?.price?.sellingPrice
                     }
-                    Mrp={product?.products?.[0]?.price[0]?.MRP}
+                    Mrp={product?.products?.[0]?.price?.MRP}
+                    Discount={product?.products?.[0]?.price?.discount}
                     Rating={product?.products?.[0]?.product?.Rating}
                     Offer={product?.products?.[0]?.product?.off}
                     Description={product?.products?.[0]?.product?.description}
@@ -598,24 +599,23 @@ const Dashboard = ({ startLoading, stopLoading }) => {
                 Your wishlist is here with {""}
                 <span>{wishlistProducts?.length} items.</span>
               </h1>
-              {/* {console.log(wishlistProducts)} */}
+              {console.log(wishlistProducts)}
               <div className="flex justify-start items-start gap-5 flex-wrap p-5">
                 {wishlistProducts?.map((product, index) => (
                   <ProductCard
                     Image={product?.images[0]?.url}
                     key={index}
                     ProductName={product?.name}
-                    CurrentPrice={product?.price}
-                    Mrp={product?.price}
-                    Rating={product?.Rating}
-                    Offer={product?.off}
+                    CurrentPrice={product?.price?.sellingPrice}
+                    Mrp={product?.price?.MRP}
+                    // Rating={product?.products?.[0]?.product?.Rating}
+                    Discount={product?.price?.discount}
                     Description={product?.description}
                     productId={product?._id}
-                    className={`hidden lg:block`}
                   />
                 ))}
               </div>
-              <div className="flex justify-start items-start gap-5 flex-wrap lg:hidden">
+              {/* <div className="flex justify-start items-start gap-5 flex-wrap lg:hidden">
                 {wishlistProducts?.map((product, index) => (
                   <ProductCardMobile
                     Image={product?.images[0]?.url}
@@ -629,7 +629,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
                     StockQuantity={product.stockQuantity}
                   />
                 ))}
-              </div>
+              </div> */}
             </section>
           )}
         </motion.div>

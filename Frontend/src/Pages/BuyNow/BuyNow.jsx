@@ -138,7 +138,7 @@ const BuyNow = ({ startLoading, stopLoading }) => {
   const Payment = async (e) => {
     const order = await FetchData("payment/create-new-paymentId", "post", {
       options: {
-        amount: 100,
+        amount: product?.price.MRP,
         currency: "INR",
         receipt: "qwerty1234",
       },

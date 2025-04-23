@@ -34,7 +34,7 @@ const CartPage = ({ startLoading, stopLoading }) => {
   const Payment = async (e) => {
     const order = await FetchData("payment/create-new-paymentId", "post", {
       options: {
-        amount: 100,
+        amount: (getTotalPayablePrice() * 1.1).toFixed(2),
         currency: "INR",
         receipt: "qwerty1234",
       },
