@@ -11,6 +11,7 @@ import {
   subtractQuantity,
 } from "../../Utility/Slice/CartSlice";
 import { useDebounce } from "../../Utility/Utility-functions";
+import { useNavigate } from "react-router";
 
 const CartPage = ({ startLoading, stopLoading }) => {
   const [error, setError] = useState("");
@@ -22,6 +23,7 @@ const CartPage = ({ startLoading, stopLoading }) => {
   const [paymentMethod, setPaymentMethod] = useState("");
 
   const dispatch = useDispatch();
+  const Navigate = useNavigate();
 
   const handleAddressChange = (e) => {
     setSelectedAddress(e.target.value);
@@ -133,7 +135,7 @@ const CartPage = ({ startLoading, stopLoading }) => {
     fetchProducts();
   }, []);
 
-  console.log(cart?.[0]?.quantity);
+  // console.log(cart?.[0]?.quantity);
 
   const removeFromCart = async (productId) => {
     try {
@@ -188,6 +190,46 @@ const CartPage = ({ startLoading, stopLoading }) => {
       return total + item.product.price.sellingPrice * item.quantity;
     }, 0);
   }
+
+  console.log(cart);
+  console.log(cart[0]?._id);
+  console.log(cart[0]?.product?.vendor);
+  const HandleHome = () => {
+    Navigate("/");
+  };
+
+  const handleBuyNow = async () => {
+    try {
+      startLoading();
+      const quantity = 1;
+
+      // Ensure all required fields are included
+      const response = await FetchData(
+        `users/book-product/${user?.[0]?._id}/${cart[0]?.product?._id}/${cart[0]?.product?.vendor}`,
+        "post",
+        {
+          quantity,
+          paymentMethod,
+          shippingAddress: addresses[selectedAddress],
+          orderStatus: "confirmed", // Ensure this is a valid enum value in your model
+        }
+      );
+      console.log(response);
+
+      if (response.data.success) {
+        alert("Order placed successfully!");
+        HandleHome();
+        // cart.deleteFromCart();
+      } else {
+        alert("Failed to place order.");
+      }
+    } catch (err) {
+      console.log(err);
+      alert(err.response?.data?.message || "Failed to place order.");
+    } finally {
+      stopLoading();
+    }
+  };
 
   return (
     <div className="container mx-auto p-4">
@@ -282,10 +324,10 @@ const CartPage = ({ startLoading, stopLoading }) => {
                   <p>Total</p>
                   <p>₹ {(getTotalPayablePrice() * 1.1).toFixed(2)}</p>
                 </div>
-                <Button
+                {/* <Button
                   label={"Proceed to Checkout"}
                   className="bg-white hover:bg-orange-500 hover:text-white"
-                />
+                /> */}
               </div>
               <div className="addresses">
                 <h2 className="mb-5 font-semibold">Select Shipping Address</h2>
@@ -323,13 +365,21 @@ const CartPage = ({ startLoading, stopLoading }) => {
                     Select a payment method
                   </option>
                   <option value="online">Online</option>
-                  <option value="card">Cash on delivery</option>
+                  <option value="cash">Cash on delivery</option>
                 </select>
                 {paymentMethod === "online" && (
                   <Button
                     className={`mt-5 bg-white text-blue-600 hover:bg-green-500 hover:text-black`}
                     onClick={Payment}
-                    label={"Proceed to payment"}
+                    label={"Proceed for payment"}
+                  />
+                )}
+                {paymentMethod === "cash" && (
+                  <Button
+                    className={` bg-white text-blue-600 hover:bg-green-500 hover:text-black`}
+                    onClick={handleBuyNow}
+                    Disabled={!selectedAddress || !paymentMethod}
+                    label={"Place order"}
                   />
                 )}
               </div>
