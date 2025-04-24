@@ -55,7 +55,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
   //filtering functions for each entities
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen overflow-scroll">
       {user === null || user.length === 0 ? (
         <div>
           <h1>
@@ -67,7 +67,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
         <div>
           {" "}
           <motion.aside
-            className="w-64 text-black p-4 shadow-lg fixed overscroll-auto top-0 h-screen"
+            className="w-64 text-black p-4 shadow-lg fixed overscroll-auto top-0 h-screen bg-white"
             initial="hidden"
             animate="visible"
             variants={sidebarVariants}
@@ -191,7 +191,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
               </ul>
             </nav>
           </motion.aside>
-          <main className="flex-1 p-6 ml-64">
+          <main className="flex-1 p-6 ml-64 w-full">
             <motion.div
               initial="hidden"
               animate="visible"

@@ -18,7 +18,7 @@ const Orders = ({ startLoading, stopLoading }) => {
             `orders/all-products-of-vendor/${user?.[0]?._id}`,
             "get"
           );
-          console.log(response);
+          // console.log(response);
           if (response.data.success) {
             setAllOrders(response.data.orders);
           } else {
@@ -77,7 +77,7 @@ const Orders = ({ startLoading, stopLoading }) => {
                       {order.products[0]?.quantity}
                     </td>
                     <td className="py-2 px-4 border-b">
-                      {order.products[0]?.price}
+                      {order.products[0]?.product?.price?.sellingPrice}
                     </td>
                     <td className="py-2 px-4 border-b">{order.totalAmount}</td>
                     <td className="py-2 px-4 border-b">{order.orderStatus}</td>
