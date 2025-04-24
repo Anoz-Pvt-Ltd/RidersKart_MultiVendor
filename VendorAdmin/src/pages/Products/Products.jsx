@@ -10,7 +10,6 @@ import TextArea from "../../components/TextWrapper";
 
 const Products = ({ startLoading, stopLoading }) => {
   const user = useSelector((store) => store.UserInfo.user);
-
   const [images, setImages] = useState(null);
   const formRef = useRef(null);
   const mrpRef = useRef(null);
