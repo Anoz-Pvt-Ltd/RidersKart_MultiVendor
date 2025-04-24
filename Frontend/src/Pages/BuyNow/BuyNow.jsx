@@ -80,6 +80,7 @@ const BuyNow = ({ startLoading, stopLoading }) => {
       return;
     }
     try {
+      startLoading()
       const response = await FetchData("orders/update-order-status", "post", {
         orderId,
         status: "confirmed",
@@ -93,6 +94,8 @@ const BuyNow = ({ startLoading, stopLoading }) => {
     } catch (error) {
       console.error("Error confirming order:", error);
       alert("Failed to confirm order. Please try again.");
+    } finally {
+      stopLoading();
     }
   };
 
