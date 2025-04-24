@@ -6,11 +6,11 @@ const orderSchema = new mongoose.Schema({
     ref: "User",
     required: true, // The user who placed the order
   },
-  vendor: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "VendorUser",
-    required: true, // The vendor fulfilling the order
-  },
+  // vendor: {
+  //   type: mongoose.Schema.Types.ObjectId,
+  //   ref: "VendorUser",
+  //   required: true, // The vendor fulfilling the order
+  // },
   products: [
     {
       product: {
@@ -24,14 +24,26 @@ const orderSchema = new mongoose.Schema({
         min: 1,
       },
       price: {
-        type: Number,
-        required: true, // Price at the time of order
+        // type: Number,
+        // required: true, // Price at the time of order
+        MRP: {
+          type: String,
+          required: true,
+        },
+        sellingPrice: {
+          type: String,
+          required: true,
+        },
+        discount: {
+          type: String,
+          required: true,
+        },
       },
     },
   ],
   totalAmount: {
     type: Number,
-    required: true, // Total cost of the order
+    // Total cost of the order
   },
   orderStatus: {
     type: String,
@@ -50,26 +62,31 @@ const orderSchema = new mongoose.Schema({
     enum: ["pending", "completed", "failed", "refunded"],
     default: "pending", // Payment status
   },
+  paymentMethod: {
+    type: String,
+    enum: ["online", "cash"],
+    default: "cash",
+  },
   shippingAddress: {
     street: {
       type: String,
-      required: true,
+      // required: true,
     },
     city: {
       type: String,
-      required: true,
+      // required: true,
     },
     state: {
       type: String,
-      required: true,
+      // required: true,
     },
     country: {
       type: String,
-      required: true,
+      // required: true,
     },
     postalCode: {
       type: String,
-      required: true,
+      // required: true,
     },
   },
   placedAt: {

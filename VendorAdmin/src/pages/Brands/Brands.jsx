@@ -1,24 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import LoadingUI from "../../components/Loading";
+import { FetchData } from "../../utils/FetchFromApi";
 
-const initialBrandData = [
-  {
-    id: "1",
-    name: "Brand A",
-    description: "Description A",
-    products: 12,
-    logo: null,
-  },
-  {
-    id: "2",
-    name: "Brand B",
-    description: "Description B",
-    products: 8,
-    logo: null,
-  },
-];
-
-const Brands = () => {
-  const [brands, setBrands] = useState(initialBrandData);
+const Brands = ({ startLoading, stopLoading }) => {
+  const formRef = useRef(null);
+  const [brands, setBrands] = useState([]);
   const [newBrand, setNewBrand] = useState({
     id: "",
     name: "",
@@ -37,27 +23,45 @@ const Brands = () => {
     setNewBrand({ ...newBrand, [name]: files ? files[0] : value });
   };
 
-  // Handle form submission
-  const handleAddBrand = (e) => {
-    e.preventDefault();
-    if (!newBrand.name || !newBrand.description) {
-      alert("Please fill out all required fields.");
-      return;
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        startLoading();
+        const response = await FetchData(
+          `brands/get-all-brands-for-vendor`,
+          "get"
+        );
+        // console.log(response);
+        setBrands(response.data.data);
+      } catch (err) {
+        setError(err.response?.data?.message || "Failed to fetch products.");
+      } finally {
+        stopLoading();
+      }
+    };
+    fetchProducts();
+  }, []);
+
+  const addBrand = async () => {
+    const formData = new FormData.current();
+    try {
+      startLoading();
+      const response = await FetchData(
+        "brands/vendor/add-brand-request",
+        "post",
+        formData,
+        true
+      );
+      // console.log(response);
+      alert(
+        "Your Brand is sent for approval... It might take time to get reviewed"
+      );
+    } catch (error) {
+      alert("error");
+      console.log("Error getting all main subcategories", error);
+    } finally {
+      stopLoading();
     }
-
-    // Add or edit brand
-    const updatedBrands = newBrand.id
-      ? brands.map((brand) =>
-          brand.id === newBrand.id
-            ? { ...newBrand, products: brand.products }
-            : brand
-        )
-      : [...brands, { ...newBrand, id: String(Date.now()) }];
-    setBrands(updatedBrands);
-
-    // Reset the form
-    setNewBrand({ id: "", name: "", description: "", products: 0, logo: null });
-    setShowForm(false);
   };
 
   // Handle editing a brand
@@ -94,26 +98,27 @@ const Brands = () => {
 
   // Handle filtering
   const filteredBrands = brands.filter((brand) =>
-    brand.name.toLowerCase().includes(searchQuery.toLowerCase())
+    brand?.title?.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-lg">
       <h2 className="text-2xl font-bold text-gray-700 mb-4">Brands</h2>
 
       {/* Search and Sort */}
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex flex-col lg:flex-row w-full justify-evenly items-center mb-4 gap-4 lg:gap-0">
         <input
           type="text"
           placeholder="Search by name..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="border px-3 py-2 rounded w-1/3"
+          className="border px-3 py-2 rounded lg:w-1/3 w-full"
         />
         <select
           value={sortBy}
           onChange={handleSortChange}
-          className="border px-3 py-2 rounded"
+          className="border px-3 py-2 rounded w-full lg:w-1/3 "
         >
           <option value="name">Sort by Name</option>
           <option value="products">Sort by Products</option>
@@ -141,7 +146,8 @@ const Brands = () => {
       {/* Add/Edit Brand Form */}
       {showForm && (
         <form
-          onSubmit={handleAddBrand}
+          ref={formRef}
+          onSubmit={addBrand}
           className="bg-gray-100 p-4 rounded mb-6 shadow"
         >
           <div className="mb-4">
@@ -149,8 +155,8 @@ const Brands = () => {
             <input
               type="text"
               name="name"
-              value={newBrand.name}
-              onChange={handleInputChange}
+              // value={newBrand.name}
+              // onChange={handleInputChange}
               className="w-full px-3 py-2 border rounded"
               required
             />
@@ -159,8 +165,8 @@ const Brands = () => {
             <label className="block text-gray-700">Description</label>
             <textarea
               name="description"
-              value={newBrand.description}
-              onChange={handleInputChange}
+              // value={newBrand.description}
+              // onChange={handleInputChange}
               className="w-full px-3 py-2 border rounded"
               required
             />
@@ -169,8 +175,8 @@ const Brands = () => {
             <label className="block text-gray-700">Brand Logo</label>
             <input
               type="file"
-              name="logo"
-              onChange={handleInputChange}
+              name="image"
+              // onChange={handleInputChange}
               className="w-full px-3 py-2 border rounded"
             />
             {newBrand.logo && (
@@ -183,6 +189,7 @@ const Brands = () => {
           </div>
           <button
             type="submit"
+            // onClick={addBrand}
             className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
           >
             {newBrand.id ? "Update Brand" : "Add Brand"}
@@ -207,34 +214,36 @@ const Brands = () => {
               </th>
               <th className="py-3 px-4 border-b">Brand Name</th>
               <th className="py-3 px-4 border-b">Description</th>
-              <th className="py-3 px-4 border-b">Products</th>
-              <th className="py-3 px-4 border-b">Actions</th>
+              <th className="py-3 px-4 border-b">Brand Logo</th>
+              <th className="py-3 px-4 border-b">Status</th>
             </tr>
           </thead>
           <tbody>
             {filteredBrands.map((brand) => (
               <tr
-                key={brand.id}
+                key={brand._id}
                 className="text-sm text-gray-700 border-b hover:bg-gray-50"
               >
                 <td className="py-3 px-4">
                   <input
                     type="checkbox"
-                    checked={selectedBrands.includes(brand.id)}
+                    checked={selectedBrands.includes(brand._id)}
                     onChange={(e) =>
                       setSelectedBrands((prev) =>
                         e.target.checked
-                          ? [...prev, brand.id]
-                          : prev.filter((id) => id !== brand.id)
+                          ? [...prev, brand._id]
+                          : prev.filter((id) => id !== brand._id)
                       )
                     }
                   />
                 </td>
-                <td className="py-3 px-4 font-semibold">{brand.name}</td>
+                <td className="py-3 px-4 font-semibold">{brand.title}</td>
                 <td className="py-3 px-4">{brand.description}</td>
-                <td className="py-3 px-4 text-center">{brand.products}</td>
-                <td className="py-3 px-4">
-                  <button
+                <td className="py-3 px-4 text-center w-10 h-10">
+                  <img src={brand.logo.url} />
+                </td>
+                <td className="py-3 px-4 text-green-500 font-bold">
+                  {/* <button
                     className="text-blue-600 hover:underline mr-2"
                     onClick={() => handleEditBrand(brand)}
                   >
@@ -245,7 +254,8 @@ const Brands = () => {
                     onClick={() => handleDeleteBrand(brand.id)}
                   >
                     Delete
-                  </button>
+                  </button> */}
+                  {brand.status}
                 </td>
               </tr>
             ))}
@@ -256,4 +266,4 @@ const Brands = () => {
   );
 };
 
-export default Brands;
+export default LoadingUI(Brands);

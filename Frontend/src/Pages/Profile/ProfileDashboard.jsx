@@ -22,8 +22,10 @@ import Lottie from "lottie-react";
 import Loading from "../../assets/Loading/Loading.json";
 import { useNavigate } from "react-router";
 import { clearUser } from "../../Utility/Slice/UserInfoSlice";
+import ProductCardMobile from "../../Components/ProductCardMobile";
+import LoadingUI from "../../Components/Loading";
 
-const Dashboard = () => {
+const Dashboard = ({ startLoading, stopLoading }) => {
   const user = useSelector((store) => store.UserInfo.user);
   const Dispatch = useDispatch();
   const [error, setError] = useState(null);
@@ -65,6 +67,7 @@ const Dashboard = () => {
 
   const addAddress = async () => {
     try {
+      startLoading();
       const response = await FetchData(
         `users/${user?.[0]?._id}/addresses`,
         "post",
@@ -80,6 +83,8 @@ const Dashboard = () => {
       }
     } catch (err) {
       setError(err.response?.data?.message || "Failed to add address.");
+    } finally {
+      stopLoading();
     }
   };
 
@@ -127,16 +132,17 @@ const Dashboard = () => {
   const handleAddressChange = (index) => {
     setSelectedAddressIndex(index);
   };
-
+  // console.log(user?.[0]?._id);
   useEffect(() => {
     const fetchAllOrders = async () => {
       if (user?.length > 0) {
         try {
+          startLoading();
           const response = await FetchData(
             `orders/all-products-of/${user?.[0]?._id}`,
             "get"
           );
-          // console.log(response);
+          console.log(response);
           if (response.data.success) {
             setAllOrders(response.data.orders);
           } else {
@@ -144,6 +150,8 @@ const Dashboard = () => {
           }
         } catch (err) {
           setError(err.response?.data?.message || "Failed to fetch orders.");
+        } finally {
+          stopLoading();
         }
       }
     };
@@ -153,6 +161,7 @@ const Dashboard = () => {
   const fetchWishlistProducts = async () => {
     if (user?.length > 0) {
       try {
+        startLoading();
         const response = await FetchData(
           `users/${user?.[0]?._id}/wishlist-products`,
           "get"
@@ -167,6 +176,8 @@ const Dashboard = () => {
         setError(
           err.response?.data?.message || "Failed to fetch Wishlist products."
         );
+      } finally {
+        stopLoading();
       }
     }
   };
@@ -178,6 +189,7 @@ const Dashboard = () => {
     e.preventDefault();
     const formData = new FormData(fromRef.current);
     try {
+      startLoading();
       const response = await FetchData(
         `users/edit-user-profile/${user?.[0]?._id}`,
         "post",
@@ -193,6 +205,8 @@ const Dashboard = () => {
       }
     } catch (err) {
       setError(err.response?.data?.message || "Failed to update profile.");
+    } finally {
+      stopLoading();
     }
   };
 
@@ -207,17 +221,17 @@ const Dashboard = () => {
       <Lottie width={50} height={50} animationData={Loading} />
     </div>
   ) : (
-    <div className="flex min-h-screen">
+    <div className="flex flex-col lg:flex-row min-h-screen">
       <motion.aside
-        className="w-64 text-black p-4 shadow-lg"
+        className="lg:w-64 text-black p-4 shadow-lg"
         initial="hidden"
         animate="visible"
         variants={sidebarVariants}
       >
         <nav>
-          <ul>
+          <ul className="flex lg:flex-col justify-evenly items-center lg:jun">
             <li
-              className={`p-4 rounded-md mb-2 cursor-pointer transition-all duration-300 ${
+              className={`lg:p-4 rounded-md lg:mb-2 cursor-pointer transition-all duration-300 p-2 flex flex-col justify-center items-center lg:justify-start lg:items-start lg:w-full ${
                 activeSection === "profile"
                   ? "bg-blue-600 text-white"
                   : "bg-gray-300 text-black"
@@ -227,7 +241,7 @@ const Dashboard = () => {
               {<User />}Profile
             </li>
             <li
-              className={`p-4 rounded-md mb-2 cursor-pointer transition-all duration-300 ${
+              className={`lg:p-4 rounded-md lg:mb-2 cursor-pointer transition-all duration-300 p-2 flex flex-col justify-center items-center lg:justify-start lg:items-start lg:w-full ${
                 activeSection === "orders"
                   ? "bg-blue-600 text-white"
                   : "bg-gray-300 text-black"
@@ -237,17 +251,17 @@ const Dashboard = () => {
               {<ListOrdered />}Orders
             </li>
             <li
-              className={`p-4 rounded-md mb-2 cursor-pointer transition-all duration-300 ${
+              className={`lg:p-4 rounded-md lg:mb-2 cursor-pointer transition-all duration-300 p-2 flex flex-col justify-center items-center lg:justify-start lg:items-start lg:w-full ${
                 activeSection === "coupons"
                   ? "bg-blue-600 text-white"
                   : "bg-gray-300 text-black"
               }`}
               onClick={() => setActiveSection("coupons")}
             >
-              {<Newspaper />}Available Coupons
+              {<Newspaper />} Coupons
             </li>
             <li
-              className={`p-4 rounded-md cursor-pointer transition-all duration-300 ${
+              className={`lg:p-4 rounded-md cursor-pointer transition-all duration-300 p-2 flex flex-col justify-center items-center lg:justify-start lg:items-start lg:w-full ${
                 activeSection === "wishlist"
                   ? "bg-blue-600 text-white"
                   : "bg-gray-300 text-black"
@@ -268,9 +282,9 @@ const Dashboard = () => {
         >
           {activeSection === "profile" && (
             <section className="flex justify-center items-center flex-col">
-              <div className="flex w-full justify-evenly items-center mb-20 shadow py-10 rounded-xl">
-                <div>
-                  <h2 className="text-2xl font-bold mb-4 flex justify-center items-center ">
+              <div className="flex lg:flex-row flex-col w-full justify-evenly items-center lg:shadow py-2 rounded-xl">
+                <div className="name">
+                  <h2 className="text-2xl font-bold lg:flex justify-center items-center hidden">
                     <span>
                       <UserCheck className="mr-5" />
                     </span>
@@ -278,26 +292,27 @@ const Dashboard = () => {
                   </h2>
                   <p>
                     Name:{" "}
-                    <span className="text-2xl font-bold">
+                    <span className="lg:text-2xl font-bold">
                       {user?.[0]?.name}
                     </span>
                   </p>
                   <p>
                     Email:{" "}
-                    <span className="text-2xl font-bold">
+                    <span className="lg:text-2xl font-bold">
                       {user?.[0]?.email}
                     </span>
                   </p>
                   <p>
                     Number:{" "}
-                    <span className="text-2xl font-bold">
+                    <span className="lg:text-2xl font-bold">
                       {user?.[0]?.phoneNumber}
                     </span>
                   </p>
                 </div>
-                <div className="flex flex-col gap-5 justify-center items-center">
-                  <div className="flex justify-evenly items-center gap-5">
+                <div className="flex flex-col gap-5 justify-center items-center mt-10 lg:mt-0">
+                  <div className="button flex flex-col justify-evenly items-center gap-5 w-full">
                     <Button
+                      className={` bg-white text-blue-600 hover:bg-green-500 hover:text-black w-full`}
                       onClick={navigateHome}
                       // label={<ShoppingBag/>"Continue Shopping"}
                       label={
@@ -310,13 +325,15 @@ const Dashboard = () => {
                       }
                     />
                     <Button
+                      className={` bg-white text-blue-600 hover:bg-orange-500  hover:text-black w-full`}
                       onClick={() => {
                         Dispatch(clearUser());
-                        navigate("/login");
-                        alertInfo("you are logged Out! Please log in");
-                        localStorage.clear();
+                        localStorage.removeItem("AccessToken");
+                        localStorage.removeItem("RefreshToken");
+                        alert("You are logged out! Please log in.");
+                        setTimeout(() => navigate("/login"), 100);
+                        console.log(localStorage.getItem("RefreshToken"));
                       }}
-                      className={"hover:bg-orange-500"}
                       label={
                         <h1 className="flex justify-start gap-2">
                           <span>
@@ -328,8 +345,9 @@ const Dashboard = () => {
                     />
                     {/* <Button label={"Add Address"} /> */}
                   </div>
-                  <div className="flex justify-evenly items-center gap-5">
+                  <div className="button flex flex-col justify-evenly items-center gap-5 w-full">
                     <Button
+                      className={` bg-white text-blue-600 hover:bg-green-500 hover:text-black w-full`}
                       onClick={openModal}
                       label={
                         <h1 className="flex justify-start gap-2">
@@ -341,9 +359,10 @@ const Dashboard = () => {
                       }
                     />
                     <Button
+                      className={` bg-white text-blue-600 hover:bg-green-500 hover:text-black w-full`}
                       onClick={openModal2}
                       label={
-                        <h1 className="flex justify-start gap-2">
+                        <h1 className="flex justify-start gap-2 w-full">
                           <span>
                             <Edit />
                           </span>
@@ -355,43 +374,68 @@ const Dashboard = () => {
                   </div>
                 </div>
               </div>
-              <div className="flex flex-wrap flex-col">
-                <p className="m-10 font-bold text-xl">
+              <div className="address flex flex-wrap flex-col">
+                <p className=" font-bold text-xl lg:hidden block">Address:</p>
+                <p className=" font-bold text-xl hidden lg:block">
                   Select a Default Address:
                 </p>
-                {user?.[0]?.address?.map((address, index) => (
-                  <div
-                    key={address._id}
-                    className="gap-5 flex justify-center items-center  flex-wrap"
-                  >
-                    <input
-                      type="radio"
-                      name="address"
-                      value={index}
-                      checked={selectedAddressIndex === index}
-                      onChange={() => handleAddressChange(index)}
-                    />
-                    <span className="shadow m-2 p-4 rounded-xl">
-                      <li className="ml-4 font-semibold list-none">
-                        Street: <span>{address.street}</span>
-                      </li>
-                      <li className="ml-4 font-semibold list-none">
-                        City: <span>{address.city}</span>
-                      </li>
-                      <li className="ml-4 font-semibold list-none">
-                        Country: <span>{address.country}</span>
-                      </li>
-                      <li className="ml-4 font-semibold list-none">
-                        Postal Code: <span>{address.postalCode}</span>
-                      </li>
-                      <li className="ml-4 font-semibold list-none">
-                        State: <span>{address.state}</span>
-                      </li>
-                    </span>
-                    <Button label={<PencilLine />} />
-                    <Button label={<Trash />} />
-                  </div>
-                ))}
+                <div className="flex lg:flex-row flex-col">
+                  {user?.[0]?.address?.map((address, index) => (
+                    <div
+                      key={address._id}
+                      className="gap-5 flex justify-center items-center flex-row flex-wrap"
+                    >
+                      <input
+                        className="hidden lg:block"
+                        type="radio"
+                        name="address"
+                        value={index}
+                        checked={selectedAddressIndex === index}
+                        onChange={() => handleAddressChange(index)}
+                      />
+                      <span className="shadow m-2 p-4 rounded-xl">
+                        <li className="ml-4 font-semibold list-none">
+                          Street:{" "}
+                          <span className="font-thin font-serif">
+                            {address.street}
+                          </span>
+                        </li>
+                        <li className="ml-4 font-semibold list-none">
+                          City:{" "}
+                          <span className="font-thin font-serif">
+                            {address.city}
+                          </span>
+                        </li>
+                        <li className="ml-4 font-semibold list-none">
+                          Country:{" "}
+                          <span className="font-thin font-serif">
+                            {address.country}
+                          </span>
+                        </li>
+                        <li className="ml-4 font-semibold list-none">
+                          Postal Code:{" "}
+                          <span className="font-thin font-serif">
+                            {address.postalCode}
+                          </span>
+                        </li>
+                        <li className="ml-4 font-semibold list-none">
+                          State:{" "}
+                          <span className="font-thin font-serif">
+                            {address.state}
+                          </span>
+                        </li>
+                      </span>
+                      <Button
+                        className={` bg-white text-blue-600 hover:bg-green-500 hover:text-black`}
+                        label={<PencilLine />}
+                      />
+                      <Button
+                        className={` bg-white text-blue-600 hover:bg-green-500 hover:text-black`}
+                        label={<Trash />}
+                      />
+                    </div>
+                  ))}
+                </div>
 
                 {/* <button onClick={openModal}>Add Address</button> */}
 
@@ -442,10 +486,10 @@ const Dashboard = () => {
                           onChange={handleAddressInputChange}
                         />
                         <Button
+                          className={`mt-4 bg-white text-blue-600 hover:bg-green-500 hover:text-black`}
                           type="button"
                           onClick={addAddress}
                           label="Add Address"
-                          className="mt-4"
                         />
                       </form>
                       {error && <p className="text-red-500">{error}</p>}
@@ -497,9 +541,9 @@ const Dashboard = () => {
                             onChange={handleAddressInputChange2}
                           />
                           <Button
+                            className={`mt-4 bg-white text-blue-600 hover:bg-green-500 hover:text-black`}
                             type="submit"
                             label="Update Profile"
-                            className="mt-4"
                           />
                         </form>
                       </div>
@@ -524,10 +568,14 @@ const Dashboard = () => {
                 {console.log(allOrders)}
                 {allOrders?.map((product, index) => (
                   <ProductCard
+                    Image={product?.products[0]?.product?.images[0]?.url}
                     key={index}
-                    ProductName={product?.products?.[0]?.product?.name}
-                    CurrentPrice={product?.products?.[0]?.product?.price}
-                    Mrp={product?.products?.[0]?.product?.price}
+                    ProductName={product?.products[0]?.product?.name}
+                    CurrentPrice={
+                      product?.products?.[0]?.price?.sellingPrice
+                    }
+                    Mrp={product?.products?.[0]?.price?.MRP}
+                    Discount={product?.products?.[0]?.price?.discount}
                     Rating={product?.products?.[0]?.product?.Rating}
                     Offer={product?.products?.[0]?.product?.off}
                     Description={product?.products?.[0]?.product?.description}
@@ -551,21 +599,37 @@ const Dashboard = () => {
                 Your wishlist is here with {""}
                 <span>{wishlistProducts?.length} items.</span>
               </h1>
-              {/* {console.log(wishlistProducts)} */}
-              <div className="flex justify-start items-start gap-5 flex-wrap p-5 ">
+              {console.log(wishlistProducts)}
+              <div className="flex justify-start items-start gap-5 flex-wrap p-5">
                 {wishlistProducts?.map((product, index) => (
                   <ProductCard
+                    Image={product?.images[0]?.url}
                     key={index}
                     ProductName={product?.name}
-                    CurrentPrice={product?.price}
-                    Mrp={product?.price}
-                    Rating={product?.Rating}
-                    Offer={product?.off}
+                    CurrentPrice={product?.price?.sellingPrice}
+                    Mrp={product?.price?.MRP}
+                    // Rating={product?.products?.[0]?.product?.Rating}
+                    Discount={product?.price?.discount}
                     Description={product?.description}
                     productId={product?._id}
                   />
                 ))}
               </div>
+              {/* <div className="flex justify-start items-start gap-5 flex-wrap lg:hidden">
+                {wishlistProducts?.map((product, index) => (
+                  <ProductCardMobile
+                    Image={product?.images[0]?.url}
+                    key={product._id}
+                    ProductName={product.name}
+                    CurrentPrice={product.price}
+                    Mrp={product.price}
+                    Rating={product.rating || "No rating"}
+                    Offer="No offer"
+                    Category={product.category.main}
+                    StockQuantity={product.stockQuantity}
+                  />
+                ))}
+              </div> */}
             </section>
           )}
         </motion.div>
@@ -574,4 +638,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default LoadingUI(Dashboard);

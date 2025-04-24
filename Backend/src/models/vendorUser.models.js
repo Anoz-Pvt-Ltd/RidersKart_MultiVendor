@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import mongoose from "mongoose";
 import Jwt from "jsonwebtoken";
+import { Subcategory } from "./sub-category.model.js";
 
 const vendorSchema = new mongoose.Schema({
   name: {
@@ -16,6 +17,10 @@ const vendorSchema = new mongoose.Schema({
     lowercase: true,
   },
   contactNumber: {
+    type: String,
+    required: true,
+  },
+  panNumber: {
     type: String,
     required: true,
   },
@@ -59,6 +64,37 @@ const vendorSchema = new mongoose.Schema({
       ref: "Product",
     },
   ],
+
+  category: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Category",
+    },
+  ],
+
+  subcategory: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Subcategory",
+    },
+  ],
+
+  image: {
+    fileId: {
+      type: String, // ImageKit file ID
+      default: null,
+      required: true, // The unique identifier for the uploaded image file
+    },
+    url: {
+      type: String,
+      required: true,
+    },
+    altText: {
+      type: String,
+      default: "",
+    },
+  },
+
   businessDetails: {
     gstNumber: {
       type: String,
@@ -98,6 +134,11 @@ const vendorSchema = new mongoose.Schema({
     enum: ["active", "inactive", "suspended"],
     default: "active",
   },
+  isVerified: {
+    type: Boolean,
+    default: false,
+  },
+
   createdAt: {
     type: Date,
     default: Date.now,

@@ -4,8 +4,10 @@ import InputBox from "../../components/InputBox";
 import { addUser, clearUser } from "../../utils/Slice/UserInfoSlice";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import LoadingUI from "../../components/Loading";
+import Button from "../../components/Button";
 
-const LoginForm = () => {
+const LoginForm = ({ startLoading, stopLoading, openRegister }) => {
   const Dispatch = useDispatch();
   const Navigate = useNavigate();
   const [credentials, setCredentials] = useState({
@@ -27,6 +29,7 @@ const LoginForm = () => {
     setSuccess("");
 
     try {
+      startLoading();
       const response = await FetchData("vendor/login", "post", credentials);
       console.log(response);
       Dispatch(clearUser());
@@ -43,20 +46,22 @@ const LoginForm = () => {
         "RefreshToken",
         response.data.data.tokens.refreshToken
       ); // Save token to localStorage
-      Navigate("/");
+      Navigate("/dashboard");
     } catch (err) {
       setError(err.response?.data?.message || "Invalid email or password.");
+    } finally {
+      stopLoading();
     }
   };
 
   return (
-    <div className="max-w-md mx-auto p-6 bg-white shadow-lg rounded-lg">
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">Login</h1>
+    <div className="max-w-md mx-auto p-6 backdrop-blur-sm shadow-lg rounded-lg w-96">
+      <h1 className="text-2xl font-bold text-gray-800 lg:mb-6">Login</h1>
 
       {error && <div className="text-red-500 mb-4">{error}</div>}
       {success && <div className="text-green-500 mb-4">{success}</div>}
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="lg:space-y-6">
         {/* Email Input */}
         <InputBox
           LabelName="Email"
@@ -79,16 +84,28 @@ const LoginForm = () => {
 
         {/* Submit Button */}
         <div>
-          <button
+          <Button Type={"submit"} label={"Login"} className={"w-full"} />
+          {/* <button
             type="submit"
             className="w-full bg-blue-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-600"
           >
             Login
-          </button>
+          </button> */}
         </div>
       </form>
+      <div className="lg:block hidden">
+        <p className="text-sm text-gray-500">
+          Don't have an account?{" "}
+          <span
+            className="font-bold underline text-blue-500 cursor-pointer"
+            onClick={openRegister}
+          >
+            Sign Up
+          </span>
+        </p>
+      </div>
     </div>
   );
 };
 
-export default LoginForm;
+export default LoadingUI(LoginForm);

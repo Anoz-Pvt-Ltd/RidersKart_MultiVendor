@@ -12,6 +12,7 @@ import AdminLogin from "./Pages/Login/Login";
 import CurrentUser from "./Pages/CurrentUser/CurrentUser";
 import CurrentProduct from "./Pages/CurrentProduct/CurrentProduct";
 import CurrentOrder from "./Pages/CurrentOrder/CurrentOrder";
+import CurrentUnVerifiedVendor from "./Pages/Current-UnVerifiedVendor/CurrentUnVerifiedVendor";
 import CurrentVerifiedVendor from "./Pages/Current-VerifiedVendor/CurrentVerifiedVendor";
 
 const App = () => {
@@ -64,8 +65,12 @@ const App = () => {
           />
           <Route path="/current-order/:orderId" element={<CurrentOrder />} />
           <Route
-            path="/current-vendor/:vendorId"
+            path="/current-verified-vendor/:vendorId"
             element={<CurrentVerifiedVendor />}
+          />
+          <Route
+            path="/current-un-verified-vendor/:vendorId"
+            element={<CurrentUnVerifiedVendor />}
           />
         </Routes>
       </div>

@@ -3,8 +3,9 @@ import { useParams } from "react-router";
 import { FetchData } from "../../Utility/FetchFromApi";
 import { useSelector } from "react-redux";
 import Button from "../../Components/Button";
+import LoadingUI from "../../Components/Loading";
 
-const CurrentOrder = () => {
+const CurrentOrder = ({ startLoading, stopLoading }) => {
   const { orderId } = useParams();
   const user = useSelector((store) => store.UserInfo.user);
   const [error, setError] = useState("");
@@ -16,6 +17,7 @@ const CurrentOrder = () => {
     const fetchOrder = async () => {
       if (user?.length > 0) {
         try {
+          startLoading();
           const response = await FetchData(
             `orders/admin/current-order/${orderId}`,
             "get"
@@ -29,6 +31,8 @@ const CurrentOrder = () => {
           }
         } catch (err) {
           setError(err.response?.data?.message || "Failed to fetch orders.");
+        } finally {
+          stopLoading();
         }
       }
     };
@@ -39,7 +43,6 @@ const CurrentOrder = () => {
   // console.log(currentOrder);
   //   console.log(currentOrderProducts);
   //   console.log(CurrentOrderAddress);
-
 
   const fullAddress = `${CurrentOrderAddress?.street}, ${CurrentOrderAddress?.city}, ${CurrentOrderAddress?.state} ${CurrentOrderAddress?.postalCode}, ${CurrentOrderAddress?.country}`;
 
@@ -81,7 +84,9 @@ const CurrentOrder = () => {
                 <span className="font-medium text-gray-600 w-1/3">
                   {item.label}
                 </span>
-                <span className="text-xl font-medium text-gray-700">{item.value}</span>
+                <span className="text-xl font-medium text-gray-700">
+                  {item.value}
+                </span>
               </div>
             ))}
           </div>
@@ -91,4 +96,4 @@ const CurrentOrder = () => {
   );
 };
 
-export default CurrentOrder;
+export default LoadingUI(CurrentOrder);

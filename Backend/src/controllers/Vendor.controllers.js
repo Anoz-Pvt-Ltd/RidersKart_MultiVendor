@@ -4,13 +4,18 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { VendorUser } from "../models/vendorUser.models.js";
 import { Product } from "../models/products.models.js";
 import jwt from "jsonwebtoken";
+import { UploadImages } from "../utils/imageKit.io.js";
 
 const registerVendor = asyncHandler(async (req, res, next) => {
   const {
     name,
     email,
     contactNumber,
-    location = {}, // Default to an empty object to avoid destructuring issues
+    address,
+    city,
+    state,
+    country,
+    postalCode, // Default to an empty object to avoid destructuring issues
     gstNumber,
     businessName,
     accountHolderName,
@@ -18,11 +23,9 @@ const registerVendor = asyncHandler(async (req, res, next) => {
     bankName,
     ifscCode,
     password,
+    panNumber,
   } = req.body;
 
-  const { address, city, state, country, postalCode } = location;
-  // console.log(req.body);
-  // Validate input (all required fields, including nested location fields)
   if (
     !name ||
     !email ||
@@ -38,7 +41,8 @@ const registerVendor = asyncHandler(async (req, res, next) => {
     !accountNumber ||
     !bankName ||
     !ifscCode ||
-    !password
+    !password ||
+    !panNumber
   ) {
     return next(new ApiError(400, "All fields are required"));
   }
@@ -49,11 +53,29 @@ const registerVendor = asyncHandler(async (req, res, next) => {
     return next(new ApiError(400, "A vendor with this email already exists"));
   }
 
+  const imageFile = req.file;
+  if (!imageFile) throw new ApiError(404, "Image file not found!");
+
+  const image = await UploadImages(
+    imageFile.filename,
+    {
+      folderStructure: `all-vendor/${name.split(" ").join("-")}/GST-Image`,
+    },
+    [`${name.split(" ").join("-")}-GST-Id`, `${gstNumber}`]
+  );
+
+  if (!image)
+    throw new ApiError(
+      500,
+      "Failed to upload image due to internal error! Please try again"
+    );
+
   // Create new vendor instance
   const newVendor = new VendorUser({
     name,
     email,
     contactNumber,
+    panNumber,
     location: {
       address,
       city,
@@ -70,6 +92,11 @@ const registerVendor = asyncHandler(async (req, res, next) => {
       accountNumber,
       bankName,
       ifscCode,
+    },
+    image: {
+      url: image.url,
+      fileId: image.fileId,
+      altText: name,
     },
     password, // Password will be hashed in the pre-save middleware
   });
@@ -88,6 +115,7 @@ const registerVendor = asyncHandler(async (req, res, next) => {
       name: newVendor.name,
       email: newVendor.email,
       contactNumber: newVendor.contactNumber,
+      panNumber: newVendor.panNumber,
       location: newVendor.location,
       status: newVendor.status,
       createdAt: newVendor.createdAt,
@@ -120,6 +148,8 @@ const loginVendor = asyncHandler(async (req, res, next) => {
   if (!isPasswordValid) {
     return next(new ApiError(401, "Invalid email or password"));
   }
+
+  if (!vendor.isVerified) throw new ApiError(401, "You are not verified yet!");
 
   // Generate access and refresh tokens
   const accessToken = vendor.generateAccessToken();
@@ -179,14 +209,13 @@ const regenerateRefreshToken = asyncHandler(async (req, res) => {
 
     if (!token) throw new ApiError(401, "Unauthorized request");
 
-    console.log(token, process.env.REFRESH_TOKEN_SECRET);
-
+   
     const DecodedToken = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
 
     const user = await VendorUser.findById(DecodedToken._id).select(
       "-password -refreshToken"
     );
-    console.log(user);
+    // console.log(user);
 
     if (!user) throw new ApiError(400, "Invalid Token");
 
@@ -283,14 +312,24 @@ const getVendorDetailsByProductId = async (req, res) => {
 };
 
 const getAllVendors = asyncHandler(async (req, res) => {
-  try {
-    const vendors = await VendorUser.find({});
-    res.json(
-      new ApiResponse(200, { vendors }, "All vendors fetched successfully")
-    );
-  } catch (error) {
-    throw new ApiError(500, error.message || "Something went wrong");
-  }
+  const vendors = await VendorUser.find({});
+  res.json(
+    new ApiResponse(200, { vendors }, "All vendors fetched successfully")
+  );
+});
+
+const getVerifiedVendors = asyncHandler(async (req, res) => {
+  const vendor = await VendorUser.find({ isVerified: true });
+  res.json(
+    new ApiResponse(200, { vendor }, "Verified vendors fetched successfully")
+  );
+});
+
+const getUnverifiedVendors = asyncHandler(async (req, res) => {
+  const vendor = await VendorUser.find({ isVerified: false });
+  res.json(
+    new ApiResponse(200, { vendor }, "Unverified vendors fetched successfully")
+  );
 });
 
 const getCurrentVendor = asyncHandler(async (req, res) => {
@@ -317,6 +356,31 @@ const VendorBan = asyncHandler(async (req, res) => {
   res.status(200).json(new ApiResponse(200, vendor, "vendor status updated"));
 });
 
+const rejectVendor = asyncHandler(async (req, res) => {
+  const { vendorId } = req.params;
+
+  if (!vendorId) throw new ApiError(404, "vendor Id not found");
+  const vendor = await VendorUser.findByIdAndDelete(vendorId);
+
+  if (!vendor) throw new ApiError(404, "Vendor not found");
+
+  res.status(200).json(new ApiResponse(200, null, "Vendor rejected!"));
+});
+
+const acceptVendor = asyncHandler(async (req, res) => {
+  const { vendorId } = req.params;
+  if (!vendorId) throw new ApiError(404, "Vendor Id is required!");
+
+  const vendor = await VendorUser.findByIdAndUpdate(
+    vendorId,
+    { isVerified: true },
+    { new: true }
+  );
+
+  if (!vendor) throw new ApiError(404, "Vendor not found");
+  res.status(200).json(new ApiResponse(200, vendor, "Vendor accepted!"));
+});
+
 export {
   registerVendor,
   loginVendor,
@@ -326,6 +390,10 @@ export {
   deleteVendor,
   getVendorDetailsByProductId,
   getAllVendors,
+  getVerifiedVendors,
+  getUnverifiedVendors,
   getCurrentVendor,
   VendorBan,
+  acceptVendor,
+  rejectVendor,
 };

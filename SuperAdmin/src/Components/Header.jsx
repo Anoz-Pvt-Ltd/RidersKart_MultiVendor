@@ -2,15 +2,20 @@ import { LogIn, LogOut, User2 } from "lucide-react";
 import React from "react";
 import { Link, Navigate, useNavigate } from "react-router";
 import Button from "./Button";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { clearUser } from "../Utility/Slice/UserInfoSlice";
 
 const Header = () => {
   const user = useSelector((store) => store.UserInfo.user);
   // console.log(user);
+  const dispatch = useDispatch();
 
   const Navigate = useNavigate();
 
   const NavigateLogin = () => {
+    dispatch(clearUser());
+    alert("You are logged out! Please log in");
+    localStorage.clear();
     Navigate("/");
   };
   const NavigateToProfile = () => {
@@ -21,7 +26,7 @@ const Header = () => {
     <header className="flex justify-between items-center mb-4 px-5 ">
       {/* Logo */}
       <div className="flex items-center">
-        <Link to={"/"}>
+        <Link to={"/home"}>
           <img
             src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Flipkart_logo.png/800px-Flipkart_logo.png"
             alt="Logo"
@@ -30,7 +35,7 @@ const Header = () => {
         </Link>
       </div>
       <div className="flex items-center gap-5 px-4 py-5">
-        {user.length ? (
+        {user.length > 0 ? (
           <div>
             <Button
               label={
@@ -42,6 +47,17 @@ const Header = () => {
                 </h1>
               }
               onClick={NavigateToProfile}
+            />
+            <Button
+              label={
+                <h1 className="flex  justify-start gap-2">
+                  <span>
+                    <LogOut />
+                  </span>
+                  Log Out{" "}
+                </h1>
+              }
+              onClick={NavigateLogin}
             />
           </div>
         ) : (
@@ -59,17 +75,6 @@ const Header = () => {
             />
           </div>
         )}
-        <Button
-          label={
-            <h1 className="flex  justify-start gap-2">
-              <span>
-                <LogOut />
-              </span>
-              Log Out{" "}
-            </h1>
-          }
-          onClick={NavigateLogin}
-        />
       </div>
     </header>
   );

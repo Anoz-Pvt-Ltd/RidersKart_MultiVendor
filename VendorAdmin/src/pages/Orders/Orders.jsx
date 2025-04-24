@@ -1,17 +1,10 @@
 import React, { useEffect, useState } from "react";
 import OrderCard from "./OrderCard";
-import {
-  FaBox,
-  FaTruck,
-  FaCheckCircle,
-  FaTimesCircle,
-  FaUndoAlt,
-  FaClipboardList,
-} from "react-icons/fa";
 import { FetchData } from "../../utils/FetchFromApi";
 import { useSelector } from "react-redux";
+import LoadingUI from "../../components/Loading";
 
-const Orders = () => {
+const Orders = ({ startLoading, stopLoading }) => {
   const user = useSelector((store) => store.UserInfo.user);
   const [error, setError] = useState(null);
   const [allOrders, setAllOrders] = useState([]);
@@ -20,10 +13,12 @@ const Orders = () => {
     const fetchAllOrders = async () => {
       if (user?.length > 0) {
         try {
+          startLoading();
           const response = await FetchData(
             `orders/all-products-of-vendor/${user?.[0]?._id}`,
             "get"
           );
+          // console.log(response);
           if (response.data.success) {
             setAllOrders(response.data.orders);
           } else {
@@ -31,14 +26,14 @@ const Orders = () => {
           }
         } catch (err) {
           setError(err.response?.data?.message || "Failed to fetch orders.");
+        } finally {
+          stopLoading();
         }
       }
     };
     fetchAllOrders();
   }, [user]);
   console.log(allOrders);
-
-  
 
   if (error) {
     return <p className="text-red-600 text-center">{error}</p>;
@@ -55,7 +50,7 @@ const Orders = () => {
               <tr>
                 <th className="py-2 px-4 border-b">Order ID</th>
                 <th className="py-2 px-4 border-b">Product Name</th>
-                <th className="py-2 px-4 border-b">Category</th>
+                <th className="py-2 px-4 border-b">Category ID / Subcategory ID</th>
                 <th className="py-2 px-4 border-b">Quantity</th>
                 <th className="py-2 px-4 border-b">Price</th>
                 <th className="py-2 px-4 border-b">Total Amount</th>
@@ -75,14 +70,14 @@ const Orders = () => {
                       {order.products[0]?.product.name || "N/A"}
                     </td>
                     <td className="py-2 px-4 border-b">
-                      {order.products[0]?.product.category.main || "N/A"} -{" "}
-                      {order.products[0]?.product.category.sub || "N/A"}
+                      {order.products[0]?.product.category || "N/A"} -----------------------------{" "}
+                      {order.products[0]?.product.subcategory || "N/A"}
                     </td>
                     <td className="py-2 px-4 border-b">
                       {order.products[0]?.quantity}
                     </td>
                     <td className="py-2 px-4 border-b">
-                      {order.products[0]?.price}
+                      {order.products[0]?.product?.price?.sellingPrice}
                     </td>
                     <td className="py-2 px-4 border-b">{order.totalAmount}</td>
                     <td className="py-2 px-4 border-b">{order.orderStatus}</td>
@@ -117,4 +112,4 @@ const Orders = () => {
   );
 };
 
-export default Orders;
+export default LoadingUI(Orders);

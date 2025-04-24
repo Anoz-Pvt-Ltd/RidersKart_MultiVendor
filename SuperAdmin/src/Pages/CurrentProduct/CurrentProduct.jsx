@@ -3,8 +3,9 @@ import { useNavigate, useParams } from "react-router";
 import { FetchData } from "../../Utility/FetchFromApi";
 import { useSelector } from "react-redux";
 import Button from "../../Components/Button";
+import LoadingUI from "../../Components/Loading";
 
-const CurrentProduct = () => {
+const CurrentProduct = ({ startLoading, stopLoading }) => {
   const { productId } = useParams();
   const user = useSelector((store) => store.UserInfo.user);
   const [error, setError] = useState("");
@@ -17,6 +18,7 @@ const CurrentProduct = () => {
     const fetchProduct = async () => {
       if (user?.length > 0) {
         try {
+          startLoading();
           const response = await FetchData(
             `products/admin/get-single-product/${productId}`,
             "get"
@@ -29,6 +31,8 @@ const CurrentProduct = () => {
           }
         } catch (err) {
           setError(err.response?.data?.message || "Failed to fetch orders.");
+        } finally {
+          startLoading();
         }
       }
     };
@@ -38,6 +42,7 @@ const CurrentProduct = () => {
 
   const handleDeleteProduct = async () => {
     try {
+      startLoading();
       const response = await FetchData(
         `products/admin/single-product/${productId}`,
         "delete"
@@ -51,6 +56,8 @@ const CurrentProduct = () => {
       }
     } catch (err) {
       setError(err.response?.data?.message || "Failed to delete product.");
+    } finally {
+      stopLoading();
     }
   };
 
@@ -105,4 +112,4 @@ const CurrentProduct = () => {
   );
 };
 
-export default CurrentProduct;
+export default LoadingUI(CurrentProduct);
