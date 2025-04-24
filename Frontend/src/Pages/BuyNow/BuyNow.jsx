@@ -133,7 +133,7 @@ const BuyNow = ({ startLoading, stopLoading }) => {
           alert("Payment Failed");
         } else if (isValidated.status === 201) {
           alert("Payment Successful");
-          setPaymentMethod("done")
+          setPaymentMethod("done");
         }
       },
     };
@@ -261,6 +261,12 @@ const BuyNow = ({ startLoading, stopLoading }) => {
     );
   };
 
+  // function getTotalPayablePrice() {
+  //   return product.map((total, item) => {
+  //     if (!item.product) return total;
+  //     return total + item.product.price.sellingPrice * item.quantity;
+  //   }, 0);
+  // }
   return (
     <div>
       {user === null || user.length === 0 ? (
@@ -278,17 +284,44 @@ const BuyNow = ({ startLoading, stopLoading }) => {
           <Login />
         </div>
       ) : (
-        <div className="buy-now-page flex flex-col lg:flex-row justify-center items-center gap-20 mt-10">
+        <div className="buy-now-page flex flex-col lg:flex-row justify-center items-center gap-20 mt-10 h-full">
           {product && (
-            <div className="w-fit">
-              <ProductCard
-                Image={product?.images[0]?.url}
-                ProductName={product?.name}
-                Description={product?.description}
-                productId={product?._id}
-                CurrentPrice={product?.price.sellingPrice}
-                Mrp={product?.price.MRP}
-              />
+            <div className="w-fit px-10">
+              <div className="grid grid-cols-5 grid-rows-4 gap-4 w-full rounded-lg  px-5 py-6 shadow-lg shadow-neutral-300">
+                <div className="col-span-2 row-span-4 ">
+                  <div className="flex justify-center items-center w-full h-full rounded">
+                    <img
+                      src={product?.images[0].url}
+                      alt={product?.name}
+                      className=" object-cover rounded shadow-lg shadow-neutral-600 "
+                    />
+                  </div>
+                </div>
+                <div className="col-span-3 col-start-3 row-start-1 w-full border rounded-xl shadow-xl shadow-neutral-300">
+                  <h2 className="font-medium text-2xl px-5 w-full h-full flex items-center">
+                    {product?.name}
+                  </h2>
+                </div>
+                <div className="col-span-3 col-start-3 row-start-2  w-full">
+                  <h2 className="text-sm w-full h-full flex items-center truncate">
+                    {/* Seller name: {item?.product?.name} */}
+                    Description: {product?.description}
+                  </h2>
+                </div>
+                <div className="col-span-3 col-start-3 row-start-3  w-full ">
+                  <div className="flex justify-evenly items-center gap-5">
+                    <span className="text-sm line-through">
+                      MRP: ₹ {product?.price.MRP}
+                    </span>
+                    <span className="font-semibold">
+                      Current price: ₹{product?.price.sellingPrice}
+                    </span>
+                    <span className="text-green-500 font-semibold">
+                      {product?.price.discount}%off
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
 
@@ -337,22 +370,44 @@ const BuyNow = ({ startLoading, stopLoading }) => {
                 <option value="cash">Cash on delivery</option>
               </select>
             </div>
+            {paymentMethod === "online" && (
+              <Button
+                className={`mt-5 bg-white text-blue-600 hover:bg-green-500 hover:text-black w-3/4`}
+                onClick={Payment}
+                label={"Proceed for payment"}
+              />
+            )}
+            {paymentMethod === "cash" && (
+              <Button
+                className={`mt-5 bg-white text-blue-600 hover:bg-green-500 hover:text-black w-3/4`}
+                onClick={Payment}
+                label={"Proceed for payment"}
+              />
+            )}
           </div>
 
-          {paymentMethod === "online" && (
-            <Button
-              className={`mt-5 bg-white text-blue-600 hover:bg-green-500 hover:text-black`}
-              onClick={Payment}
-              label={"Proceed for payment"}
-            />
-          )}
+          {/* <div className="bg-white shadow-md rounded-md p-4 w-full">
+            <h2 className="text-xl font-bold mb-4">Order Summary</h2>
+            <div className="flex justify-between mb-2">
+              <p>Subtotal</p>
+              <p>₹ {getTotalPayablePrice()}</p>
+            </div>
+            <div className="flex justify-between mb-2">
+              <p>Tax</p>
+              <p>₹ {(getTotalPayablePrice() * 0.1).toFixed(2)}</p>
+            </div>
+            <div className="flex justify-between font-bold mb-4">
+              <p>Total</p>
+              <p>₹ {(getTotalPayablePrice() * 1.1).toFixed(2)}</p>
+            </div>
+          </div> */}
 
-          <Button
+          {/* <Button
             className={` bg-white text-blue-600 hover:bg-green-500 hover:text-black`}
             onClick={handleOrderConfirmation}
             // Disabled={!selectedAddress || !paymentMethod}
             label={"Place order"}
-          />
+          /> */}
         </div>
       )}
     </div>

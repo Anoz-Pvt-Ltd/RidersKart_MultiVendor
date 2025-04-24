@@ -285,12 +285,14 @@ const CartPage = ({ startLoading, stopLoading }) => {
                       className="flex flex-col gap-5 md:flex-row items-center justify-between border-b pb-4 mb-4"
                     >
                       <div className="grid grid-cols-5 grid-rows-5 gap-4 w-full rounded">
-                        <div className="col-span-2 row-span-4 shadow-lg shadow-neutral-600 w-full rounded">
-                          <img
-                            src={item?.product?.images[0].url}
-                            alt={item?.product?.name}
-                            className="w-full object-cover rounded"
-                          />
+                        <div className="col-span-2 row-span-4 ">
+                          <div className="flex justify-center items-center w-full h-full rounded">
+                            <img
+                              src={item?.product?.images[0].url}
+                              alt={item?.product?.name}
+                              className="w-40 object-cover rounded shadow-lg shadow-neutral-600 "
+                            />
+                          </div>
                         </div>
                         <div className="col-span-5 col-start-1 row-start-5 w-full">
                           <div className="flex justify-evenly items-center gap-5">
@@ -434,13 +436,14 @@ const CartPage = ({ startLoading, stopLoading }) => {
                     label={"Proceed for payment"}
                   />
                 )}
-
-                <Button
-                  className={` bg-white text-blue-600 hover:bg-green-500 hover:text-black mt-10`}
-                  onClick={HandleConfirmOrder}
-                  Disabled={!selectedAddress || !paymentMethod}
-                  label={"Place order"}
-                />
+                {paymentMethod === "cash" && (
+                  <Button
+                    className={` bg-white text-blue-600 hover:bg-green-500 hover:text-black mt-10`}
+                    onClick={HandleConfirmOrder}
+                    Disabled={!selectedAddress || !paymentMethod}
+                    label={"Place order"}
+                  />
+                )}
               </div>
             </div>
           </div>
