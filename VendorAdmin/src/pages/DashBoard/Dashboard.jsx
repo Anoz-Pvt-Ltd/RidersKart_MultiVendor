@@ -20,7 +20,7 @@ import VerifiedDrivers from "../Delivery-partner/VerifiedDrivers";
 
 const Dashboard = ({ startLoading, stopLoading }) => {
   const user = useSelector((store) => store.UserInfo.user);
-  console.log(user);
+  // console.log(user);
   const Dispatch = useDispatch();
   const [selectedMenu, setSelectedMenu] = useState("Home");
   const navigate = useNavigate();
@@ -80,18 +80,18 @@ const Dashboard = ({ startLoading, stopLoading }) => {
     navigate("/vendor-profile");
   };
   const [products, setProducts] = useState([]);
-  console.log(products);
+
   const [pieData, setPieData] = useState({
     labels: [],
     datasets: [
       {
         data: [],
         backgroundColor: [
+          "#8E44AD",
           "#36A2EB",
           "#FF6384",
           "#FFCE56",
           "#FF5733",
-          "#8E44AD",
           "#28B463",
           "#C70039",
           "#1ABC9C",
@@ -100,6 +100,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
       },
     ],
   });
+  // console.log(pieData);
 
   const fetchProducts = async () => {
     try {
@@ -108,11 +109,11 @@ const Dashboard = ({ startLoading, stopLoading }) => {
         `products/get-all-product-of-vendor/${user?.[0]?._id}`,
         "get"
       );
-      console.log(response);
+      // console.log(response);
 
       const fetchedProducts = response.data.data || [];
       setProducts(fetchedProducts);
-      console.log(fetchedProducts);
+      // console.log(fetchedProducts);
 
       // Aggregate stockQuantity by category
       const categoryData = {};
@@ -123,6 +124,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
             (categoryData[category?.title] || 0) + stockQuantity;
         }
       });
+      // console.log(categoryData);
 
       // Prepare pieData
       const labels = Object.keys(categoryData);
@@ -138,6 +140,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
           },
         ],
       }));
+
     } catch (err) {
       console.error(err);
       setError(err.response?.data?.message || "Failed to fetch products.");
