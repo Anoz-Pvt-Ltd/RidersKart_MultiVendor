@@ -3,7 +3,7 @@ import { useNavigate } from "react-router";
 import Button from "../../Components/Button";
 import InputBox from "../../Components/InputBox";
 import { FetchData } from "../../Utility/FetchFromApi";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addUser, clearUser } from "../../Utility/Slice/UserInfoSlice";
 import LoadingUI from "../../Components/Loading";
 
@@ -18,6 +18,9 @@ const AdminLogin = ({ startLoading, stopLoading }) => {
     phoneNumber: "",
     password: "",
   });
+
+  const user = useSelector((store) => store.UserInfo.user);
+  console.log(user);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -54,7 +57,9 @@ const AdminLogin = ({ startLoading, stopLoading }) => {
     }
   };
 
-  return (
+  return user.length > 0 ? (
+    navigate("/home")
+  ) : (
     <div className="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg">
       <h1 className="text-2xl font-bold text-gray-800 mb-6">
         Welcome, Login yourself as Admin

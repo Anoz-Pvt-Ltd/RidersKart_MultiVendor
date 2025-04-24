@@ -23,7 +23,7 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
             `products/admin/get-single-product/${productId}`,
             "get"
           );
-          // console.log(response);
+          console.log(response);
           if (response.data.success) {
             setCurrentProduct(response.data.data);
           } else {
@@ -32,7 +32,7 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
         } catch (err) {
           setError(err.response?.data?.message || "Failed to fetch orders.");
         } finally {
-          startLoading();
+          stopLoading();
         }
       }
     };
@@ -66,7 +66,9 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
       <div>
         <h2>
           Vendor Id:{" "}
-          <span className="text-xl font-bold">{currentProduct?.vendor}</span>
+          <span className="text-xl font-bold">
+            {currentProduct?.vendor?._id}
+          </span>
         </h2>
         <h1>
           CurrentProduct Id:{" "}
@@ -90,11 +92,14 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
           {[
             { label: "Name", value: currentProduct?.name },
             { label: "Description", value: currentProduct?.description },
-            { label: "Price", value: `₹ ${currentProduct?.price}` },
+            {
+              label: "Price",
+              value: `₹ ${currentProduct?.price?.sellingPrice}`,
+            },
             { label: "Quantity", value: currentProduct?.stockQuantity },
             { label: "Created At", value: currentProduct?.createdAt },
-            { label: "Category", value: currentProduct?.category?.main },
-            { label: "Sub-Category", value: currentProduct?.category?.sub },
+            { label: "Category", value: currentProduct?.category?._id },
+            { label: "Sub-Category", value: currentProduct?.subcategory?._id },
           ].map((item, index) => (
             <h2
               key={index}

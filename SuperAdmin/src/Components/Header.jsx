@@ -21,6 +21,9 @@ const Header = () => {
   const NavigateToProfile = () => {
     Navigate(`/user-profile/dashboard/${user?.[0]?._id}`);
   };
+  const NavigateToAdminRegister = () => {
+    Navigate(`/admin-register`);
+  };
 
   return (
     <header className="flex justify-between items-center mb-4 px-5 ">
@@ -36,8 +39,9 @@ const Header = () => {
       </div>
       <div className="flex items-center gap-5 px-4 py-5">
         {user.length > 0 ? (
-          <div>
+          <div className="flex justify-center items-center gap-5">
             <Button
+              className={` bg-white text-blue-600 hover:bg-green-500 hover:text-black`}
               label={
                 <h1 className="flex justify-start gap-2">
                   <span>
@@ -49,6 +53,19 @@ const Header = () => {
               onClick={NavigateToProfile}
             />
             <Button
+              className={` bg-white text-blue-600 hover:bg-green-500 hover:text-black`}
+              label={
+                <h1 className="flex justify-start gap-2">
+                  <span>
+                    <User2 />
+                  </span>
+                  Register a new Admin
+                </h1>
+              }
+              onClick={NavigateToAdminRegister}
+            />
+            <Button
+              className={` bg-white text-blue-600 hover:bg-green-500 hover:text-black`}
               label={
                 <h1 className="flex  justify-start gap-2">
                   <span>
@@ -63,6 +80,7 @@ const Header = () => {
         ) : (
           <div>
             <Button
+              className={` bg-white text-blue-600 hover:bg-green-500 hover:text-black`}
               label={
                 <h1 className="flex  justify-start gap-2">
                   <span>

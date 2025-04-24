@@ -17,7 +17,7 @@ const AdminRegister = ({ startLoading, stopLoading }) => {
   });
 
   const HandleLogin = () => {
-    navigate("/");
+    navigate("/home");
   };
 
   const handleChange = (e) => {
@@ -30,7 +30,7 @@ const AdminRegister = ({ startLoading, stopLoading }) => {
     e.preventDefault();
     const formData = new FormData(formRef.current);
     try {
-      startLoading()
+      startLoading();
       const response = await FetchData(
         `admins/admin-register`,
         "post",
@@ -46,7 +46,7 @@ const AdminRegister = ({ startLoading, stopLoading }) => {
     } catch (err) {
       setError(err.response?.data?.message || "Failed to register.");
     } finally {
-      stopLoading()
+      stopLoading();
     }
   };
 
@@ -55,6 +55,9 @@ const AdminRegister = ({ startLoading, stopLoading }) => {
       <h1 className="text-2xl font-bold text-gray-800 mb-6">
         Welcome, register yourself as Admin
       </h1>
+      <span>
+        <span className="font-bold text-red-500">Note:</span> Kindly note down the registering Email and Password.
+      </span>
 
       {error && <div className="text-red-500 mb-4">{error}</div>}
       {success && <div className="text-green-500 mb-4">{success}</div>}
