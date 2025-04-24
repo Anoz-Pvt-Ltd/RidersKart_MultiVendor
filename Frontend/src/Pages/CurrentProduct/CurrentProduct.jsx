@@ -35,29 +35,37 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
   const [AllProducts, setAllProducts] = useState();
   const [specifications, setSpecifications] = useState("");
 
+  // console.log(user[0]?._id);
+
   // Utility functions
   const HandleBuyNow = async () => {
-    try {
-      startLoading();
+    if (user.length > 0) {
+      try {
+        startLoading();
 
-      // Ensure all required fields are included
-      const response = await FetchData(`orders/create-order`, "post", {
-        userId: user[0]._id,
-        products: [{ product: productId, quantity: 1, price: products?.price }],
-        // shippingAddress: addresses[selectedAddress],
-        totalAmount: products?.price.sellingPrice,
-      });
-      console.log(response);
+        // Ensure all required fields are included
+        const response = await FetchData(`orders/create-order`, "post", {
+          userId: user[0]._id,
+          products: [
+            { product: productId, quantity: 1, price: products?.price },
+          ],
+          // shippingAddress: addresses[selectedAddress],
+          totalAmount: products?.price.sellingPrice,
+        });
+        // console.log(response);
 
-      if (response.data.success) {
-        // alert("Order placed successfully!");
-        navigate(`/checkout/${productId}/${response.data.data._id}`);
+        if (response.data.success) {
+          // alert("Order placed successfully!");
+          navigate(`/checkout/${productId}/${response.data.data._id}`);
+        }
+      } catch (err) {
+        // console.log(err);
+        alert(parseErrorMessage(err.response.data));
+      } finally {
+        stopLoading();
       }
-    } catch (err) {
-      console.log(err);
-      alert(parseErrorMessage(err.response.data));
-    } finally {
-      stopLoading();
+    } else {
+      alert("Please Login first!");
     }
   };
 
@@ -85,7 +93,7 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
       try {
         startLoading();
         const response = await FetchData("products/get-all-products", "get");
-        console.log(response);
+        // console.log(response);
         setAllProducts(response.data.data.products);
       } catch (err) {
         setError(err.response?.data?.message || "Failed to fetch products.");
@@ -103,10 +111,10 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
         `users/${user?.[0]?._id}/${products?._id}/cart/add`,
         "post"
       );
-      console.log(response);
+      // console.log(response);
 
       alert(response.data.message);
-      console.log(products);
+      // console.log(products);
       dispatch(addCart(products));
     } catch (err) {
       console.log(err);
@@ -126,7 +134,7 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
         `users/${user?.[0]?._id}/${products?._id}/wishlist/add`,
         "post"
       );
-      console.log(response);
+      // console.log(response);
       alert(response.data.message);
     } catch (err) {
       // console.log(err);
