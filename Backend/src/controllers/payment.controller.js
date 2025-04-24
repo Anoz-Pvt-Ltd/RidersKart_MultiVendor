@@ -13,7 +13,8 @@ const CreatePaymentId = asyncHandler(async (req, res) => {
 
   // Ensure amount is in paise (multiply by 100)
   const paymentOptions = {
-    amount: options.amount * 100, // Convert to paise
+    // amount: options.amount * 100, // Convert to paise
+    amount: 100, // For testing, set a fixed amount of 100 paise (1 INR)
     currency: options.currency,
     receipt: `receipt_${Date.now()}`, // Ensure a receipt is always there
     payment_capture: 1, // Auto-capture payment
@@ -41,7 +42,6 @@ const CreatePaymentId = asyncHandler(async (req, res) => {
     throw new ApiError(500, "Failed to create order");
   }
 });
-
 
 // const ValidatePayment = asyncHandler(async (req, res) => {
 //   const { razorpay_payment_id, razorpay_order_id, razorpay_signature } =
@@ -78,6 +78,7 @@ const ValidatePayment = asyncHandler(async (req, res) => {
     razorpay_signature,
     amount,
     paymentMethod,
+    orderId,
   } = req.body;
 
   if (
@@ -85,7 +86,8 @@ const ValidatePayment = asyncHandler(async (req, res) => {
     !razorpay_order_id ||
     !razorpay_signature ||
     !amount ||
-    !paymentMethod
+    !paymentMethod ||
+    !orderId
   ) {
     throw new ApiError(401, "Invalid request");
   }
@@ -103,19 +105,29 @@ const ValidatePayment = asyncHandler(async (req, res) => {
       .json(new ApiResponse(450, {}, "Transaction is not legit!"));
   }
 
+  // Check if the orderId is valid and belongs to the user and also updating the order's payment status
+  const order = await mongoose.model("Order").findById(orderId);
+  if (!order) throw new ApiError(404, "Order not found !");
+  if (!order.user.equals(req.user._id))
+    throw new ApiError(403, "Unauthorized access to this order");
+
+  order.paymentStatus = "completed";
+  order.paymentMethod = "online";
+
   const newTransaction = new paymentTransaction({
     razorpay_payment_id,
     razorpay_order_id,
     user: req.user._id,
     amount,
     paymentMethod: paymentMethod,
+    order: orderId,
   });
 
   newTransaction.save();
 
-  res.status(200).json(
+  res.status(201).json(
     new ApiResponse(
-      200,
+      201,
       {
         orderId: razorpay_order_id,
         paymentId: razorpay_payment_id,

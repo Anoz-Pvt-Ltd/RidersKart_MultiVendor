@@ -11,11 +11,12 @@ import { Heart } from "lucide-react";
 import LoadingUI from "../../Components/Loading";
 import PopUp from "../../Components/PopUpWrapper";
 import { addCart } from "../../Utility/Slice/CartSlice";
+import { parseErrorMessage } from "../../Utility/ErrorMessageParser";
 
 const CurrentProduct = ({ startLoading, stopLoading }) => {
   const [isReadMoreDescription, setIsReadMoreDescription] = useState(false);
   const [isReadMoreSpecification, setIsReadMoreSpecification] = useState(false);
-  const maxLength = 100; 
+  const maxLength = 100;
   const toggleReadMore = () => {
     setIsReadMoreDescription(!isReadMoreDescription);
   };
@@ -23,21 +24,42 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
     setIsReadMoreSpecification(!isReadMoreSpecification);
   };
   const user = useSelector((store) => store.UserInfo.user);
-  // console.log(user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [error, setError] = useState();
   const { productId } = useParams();
-  const HandleBuyNow = () => {
-    navigate(`/checkout/${productId}/${user?.[0]?._id}`);
-  };
   const [isLiked, setIsLiked] = useState(false);
   const [imgPopup, setImgPopup] = useState(false);
   const [currentImg, setCurrentImg] = useState(0);
   const [products, setProducts] = useState();
   const [AllProducts, setAllProducts] = useState();
   const [specifications, setSpecifications] = useState("");
-  // console.log(specifications);
+
+  // Utility functions
+  const HandleBuyNow = async () => {
+    try {
+      startLoading();
+
+      // Ensure all required fields are included
+      const response = await FetchData(`orders/create-order`, "post", {
+        userId: user[0]._id,
+        products: [{ product: productId, quantity: 1, price: products?.price }],
+        // shippingAddress: addresses[selectedAddress],
+        totalAmount: products?.price.sellingPrice,
+      });
+      console.log(response);
+
+      if (response.data.success) {
+        // alert("Order placed successfully!");
+        navigate(`/checkout/${productId}/${response.data.data._id}`);
+      }
+    } catch (err) {
+      console.log(err);
+      alert(parseErrorMessage(err.response.data));
+    } finally {
+      stopLoading();
+    }
+  };
 
   // Fetching the current product
   useEffect(() => {

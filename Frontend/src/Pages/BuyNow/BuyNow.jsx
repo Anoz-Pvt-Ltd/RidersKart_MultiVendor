@@ -7,23 +7,19 @@ import Button from "../../Components/Button";
 import LoadingUI from "../../Components/Loading";
 import { MoveRight } from "lucide-react";
 import InputBox from "../../Components/InputBox";
+import { parseErrorMessage } from "../../Utility/ErrorMessageParser";
 
 const BuyNow = ({ startLoading, stopLoading }) => {
-  const { productId } = useParams();
+  const { productId, orderId } = useParams();
   const [product, setProduct] = useState(null);
   const [addresses, setAddresses] = useState([]);
-  const [selectedAddress, setSelectedAddress] = useState();
-  const [paymentMethod, setPaymentMethod] = useState("");
-  const [productVendor, setProductVendor] = useState("");
+  const [selectedAddress, setSelectedAddress] = useState(null);
+  const [paymentMethod, setPaymentMethod] = useState(null);
   const [error, setError] = useState("");
   const user = useSelector((store) => store.UserInfo.user);
-  const [addAmount, setAddAmount] = useState("");
 
   const Navigate = useNavigate();
   const Dispatch = useDispatch();
-  const HandleHome = () => {
-    Navigate("/");
-  };
 
   useEffect(() => {
     const fetchProductDetails = async () => {
@@ -57,7 +53,6 @@ const BuyNow = ({ startLoading, stopLoading }) => {
             `users/${user?.[0]?._id}/addresses`,
             "get"
           );
-          console.log(response);
           setAddresses(response.data);
         } catch (err) {
           setError(err.response?.data?.message || "Failed to fetch addresses.");
@@ -67,33 +62,8 @@ const BuyNow = ({ startLoading, stopLoading }) => {
       }
     };
 
-    const fetchVendorByProductId = async () => {
-      if (user?.length > 0) {
-        startLoading();
-        try {
-          const response = await FetchData(
-            `vendor/get-vendor-by-product-id/${productId}`,
-            "get"
-          );
-          // console.log(response);
-          if (response.data.success) {
-            setProductVendor(response.data.data);
-          } else {
-            setError("Failed to load vendor details.");
-          }
-        } catch (err) {
-          console.log(err);
-          setError(
-            err.response?.data?.message || "Failed to fetch vendor details."
-          );
-        } finally {
-          stopLoading();
-        }
-      }
-    };
     fetchProductDetails();
     fetchUserAddresses();
-    fetchVendorByProductId();
   }, [productId, user]);
 
   const handleAddressChange = (e) => {
@@ -104,35 +74,25 @@ const BuyNow = ({ startLoading, stopLoading }) => {
     setPaymentMethod(e.target.value);
   };
 
-  const handleBuyNow = async () => {
+  const handleOrderConfirmation = async () => {
+    if (!selectedAddress || !paymentMethod) {
+      alert("Please select address and payment method.");
+      return;
+    }
     try {
-      startLoading();
-      const quantity = 1;
-
-      // Ensure all required fields are included
-      const response = await FetchData(
-        `users/book-product/${user?.[0]?._id}/${product?._id}/${productVendor?._id}`,
-        "post",
-        {
-          quantity,
-          paymentMethod,
-          shippingAddress: addresses[selectedAddress],
-          orderStatus: "confirmed", // Ensure this is a valid enum value in your model
-        }
-      );
+      const response = await FetchData("orders/update-order-status", "post", {
+        orderId,
+        status: "confirmed",
+        address: addresses[selectedAddress],
+      });
       console.log(response);
-
-      if (response.data.success) {
-        alert("Order placed successfully!");
-        HandleHome();
-      } else {
-        alert("Failed to place order.");
+      if (response.status === 200) {
+        alert("Order confirmed successfully!");
+        Navigate("/"); // Redirect to orders page after confirmation
       }
-    } catch (err) {
-      console.log(err);
-      alert(err.response?.data?.message || "Failed to place order.");
-    } finally {
-      stopLoading();
+    } catch (error) {
+      console.error("Error confirming order:", error);
+      alert("Failed to confirm order. Please try again.");
     }
   };
 
@@ -160,6 +120,7 @@ const BuyNow = ({ startLoading, stopLoading }) => {
           ...response,
           amount: order.data.data.amount, // Pass correct amount
           paymentMethod: "UPI",
+          orderId: orderId,
         };
 
         const isValidated = await FetchData(
@@ -172,6 +133,7 @@ const BuyNow = ({ startLoading, stopLoading }) => {
           alert("Payment Failed");
         } else if (isValidated.status === 201) {
           alert("Payment Successful");
+          setPaymentMethod("done")
         }
       },
     };
@@ -227,9 +189,9 @@ const BuyNow = ({ startLoading, stopLoading }) => {
         setSuccess("Login successful!");
         Navigate(`/checkout/${productId}/${user?._id}`);
       } catch (err) {
-        console.log(error);
+        console.log(err);
         // alert(parseErrorMessage(error.response.data.data.statusCode));
-        alert("Invalid login credentials");
+        alert(parseErrorMessage(err.response.data));
       } finally {
         stopLoading(); // Stop loading once response is received
       }
@@ -368,7 +330,7 @@ const BuyNow = ({ startLoading, stopLoading }) => {
                 onChange={handlePaymentChange}
                 className="bg-white p-5 rounded-xl outline-none w-full shadow-xl border"
               >
-                <option value="" disabled>
+                <option value="" disabled selected>
                   Select a payment method
                 </option>
                 <option value="online">Online</option>
@@ -384,14 +346,13 @@ const BuyNow = ({ startLoading, stopLoading }) => {
               label={"Proceed for payment"}
             />
           )}
-          {paymentMethod === "cash" && (
-            <Button
-              className={` bg-white text-blue-600 hover:bg-green-500 hover:text-black`}
-              onClick={handleBuyNow}
-              Disabled={!selectedAddress || !paymentMethod}
-              label={"Place order"}
-            />
-          )}
+
+          <Button
+            className={` bg-white text-blue-600 hover:bg-green-500 hover:text-black`}
+            onClick={handleOrderConfirmation}
+            // Disabled={!selectedAddress || !paymentMethod}
+            label={"Place order"}
+          />
         </div>
       )}
     </div>

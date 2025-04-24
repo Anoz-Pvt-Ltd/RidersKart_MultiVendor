@@ -5,44 +5,57 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
 const CreateOrder = asyncHandler(async (req, res) => {
-  const { userId, vendorId, products, shippingAddress } = req.body;
+  const { userId, products, totalAmount } = req.body;
+
+  // structure of products (array of objects representing each product with its quantity and price details)
+  // products: [
+  //   {
+  //     product: "productId",
+  //     quantity: 2,
+  //     price: {
+  //       MRP: 100,
+  //       sellingPrice: 80,
+  //       discount: 20,
+  //     },
+  //   },
+  //   //... more products
+  // ];
+
+  console.log([userId, products, totalAmount]);
 
   if (
     !userId ||
-    !vendorId ||
     !products ||
     products.length === 0 ||
-    !shippingAddress
+    // !shippingAddress ||
+    !totalAmount
   ) {
     throw new ApiError(400, "Missing required fields");
   }
 
-  // Validate product availability and calculate total amount
-  let totalAmount = 0;
+  // Verify that all product IDs are valid and available
   for (const item of products) {
     const product = await Product.findById(item.product);
     if (!product) {
       throw new ApiError(404, `Product with ID ${item.product} not found`);
     }
-    if (product.stockQuantity < item.quantity) {
+    if (product.stockQuantity <= 0) {
       throw new ApiError(
         400,
-        `Insufficient stock for product: ${product.name}`
+        `Product with ID ${item.product} is out of stock`
       );
+    } else {
+      // Reduce stock quantity before creating the order
+      product.stockQuantity -= item.quantity;
+      await product.save();
     }
-    totalAmount += product.price * item.quantity;
-
-    // Reduce stock quantity
-    product.stockQuantity -= item.quantity;
-    await product.save();
   }
 
   const order = await Order.create({
     user: userId,
-    vendor: vendorId,
     products,
     totalAmount,
-    shippingAddress,
+    // shippingAddress,
   });
 
   res
@@ -172,6 +185,56 @@ const getCurrentOrder = asyncHandler(async (req, res) => {
   }
 });
 
+const updateOrderStatus = asyncHandler(async (req, res) => {
+  const { orderId, status, address } = req.body;
+  if (!orderId || !status) {
+    throw new ApiError(400, "Missing required fields");
+  }
+  if (
+    ![
+      "pending",
+      "confirmed",
+      "shipped",
+      "delivered",
+      "cancelled",
+      "booked",
+    ].includes(status)
+  ) {
+    throw new ApiError(400, "Invalid order status");
+  }
+
+  const order = await Order.findById(orderId);
+  if (!order) {
+    throw new ApiError(404, "Order not found");
+  }
+
+  order.orderStatus = status;
+  order.shippingAddress = address; // Update shipping address if provided
+  await order.save();
+
+  res.json(new ApiResponse(200, order, "Order status updated successfully"));
+});
+
+const updatePaymentStatus = asyncHandler(async (req, res) => {
+  const { orderId, status } = req.body;
+  if (!orderId || !status) {
+    throw new ApiError(400, "Missing required fields");
+  }
+  if (!["pending", "completed", "failed", "refunded"].includes(status)) {
+    throw new ApiError(400, "Invalid payment status");
+  }
+
+  const order = await Order.findById(orderId);
+  if (!order) {
+    throw new ApiError(404, "Order not found");
+  }
+
+  order.paymentStatus = status;
+  await order.save();
+
+  res.json(new ApiResponse(200, order, "Payment status updated successfully"));
+});
+
 export {
   CreateOrder,
   CancelOrder,
@@ -180,6 +243,8 @@ export {
   getVendorAllOrders,
   getAllOrders,
   getCurrentOrder,
+  updateOrderStatus,
+  updatePaymentStatus,
 };
 
 //fetch data fn in utils; set domain url;

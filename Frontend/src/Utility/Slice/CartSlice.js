@@ -7,7 +7,7 @@ export const fetchCart = createAsyncThunk(
   async (user) => {
     try {
       const response = await FetchData(`users/${user}/cart-products`, "get"); // Replace with your API URL
-      console.log(response);
+      // console.log(response);
       return response.data.data; // Assuming the API returns a list of cart items
     } catch (err) {
       console.error(err);

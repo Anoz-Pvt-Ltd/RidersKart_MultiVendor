@@ -465,70 +465,6 @@ const getWishlistProducts = asyncHandler(async (req, res) => {
   }
 });
 
-// Order controller ------------------------------------
-const bookProduct = asyncHandler(async (req, res) => {
-  const { userId, productId, vendorId } = req.params;
-  const { quantity, shippingAddress, orderStatus, paymentMethod } = req.body;
-
-  try {
-    // Find the user
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    // Find the product
-    const product = await Product.findById(productId);
-    if (!product) {
-      return res.status(404).json({ message: "Product not found" });
-    }
-
-    // Check if the product belongs to the vendor
-    if (product.vendor.toString() !== vendorId) {
-      return res
-        .status(400)
-        .json({ message: "Product does not belong to the specified vendor" });
-    }
-
-    // Check product availability
-    if (product.stockQuantity < quantity) {
-      return res.status(400).json({ message: "Insufficient stock" });
-    }
-
-    // Reduce product stock
-    product.stockQuantity -= quantity;
-    await product.save();
-
-    // Create an order
-    const order = new Order({
-      user: userId,
-      vendor: vendorId,
-      products: [
-        {
-          product: productId,
-          quantity,
-          price: product.price,
-        },
-      ],
-      // totalAmount: product.price * quantity,
-      paymentMethod,
-      shippingAddress, // Ensure this field is provided in the request body
-      orderStatus, // Ensure this is a valid enum value in the Order model
-    });
-
-    await order.save();
-
-    return res.status(201).json({
-      success: true,
-      message: "Product booked successfully",
-      order,
-    });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Server error" });
-  }
-});
-
 // Address controller ------------------------------------
 // Controller to add a new address
 const addAddress = asyncHandler(async (req, res, next) => {
@@ -671,7 +607,6 @@ export {
   removeProductFromCart,
   removeProductFromWishlist,
   EditProductQuantity,
-  bookProduct,
   addAddress,
   getUserAddresses,
   AdminGetUserAddresses,

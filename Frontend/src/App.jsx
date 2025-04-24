@@ -123,7 +123,7 @@ const App = () => {
           />
           <Route path="/cart/:userId" element={<CartPage />} />
           {/* <Route path="/cart/:userId/buy-now-product" element={<BuyNow />} /> */}
-          <Route path="/checkout/:productId/:userId" element={<BuyNow />} />
+          <Route path="/checkout/:productId/:orderId" element={<BuyNow />} />
           <Route
             path="/register-delivery-partner"
             element={<RegisterDriver />}

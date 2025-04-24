@@ -77,22 +77,6 @@ const CartPage = ({ startLoading, stopLoading }) => {
   };
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        startLoading();
-        const response = await FetchData("products/get-all-product", "get");
-        if (response.data.success) {
-          setProducts(response.data.data.products);
-        } else {
-          setError("Failed to load products.");
-        }
-      } catch (err) {
-        setError(err.response?.data?.message || "Failed to fetch products.");
-      } finally {
-        stopLoading();
-      }
-    };
-
     const fetchUserAddresses = async () => {
       if (user?.length > 0) {
         startLoading();
@@ -115,23 +99,22 @@ const CartPage = ({ startLoading, stopLoading }) => {
     fetchUserAddresses();
   }, [user]);
 
-  const fetchProducts = async () => {
-    try {
-      startLoading();
-      const response = await FetchData("products/get-all-products", "get");
-      if (response.data.success) {
-        setProducts(response.data.data.products);
-      } else {
-        setError("Failed to load products.");
-      }
-    } catch (err) {
-      setError(err.response?.data?.message || "Failed to fetch products.");
-    } finally {
-      stopLoading();
-    }
-  };
-
   useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        startLoading();
+        const response = await FetchData("products/get-all-products", "get");
+        if (response.data.success) {
+          setProducts(response.data.data.products);
+        } else {
+          setError("Failed to load products.");
+        }
+      } catch (err) {
+        setError(err.response?.data?.message || "Failed to fetch products.");
+      } finally {
+        stopLoading();
+      }
+    };
     fetchProducts();
   }, []);
 

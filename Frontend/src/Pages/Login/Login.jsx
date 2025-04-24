@@ -8,6 +8,7 @@ import { FetchData } from "../../Utility/FetchFromApi";
 import { useDispatch } from "react-redux";
 import { clearUser, addUser } from "../../Utility/Slice/UserInfoSlice";
 import LoadingUI from "../../Components/Loading";
+import { parseErrorMessage } from "../../Utility/ErrorMessageParser";
 
 const Login = ({ startLoading, stopLoading }) => {
   const Navigate = useNavigate();
@@ -58,9 +59,9 @@ const Login = ({ startLoading, stopLoading }) => {
       setSuccess("Login successful!");
       Navigate("/");
     } catch (err) {
-      console.log(error);
+      console.log(err);
       // alert(parseErrorMessage(error.response.data.data.statusCode));
-      alert("Invalid login credentials");
+      alert(parseErrorMessage(err.response.data));
     } finally {
       stopLoading(); // Stop loading once response is received
     }

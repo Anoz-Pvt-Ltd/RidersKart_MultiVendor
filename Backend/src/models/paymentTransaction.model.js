@@ -25,6 +25,11 @@ const paymentTransactionSchema = new Schema(
       type: String,
       required: true,
     },
+    order:{
+      type: Schema.Types.ObjectId,
+      ref: "Order",
+      required: true,
+    }
   },
   {
     timestamps: true,

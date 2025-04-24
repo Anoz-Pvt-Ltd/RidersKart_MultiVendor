@@ -7,7 +7,6 @@ import {
   addProductToCart,
   removeProductFromCart,
   getCartProducts,
-  bookProduct,
   addAddress,
   editAddress,
   deleteAddress,
@@ -49,10 +48,6 @@ router
   .post(VerifyUser, removeProductFromWishlist);
 router.route("/:userId/cart-products").get(VerifyUser, getCartProducts);
 router.route("/:userId/wishlist-products").get(VerifyUser, getWishlistProducts);
-
-router
-  .route("/book-product/:userId/:productId/:vendorId")
-  .post(VerifyUser, bookProduct);
 
 //modification routes
 router.route("/:userId/addresses").post(VerifyUser, addAddress);
