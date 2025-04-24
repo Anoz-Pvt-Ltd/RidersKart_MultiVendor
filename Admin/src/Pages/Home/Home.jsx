@@ -30,8 +30,10 @@ import Promotion from "../Promotions/promotion";
 
 const Dashboard = ({ startLoading, stopLoading }) => {
   const user = useSelector((store) => store.UserInfo.user);
-  const [activeSection, setActiveSection] = useState("Users");
   const [error, setError] = useState("");
+  const [activeSection, setActiveSection] = useState("Users");
+  const [isVendorOpen, setIsVendorOpen] = useState(false);
+  const [isBrandOpen, setIsBrandOpen] = useState(false);
 
   const sectionVariants = {
     hidden: { opacity: 0, x: -50 },
@@ -54,115 +56,164 @@ const Dashboard = ({ startLoading, stopLoading }) => {
 
   return (
     <div className="flex min-h-screen">
-      <motion.aside
-        className="w-64 text-black p-4 shadow-lg fixed overscroll-auto top-0 h-screen"
-        initial="hidden"
-        animate="visible"
-        variants={sidebarVariants}
-      >
-        <nav>
-          <ul>
-            <li
-              className={`p-4 rounded-md mb-2 cursor-pointer transition-all duration-300 ${
-                activeSection === "Users"
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-300 text-black"
-              }`}
-              onClick={() => setActiveSection("Users")}
-            >
-              {<User />}Users
-            </li>
-            <li
-              className={`p-4 rounded-md mb-2 cursor-pointer transition-all duration-300 ${
-                activeSection === "Vendors (Under review)"
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-300 text-black"
-              }`}
-              onClick={() => setActiveSection("Vendors (Under review)")}
-            >
-              {<ListOrdered />}Vendors (Under review)
-            </li>
-            <li
-              className={`p-4 rounded-md mb-2 cursor-pointer transition-all duration-300 ${
-                activeSection === "Vendors (Verified)"
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-300 text-black"
-              }`}
-              onClick={() => setActiveSection("Vendors (Verified)")}
-            >
-              {<Newspaper />}Vendors (Verified)
-            </li>
+      {user === null || user.length === 0 ? (
+        <div>
+          <h1>
+            You are not logged in kindly request your Team leader to provide you
+            an Admin id and password.
+          </h1>
+        </div>
+      ) : (
+        <div>
+          {" "}
+          <motion.aside
+            className="w-64 text-black p-4 shadow-lg fixed overscroll-auto top-0 h-screen"
+            initial="hidden"
+            animate="visible"
+            variants={sidebarVariants}
+          >
+            <nav>
+              <ul>
+                <li
+                  className={`p-4 rounded-md mb-2 cursor-pointer transition-all duration-300 ${
+                    activeSection === "Users"
+                      ? "bg-blue-600 text-white"
+                      : "bg-gray-300 text-black"
+                  }`}
+                  onClick={() => setActiveSection("Users")}
+                >
+                  {<User />}Users
+                </li>
 
-            <li
-              className={`p-4 rounded-md mb-2 cursor-pointer transition-all duration-300 ${
-                activeSection === "Brands (Under review)"
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-300 text-black"
-              }`}
-              onClick={() => setActiveSection("Brands (Under review)")}
+                {/* Vendors with nested items */}
+                <li className="mb-2">
+                  <div
+                    className="p-4 rounded-md cursor-pointer bg-gray-300 text-black hover:bg-gray-400 transition-all"
+                    onClick={() => setIsVendorOpen(!isVendorOpen)}
+                  >
+                    {<ListOrdered />}Vendors
+                  </div>
+                  {isVendorOpen && (
+                    <ul className="ml-6 mt-2">
+                      <li
+                        className={`p-3 rounded-md cursor-pointer mb-2 transition-all ${
+                          activeSection === "Vendors (Under review)"
+                            ? "bg-blue-600 text-white"
+                            : "bg-gray-200 text-black"
+                        }`}
+                        onClick={() =>
+                          setActiveSection("Vendors (Under review)")
+                        }
+                      >
+                        Under review
+                      </li>
+                      <li
+                        className={`p-3 rounded-md cursor-pointer transition-all ${
+                          activeSection === "Vendors (Verified)"
+                            ? "bg-blue-600 text-white"
+                            : "bg-gray-200 text-black"
+                        }`}
+                        onClick={() => setActiveSection("Vendors (Verified)")}
+                      >
+                        Verified
+                      </li>
+                    </ul>
+                  )}
+                </li>
+
+                {/* Brands with nested items */}
+                <li className="mb-2">
+                  <div
+                    className="p-4 rounded-md cursor-pointer bg-gray-300 text-black hover:bg-gray-400 transition-all"
+                    onClick={() => setIsBrandOpen(!isBrandOpen)}
+                  >
+                    {<Package />}Brands
+                  </div>
+                  {isBrandOpen && (
+                    <ul className="ml-6 mt-2">
+                      <li
+                        className={`p-3 rounded-md cursor-pointer mb-2 transition-all ${
+                          activeSection === "Brands (Under review)"
+                            ? "bg-blue-600 text-white"
+                            : "bg-gray-200 text-black"
+                        }`}
+                        onClick={() =>
+                          setActiveSection("Brands (Under review)")
+                        }
+                      >
+                        Under review
+                      </li>
+                      <li
+                        className={`p-3 rounded-md cursor-pointer transition-all ${
+                          activeSection === "Brands (Verified)"
+                            ? "bg-blue-600 text-white"
+                            : "bg-gray-200 text-black"
+                        }`}
+                        onClick={() => setActiveSection("Brands (Verified)")}
+                      >
+                        Verified
+                      </li>
+                    </ul>
+                  )}
+                </li>
+
+                {/* Other items */}
+                <li
+                  className={`p-4 rounded-md mb-2 cursor-pointer transition-all duration-300 ${
+                    activeSection === "Products"
+                      ? "bg-blue-600 text-white"
+                      : "bg-gray-300 text-black"
+                  }`}
+                  onClick={() => setActiveSection("Products")}
+                >
+                  {<Package />}Products
+                </li>
+                <li
+                  className={`p-4 rounded-md mb-2 cursor-pointer transition-all duration-300 ${
+                    activeSection === "Orders"
+                      ? "bg-blue-600 text-white"
+                      : "bg-gray-300 text-black"
+                  }`}
+                  onClick={() => setActiveSection("Orders")}
+                >
+                  {<ScanLine />}Orders
+                </li>
+                <li
+                  className={`p-4 rounded-md cursor-pointer transition-all duration-300 ${
+                    activeSection === "Promotions"
+                      ? "bg-blue-600 text-white"
+                      : "bg-gray-300 text-black"
+                  }`}
+                  onClick={() => setActiveSection("Promotions")}
+                >
+                  {<Heart />}Promotions
+                </li>
+              </ul>
+            </nav>
+          </motion.aside>
+          <main className="flex-1 p-6 ml-64">
+            <motion.div
+              initial="hidden"
+              animate="visible"
+              variants={sectionVariants}
+              transition={{ duration: 0.5 }}
             >
-              {<Package />}Brands (Under review)
-            </li>
-            <li
-              className={`p-4 rounded-md mb-2 cursor-pointer transition-all duration-300 ${
-                activeSection === "Brands (Verified)"
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-300 text-black"
-              }`}
-              onClick={() => setActiveSection("Brands (Verified)")}
-            >
-              {<Package />}Brands (Verified)
-            </li>
-            <li
-              className={`p-4 rounded-md mb-2 cursor-pointer transition-all duration-300 ${
-                activeSection === "Products"
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-300 text-black"
-              }`}
-              onClick={() => setActiveSection("Products")}
-            >
-              {<Package />}Products
-            </li>
-            <li
-              className={`p-4 rounded-md mb-2 cursor-pointer transition-all duration-300 ${
-                activeSection === "Orders"
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-300 text-black"
-              }`}
-              onClick={() => setActiveSection("Orders")}
-            >
-              {<ScanLine />}Orders
-            </li>
-            <li
-              className={`p-4 rounded-md cursor-pointer transition-all duration-300 ${
-                activeSection === "Promotions"
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-300 text-black"
-              }`}
-              onClick={() => setActiveSection("Promotions")}
-            >
-              {<Heart />}Promotions
-            </li>
-          </ul>
-        </nav>
-      </motion.aside>
-      <main className="flex-1 p-6 ml-64">
-        <motion.div
-          initial="hidden"
-          animate="visible"
-          variants={sectionVariants}
-          transition={{ duration: 0.5 }}
-        >
-          {activeSection === "Users" && <Users />}
-          {activeSection === "Vendors (Under review)" && <VendorUnderReview />}
-          {activeSection === "Vendors (Verified)" && <VendorsVerified />}
-          {activeSection === "Products" && <Products />}
-          {activeSection === "Brands (Verified)" && <Brandsverified />}
-          {activeSection === "Brands (Under review)" && <BrandsUnderReview />}
-          {activeSection === "Orders" && <Orders />}
-          {activeSection === "Promotions" && <Promotion />}
-        </motion.div>
-      </main>
+              {activeSection === "Users" && <Users />}
+              {activeSection === "Vendors (Under review)" && (
+                <VendorUnderReview />
+              )}
+              {activeSection === "Vendors (Verified)" && <VendorsVerified />}
+              {activeSection === "Products" && <Products />}
+              {activeSection === "Brands (Verified)" && <Brandsverified />}
+              {activeSection === "Brands (Under review)" && (
+                <BrandsUnderReview />
+              )}
+              {activeSection === "Orders" && <Orders />}
+              {activeSection === "Promotions" && <Promotion />}
+            </motion.div>
+          </main>
+        </div>
+      )}
     </div>
   );
 };
