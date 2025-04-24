@@ -12,6 +12,7 @@ import {
 } from "../../Utility/Slice/CartSlice";
 import { useDebounce } from "../../Utility/Utility-functions";
 import { useNavigate } from "react-router";
+import { parseErrorMessage } from "../../Utility/ErrorMessageParser";
 
 const CartPage = ({ startLoading, stopLoading }) => {
   const [error, setError] = useState("");
@@ -31,7 +32,50 @@ const CartPage = ({ startLoading, stopLoading }) => {
   const handlePaymentChange = (e) => {
     setPaymentMethod(e.target.value);
   };
+
+  const productFormatter = (products) => {
+    return products.map((product) => {
+      return {
+        product: product.product._id,
+        quantity: product.quantity,
+        price: product.product.price,
+      };
+    });
+  };
+
+  const HandleBuyNow = async () => {
+    const products = productFormatter(cart);
+    console.log("products", products);
+    try {
+      startLoading();
+
+      // Ensure all required fields are included
+      const response = await FetchData(`orders/create-order`, "post", {
+        userId: user[0]._id,
+        products,
+        // shippingAddress: addresses[selectedAddress],
+        totalAmount: (getTotalPayablePrice() * 1.1).toFixed(2),
+      });
+      // console.log(response);
+      stopLoading();
+      localStorage.setItem("orderId", response.data.data._id);
+      return response.data.data._id;
+    } catch (err) {
+      // console.log(err);
+      alert(parseErrorMessage(err.response.data));
+    } finally {
+      stopLoading();
+    }
+  };
+
   const Payment = async (e) => {
+    const orderId = await HandleBuyNow();
+
+    if (!orderId) {
+      alert("Failed to create order. Please try again.");
+      return;
+    }
+
     const order = await FetchData("payment/create-new-paymentId", "post", {
       options: {
         amount: (getTotalPayablePrice() * 1.1).toFixed(2),
@@ -55,6 +99,7 @@ const CartPage = ({ startLoading, stopLoading }) => {
           ...response,
           amount: order.data.data.amount, // Pass correct amount
           paymentMethod: "UPI",
+          orderId: orderId,
         };
 
         const isValidated = await FetchData(
@@ -67,6 +112,8 @@ const CartPage = ({ startLoading, stopLoading }) => {
           alert("Payment Failed");
         } else if (isValidated.status === 201) {
           alert("Payment Successful");
+          alert("Please don't refresh the page.");
+          setPaymentMethod("done");
         }
       },
     };
@@ -74,6 +121,43 @@ const CartPage = ({ startLoading, stopLoading }) => {
     var rzp1 = new window.Razorpay(options);
     rzp1.open();
     e.preventDefault();
+  };
+
+  const OrderConfirmation = async () => {
+    const orderId = localStorage.getItem("orderId");
+    if (!orderId) {
+      alert("Failed to find order. Please try again.");
+      return;
+    }
+    try {
+      const response = await FetchData("orders/update-order-status", "post", {
+        orderId,
+        status: "confirmed",
+        address: addresses[selectedAddress],
+      });
+      console.log(response);
+      if (response.status === 200) {
+        alert("Order confirmed successfully!");
+        Navigate("/"); // Redirect to orders page after confirmation
+      }
+    } catch (error) {
+      console.error("Error confirming order:", error);
+      alert("Failed to confirm order. Please try again.");
+    }
+  };
+
+  const HandleConfirmOrder = async (e) => {
+    e.preventDefault();
+    if (!selectedAddress || !paymentMethod) {
+      alert("Please select an address and payment method.");
+      return;
+    }
+
+    if (paymentMethod === "done") {
+      OrderConfirmation();
+    } else if (paymentMethod === "cash") {
+      HandleBuyNow();
+    }
   };
 
   useEffect(() => {
@@ -174,46 +258,14 @@ const CartPage = ({ startLoading, stopLoading }) => {
     }, 0);
   }
 
-  // console.log(cart);
+  console.log(cart);
   // console.log(cart[0]?._id);
   // console.log(cart[0]?.product?.vendor);
   const HandleHome = () => {
     Navigate("/");
   };
 
-  const handleBuyNow = async () => {
-    try {
-      startLoading();
-      const quantity = 1;
-
-      // Ensure all required fields are included
-      const response = await FetchData(
-        `users/book-product/${user?.[0]?._id}/${cart[0]?.product?._id}/${cart[0]?.product?.vendor}`,
-        "post",
-        {
-          quantity,
-          paymentMethod,
-          shippingAddress: addresses[selectedAddress],
-          orderStatus: "confirmed", // Ensure this is a valid enum value in your model
-        }
-      );
-      console.log(response);
-
-      if (response.data.success) {
-        alert("Order placed successfully!");
-        HandleHome();
-        // cart.deleteFromCart();
-      } else {
-        alert("Failed to place order.");
-      }
-    } catch (err) {
-      console.log(err);
-      alert(err.response?.data?.message || "Failed to place order.");
-    } finally {
-      stopLoading();
-    }
-  };
-  console.log("addresses", cart);
+  // console.log("products", productFormatter(cart));
 
   return (
     <div className="container mx-auto p-4">
@@ -382,14 +434,13 @@ const CartPage = ({ startLoading, stopLoading }) => {
                     label={"Proceed for payment"}
                   />
                 )}
-                {paymentMethod === "cash" && (
-                  <Button
-                    className={` bg-white text-blue-600 hover:bg-green-500 hover:text-black`}
-                    onClick={handleBuyNow}
-                    Disabled={!selectedAddress || !paymentMethod}
-                    label={"Place order"}
-                  />
-                )}
+
+                <Button
+                  className={` bg-white text-blue-600 hover:bg-green-500 hover:text-black mt-10`}
+                  onClick={HandleConfirmOrder}
+                  Disabled={!selectedAddress || !paymentMethod}
+                  label={"Place order"}
+                />
               </div>
             </div>
           </div>

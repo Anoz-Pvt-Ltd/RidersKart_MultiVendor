@@ -18,10 +18,19 @@ const CreateOrder = asyncHandler(async (req, res) => {
   //       discount: 20,
   //     },
   //   },
+  //   {
+  //     product: "productId",
+  //     quantity: 2,
+  //     price: {
+  //       MRP: 100,
+  //       sellingPrice: 80,
+  //       discount: 20,
+  //     },
+  //   },
   //   //... more products
   // ];
 
-  console.log([userId, products, totalAmount]);
+  console.log("from controller", [userId, products, totalAmount]);
 
   if (
     !userId ||
@@ -35,6 +44,7 @@ const CreateOrder = asyncHandler(async (req, res) => {
 
   // Verify that all product IDs are valid and available
   for (const item of products) {
+    console.log("item.product: ", item.product);
     const product = await Product.findById(item.product);
     if (!product) {
       throw new ApiError(404, `Product with ID ${item.product} not found`);
