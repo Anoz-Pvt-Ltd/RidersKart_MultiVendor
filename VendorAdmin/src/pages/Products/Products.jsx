@@ -24,10 +24,12 @@ const Products = ({ startLoading, stopLoading }) => {
   const [brands, setBrands] = useState([]);
   const [imagePreview, setImagePreview] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState();
-
+  const [searchQuery, setSearchQuery] = useState("");
   const [products, setProducts] = useState([]);
-  // console.log(subcategories);
-  // console.log(products);
+
+  const filteredProducts = products.filter((product) =>
+    product?.name?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const handleImageFileChange = (e) => {
     const file = e.target.files[0];
@@ -381,40 +383,51 @@ const Products = ({ startLoading, stopLoading }) => {
       {products.length === 0 ? (
         <div>No products available.</div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {products.map((product) => (
-            <div
-              key={product?._id}
-              className="mx-2 p-4 border rounded-lg shadow-md bg-gray-100"
-            >
-              <h3 className="font-bold text-gray-900 flex items-center justify-start gap-10 ">
-                {product?.name}{" "}
-                <span className="bg-white p-1 rounded-xl shadow">
-                  <img
-                    src={product?.images[0]?.url}
-                    className="w-20 h-20 rounded-xl shadow"
-                  />
-                </span>
-              </h3>
-              <p className="truncate">{product?.description}</p>
-              <p>
-                <strong>Category:</strong> {product?.category?.title} -{" "}
-                {product?.subcategory?.title}
-              </p>
-              <p>
-                <strong>Price:</strong> ₹ {product?.price?.sellingPrice}
-              </p>
-              <p>
-                <strong>Stock:</strong> {product?.stockQuantity}
-              </p>
-              <Button
-                label="Delete"
-                Type="button"
-                className="mt-2 w-full hover:bg-red-500"
-                onClick={() => handleDeleteProduct(product?._id)}
-              />
-            </div>
-          ))}
+        <div>
+          <div className="mb-4">
+            <input
+              type="text"
+              placeholder="Search by Product name to modify stocks..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 outline-none transition duration-200 ease-in-out hover:shadow-md"
+            />
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredProducts.map((product) => (
+              <div
+                key={product?._id}
+                className="mx-2 p-4 border rounded-lg shadow-md bg-gray-100"
+              >
+                <h3 className="font-bold text-gray-900 flex items-center justify-start gap-10 ">
+                  {product?.name}{" "}
+                  <span className="bg-white p-1 rounded-xl shadow">
+                    <img
+                      src={product?.images[0]?.url}
+                      className="w-20 h-20 rounded-xl shadow"
+                    />
+                  </span>
+                </h3>
+                <p className="truncate">{product?.description}</p>
+                <p>
+                  <strong>Category:</strong> {product?.category?.title} -{" "}
+                  {product?.subcategory?.title}
+                </p>
+                <p>
+                  <strong>Price:</strong> ₹ {product?.price?.sellingPrice}
+                </p>
+                <p>
+                  <strong>Stock:</strong> {product?.stockQuantity}
+                </p>
+                <Button
+                  label="Delete"
+                  Type="button"
+                  className="mt-2 w-full hover:bg-red-500"
+                  onClick={() => handleDeleteProduct(product?._id)}
+                />
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </div>

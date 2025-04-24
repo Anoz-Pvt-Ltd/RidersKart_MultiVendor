@@ -16,6 +16,11 @@ const ManageStocks = ({ startLoading, stopLoading }) => {
   });
   const [productId, setProductId] = useState("");
   const formRef = useRef(null);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredProducts = products.filter((product) =>
+    product?.name?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -57,12 +62,42 @@ const ManageStocks = ({ startLoading, stopLoading }) => {
       stopLoading();
     }
   };
-  // console.log(productId);
+  const handleRemoveStock = async () => {
+    const formData = new FormData(formRef.current);
+    for (let [key, value] of formData.entries()) {
+      console.log(`${key}: ${value}`);
+    }
+    try {
+      startLoading();
+      const response = await FetchData(
+        `products/remove-stock-quantity/${productId}`,
+        "post",
+        formData
+      );
+      console.log(response);
+      alert("stock added successfully");
+    } catch (err) {
+      alert("stock not added");
+      setError(err.response?.data?.message || "Failed to remove stock.");
+    } finally {
+      stopLoading();
+    }
+  };
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-lg">
       <h2 className="text-2xl font-bold text-gray-700 mb-4">Manage Stocks</h2>
       <p>Monitor and manage stock levels here.</p>
+      <div className="mb-4">
+        <input
+          type="text"
+          placeholder="Search by Product name to modify stocks..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 outline-none transition duration-200 ease-in-out hover:shadow-md"
+        />
+      </div>
+
       <div className="overflow-x-auto mt-5">
         <table className="min-w-full bg-white border border-gray-200 rounded-lg">
           <thead>
@@ -76,7 +111,7 @@ const ManageStocks = ({ startLoading, stopLoading }) => {
             </tr>
           </thead>
           <tbody>
-            {products.map((elements) => (
+            {filteredProducts.map((elements) => (
               <tr
                 key={elements._id}
                 className="text-sm text-gray-700 border-b hover:bg-gray-50"
@@ -112,7 +147,15 @@ const ManageStocks = ({ startLoading, stopLoading }) => {
                       <Plus />
                       Add
                     </button>
-                    <button className="text-red-500 flex justify-center items-center text-xs">
+                    <button
+                      onClick={() => {
+                        setProductId(elements._id);
+                        setHandlePopup((prev) => {
+                          return { ...prev, removeStocksPopup: true };
+                        });
+                      }}
+                      className="text-red-500 flex justify-center items-center text-xs"
+                    >
                       <Minus />
                       Remove
                     </button>
@@ -150,6 +193,41 @@ const ManageStocks = ({ startLoading, stopLoading }) => {
                 onClick={() =>
                   setHandlePopup((prev) => {
                     return { ...prev, addStocksPopup: false };
+                  })
+                }
+                className={"hover:bg-red-500"}
+              />
+            </div>
+          </form>
+        </div>
+      )}
+      {handlePopup.removeStocksPopup && (
+        <div className="absolute top-0 left-0 backdrop-blur-2xl h-screen w-screen flex justify-center items-center">
+          <form
+            ref={formRef}
+            onSubmit={handleRemoveStock}
+            className="w-96 h-fit bg-white px-5 py-5 shadow-2xl rounded-xl "
+          >
+            <h1>Removing stock on product id: {productId}</h1>
+            <InputBox
+              LabelName={"Enter no. Stock/s to remove"}
+              Placeholder={"Not less than 1"}
+              Name={"quantityToRemove"}
+              // Value={"RemoveStock"}
+              Type="number"
+              Required
+            />
+            <div className="flex flex-col gap-2">
+              <Button
+                label={"Remove Stock"}
+                type={"submit"}
+                // className={"hover:bg-green-500"}
+              />
+              <Button
+                label={"Cancel"}
+                onClick={() =>
+                  setHandlePopup((prev) => {
+                    return { ...prev, removeStocksPopup: false };
                   })
                 }
                 className={"hover:bg-red-500"}
