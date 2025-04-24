@@ -56,8 +56,9 @@ const CartPage = ({ startLoading, stopLoading }) => {
         // shippingAddress: addresses[selectedAddress],
         totalAmount: (getTotalPayablePrice() * 1.1).toFixed(2),
       });
-      // console.log(response);
+      console.log(response);
       stopLoading();
+      alert(response.data.message);
       localStorage.setItem("orderId", response.data.data._id);
       return response.data.data._id;
     } catch (err) {
@@ -157,6 +158,7 @@ const CartPage = ({ startLoading, stopLoading }) => {
       OrderConfirmation();
     } else if (paymentMethod === "cash") {
       HandleBuyNow();
+      Navigate("/");
     }
   };
 
