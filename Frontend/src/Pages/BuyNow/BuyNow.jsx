@@ -379,9 +379,10 @@ const BuyNow = ({ startLoading, stopLoading }) => {
             )}
             {paymentMethod === "cash" && (
               <Button
-                className={`mt-5 bg-white text-blue-600 hover:bg-green-500 hover:text-black w-3/4`}
-                onClick={Payment}
-                label={"Proceed for payment"}
+                className={`w-3/4 bg-white text-blue-600 hover:bg-green-500 hover:text-black`}
+                onClick={handleOrderConfirmation}
+                // Disabled={!selectedAddress || !paymentMethod}
+                label={"Place order"}
               />
             )}
           </div>
