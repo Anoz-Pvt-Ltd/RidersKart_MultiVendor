@@ -43,7 +43,6 @@ const VerifyVendorUser = asyncHandler(async (req, _, next) => {
     if (!token) {
       throw new ApiError(401, "Unauthorized request");
     }
-
     const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
 
     const user = await VendorUser.findById(decodedToken?._id).select(
@@ -53,6 +52,12 @@ const VerifyVendorUser = asyncHandler(async (req, _, next) => {
     if (!user) {
       throw new ApiError(401, "Invalid Access Token");
     }
+
+    if (!user.isVerified)
+      throw new ApiError(
+        401,
+        "You are not verified yet! Please try after your verification"
+      );
 
     req.user = user;
     next();

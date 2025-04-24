@@ -7,9 +7,10 @@ import { useState } from "react";
 import { FetchData } from "../../Utility/FetchFromApi";
 import { useDispatch } from "react-redux";
 import { clearUser, addUser } from "../../Utility/Slice/UserInfoSlice";
+import LoadingUI from "../../Components/Loading";
 import { parseErrorMessage } from "../../Utility/ErrorMessageParser";
 
-const Login = () => {
+const Login = ({ startLoading, stopLoading }) => {
   const Navigate = useNavigate();
   const Dispatch = useDispatch();
 
@@ -37,6 +38,7 @@ const Login = () => {
     e.preventDefault();
     setError("");
     setSuccess("");
+    startLoading(); // Start loading when login button is clicked
 
     try {
       const response = await FetchData("users/login", "post", formData);
@@ -57,16 +59,18 @@ const Login = () => {
       setSuccess("Login successful!");
       Navigate("/");
     } catch (err) {
-      console.log(error);
+      console.log(err);
       // alert(parseErrorMessage(error.response.data.data.statusCode));
-      alert("Invalid login credentials");
+      alert(parseErrorMessage(err.response.data));
+    } finally {
+      stopLoading(); // Stop loading once response is received
     }
   };
 
   return (
     <div>
-      <section className="flex m-28 border rounded-lg shadow-md shadow-neutral-300 h-96 ">
-        <div className="w-1/2 p-10 rounded-lg rounded-r-none headerBg text-white">
+      <section className="flex lg:m-28 lg:border rounded-lg lg:shadow-md lg:shadow-neutral-300 lg:h-96 my-20">
+        <div className="lg:w-1/2 p-10 rounded-lg rounded-r-none headerBg text-white hidden lg:block">
           <h1 className="text-4xl h-3/4 text-white font-semibold">
             Login with your e-mail to get started !
           </h1>
@@ -75,7 +79,7 @@ const Login = () => {
             <MoveRight />
           </h1>
         </div>
-        <div className=" w-1/2 flex justify-center items-center flex-col whiteSoftBG">
+        <div className=" lg:w-1/2 w-full flex justify-center items-center flex-col lg:whiteSoftBG">
           <form
             ref={formRef}
             className="login h-3/4 flex justify-top items-top flex-col w-3/4"
@@ -105,18 +109,18 @@ const Login = () => {
               className={"w-full"}
             /> */}
             <Button
+              className={`w-full bg-white text-blue-600 hover:bg-green-500 hover:text-black`}
               label={"Login"}
-              className={"w-full"}
               onClick={handleSubmit}
             />
           </form>
-          <div className="w-full h-full justify-center items-center flex flex-col">
+          <div className="w-full h-full justify-center items-center flex flex-col mt-20 lg:mt-0">
             <Button
               label={"Register Here"}
               onClick={NavigateRegister}
-              className={"w-1/2 hover:bg-green-500"}
+              className={`w-1/2 hover:bg-green-500 bg-white text-blue-600  hover:text-black`}
             />
-            <p className="text-xs text-neutral-500">
+            <p className="text-xs text-neutral-500 text-center">
               ** By continuing, you agree to our Terms of Use and Privacy
               Policy.
             </p>
@@ -127,4 +131,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default LoadingUI(Login);

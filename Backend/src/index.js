@@ -11,7 +11,7 @@ connectDB()
     });
 
     app.listen(process.env.PORT || 2000, () => {
-      console.log("Server is running at the post:" + process.env.PORT);
+      console.log("app is running at the post:" + process.env.PORT);
     });
   })
   .catch((err) => {

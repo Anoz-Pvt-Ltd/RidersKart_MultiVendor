@@ -3,8 +3,9 @@ import { useNavigate, useParams } from "react-router";
 import { FetchData } from "../../Utility/FetchFromApi";
 import { useSelector } from "react-redux";
 import Button from "../../Components/Button";
+import LoadingUI from "../../Components/Loading";
 
-const CurrentProduct = () => {
+const CurrentProduct = ({ startLoading, stopLoading }) => {
   const { productId } = useParams();
   const user = useSelector((store) => store.UserInfo.user);
   const [error, setError] = useState("");
@@ -17,11 +18,12 @@ const CurrentProduct = () => {
     const fetchProduct = async () => {
       if (user?.length > 0) {
         try {
+          startLoading();
           const response = await FetchData(
             `products/admin/get-single-product/${productId}`,
             "get"
           );
-          // console.log(response);
+          console.log(response);
           if (response.data.success) {
             setCurrentProduct(response.data.data);
           } else {
@@ -29,6 +31,8 @@ const CurrentProduct = () => {
           }
         } catch (err) {
           setError(err.response?.data?.message || "Failed to fetch orders.");
+        } finally {
+          stopLoading();
         }
       }
     };
@@ -38,6 +42,7 @@ const CurrentProduct = () => {
 
   const handleDeleteProduct = async () => {
     try {
+      startLoading();
       const response = await FetchData(
         `products/admin/single-product/${productId}`,
         "delete"
@@ -51,6 +56,8 @@ const CurrentProduct = () => {
       }
     } catch (err) {
       setError(err.response?.data?.message || "Failed to delete product.");
+    } finally {
+      stopLoading();
     }
   };
 
@@ -59,7 +66,9 @@ const CurrentProduct = () => {
       <div>
         <h2>
           Vendor Id:{" "}
-          <span className="text-xl font-bold">{currentProduct?.vendor}</span>
+          <span className="text-xl font-bold">
+            {currentProduct?.vendor?._id}
+          </span>
         </h2>
         <h1>
           CurrentProduct Id:{" "}
@@ -83,11 +92,14 @@ const CurrentProduct = () => {
           {[
             { label: "Name", value: currentProduct?.name },
             { label: "Description", value: currentProduct?.description },
-            { label: "Price", value: `₹ ${currentProduct?.price}` },
+            {
+              label: "Price",
+              value: `₹ ${currentProduct?.price?.sellingPrice}`,
+            },
             { label: "Quantity", value: currentProduct?.stockQuantity },
             { label: "Created At", value: currentProduct?.createdAt },
-            { label: "Category", value: currentProduct?.category?.main },
-            { label: "Sub-Category", value: currentProduct?.category?.sub },
+            { label: "Category", value: currentProduct?.category?._id },
+            { label: "Sub-Category", value: currentProduct?.subcategory?._id },
           ].map((item, index) => (
             <h2
               key={index}
@@ -105,4 +117,4 @@ const CurrentProduct = () => {
   );
 };
 
-export default CurrentProduct;
+export default LoadingUI(CurrentProduct);

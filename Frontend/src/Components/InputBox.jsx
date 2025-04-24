@@ -1,12 +1,12 @@
 import React from "react";
 
 const InputBox = ({
-  LabelName,
-  Placeholder,
+  LabelName = "",
+  Placeholder = "",
   className = "",
   Type = "text",
-  Name,
-  Value,
+  Name = "",
+  Value = "",
   onChange,
   Required = true,
 }) => {

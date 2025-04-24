@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 import { categories } from "../utils/constants.js";
 
 const productSchema = new mongoose.Schema({
@@ -13,30 +13,41 @@ const productSchema = new mongoose.Schema({
     trim: true,
   },
   category: {
-    main: {
-      type: String,
-      required: true,
-      enum: categories.map((cat) => cat.title),
-    },
-    sub: {
-      type: String,
-      required: true,
-      validate: {
-        validator: function (value) {
-          const mainCategory = this.category.main;
-          const categoryData = categories.find(
-            (cat) => cat.title === mainCategory
-          );
-          return categoryData ? categoryData.items.includes(value) : false;
-        },
-        message: "Invalid subcategory for the selected main category.",
-      },
-    },
+    type: Schema.Types.ObjectId,
+    ref: "Category",
+    required: true,
+  },
+  subcategory: {
+    type: Schema.Types.ObjectId,
+    ref: "Subcategory",
+    required: true,
   },
   price: {
-    type: Number,
-    required: true,
-    min: 0,
+    MRP: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
+    sellingPrice: {
+      type: Number,
+      min: 0,
+    },
+    discount: {
+      type: Number,
+      min: 0,
+      max: 100, // Maximum discount percentage allowed
+    },
+    discountedPrice: {
+      type: Number,
+      // required: true,
+      min: 0, // Calculated discounted price based on MRP and discount percentage
+      get: function () {
+        return this.MRP - (this.MRP * this.discount) / 100;
+      },
+      set: function (value) {
+        this.discountedPrice = value;
+      },
+    },
   },
   stockQuantity: {
     type: Number,
@@ -55,6 +66,10 @@ const productSchema = new mongoose.Schema({
   },
   images: [
     {
+      fileId: {
+        type: String, // ImageKit file ID
+        required: true, // The unique identifier for the uploaded image file
+      },
       url: {
         type: String,
         required: true,
@@ -78,6 +93,11 @@ const productSchema = new mongoose.Schema({
     type: String,
     enum: ["active", "inactive", "out-of-stock"],
     default: "active",
+  },
+  brand: {
+    type: Schema.Types.ObjectId,
+    ref: "Brand",
+    required: true,
   },
   createdAt: {
     type: Date,

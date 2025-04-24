@@ -1,8 +1,14 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { categoryData as initialData } from "../../constants/VendorDashboard.Categories";
+import { FetchData } from "../../utils/FetchFromApi";
+import { useSelector } from "react-redux";
+import LoadingUI from "../../components/Loading";
+import Button from "../../components/Button";
+import InputBox from "../../components/InputBox";
 
-const Categories = () => {
-  const [categories, setCategories] = useState(initialData);
+const Categories = ({ startLoading, stopLoading }) => {
+  const user = useSelector((store) => store.UserInfo.user);
+  const [categories, setCategories] = useState([]);
   const [newCategory, setNewCategory] = useState({
     id: "",
     name: "",
@@ -12,40 +18,93 @@ const Categories = () => {
     status: "Active",
     image: null,
   });
+  const categoryFormRef = useRef(null);
+  const [handlePopup, setHandlePopup] = useState({
+    addCategoryPopup: false,
+    allCategoryPopup: false,
+    allSubCategoryPopup: false,
+    addSubCategory: false,
+    editSubcategory: false,
+    selectedSubcategoryId: null,
+    selectedSubcategoryTitle: null,
+  });
   const [showForm, setShowForm] = useState(false);
   const [sortBy, setSortBy] = useState("name");
   const [selectedCategories, setSelectedCategories] = useState([]);
+  const [products, setProducts] = useState([]);
+  const [error, setError] = useState("");
+  console.log(categories);
 
-  // Handle input changes for the form
-  const handleInputChange = (e) => {
-    const { name, value, files } = e.target;
-    setNewCategory({ ...newCategory, [name]: files ? files[0] : value });
-  };
+  useEffect(() => {
+    const getAllMainSubcategories = async () => {
+      try {
+        startLoading();
+        const response = await FetchData(
+          "categories/get-all-category-and-subcategories",
+          "get"
+        );
+        // console.log(response);
+
+        // Ensure categories exist before setting state
+        setCategories(response.data?.data?.categories || []);
+      } catch (error) {
+        console.log("Error getting all main subcategories", error);
+      } finally {
+        stopLoading();
+      }
+    };
+
+    getAllMainSubcategories();
+  }, [user]);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        startLoading();
+        const response = await FetchData(
+          `products/get-all-product-of-vendor/${user?.[0]?._id}`,
+          "get"
+        );
+        console.log(response);
+        if (response.data.success) setProducts(response.data.data);
+      } catch (err) {
+        setError(err.response?.data?.message || "Failed to fetch products.");
+      } finally {
+        stopLoading();
+      }
+    };
+    fetchProducts();
+  }, [user]);
 
   // Handle form submission
-  const handleAddCategory = (e) => {
+  const submitCategory = async (e) => {
     e.preventDefault();
-    if (!newCategory.id || !newCategory.name || !newCategory.description) {
-      alert("Please fill out all required fields.");
-      return;
+    const formData = new FormData(categoryFormRef.current);
+
+    for (let [key, value] of formData.entries()) {
+      console.log(`${key}: ${value}`);
     }
 
-    const updatedCategories = [...categories, newCategory];
-    setCategories(updatedCategories);
-    initialData.push(newCategory);
-
-    setNewCategory({
-      id: "",
-      name: "",
-      description: "",
-      parent: "",
-      products: 0,
-      status: "Active",
-      image: null,
-    });
-    setShowForm(false);
+    try {
+      startLoading();
+      const response = await FetchData(
+        "categories/category-request-vendor/add",
+        "post",
+        formData,
+        true
+      );
+      console.log(response);
+      setHandlePopup((prev) => ({
+        ...prev,
+        addCategoryPopup: false,
+      }));
+      alert("Your category request has been added successfully");
+    } catch (err) {
+      console.log(err);
+    } finally {
+      stopLoading();
+    }
   };
-
   // Handle sorting
   const handleSortChange = (e) => {
     setSortBy(e.target.value);
@@ -75,183 +134,156 @@ const Categories = () => {
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-lg">
-      <h2 className="text-2xl font-bold text-gray-700 mb-4">Categories</h2>
+      <h2 className="text-2xl font-bold text-gray-700 mb-4">
+        Active products under category{" "}
+        <span className="font-thin text-sm">
+          (Total active products:{" "}
+          <span className="font-bold">{products?.length}</span>)
+        </span>
+      </h2>
 
-      {/* Add Category Button */}
-      <div className="mb-4 flex justify-between items-center">
-        <button
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-          onClick={() => setShowForm(!showForm)}
-        >
-          {showForm ? "Cancel" : "Add Category"}
-        </button>
-
-        {/* Sorting */}
-        <div>
-          <label className="mr-2 text-gray-700">Sort By:</label>
-          <select
-            value={sortBy}
-            onChange={handleSortChange}
-            className="px-3 py-2 border rounded"
-          >
-            <option value="name">Name</option>
-            <option value="products">Number of Products</option>
-          </select>
-        </div>
+      <div className="py-2">
+        <Button
+          label={"Request to add for new category"}
+          onClick={() =>
+            setHandlePopup((prev) => {
+              return { ...prev, addCategoryPopup: true };
+            })
+          }
+        />
       </div>
 
-      {/* Add/Edit Category Form */}
-      {showForm && (
-        <form
-          onSubmit={handleAddCategory}
-          className="bg-gray-100 p-4 rounded mb-6 shadow"
-        >
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-gray-700">Category ID</label>
-              <input
-                type="text"
-                name="id"
-                value={newCategory.id}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 border rounded"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-gray-700">Category Name</label>
-              <input
-                type="text"
-                name="name"
-                value={newCategory.name}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 border rounded"
-                required
-              />
-            </div>
-          </div>
-          <div className="mt-4">
-            <label className="block text-gray-700">Description</label>
-            <textarea
-              name="description"
-              value={newCategory.description}
-              onChange={handleInputChange}
-              className="w-full px-3 py-2 border rounded"
-              required
-            />
-          </div>
-          <div className="mt-4 grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-gray-700">Parent Category</label>
-              <select
-                name="parent"
-                value={newCategory.parent}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 border rounded"
-              >
-                <option value="">None</option>
-                {categories.map((cat) => (
-                  <option key={cat.id} value={cat.name}>
-                    {cat.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-gray-700">Category Image</label>
-              <input
-                type="file"
-                name="image"
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 border rounded"
-              />
-            </div>
-          </div>
-          <button
-            type="submit"
-            className="mt-4 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-          >
-            Save Category
-          </button>
-        </form>
-      )}
-
-      {/* Bulk Actions */}
-      <div className="mb-4">
-        {selectedCategories.length > 0 && (
-          <button
-            onClick={handleBulkDelete}
-            className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
-          >
-            Delete Selected
-          </button>
-        )}
-      </div>
-
-      {/* Category Table */}
+      {/* selling Category Table */}
       <div className="overflow-x-auto">
         <table className="min-w-full bg-white border border-gray-200 rounded-lg">
           <thead>
             <tr className="bg-gray-100 text-gray-600 text-left text-sm font-medium">
-              <th className="py-3 px-4 border-b">
-                <input
-                  type="checkbox"
-                  onChange={(e) =>
-                    setSelectedCategories(
-                      e.target.checked ? categories.map((cat) => cat.id) : []
-                    )
-                  }
-                />
-              </th>
               <th className="py-3 px-4 border-b">Category ID</th>
               <th className="py-3 px-4 border-b">Category Name</th>
-              <th className="py-3 px-4 border-b">Description</th>
-              <th className="py-3 px-4 border-b">Products</th>
+              <th className="py-3 px-4 border-b">Product Name</th>
+              <th className="py-3 px-4 border-b">Number of Products</th>
               <th className="py-3 px-4 border-b">Status</th>
-              <th className="py-3 px-4 border-b">Actions</th>
             </tr>
           </thead>
           <tbody>
-            {categories.map((category) => (
+            {products.map((elements) => (
               <tr
-                key={category.id}
+                key={elements._id}
                 className="text-sm text-gray-700 border-b hover:bg-gray-50"
               >
-                <td className="py-3 px-4">
-                  <input
-                    type="checkbox"
-                    checked={selectedCategories.includes(category.id)}
-                    onChange={() => toggleCategorySelection(category.id)}
-                  />
+                <td className="py-3 px-4">{elements?.category?._id}</td>
+                <td className="py-3 px-4 font-semibold">
+                  {elements?.category?.title}
                 </td>
-                <td className="py-3 px-4">{category.id}</td>
-                <td className="py-3 px-4 font-semibold">{category.name}</td>
-                <td className="py-3 px-4">{category.description}</td>
-                <td className="py-3 px-4 text-center">{category.products}</td>
+                <td className="py-3 px-4 font-semibold">{elements?.name}</td>
+                <td className="py-3 px-4 text-center">
+                  {elements?.stockQuantity}
+                </td>
                 <td
                   className={`py-3 px-4 font-bold ${
-                    category.status === "Active"
-                      ? "text-green-600"
-                      : "text-red-600"
+                    elements.status === "Active"
+                      ? "text-red-600"
+                      : "text-green-600"
                   }`}
                 >
-                  {category.status}
-                </td>
-                <td className="py-3 px-4">
-                  <button className="text-blue-600 hover:underline mr-2">
-                    Edit
-                  </button>
-                  <button className="text-red-600 hover:underline">
-                    Delete
-                  </button>
+                  {elements.status}
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+      {handlePopup.addCategoryPopup && (
+        <div className="backdrop-blur-xl absolute top-0 w-full h-full flex justify-center items-center flex-col left-0">
+          <div className="bg-white shadow-2xl rounded-xl w-fit h-fit px-10 py-10 flex justify-center items-center">
+            <form
+              ref={categoryFormRef}
+              onSubmit={submitCategory}
+              // onSubmit={(e) => {
+              //   e.preventDefault();
+              //   submitCategory;
+              // }}
+              className="flex flex-col gap-2 "
+            >
+              <h1>Add Main & Sub category</h1>
+              <InputBox
+                LabelName={"Category"}
+                Placeholder={"Add Category"}
+                Name={"category"}
+                Required
+              />
+              <InputBox
+                LabelName={"Sub Category"}
+                Placeholder={"Add Sub Category"}
+                Name={"subcategory"}
+                Required
+              />
+              <div className="mt-4">
+                <label className="block text-sm font-medium text-gray-700">
+                  Upload Image
+                </label>
+                <input
+                  name="image"
+                  type="file"
+                  accept="image/*"
+                  className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                  // onChange={(e) =>
+                  //   setImage(e.target.files[0])
+                  // }
+                />
+              </div>
+              <Button label={"Confirm"} type={"submit"} />
+              <Button
+                label={"Cancel"}
+                onClick={() =>
+                  setHandlePopup((prev) => {
+                    return { ...prev, addCategoryPopup: false };
+                  })
+                }
+                className={"hover:bg-red-500"}
+              />
+            </form>
+          </div>
+        </div>
+      )}
+      {/* all available category table */}
+      {/* <div className="overflow-x-auto my-20">
+        <h2 className="text-2xl font-bold text-gray-700 mb-4">
+          All available categories
+        </h2>
+        <table className="min-w-full bg-white border border-gray-200 rounded-lg">
+          <thead>
+            <tr className="bg-gray-100 text-gray-600 text-left text-sm font-medium">
+              <th className="py-3 px-4 border-b">Category ID</th>
+              <th className="py-3 px-4 border-b">Category Name</th>
+              <th className="py-3 px-4 border-b">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {categories.map((category) => (
+              <tr
+                key={category._id}
+                className="text-sm text-gray-700 border-b hover:bg-gray-50"
+              >
+                <td className="py-3 px-4">{category._id}</td>
+                <td className="py-3 px-4 font-semibold">{category.title}</td>
+                <td
+                  className={`py-3 px-4 font-bold ${
+                    category.status === "Active"
+                      ? "text-green-600"
+                      : "text-green-600"
+                  }`}
+                >
+                  Active
+                </td>
+               
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div> */}
     </div>
   );
 };
 
-export default Categories;
+export default LoadingUI(Categories);

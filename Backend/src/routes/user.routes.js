@@ -6,9 +6,7 @@ import {
   regenerateRefreshToken,
   addProductToCart,
   removeProductFromCart,
-  updateProductQuantityInCart,
   getCartProducts,
-  bookProduct,
   addAddress,
   editAddress,
   deleteAddress,
@@ -21,6 +19,8 @@ import {
   getCurrentUser,
   AdminGetUserAddresses,
   UserBan,
+  removeProductFromWishlist,
+  EditProductQuantity,
   //   getUserProfile,
 } from "../controllers/user.controllers.js";
 
@@ -34,18 +34,20 @@ router.route("/login").post(loginUser);
 router.route("/re-login").post(VerifyUser, regenerateRefreshToken);
 router.route("/:userId/:productId/cart/add").post(VerifyUser, addProductToCart);
 router
-  .route("/:userId/:productId/wishlist/add")
-  .post(VerifyUser, addProductToWishlist);
-router.route("/:userId/cart-products").get(VerifyUser, getCartProducts);
-router.route("/:userId/wishlist-products").get(VerifyUser, getWishlistProducts);
-router.route("/:userId/cart/remove").delete(VerifyUser, removeProductFromCart);
+  .route("/:userId/:productId/cart/remove")
+  .delete(VerifyUser, removeProductFromCart);
 router
-  .route("/:userId/cart/update")
-  .post(VerifyUser, updateProductQuantityInCart);
+  .route("/:productId/cart/edit-quantity")
+  .post(VerifyUser, EditProductQuantity);
 
 router
-  .route("/book-product/:userId/:productId/:vendorId")
-  .post(VerifyUser, bookProduct);
+  .route("/:userId/:productId/wishlist/add")
+  .post(VerifyUser, addProductToWishlist);
+router
+  .route("/:userId/:productId/wishlist/remove")
+  .post(VerifyUser, removeProductFromWishlist);
+router.route("/:userId/cart-products").get(VerifyUser, getCartProducts);
+router.route("/:userId/wishlist-products").get(VerifyUser, getWishlistProducts);
 
 //modification routes
 router.route("/:userId/addresses").post(VerifyUser, addAddress);
