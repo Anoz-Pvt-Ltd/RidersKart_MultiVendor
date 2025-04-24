@@ -9,6 +9,7 @@ import {
   getProductByCategory,
   getAllProductForAdmin,
   addStockQuantity,
+  removeStockQuantity,
 } from "../controllers/product.controllers.js";
 import {
   VerifyUser,
@@ -32,6 +33,9 @@ router
 router
   .route("/add-stock-quantity/:productId")
   .post(VerifyVendorUser, addStockQuantity);
+router
+  .route("/remove-stock-quantity/:productId")
+  .post(VerifyVendorUser, removeStockQuantity);
 router
   .route("/get-all-product/:category/:subcategory")
   .get(getProductByCategory);
