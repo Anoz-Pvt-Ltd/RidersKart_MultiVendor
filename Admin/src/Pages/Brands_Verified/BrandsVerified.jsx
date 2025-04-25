@@ -27,9 +27,9 @@ const BrandsVerified = ({ startLoading, stopLoading }) => {
   const { categories, status, error } = useSelector(
     (state) => state.categoryList
   );
-
+  // console.log(allBrands);
   const handleSearchBrands = (e) => {
-    const searchValueBrands = e.target.value;
+    const searchValueBrands = e.target.value.toLowerCase();
     setSearchTermBrands(searchValueBrands);
 
     if (searchValueBrands === "") {
@@ -37,8 +37,8 @@ const BrandsVerified = ({ startLoading, stopLoading }) => {
     } else {
       const filtered = allBrands.filter(
         (order) =>
-          order._id.includes(searchValueBrands) ||
-          order.user.includes(searchValueBrands)
+          order._id.toLowerCase().includes(searchValueBrands) ||
+          order.title.toLowerCase().includes(searchValueBrands)
       );
       setFilteredBrands(filtered);
     }
@@ -57,7 +57,7 @@ const BrandsVerified = ({ startLoading, stopLoading }) => {
             "brands/admin/get-all-verified-brands",
             "get"
           );
-          console.log(response);
+          // console.log(response);
           if (response.data.success) {
             setAllBrands(response.data.data);
           } else {
@@ -77,9 +77,9 @@ const BrandsVerified = ({ startLoading, stopLoading }) => {
   const addBrand = async (e) => {
     e.preventDefault();
     const formData = new FormData(formRef.current);
-    for (var pair of formData.entries()) {
-      console.log(pair[0] + ", " + pair[1]);
-    }
+    // for (var pair of formData.entries()) {
+    //   console.log(pair[0] + ", " + pair[1]);
+    // }
     // console.log(formData);
     try {
       startLoading();
@@ -89,7 +89,7 @@ const BrandsVerified = ({ startLoading, stopLoading }) => {
         formData,
         true
       );
-      console.log(response);
+      // console.log(response);
       alert("Brand added successfully");
       // window.location.reload();
     } catch (err) {
@@ -136,7 +136,10 @@ const BrandsVerified = ({ startLoading, stopLoading }) => {
               filteredBrands?.map((brand) => (
                 <tr key={brand._id}>
                   <td className="border border-gray-500 px-4 py-2">
-                    <Link to={`/current-brand/${brand._id}`}>{brand._id}</Link>
+                    {/* <Link to={`/current-brand/${brand._id}`}>{brand._id}</Link> */}
+                    <span className="hover:text-blue-500 underline-blue-500 hover:underline cursor-pointer">
+                      {brand._id}
+                    </span>
                   </td>
                   <td className="border border-gray-500 px-4 py-2">
                     {brand?.title}

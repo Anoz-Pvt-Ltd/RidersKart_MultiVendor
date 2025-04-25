@@ -94,7 +94,12 @@ const Orders = ({ startLoading, stopLoading }) => {
               filteredOrders.map((order) => (
                 <tr key={order.id}>
                   <td className="border border-gray-500 px-4 py-2">
-                    <Link to={`/current-order/${order._id}`}>{order._id}</Link>
+                    <Link
+                      className="hover:text-blue-500 underline-blue-500 hover:underline "
+                      to={`/current-order/${order._id}`}
+                    >
+                      {order._id}
+                    </Link>
                   </td>
                   <td className="border border-gray-500 px-4 py-2">
                     {order?.user}

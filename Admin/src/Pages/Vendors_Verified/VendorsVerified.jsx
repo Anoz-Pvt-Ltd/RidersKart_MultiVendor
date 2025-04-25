@@ -32,7 +32,7 @@ const VendorsVerified = ({ startLoading, stopLoading }) => {
         (vendor) =>
           vendor._id.includes(searchValueVerifiedVendors) ||
           vendor.contactNumber.includes(searchValueVerifiedVendors) ||
-          vendor.name.includes(searchValueVerifiedVendors)
+          vendor.name.toLowerCase().includes(searchValueVerifiedVendors)
       );
       setFilteredVerifiedVendors(filtered);
     }
@@ -50,7 +50,7 @@ const VendorsVerified = ({ startLoading, stopLoading }) => {
             "vendor/admin/get-all-verified-vendor",
             "get"
           );
-          console.log(response);
+          // console.log(response);
           if (response.data.success) {
             setAllVerifiedVendors(response.data.data.vendor);
           } else {
@@ -96,7 +96,10 @@ const VendorsVerified = ({ startLoading, stopLoading }) => {
               filteredVerifiedVendors.map((vendor) => (
                 <tr key={vendor.id}>
                   <td className="border border-gray-500 px-4 py-2">
-                    <Link to={`/current-verified-vendor/${vendor?._id}`}>
+                    <Link
+                      className="hover:text-blue-500 underline-blue-500 hover:underline "
+                      to={`/current-verified-vendor/${vendor?._id}`}
+                    >
                       {vendor?._id}
                     </Link>
                   </td>

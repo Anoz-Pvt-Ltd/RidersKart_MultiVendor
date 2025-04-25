@@ -26,7 +26,8 @@ const Users = ({ startLoading, stopLoading }) => {
       const filtered = allUser.filter(
         (user) =>
           user._id.includes(searchValueUser) ||
-          user.phoneNumber.includes(searchValueUser)
+          user.phoneNumber.includes(searchValueUser) ||
+          user.name.toLowerCase().includes(searchValueUser)
       );
       setFilteredUsers(filtered);
     }
@@ -90,7 +91,12 @@ const Users = ({ startLoading, stopLoading }) => {
               filteredUsers.map((user) => (
                 <tr key={user._id}>
                   <td className="border border-gray-500 px-4 py-2">
-                    <Link to={`/current-user/${user._id}`}>{user?._id}</Link>
+                    <Link
+                      className="hover:text-blue-500 underline-blue-500 hover:underline "
+                      to={`/current-user/${user._id}`}
+                    >
+                      {user?._id}
+                    </Link>
                   </td>
                   <td className="border border-gray-500 px-4 py-2">
                     {user?.name}
