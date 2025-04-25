@@ -58,7 +58,7 @@ const CartPage = ({ startLoading, stopLoading }) => {
       });
       console.log(response);
       stopLoading();
-      alert(response.data.message);
+      // alert(response.data.message);
       localStorage.setItem("orderId", response.data.data._id);
       return response.data.data._id;
     } catch (err) {
@@ -79,7 +79,8 @@ const CartPage = ({ startLoading, stopLoading }) => {
 
     const order = await FetchData("payment/create-new-paymentId", "post", {
       options: {
-        amount: (getTotalPayablePrice() * 1.1).toFixed(2),
+        // amount: (getTotalPayablePrice() * 1.1).toFixed(2),
+        amount: 100,
         currency: "INR",
         receipt: "qwerty1234",
       },
@@ -113,7 +114,8 @@ const CartPage = ({ startLoading, stopLoading }) => {
           alert("Payment Failed");
         } else if (isValidated.status === 201) {
           alert("Payment Successful");
-          alert("Please don't refresh the page.");
+         
+          OrderConfirmation();
           setPaymentMethod("done");
         }
       },

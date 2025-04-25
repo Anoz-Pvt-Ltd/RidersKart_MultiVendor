@@ -113,6 +113,8 @@ const ValidatePayment = asyncHandler(async (req, res) => {
 
   order.paymentStatus = "completed";
   order.paymentMethod = "online";
+  // order.orderStatus = "confirmed"; // Update order status to confirmed
+  await order.save();
 
   const newTransaction = new paymentTransaction({
     razorpay_payment_id,

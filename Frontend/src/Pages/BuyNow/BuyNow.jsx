@@ -80,7 +80,7 @@ const BuyNow = ({ startLoading, stopLoading }) => {
       return;
     }
     try {
-      startLoading()
+      startLoading();
       const response = await FetchData("orders/update-order-status", "post", {
         orderId,
         status: "confirmed",
@@ -102,7 +102,8 @@ const BuyNow = ({ startLoading, stopLoading }) => {
   const Payment = async (e) => {
     const order = await FetchData("payment/create-new-paymentId", "post", {
       options: {
-        amount: product?.price.MRP,
+        // amount: product?.price.MRP,
+        amount: 100,
         currency: "INR",
         receipt: "qwerty1234",
       },
@@ -136,6 +137,7 @@ const BuyNow = ({ startLoading, stopLoading }) => {
           alert("Payment Failed");
         } else if (isValidated.status === 201) {
           alert("Payment Successful");
+          handleOrderConfirmation();
           setPaymentMethod("done");
         }
       },

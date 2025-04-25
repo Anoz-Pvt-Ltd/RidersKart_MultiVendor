@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2";
 
 const orderSchema = new mongoose.Schema({
   user: {
@@ -115,4 +116,5 @@ orderSchema.pre("save", function (next) {
   next();
 });
 
+orderSchema.plugin(mongooseAggregatePaginate);
 export const Order = mongoose.model("Order", orderSchema);
