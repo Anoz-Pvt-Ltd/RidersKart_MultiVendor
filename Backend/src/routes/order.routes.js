@@ -27,7 +27,7 @@ router.route("/get-vendor-orders/:vendorId").get(GetVendorOrders);
 router.route("/all-products-of/:userId").get(VerifyUser, getUserAllOrders);
 router
   .route("/all-products-of-vendor/:vendorId")
-  .get(VerifyVendorUser, getVendorAllOrders);
+  .get( getVendorAllOrders);
 
 router.route("/update-order-status").post(VerifyUser, updateOrderStatus);
 router.route("/update-payment-status").post(VerifyUser, updatePaymentStatus);
