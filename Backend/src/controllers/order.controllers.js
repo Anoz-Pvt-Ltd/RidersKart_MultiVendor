@@ -1,5 +1,6 @@
 import { Order } from "../models/order.models.js";
 import { Product } from "../models/products.models.js";
+import { VendorUser } from "../models/vendorUser.models.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
@@ -112,10 +113,48 @@ const GetVendorOrders = asyncHandler(async (req, res) => {
   }
 
   // Find all orders where the vendor matches the provided ID
-  const orders = await Order.find({ vendor: vendorId })
-    .populate("user", "name email") // Populating user details
-    .populate("products.product", "name price") // Populating product details
-    .exec();
+    const orders = await Order.aggregate([
+      // Unwind the products array to deal with each item individually
+      { $unwind: "$products" },
+
+      // Lookup to populate the product field
+      {
+        $lookup: {
+          from: "products", // collection name in MongoDB
+          localField: "products.product",
+          foreignField: "_id",
+          as: "productDetails",
+        },
+      },
+      { $unwind: "$productDetails" }, // Get single object from array
+
+      // Match only products belonging to the specified vendor
+      {
+        $match: {
+          "productDetails.vendor": vendorId,
+        },
+      },
+
+      // Optionally group back to reconstruct orders if needed
+      {
+        $group: {
+          _id: "$_id",
+          user: { $first: "$user" },
+          createdAt: { $first: "$createdAt" },
+          updatedAt: { $first: "$updatedAt" },
+          products: {
+            $push: {
+              product: "$productDetails",
+              quantity: "$products.quantity",
+              price: "$products.price",
+            },
+          },
+        },
+      },
+
+      // Optional: sort orders
+      { $sort: { createdAt: -1 } },
+    ]);
 
   if (orders.length === 0) {
     throw new ApiError(404, "No orders found for this vendor");
@@ -147,26 +186,69 @@ const getUserAllOrders = asyncHandler(async (req, res) => {
 const getVendorAllOrders = asyncHandler(async (req, res) => {
   const { vendorId } = req.params;
 
-  try {
-    // Fetch all orders for the specified user
-    const orders = await Order.find({ vendor: vendorId }).populate(
-      "products.product"
-    );
-
-    console.log(orders);
-
-    if (!orders || orders.length === 0) {
-      return res.status(404).json({ message: "No orders found for this user" });
-    }
-
-    return res.status(200).json({
-      success: true,
-      orders,
-    });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Server error" });
+  if (!vendorId) {
+    return res.status(400).json({ message: "Vendor ID is required" });
   }
+
+  const vendor = await VendorUser.findById(vendorId);
+  if (!vendor) {
+    return res.status(404).json({ message: "Vendor not found" });
+  }
+
+  // Fetch all orders for the specified user
+  const orders = await Order.aggregate([
+    // Unwind the products array to deal with each item individually
+    { $unwind: "$products" },
+
+    // Lookup to populate the product field
+    {
+      $lookup: {
+        from: "products", // collection name in MongoDB
+        localField: "products.product",
+        foreignField: "_id",
+        as: "productDetails",
+      },
+    },
+    { $unwind: "$productDetails" }, // Get single object from array
+
+    // Match only products belonging to the specified vendor
+    {
+      $match: {
+        "productDetails.vendor": vendorId,
+      },
+    },
+
+    // Optionally group back to reconstruct orders if needed
+    {
+      $group: {
+        _id: "$_id",
+        user: { $first: "$user" },
+        createdAt: { $first: "$createdAt" },
+        updatedAt: { $first: "$updatedAt" },
+        products: {
+          $push: {
+            product: "$productDetails",
+            quantity: "$products.quantity",
+            price: "$products.price",
+          },
+        },
+      },
+    },
+
+    // Optional: sort orders
+    { $sort: { createdAt: -1 } },
+  ]);
+
+  console.log(orders);
+
+  if (!orders || orders.length === 0) {
+    return res.status(404).json({ message: "No orders found for this user" });
+  }
+
+  return res.status(200).json({
+    success: true,
+    orders,
+  });
 });
 
 const getAllOrders = asyncHandler(async (req, res) => {
