@@ -36,7 +36,7 @@ const VendorUnderReview = ({ startLoading, stopLoading }) => {
         (vendor) =>
           vendor._id.includes(searchValueUnVerifiedVendors) ||
           vendor.contactNumber.includes(searchValueUnVerifiedVendors) ||
-          vendor.name.includes(searchValueUnVerifiedVendors)
+          vendor.name.toLowerCase().includes(searchValueUnVerifiedVendors)
       );
       setFilteredUnVerifiedVendors(filtered);
     }
@@ -100,7 +100,10 @@ const VendorUnderReview = ({ startLoading, stopLoading }) => {
               filteredUnVerifiedVendors.map((vendor) => (
                 <tr key={vendor.id}>
                   <td className="border border-gray-500 px-4 py-2">
-                    <Link to={`/current-un-verified-vendor/${vendor?._id}`}>
+                    <Link
+                      className="hover:text-blue-500 underline-blue-500 hover:underline "
+                      to={`/current-un-verified-vendor/${vendor?._id}`}
+                    >
                       {vendor?._id}
                     </Link>
                   </td>

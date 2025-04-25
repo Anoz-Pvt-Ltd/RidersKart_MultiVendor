@@ -45,7 +45,7 @@ const CurrentOrder = ({ startLoading, stopLoading }) => {
   //   console.log(CurrentOrderAddress);
 
   const fullAddress = `${CurrentOrderAddress?.street}, ${CurrentOrderAddress?.city}, ${CurrentOrderAddress?.state} ${CurrentOrderAddress?.postalCode}, ${CurrentOrderAddress?.country}`;
-
+  console.log(currentOrderProducts);
   return (
     <div>
       <div className="p-6 mx-auto bg-white shadow-md rounded-lg">

@@ -112,7 +112,12 @@ const BrandsUnderReview = ({ startLoading, stopLoading }) => {
               filteredBrands?.map((brand) => (
                 <tr key={brand.id}>
                   <td className="border border-gray-500 px-4 py-2">
-                    <Link to={`/current-brand/${brand._id}`}>{brand._id}</Link>
+                    <Link
+                      className="hover:text-blue-500 underline-blue-500 hover:underline "
+                      to={`/current-brand/${brand._id}`}
+                    >
+                      {brand._id}
+                    </Link>
                   </td>
                   <td className="border border-gray-500 px-4 py-2">
                     {brand?.title}
@@ -126,7 +131,6 @@ const BrandsUnderReview = ({ startLoading, stopLoading }) => {
                   <td className="border border-gray-500 px-4 py-2 ">
                     {/* {brand.status} */}
                     <Button
-                      
                       label={"Accept"}
                       onClick={() => {
                         setIdToVerify(brand._id);
