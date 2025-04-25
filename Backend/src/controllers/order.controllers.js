@@ -5,6 +5,7 @@ import { VendorUser } from "../models/vendorUser.models.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import { User } from "../models/user.model.js";
 
 const CreateOrder = asyncHandler(async (req, res) => {
   const { userId, products, totalAmount } = req.body;
@@ -114,48 +115,48 @@ const GetVendorOrders = asyncHandler(async (req, res) => {
   }
 
   // Find all orders where the vendor matches the provided ID
-    const orders = await Order.aggregate([
-      // Unwind the products array to deal with each item individually
-      { $unwind: "$products" },
+  const orders = await Order.aggregate([
+    // Unwind the products array to deal with each item individually
+    { $unwind: "$products" },
 
-      // Lookup to populate the product field
-      {
-        $lookup: {
-          from: "products", // collection name in MongoDB
-          localField: "products.product",
-          foreignField: "_id",
-          as: "productDetails",
-        },
+    // Lookup to populate the product field
+    {
+      $lookup: {
+        from: "products", // collection name in MongoDB
+        localField: "products.product",
+        foreignField: "_id",
+        as: "productDetails",
       },
-      { $unwind: "$productDetails" }, // Get single object from array
+    },
+    { $unwind: "$productDetails" }, // Get single object from array
 
-      // Match only products belonging to the specified vendor
-      {
-        $match: {
-          "productDetails.vendor": vendorId,
-        },
+    // Match only products belonging to the specified vendor
+    {
+      $match: {
+        "productDetails.vendor": vendorId,
       },
+    },
 
-      // Optionally group back to reconstruct orders if needed
-      {
-        $group: {
-          _id: "$_id",
-          user: { $first: "$user" },
-          createdAt: { $first: "$createdAt" },
-          updatedAt: { $first: "$updatedAt" },
-          products: {
-            $push: {
-              product: "$productDetails",
-              quantity: "$products.quantity",
-              price: "$products.price",
-            },
+    // Optionally group back to reconstruct orders if needed
+    {
+      $group: {
+        _id: "$_id",
+        user: { $first: "$user" },
+        createdAt: { $first: "$createdAt" },
+        updatedAt: { $first: "$updatedAt" },
+        products: {
+          $push: {
+            product: "$productDetails",
+            quantity: "$products.quantity",
+            price: "$products.price",
           },
         },
       },
+    },
 
-      // Optional: sort orders
-      { $sort: { createdAt: -1 } },
-    ]);
+    // Optional: sort orders
+    { $sort: { createdAt: -1 } },
+  ]);
 
   if (orders.length === 0) {
     throw new ApiError(404, "No orders found for this vendor");
@@ -197,43 +198,43 @@ const getVendorAllOrders = asyncHandler(async (req, res) => {
   }
 
   // Fetch all orders for the specified user
- const orders = await Order.aggregate([
-   {
-     $lookup: {
-       from: "products",
-       localField: "products.product",
-       foreignField: "_id",
-       as: "productDetails",
-     },
-   },
-   {
-     $match: {
-       "productDetails.vendor": vendorId,
-     },
-   },
-   {
-     $unwind: "$products",
-   },
-   {
-     $lookup: {
-       from: "products",
-       localField: "products.product",
-       foreignField: "_id",
-       as: "products.productDetails",
-     },
-   },
-   {
-     $match: {
-       "products.productDetails.vendor": vendorId,
-     },
-   },
-   {
-     $group: {
-       _id: "$_id",
-       orderData: { $first: "$$ROOT" },
-     },
-   },
- ]);
+  const orders = await Order.aggregate([
+    {
+      $lookup: {
+        from: "products",
+        localField: "products.product",
+        foreignField: "_id",
+        as: "productDetails",
+      },
+    },
+    {
+      $match: {
+        "productDetails.vendor": vendorId,
+      },
+    },
+    {
+      $unwind: "$products",
+    },
+    {
+      $lookup: {
+        from: "products",
+        localField: "products.product",
+        foreignField: "_id",
+        as: "products.productDetails",
+      },
+    },
+    {
+      $match: {
+        "products.productDetails.vendor": vendorId,
+      },
+    },
+    {
+      $group: {
+        _id: "$_id",
+        orderData: { $first: "$$ROOT" },
+      },
+    },
+  ]);
 
   console.log(orders);
 
@@ -299,6 +300,15 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
   order.orderStatus = status;
   order.shippingAddress = address; // Update shipping address if provided
   await order.save();
+
+  const user = await User.findById(order.user);
+
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+  user.CartProducts = [];
+  await user.save();
 
   res.json(new ApiResponse(200, order, "Order status updated successfully"));
 });

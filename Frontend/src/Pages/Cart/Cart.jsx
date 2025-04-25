@@ -8,6 +8,7 @@ import LoadingUI from "../../Components/Loading";
 import {
   addQuantity,
   deleteFromCart,
+  resetCart,
   subtractQuantity,
 } from "../../Utility/Slice/CartSlice";
 import { useDebounce } from "../../Utility/Utility-functions";
@@ -68,8 +69,35 @@ const CartPage = ({ startLoading, stopLoading }) => {
       stopLoading();
     }
   };
+  
+  const OrderConfirmation = async (orderId) => {
+    // const orderId = localStorage.getItem("orderId");
+    if (!orderId) {
+      alert("Failed to find orderId. Please try again.");
+      return;
+    }
+    try {
+      startLoading();
+      const response = await FetchData("orders/update-order-status", "post", {
+        orderId,
+        status: "confirmed",
+        address: addresses[selectedAddress],
+      });
+      console.log(response);
+      if (response.status === 200) {
+        alert("Order confirmed successfully!");
+        dispatch(resetCart());
+        Navigate("/"); // Redirect to orders page after confirmation
+      }
+    } catch (error) {
+      console.error("Error confirming order:", error);
+      alert("Failed to confirm order. Please try again.");
+    } finally {
+      stopLoading();
+    }
+  };
 
-  const Payment = async (e) => {
+  const OnlinePayment = async (e) => {
     const orderId = await HandleBuyNow();
 
     if (!orderId) {
@@ -114,8 +142,8 @@ const CartPage = ({ startLoading, stopLoading }) => {
           alert("Payment Failed");
         } else if (isValidated.status === 201) {
           alert("Payment Successful");
-         
-          OrderConfirmation();
+
+          OrderConfirmation(orderId);
           setPaymentMethod("done");
         }
       },
@@ -126,45 +154,21 @@ const CartPage = ({ startLoading, stopLoading }) => {
     e.preventDefault();
   };
 
-  const OrderConfirmation = async () => {
-    const orderId = localStorage.getItem("orderId");
-    if (!orderId) {
-      alert("Failed to find order. Please try again.");
-      return;
-    }
-    try {
-      startLoading();
-      const response = await FetchData("orders/update-order-status", "post", {
-        orderId,
-        status: "confirmed",
-        address: addresses[selectedAddress],
-      });
-      console.log(response);
-      if (response.status === 200) {
-        alert("Order confirmed successfully!");
-        Navigate("/"); // Redirect to orders page after confirmation
-      }
-    } catch (error) {
-      console.error("Error confirming order:", error);
-      alert("Failed to confirm order. Please try again.");
-    } finally {
-      stopLoading();
-    }
-  };
 
-  const HandleConfirmOrder = async (e) => {
+  const HandleCashOnDelivery = async (e) => {
     e.preventDefault();
     if (!selectedAddress || !paymentMethod) {
       alert("Please select an address and payment method.");
       return;
     }
 
-    if (paymentMethod === "done") {
-      OrderConfirmation();
-    } else if (paymentMethod === "cash") {
-      HandleBuyNow();
-      Navigate("/");
+    const orderId = await HandleBuyNow();
+    if (!orderId) {
+      alert("Failed to create order. Please try again.");
+      return;
     }
+    OrderConfirmation(orderId);
+    Navigate("/");
   };
 
   useEffect(() => {
@@ -439,14 +443,14 @@ const CartPage = ({ startLoading, stopLoading }) => {
                 {paymentMethod === "online" && (
                   <Button
                     className={`mt-5 bg-white text-blue-600 hover:bg-green-500 hover:text-black`}
-                    onClick={Payment}
+                    onClick={OnlinePayment}
                     label={"Proceed for payment"}
                   />
                 )}
                 {paymentMethod === "cash" && (
                   <Button
                     className={` bg-white text-blue-600 hover:bg-green-500 hover:text-black mt-10`}
-                    onClick={HandleConfirmOrder}
+                    onClick={HandleCashOnDelivery}
                     Disabled={!selectedAddress || !paymentMethod}
                     label={"Place order"}
                   />
