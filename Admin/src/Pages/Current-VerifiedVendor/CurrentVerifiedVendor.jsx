@@ -49,6 +49,45 @@ const CurrentVerifiedVendor = ({ startLoading, stopLoading }) => {
     fetchVendor();
   }, [user]);
 
+  const DeleteVendor = async (e) => {
+    e.preventDefault();
+
+    try {
+      startLoading();
+      const response = await FetchData(
+        `vendor/delete-vendor/${vendorId}`,
+        "post"
+      );
+
+      // console.log(response);
+      alert("Vendor Deleted!");
+      window.location.href = "/home";
+    } catch (error) {
+      console.error(error);
+    } finally {
+      stopLoading();
+    }
+  };
+  const BanVendor = async (e) => {
+    e.preventDefault();
+
+    try {
+      startLoading();
+      const response = await FetchData(
+        `vendor/delete-vendor/${vendorId}`,
+        "post"
+      );
+
+      // console.log(response);
+      alert("Vendor Banned!");
+      window.location.href = "/home";
+    } catch (error) {
+      console.error(error);
+    } finally {
+      stopLoading();
+    }
+  };
+
   const details = [
     { label: "Vendor ID", value: currentVendor?._id },
     { label: "Contact Number", value: currentVendor?.contactNumber },
@@ -127,8 +166,16 @@ const CurrentVerifiedVendor = ({ startLoading, stopLoading }) => {
           Id:{" "}
           <span className="text-2xl font-semibold">{currentVendor?._id}</span>
         </h1>
-        <Button label={"Delete Vendor"} className={"hover:bg-red-500"} />
-        <Button label={"Ban Vendor"} className={"hover:bg-red-500"} />
+        <Button
+          label={"Delete Vendor"}
+          className={"hover:bg-red-500"}
+          onClick={DeleteVendor}
+        />
+        <Button
+          label={"Ban Vendor"}
+          className={"hover:bg-red-500"}
+          onClick={BanVendor}
+        />
       </div>
       <div className="p-6 mx-auto bg-white shadow-md rounded-lg mt-10">
         <div className="overflow-x-auto">
