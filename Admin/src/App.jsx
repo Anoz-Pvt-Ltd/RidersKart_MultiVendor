@@ -16,6 +16,8 @@ import CurrentUnVerifiedVendor from "./Pages/Current-UnVerifiedVendor/CurrentUnV
 import CurrentVerifiedVendor from "./Pages/Current-VerifiedVendor/CurrentVerifiedVendor";
 import { fetchCategories } from "./Utility/Slice/CategorySlice";
 import Promotion from "./Pages/Promotions/promotion";
+import CurrentTransactionOnline from "./Pages/CurrentTransactionOnline/CurrentTransactionOnline";
+import CurrentTransactionCash from "./Pages/CurrentTransactionCash/CurrentTransactionCash";
 
 const App = () => {
   const user = useSelector((store) => store.UserInfo.user);
@@ -57,7 +59,7 @@ const App = () => {
   }, [dispatch]);
 
   return (
-    <div className="absolute top-0 z-[-2] h-screen w-screen bg-white bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.3),rgba(255,255,255,0))] overflow-x-hidden antialiased selection:bg-cyan-500 selection:text-cyan-900 font-Fredoka">
+    <div className="absolute top-0 z-[-2] h-screen w-screen bg-white bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.3),rgba(255,255,255,0))] overflow-x-hidden antialiased selection:bg-cyan-500 selection:text-cyan-900 font-Fredoka no-scrollbar">
       <div className="text-black">
         <Header />
         <Routes>
@@ -70,6 +72,14 @@ const App = () => {
             element={<CurrentProduct />}
           />
           <Route path="/current-order/:orderId" element={<CurrentOrder />} />
+          <Route
+            path="/current-transaction-detail/:transactionId"
+            element={<CurrentTransactionOnline />}
+          />
+          <Route
+            path="/current-cash-transaction-detail/:transactionId"
+            element={<CurrentTransactionCash />}
+          />
           <Route
             path="/current-verified-vendor/:vendorId"
             element={<CurrentVerifiedVendor />}

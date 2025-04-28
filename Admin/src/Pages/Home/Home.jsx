@@ -27,6 +27,8 @@ import Orders from "../Orders/Orders";
 import Brandsverified from "../Brands_Verified/Brandsverified";
 import BrandsUnderReview from "../Brands_UnderReview/BrandsUnderReview";
 import Promotion from "../Promotions/promotion";
+import TransactionOnline from "../TransactionOnline/TransactionOnline";
+import TransactionCash from "../TransactionCash/TransactionCash";
 
 const Dashboard = ({ startLoading, stopLoading }) => {
   const user = useSelector((store) => store.UserInfo.user);
@@ -34,6 +36,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
   const [activeSection, setActiveSection] = useState("Users");
   const [isVendorOpen, setIsVendorOpen] = useState(false);
   const [isBrandOpen, setIsBrandOpen] = useState(false);
+  const [isTransactionOpen, setIsTransactionOpen] = useState(false);
 
   const sectionVariants = {
     hidden: { opacity: 0, x: -50 },
@@ -67,7 +70,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
         <div>
           {" "}
           <motion.aside
-            className="w-64 text-black p-4 shadow-lg fixed overscroll-auto top-0 h-screen bg-white"
+            className="w-64 text-black p-4 shadow-lg fixed overscroll-auto top-0 h-screen bg-white overflow-scroll no-scrollbar"
             initial="hidden"
             animate="visible"
             variants={sidebarVariants}
@@ -178,6 +181,44 @@ const Dashboard = ({ startLoading, stopLoading }) => {
                 >
                   {<ScanLine />}Orders
                 </li>
+                <li className="mb-2">
+                  <div
+                    className="p-4 rounded-md cursor-pointer bg-gray-300 text-black hover:bg-gray-400 transition-all"
+                    onClick={() => setIsTransactionOpen(!isTransactionOpen)}
+                  >
+                    {<Package />}Transactions
+                  </div>
+                  {isTransactionOpen && (
+                    <ul className="ml-6 mt-2">
+                      <li
+                        className={`p-3 rounded-md cursor-pointer mb-2 transition-all ${
+                          activeSection === "Transactions (Online payment)"
+                            ? "bg-blue-600 text-white"
+                            : "bg-gray-200 text-black"
+                        }`}
+                        onClick={() =>
+                          setActiveSection("Transactions (Online payment)")
+                        }
+                      >
+                        Transactions <br />
+                        (Online payment)
+                      </li>
+                      <li
+                        className={`p-3 rounded-md cursor-pointer mb-2 transition-all ${
+                          activeSection === "Transactions (Cash on delivery)"
+                            ? "bg-blue-600 text-white"
+                            : "bg-gray-200 text-black"
+                        }`}
+                        onClick={() =>
+                          setActiveSection("Transactions (Cash on delivery)")
+                        }
+                      >
+                        Transactions <br />
+                        (Cash on delivery)
+                      </li>
+                    </ul>
+                  )}
+                </li>
                 <li
                   className={`p-4 rounded-md cursor-pointer transition-all duration-300 ${
                     activeSection === "Promotions"
@@ -209,6 +250,12 @@ const Dashboard = ({ startLoading, stopLoading }) => {
                 <BrandsUnderReview />
               )}
               {activeSection === "Orders" && <Orders />}
+              {activeSection === "Transactions (Online payment)" && (
+                <TransactionOnline />
+              )}
+              {activeSection === "Transactions (Cash on delivery)" && (
+                <TransactionCash />
+              )}
               {activeSection === "Promotions" && <Promotion />}
             </motion.div>
           </main>

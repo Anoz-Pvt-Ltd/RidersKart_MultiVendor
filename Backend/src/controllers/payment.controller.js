@@ -159,4 +159,40 @@ const GetPaymentHistory = asyncHandler(async (req, res) => {
   res.status(200).json(new ApiResponse(200, payment, "Payment details"));
 });
 
-export { CreatePaymentId, ValidatePayment, GetPaymentHistory };
+const GetAllPayments = asyncHandler(async (req, res) => {
+  const payments = await paymentTransaction
+    .find({})
+    .populate("")
+    .populate({ path: "order" });
+
+  if (!payments) {
+    throw new ApiError(404, "No payments found");
+  }
+
+  res.status(200).json(new ApiResponse(200, payments, "All payments"));
+});
+
+const GetPaymentsById = asyncHandler(async (req, res) => {
+  const { transactionId } = req.params;
+  if (!transactionId) {
+    throw new ApiError(401, "Transaction ID not provided");
+  }
+  const payments = await paymentTransaction
+    .findById({ _id: transactionId })
+    .populate("")
+    .populate({ path: "order" });
+
+  if (!payments) {
+    throw new ApiError(404, "No payments found");
+  }
+
+  res.status(200).json(new ApiResponse(200, payments, "All payments"));
+});
+
+export {
+  CreatePaymentId,
+  ValidatePayment,
+  GetPaymentHistory,
+  GetAllPayments,
+  GetPaymentsById,
+};
