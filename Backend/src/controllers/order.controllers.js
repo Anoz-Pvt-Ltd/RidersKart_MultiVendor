@@ -200,39 +200,116 @@ const getVendorAllOrders = asyncHandler(async (req, res) => {
   // Fetch all orders for the specified user
   const orders = await Order.aggregate([
     {
-      $lookup: {
-        from: "products",
-        localField: "products.product",
-        foreignField: "_id",
-        as: "productDetails",
+      $unwind: {
+        path: "$products",
       },
     },
     {
-      $match: {
-        "productDetails.vendor": vendorId,
-      },
+      $lookup:
+        /**
+         * from: The target collection.
+         * localField: The local join field.
+         * foreignField: The target join field.
+         * as: The name for the results.
+         * pipeline: Optional pipeline to run on the foreign collection.
+         * let: Optional variables to use in the pipeline field stages.
+         */
+        {
+          from: "products",
+          localField: "products.product",
+          foreignField: "_id",
+          as: "productDetails",
+        },
     },
     {
-      $unwind: "$products",
+      $unwind:
+        /**
+         * path: Path to the array field.
+         * includeArrayIndex: Optional name for index.
+         * preserveNullAndEmptyArrays: Optional
+         *   toggle to unwind null and empty values.
+         */
+        {
+          path: "$productDetails",
+        },
     },
     {
-      $lookup: {
-        from: "products",
-        localField: "products.product",
-        foreignField: "_id",
-        as: "products.productDetails",
-      },
+      $match:
+        /**
+         * query: The query in MQL.
+         */
+        {
+          $expr: {
+            $eq: [
+              "$productDetails.vendor",
+              ObjectId(vendorId),
+            ],
+          },
+        },
     },
     {
-      $match: {
-        "products.productDetails.vendor": vendorId,
-      },
+      $lookup:
+        /**
+         * from: The target collection.
+         * localField: The local join field.
+         * foreignField: The target join field.
+         * as: The name for the results.
+         * pipeline: Optional pipeline to run on the foreign collection.
+         * let: Optional variables to use in the pipeline field stages.
+         */
+        {
+          from: "vendorusers",
+          localField: "productDetails.vendor",
+          foreignField: "_id",
+          as: "vendor",
+        },
     },
     {
-      $group: {
-        _id: "$_id",
-        orderData: { $first: "$$ROOT" },
-      },
+      $unwind:
+        /**
+         * path: Path to the array field.
+         * includeArrayIndex: Optional name for index.
+         * preserveNullAndEmptyArrays: Optional
+         *   toggle to unwind null and empty values.
+         */
+        {
+          path: "$vendor",
+        },
+    },
+    {
+      $group:
+        /**
+         * _id: The id of the group.
+         * fieldN: The first field name.
+         */
+        {
+          _id: "$_id",
+          user: {
+            $first: "$user",
+          },
+          updatedAt: {
+            $first: "$updatedAt",
+          },
+          products: {
+            $push: {
+              product: "$productDetails",
+              quantity: "$products.quantity",
+              price: "$products.price",
+            },
+          },
+          vendor: {
+            $first: "$vendor",
+          },
+        },
+    },
+    {
+      $sort:
+        /**
+         * Provide any number of field/order pairs.
+         */
+        {
+          updatedAt: -1,
+        },
     },
   ]);
 
@@ -333,6 +410,124 @@ const updatePaymentStatus = asyncHandler(async (req, res) => {
   res.json(new ApiResponse(200, order, "Payment status updated successfully"));
 });
 
+const allCashOnDeliveryOrders = asyncHandler(async (req, res) => {
+  const orders = await Order.find({ paymentMethod: "cash" });
+  if (!orders || orders.length === 0) {
+    return res
+      .status(404)
+      .json({ message: "No cash on delivery orders found" });
+  }
+
+  return res.status(200).json({
+    success: true,
+    orders,
+  });
+});
+
+const getVendorsOrderReport = asyncHandler(async (req, res) => {
+  const { startDate, endDate } = req.body;
+  if (!startDate || !endDate) {
+    return res
+      .status(400)
+      .json({ message: "Start date and end date are required" });
+  }
+
+  const orders = await Order.aggregate([
+    {
+      $match:
+        /**
+         * query: The query in MQL.
+         */
+        {
+          updatedAt: {
+            $gte: ISODate(startDate),
+            $lt: ISODate(endDate),
+          },
+        },
+    },
+    {
+      $lookup:
+        /**
+         * from: The target collection.
+         * localField: The local join field.
+         * foreignField: The target join field.
+         * as: The name for the results.
+         * pipeline: Optional pipeline to run on the foreign collection.
+         * let: Optional variables to use in the pipeline field stages.
+         */
+        {
+          from: "products",
+          localField: "products.product",
+          foreignField: "_id",
+          as: "productsDetails",
+        },
+    },
+    {
+      $unwind:
+        /**
+         * path: Path to the array field.
+         * includeArrayIndex: Optional name for index.
+         * preserveNullAndEmptyArrays: Optional
+         *   toggle to unwind null and empty values.
+         */
+        {
+          path: "$productsDetails",
+        },
+    },
+    {
+      $group:
+        /**
+         * _id: The id of the group.
+         * fieldN: The first field name.
+         */
+        {
+          _id: "$productsDetails.vendor",
+          Orders: {
+            $push: "$$ROOT",
+          },
+        },
+    },
+    {
+      $lookup:
+        /**
+         * from: The target collection.
+         * localField: The local join field.
+         * foreignField: The target join field.
+         * as: The name for the results.
+         * pipeline: Optional pipeline to run on the foreign collection.
+         * let: Optional variables to use in the pipeline field stages.
+         */
+        {
+          from: "vendorusers",
+          localField: "_id",
+          foreignField: "_id",
+          as: "vendorDetails",
+        },
+    },
+    {
+      $addFields:
+        /**
+         * newField: The new field name.
+         * expression: The new field expression.
+         */
+        {
+          totalPayableAmount: {
+            $sum: "$Orders.productsDetails.price.sellingPrice",
+          },
+        },
+    },
+  ]);
+
+  if (!orders || orders.length === 0) {
+    return res.status(404).json({ message: "No orders found for this user" });
+  }
+
+  res.status(200).json({
+    success: true,
+    orders,
+  });
+});
+
 export {
   CreateOrder,
   CancelOrder,
@@ -343,6 +538,8 @@ export {
   getCurrentOrder,
   updateOrderStatus,
   updatePaymentStatus,
+  allCashOnDeliveryOrders,
+  getVendorsOrderReport,
 };
 
 //fetch data fn in utils; set domain url;
