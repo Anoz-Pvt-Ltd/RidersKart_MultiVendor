@@ -240,7 +240,11 @@ const getVendorAllOrders = asyncHandler(async (req, res) => {
          */
         {
           $expr: {
-            $eq: ["$productDetails.vendor", ObjectId(vendorId)],
+            $eq: [
+              "$productDetails.vendor",
+              new mongoose.Types.ObjectId(vendorId),
+              // ObjectId(vendorId),
+            ],
           },
         },
     },

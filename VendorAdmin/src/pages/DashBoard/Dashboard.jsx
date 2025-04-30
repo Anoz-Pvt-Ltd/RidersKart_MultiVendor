@@ -28,15 +28,18 @@ const Dashboard = ({ startLoading, stopLoading }) => {
   const [error, setError] = useState(null);
   const [allOrders, setAllOrders] = useState([]);
 
+  console.log(user?.[0]?._id);
+
   useEffect(() => {
     const fetchAllOrders = async () => {
       if (user?.length > 0) {
         try {
           startLoading();
           const response = await FetchData(
-            `orders/all-products-of-vendor/${user?.[0]?._id}`,
+            `orders/get-vendor-orders/${user?.[0]?._id}`,
             "get"
           );
+          console.log(response);
           if (response.data.success) {
             setAllOrders(response.data.orders);
           } else {
@@ -140,7 +143,6 @@ const Dashboard = ({ startLoading, stopLoading }) => {
           },
         ],
       }));
-
     } catch (err) {
       console.error(err);
       setError(err.response?.data?.message || "Failed to fetch products.");

@@ -15,7 +15,7 @@ const Orders = ({ startLoading, stopLoading }) => {
         try {
           startLoading();
           const response = await FetchData(
-            `orders/all-products-of-vendor/${user?.[0]?._id}`,
+            `orders/get-vendor-orders/${user?.[0]?._id}`,
             "get"
           );
           console.log(response);
@@ -39,6 +39,8 @@ const Orders = ({ startLoading, stopLoading }) => {
     return <p className="text-red-600 text-center">{error}</p>;
   }
 
+  console.log(allOrders);
+
   return (
     <div className="bg-white p-6 rounded-lg shadow-lg">
       <h2 className="text-2xl font-bold text-gray-700 mb-4">Orders</h2>
@@ -54,11 +56,10 @@ const Orders = ({ startLoading, stopLoading }) => {
                   Category ID / Subcategory ID
                 </th>
                 <th className="py-2 px-4 border-b">Quantity</th>
-                <th className="py-2 px-4 border-b">Price</th>
-                <th className="py-2 px-4 border-b">Total Amount</th>
+                <th className="py-2 px-4 border-b">MRP</th>
+                <th className="py-2 px-4 border-b">Sold at</th>
                 <th className="py-2 px-4 border-b">Order Status</th>
                 <th className="py-2 px-4 border-b">Payment Status</th>
-                <th className="py-2 px-4 border-b">Shipping Address</th>
                 <th className="py-2 px-4 border-b">Placed At</th>
                 <th className="py-2 px-4 border-b">Actions</th>
               </tr>
@@ -71,25 +72,31 @@ const Orders = ({ startLoading, stopLoading }) => {
                     <td className="py-2 px-4 border-b">
                       {order.products[0]?.product.name || "N/A"}
                     </td>
-                    <td className="py-2 px-4 border-b">
-                      {order.products[0]?.product.category || "N/A"}{" "}
-                      -----------------------------{" "}
-                      {order.products[0]?.product.subcategory || "N/A"}
+                    <td className="py-2 px-4 border-b truncate">
+                      Category ID:{" "}
+                      <span className="text-xs">
+                        {order.products[0]?.product.category || "N/A"}
+                      </span>{" "}
+                      <br />
+                      Subcategory ID:
+                      <span className="text-xs">
+                        {order.products[0]?.product.subcategory || "N/A"}
+                      </span>
                     </td>
                     <td className="py-2 px-4 border-b">
                       {order.products[0]?.quantity}
                     </td>
                     <td className="py-2 px-4 border-b">
-                      {order.products[0]?.product?.price?.sellingPrice}
+                      {order.products[0]?.price?.MRP}
                     </td>
-                    <td className="py-2 px-4 border-b">{order.totalAmount}</td>
+                    <td className="py-2 px-4 border-b">
+                      {order.products[0]?.price?.sellingPrice}
+                    </td>
                     <td className="py-2 px-4 border-b">{order.orderStatus}</td>
                     <td className="py-2 px-4 border-b">
                       {order.paymentStatus}
                     </td>
-                    <td className="py-2 px-4 border-b">
-                      {`${order.shippingAddress.street}, ${order.shippingAddress.city}, ${order.shippingAddress.state}, ${order.shippingAddress.country}, ${order.shippingAddress.postalCode}`}
-                    </td>
+
                     <td className="py-2 px-4 border-b">
                       {new Date(order.placedAt).toLocaleDateString()}
                     </td>

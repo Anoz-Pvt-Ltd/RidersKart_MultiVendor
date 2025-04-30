@@ -40,8 +40,6 @@ router.route("/admin/current-order/:orderId").get(getCurrentOrder);
 router.route("/admin/cash-on-delivery-orders").get(allCashOnDeliveryOrders);
 router.route("/admin/update-order-status").post(updateOrderStatus);
 router.route("/admin/update-payment-status").post(updatePaymentStatus);
-router
-  .route("/admin/get-vendor-orders-report/:vendorId")
-  .get(getVendorsOrderReport);
+router.route("/admin/get-vendor-orders-report").get(getVendorsOrderReport);
 
 export default router;
