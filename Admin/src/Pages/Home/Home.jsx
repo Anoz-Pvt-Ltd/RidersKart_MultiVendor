@@ -29,6 +29,7 @@ import BrandsUnderReview from "../Brands_UnderReview/BrandsUnderReview";
 import Promotion from "../Promotions/promotion";
 import TransactionOnline from "../TransactionOnline/TransactionOnline";
 import TransactionCash from "../TransactionCash/TransactionCash";
+import VendorsOrders from "../VendorsOrders/VendorsOrders";
 
 const Dashboard = ({ startLoading, stopLoading }) => {
   const user = useSelector((store) => store.UserInfo.user);
@@ -111,7 +112,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
                         Under review
                       </li>
                       <li
-                        className={`p-3 rounded-md cursor-pointer transition-all ${
+                        className={`p-3 rounded-md cursor-pointer transition-all mb-2 ${
                           activeSection === "Vendors (Verified)"
                             ? "bg-blue-600 text-white"
                             : "bg-gray-200 text-black"
@@ -119,6 +120,16 @@ const Dashboard = ({ startLoading, stopLoading }) => {
                         onClick={() => setActiveSection("Vendors (Verified)")}
                       >
                         Verified
+                      </li>
+                      <li
+                        className={`p-3 rounded-md cursor-pointer transition-all ${
+                          activeSection === "Vendors Orders"
+                            ? "bg-blue-600 text-white"
+                            : "bg-gray-200 text-black"
+                        }`}
+                        onClick={() => setActiveSection("Vendors Orders")}
+                      >
+                        Vendors Orders
                       </li>
                     </ul>
                   )}
@@ -244,6 +255,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
                 <VendorUnderReview />
               )}
               {activeSection === "Vendors (Verified)" && <VendorsVerified />}
+              {activeSection === "Vendors Orders" && <VendorsOrders />}
               {activeSection === "Products" && <Products />}
               {activeSection === "Brands (Verified)" && <Brandsverified />}
               {activeSection === "Brands (Under review)" && (
