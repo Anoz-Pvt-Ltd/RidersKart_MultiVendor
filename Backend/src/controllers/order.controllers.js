@@ -240,10 +240,7 @@ const getVendorAllOrders = asyncHandler(async (req, res) => {
          */
         {
           $expr: {
-            $eq: [
-              "$productDetails.vendor",
-              ObjectId(vendorId),
-            ],
+            $eq: ["$productDetails.vendor", ObjectId(vendorId)],
           },
         },
     },
@@ -440,8 +437,8 @@ const getVendorsOrderReport = asyncHandler(async (req, res) => {
          */
         {
           updatedAt: {
-            $gte: ISODate(startDate),
-            $lt: ISODate(endDate),
+            $gte: new Date(startDate),
+            $lt: new Date(endDate),
           },
         },
     },
