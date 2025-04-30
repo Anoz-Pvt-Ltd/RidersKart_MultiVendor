@@ -242,8 +242,8 @@ const getVendorAllOrders = asyncHandler(async (req, res) => {
           $expr: {
             $eq: [
               "$productDetails.vendor",
-              new mongoose.Types.ObjectId(vendorId),
-              // ObjectId(vendorId),
+              // new mongoose.Types.ObjectId(vendorId),
+              ObjectId("67d3071e3a7d05ebfb53bb33"),
             ],
           },
         },
@@ -297,6 +297,15 @@ const getVendorAllOrders = asyncHandler(async (req, res) => {
               quantity: "$products.quantity",
               price: "$products.price",
             },
+          },
+          orderStatus: {
+            $first: "$orderStatus",
+          },
+          paymentStatus: {
+            $first: "$paymentStatus",
+          },
+          paymentMethod: {
+            $first: "$paymentMethod",
           },
           vendor: {
             $first: "$vendor",
