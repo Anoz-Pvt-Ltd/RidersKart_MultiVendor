@@ -242,8 +242,8 @@ const getVendorAllOrders = asyncHandler(async (req, res) => {
           $expr: {
             $eq: [
               "$productDetails.vendor",
-              // new mongoose.Types.ObjectId(vendorId),
-              ObjectId("67d3071e3a7d05ebfb53bb33"),
+              new mongoose.Types.ObjectId(vendorId),
+              // ObjectId("67d3071e3a7d05ebfb53bb33"),
             ],
           },
         },
@@ -322,8 +322,6 @@ const getVendorAllOrders = asyncHandler(async (req, res) => {
         },
     },
   ]);
-
-  console.log(orders);
 
   if (!orders || orders.length === 0) {
     return res.status(404).json({ message: "No orders found for this user" });
