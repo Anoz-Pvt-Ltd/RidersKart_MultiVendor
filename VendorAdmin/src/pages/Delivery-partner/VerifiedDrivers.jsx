@@ -46,8 +46,8 @@ const VerifiedDrivers = ({ startLoading, stopLoading }) => {
         onClick={() => setIsOpen(true)}
       />
       {isOpen && (
-        <div className="flex justify-centre items-start absolute top-0 left-0 w-full backdrop-blur-xl">
-          <Button label={<X />} onClick={() => setIsOpen(false)} />
+        <div className="flex justify-centre items-start absolute top-0 left-0 h-screen w-full bg-black/70 backdrop-blur-sm overflow-scroll">
+          <Button label={<X />} onClick={() => setIsOpen(false)} className={"fixed top-0 left-0"} />
           <RegisterDriver />
         </div>
       )}

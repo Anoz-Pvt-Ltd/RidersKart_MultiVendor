@@ -7,12 +7,73 @@ import { useDispatch } from "react-redux";
 // import { parseErrorMessage } from "../../../utility/ErrorMessageParser";
 import InputBox from "../../components/InputBox";
 import SelectBox from "../../components/SelectionBox";
+import { useSelector } from "react-redux";
 
-export default function RegisterDriver() {
+export default function RegisterDriver({ startLoading, stopLoading }) {
   // variables----------------------------------------------------------------
   const FormRef = useRef();
   const navigate = useNavigate();
   const Dispatch = useDispatch();
+  const user = useSelector((store) => store.UserInfo.user);
+  const [imagePreviews, setImagePreviews] = useState({
+    licenseImage: null,
+    aadharImage: null,
+    panImage: null,
+    racFrontImage: null,
+    racBackImage: null,
+    insuranceImage: null,
+    pollutionImage: null,
+  });
+
+  const [images, setImages] = useState({
+    licenseImage: null,
+    aadharImage: null,
+    panImage: null,
+    racFrontImage: null,
+    racBackImage: null,
+    insuranceImage: null,
+    pollutionImage: null,
+  });
+
+  const handleImageFileChange = (e) => {
+    const file = e.target.files[0];
+    const name = e.target.name;
+
+    if (!file) return;
+
+    const validImageTypes = [
+      "image/jpeg",
+      "image/png",
+      "image/gif",
+      "image/webp",
+      "image/svg+xml",
+    ];
+    const maxSize = 1 * 1024 * 1024;
+
+    if (!validImageTypes.includes(file.type)) {
+      alert("Please upload a valid image file (JPG, PNG, GIF, WebP, SVG).");
+      e.target.value = "";
+      return;
+    }
+
+    if (file.size > maxSize) {
+      alert("File size must be less than 1MB.");
+      e.target.value = "";
+      return;
+    }
+
+    setImages((prev) => ({ ...prev, [name]: file }));
+    setImagePreviews((prev) => ({
+      ...prev,
+      [name]: URL.createObjectURL(file),
+    }));
+  };
+
+  const handleImageCancel = (name) => {
+    setImages((prev) => ({ ...prev, [name]: null }));
+    setImagePreviews((prev) => ({ ...prev, [name]: null }));
+    document.getElementsByName(name)[0].value = "";
+  };
 
   // Handel submission
   const handleSubmit = async (e) => {
@@ -24,57 +85,63 @@ export default function RegisterDriver() {
       console.log(key, value);
     }
 
-    // Validate phone number (must be 10 digits)
-    const phone = formData.get("phone");
-    const phoneRegex = /^[6-9]\d{9}$/;
-    if (!phoneRegex.test(phone)) {
-      alert("Please enter a valid phone number");
-      return;
-    }
+    // // Validate phone number (must be 10 digits)
+    // const phone = formData.get("phone");
+    // const phoneRegex = /^[6-9]\d{9}$/;
+    // if (!phoneRegex.test(phone)) {
+    //   alert("Please enter a valid phone number");
+    //   return;
+    // }
 
-    // Validate Aadhar number (12 digits)
-    const aadharNumber = formData.get("aadharNumber");
-    const aadharRegex = /^\d{12}$/;
-    if (!aadharRegex.test(aadharNumber)) {
-      alert("Please enter a valid aadhar number");
-      return;
-    }
+    // // Validate Aadhar number (12 digits)
+    // const aadharNumber = formData.get("aadharNumber");
+    // const aadharRegex = /^\d{12}$/;
+    // if (!aadharRegex.test(aadharNumber)) {
+    //   alert("Please enter a valid aadhar number");
+    //   return;
+    // }
 
-    // Validate PAN number (10 characters, alphanumeric, specific format)
-    const panNumber = formData.get("panNumber");
-    const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
-    if (!panRegex.test(panNumber)) {
-      alert("Please enter a valid Pan number");
-      return;
-    }
+    // // Validate PAN number (10 characters, alphanumeric, specific format)
+    // const panNumber = formData.get("panNumber");
+    // const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+    // if (!panRegex.test(panNumber)) {
+    //   alert("Please enter a valid Pan number");
+    //   return;
+    // }
 
-    // Validate Driving License number (adjust based on local rules, typically alphanumeric)
-    const licenseNumber = formData.get("licenseNumber");
-    const dlRegex = /^[A-Z]{2}\d{13}$/; // Adjust this regex as per the regional format
-    if (!dlRegex.test(licenseNumber)) {
-      alert("Please enter a valid Driving License number");
-      return;
-    }
+    // // Validate Driving License number (adjust based on local rules, typically alphanumeric)
+    // const licenseNumber = formData.get("licenseNumber");
+    // const dlRegex = /^[A-Z]{2}\d{13}$/; // Adjust this regex as per the regional format
+    // if (!dlRegex.test(licenseNumber)) {
+    //   alert("Please enter a valid Driving License number");
+    //   return;
+    // }
 
-    const plateNumber = formData.get("plateNumber");
-    const plateRegex = /^[A-Z]{2}\d{2}[A-Z]{2}\d{4}$/;
-    if (!plateRegex.test(plateNumber)) {
-      alert("Please enter a valid Plate number");
-      return;
-    }
+    // const plateNumber = formData.get("plateNumber");
+    // const plateRegex = /^[A-Z]{2}\d{2}[A-Z]{2}\d{4}$/;
+    // if (!plateRegex.test(plateNumber)) {
+    //   alert("Please enter a valid Plate number");
+    //   return;
+    // }
 
     try {
-      const response = await FetchData("driver/register", "post", formData);
+      const response = await FetchData(
+        `driver/register/${user[0]._id}`,
+        "post",
+        formData,
+        true
+        // vendorId === vendorId
+      );
 
       console.log(response);
 
-      alertSuccess(response.data.message);
+      alert(response.data.message);
 
       // Reset form fields and clear image previews
       FormRef.current.reset();
 
       // Navigate to home page and show success message
-      navigate("/");
+      navigate("/dashboard");
     } catch (error) {
       console.log(error);
       // alertError(parseErrorMessage(error.response.data));
@@ -83,9 +150,9 @@ export default function RegisterDriver() {
 
   return (
     <div className="w-full  rounded-lg  shadow-white-300 p-8  flex flex-col justify-center items-center">
-      <h1 className="text-3xl font-bold mb-6 heading-text-gray">
+      <h1 className="text-3xl font-bold mb-6 text-white">
         Personal Details <br />
-        <span className="text-red-600 font-thin text-sm">
+        <span className="bg-red-600 font-thin text-sm rounded-xl px-2 py-1">
           **All fields are Required
         </span>
       </h1>
@@ -94,18 +161,15 @@ export default function RegisterDriver() {
         ref={FormRef}
         className="space-y-6 bg-white flex justify-center items-center flex-col  w-3/4 p-5 rounded-xl"
       >
-        <div className="Personal-details w-full grid laptop:grid-cols-3 phone:grid-cols-1 tablet:grid-cols-2 gap-6">
-          {/* Name */}
-          <div className="mb-3">
+        <div className="grid grid-cols-3 grid-rows-5 gap-4">
+          <div>
             <InputBox
               LabelName="Name"
               Name="name"
               Placeholder="Enter your name"
             />
           </div>
-
-          {/* Phone Number */}
-          <div className="mb-3">
+          <div>
             <InputBox
               LabelName="Phone number"
               Name="phone"
@@ -113,65 +177,124 @@ export default function RegisterDriver() {
               Placeholder="Enter your contact number"
             />
           </div>
-
-          {/* Address */}
-          <div className="mb-3">
+          <div>
             <InputBox
               LabelName="Address"
               Name="address"
               Placeholder="Enter your address"
             />
           </div>
-
-          {/* Driving License */}
-          <div className="mb-3">
+          <div className="row-start-2">
             <InputBox
               LabelName="Driving License Number"
               Name="licenseNumber"
               Placeholder="Your Driving License Number"
             />
-            <InputBox
-              LabelName="Driving License Image"
-              Name="licenseImage"
-              Type="file"
-              Placeholder="Your Driving License Image"
-            />
           </div>
-
-          {/* Aadhar */}
-          <div className="mb-3">
+          <div className="row-start-2">
             <InputBox
               LabelName="Aadhar Card Number"
               Name="aadharNumber"
               Type="number"
               Placeholder="Your Aadhar Card Number"
             />
-            <InputBox
-              LabelName="Aadhar Card Image"
-              Name="aadharImage"
-              Type="file"
-              Placeholder="Your Aadhar Card Image"
-            />
           </div>
-
-          {/* PAN */}
-          <div className="mb-3">
+          <div className="row-start-2">
             <InputBox
               LabelName="Pan Card Number"
               Name="panNumber"
               Type="text"
               Placeholder="Your Pan Card Number"
             />
+          </div>
+          <div className="row-span-2 row-start-3 p-5 rounded-lg shadow-lg">
+            <InputBox
+              LabelName="Driving License Image"
+              Name={`licenseImage`}
+              Type="file"
+              Placeholder="Your Driving License Image"
+              className="w-full h-full border-none"
+              onChange={(e) => {
+                handleImageFileChange(e);
+              }}
+            />
+            {imagePreviews.licenseImage && (
+              <div className="flex justify-center items-center gap-3">
+                <img
+                  src={imagePreviews.licenseImage}
+                  alt="Preview"
+                  className="w-16 h-16 object-cover rounded-md border"
+                />
+
+                {/* Cancel Button */}
+                <button
+                  onClick={() => handleImageCancel("licenseImage")}
+                  className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition"
+                >
+                  Cancel
+                </button>
+              </div>
+            )}
+          </div>
+          <div className="row-span-2 row-start-3 p-5 rounded-lg shadow-lg">
+            <InputBox
+              className="w-full h-full border-none"
+              LabelName="Aadhar Card Image"
+              Name="aadharImage"
+              Type="file"
+              Placeholder="Your Aadhar Card Image"
+              onChange={(e) => {
+                handleImageFileChange(e);
+              }}
+            />
+            {imagePreviews.aadharImage && (
+              <div className="flex justify-center items-center gap-3">
+                <img
+                  src={imagePreviews.aadharImage}
+                  alt="Preview"
+                  className="w-16 h-16 object-cover rounded-md border"
+                />
+
+                {/* Cancel Button */}
+                <button
+                  onClick={() => handleImageCancel("aadharImage")}
+                  className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition"
+                >
+                  Cancel
+                </button>
+              </div>
+            )}
+          </div>
+          <div className="row-span-2 row-start-3 p-5 rounded-lg shadow-lg">
             <InputBox
               LabelName="Pan Card Image"
               Name="panImage"
               Type="file"
               Placeholder="Your Pan Card Image"
+              className="w-full h-full border-none"
+              onChange={(e) => {
+                handleImageFileChange(e);
+              }}
             />
-          </div>
+            {imagePreviews.panImage && (
+              <div className="flex justify-center items-center gap-3">
+                <img
+                  src={imagePreviews.panImage}
+                  alt="Preview"
+                  className="w-16 h-16 object-cover rounded-md border"
+                />
 
-          {/* Password */}
-          <div className="mb-3">
+                {/* Cancel Button */}
+                <button
+                  onClick={() => handleImageCancel("panImage")}
+                  className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition"
+                >
+                  Cancel
+                </button>
+              </div>
+            )}
+          </div>
+          <div className="col-span-2 row-start-5">
             <InputBox
               LabelName="Password"
               Name="password"
@@ -179,9 +302,7 @@ export default function RegisterDriver() {
               Placeholder="Your Password"
             />
           </div>
-
-          {/* Physical Disability */}
-          <div className="mb-3 flex items-center gap-4 justify-start  ">
+          <div className="col-start-3 row-start-5">
             <InputBox
               LabelName="Any Physical Disability:"
               Name="physicallyDisabled"
@@ -194,98 +315,188 @@ export default function RegisterDriver() {
 
         <div className="Vehicle-details grid laptop:grid-cols-3 phone:grid-cols-1 tablet:grid-cols-2 gap-4">
           {/* Vehicle Type */}
-          <div className="mb-3">
-            <select
-              name="vehicleType"
-              className=" border-l-2 border-b-2 backdrop-blur-xl border-gray-900/30 txt-light-brown text-sm rounded-lg block w-4/5 mb-4 p-2.5 dark:placeholder-white dark:text-black drop-shadow-xl focus:outline-none "
-            >
-              <option value="bike">Bike</option>
-              <option value="scooty">Scooty</option>
-              <option value="pickup">Pickup</option>
-              <option value="truck">Truck</option>
-              <option value="Electric Bike"> Electric Bike </option>
-              <option value="Electric vehicle (3/4 wheeler)">
-                Electric vehicle (3/4 wheeler)
-              </option>
-            </select>
 
-            {/* Options are not set properly yet */}
-            <SelectBox LabelName="Select Vehicle Type:" Name="vehicleType" />
-          </div>
+          <div className="grid grid-cols-3 grid-rows-5 gap-4">
+            <div className="py-4">
+              <label
+                htmlFor={"Name"}
+                className={`block text-sm font-medium text-gray-700 mb-2 `}
+              >
+                Vehicle Type
+              </label>
+              <select
+                name="vehicleType"
+                className={`w-full px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 outline-none transition duration-200 ease-in-out hover:shadow-md `}
+              >
+                <option value="bike">Bike</option>
+                <option value="scooty">Scooty</option>
+                <option value="pickup">Pickup</option>
+                <option value="truck">Truck</option>
+                <option value="Electric Bike"> Electric Bike </option>
+                <option value="Electric vehicle (3/4 wheeler)">
+                  Electric vehicle (3/4 wheeler)
+                </option>
+              </select>
+            </div>
+            <div>
+              <InputBox
+                LabelName="Plate Number:"
+                Name="plateNumber"
+                Placeholder="Plate Number"
+              />
+            </div>
+            <div className="row-span-2 col-start-2 row-start-2 rounded-lg shadow-lg">
+              <InputBox
+                LabelName="Upload RC Front Image:"
+                Name="racFrontImage"
+                Type="file"
+                Placeholder="RC Front Image"
+                className="w-full h-full border-none"
+                onChange={(e) => {
+                  handleImageFileChange(e);
+                }}
+              />
+              {imagePreviews.racFrontImage && (
+                <div className="flex justify-center items-center gap-3">
+                  <img
+                    src={imagePreviews.racFrontImage}
+                    alt="Preview"
+                    className="w-16 h-16 object-cover rounded-md border"
+                  />
 
-          {/* Vehicle Description */}
-          <div className="mb-3">
-            <label>Vehicle Description:</label>
-            <textarea
-              type="text"
-              name="vehicleDescription"
-              className=" border-l-2 border-b-2 backdrop-blur-xl border-gray-900/30 txt-light-brown text-sm rounded-lg block w-80 mb-4 p-2.5 dark:placeholder-white dark:text-black drop-shadow-xl focus:outline-none "
-              required
-            />
-          </div>
+                  {/* Cancel Button */}
+                  <button
+                    onClick={() => handleImageCancel("racFrontImage")}
+                    className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              )}
+            </div>
+            <div className="col-start-3 row-start-1">
+              <InputBox
+                LabelName="Insurance Number:"
+                Name="insuranceNumber"
+                Placeholder="Policy Number"
+              />
+            </div>
+            <div className="col-start-3 row-start-2">
+              <InputBox
+                LabelName="Insurance Expiry:"
+                Name="insuranceExpiry"
+                Type="date"
+                Placeholder="Policy Expiry Date"
+                className="w-full h-full border-none"
+                onChange={(e) => {
+                  handleImageFileChange(e);
+                }}
+              />
+            </div>
+            <div className="row-span-2 col-start-3 row-start-3 rounded-lg shadow-lg">
+              <InputBox
+                LabelName="Upload Insurance Image:"
+                Name="insuranceImage"
+                Type="file"
+                Placeholder="Insurance Image"
+                className="w-full h-full border-none"
+                onChange={(e) => {
+                  handleImageFileChange(e);
+                }}
+              />
+              {imagePreviews.insuranceImage && (
+                <div className="flex justify-center items-center gap-3">
+                  <img
+                    src={imagePreviews.insuranceImage}
+                    alt="Preview"
+                    className="w-16 h-16 object-cover rounded-md border"
+                  />
 
-          {/* Plate No */}
-          <div className="mb-3">
-            <InputBox
-              LabelName="Plate Number:"
-              Name="plateNumber"
-              Placeholder="Plate Number"
-            />
-          </div>
+                  {/* Cancel Button */}
+                  <button
+                    onClick={() => handleImageCancel("insuranceImage")}
+                    className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              )}
+            </div>
+            <div className="row-span-3 col-start-1 row-start-2">
+              <div className="">
+                <label>Vehicle Description:</label>
+                <textarea
+                  type="text"
+                  name="vehicleDescription"
+                  className={`w-full px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 outline-none transition duration-200 ease-in-out hover:shadow-md h-96 `}
+                  required
+                />
+              </div>
+            </div>
+            <div className="row-span-2 col-start-2 row-start-4 rounded-lg shadow-lg">
+              <InputBox
+                LabelName="Upload RC back Image:"
+                Name="racBackImage"
+                Type="file"
+                Placeholder="RC Back Image"
+                className="w-full h-full border-none"
+                onChange={(e) => {
+                  handleImageFileChange(e);
+                }}
+              />
+              {imagePreviews.racBackImage && (
+                <div className="flex justify-center items-center gap-3">
+                  <img
+                    src={imagePreviews.racBackImage}
+                    alt="Preview"
+                    className="w-16 h-16 object-cover rounded-md border"
+                  />
 
-          {/* RAC Front and Back Images */}
-          <div>
-            <InputBox
-              LabelName="Upload RAC Front Image:"
-              Name="racFrontImage"
-              Type="file"
-              Placeholder="RAC Front Image"
-            />
-          </div>
-          <div>
-            <InputBox
-              LabelName="Upload RAC back Image:"
-              Name="racBackImage"
-              Type="file"
-              Placeholder="RAC Back Image"
-            />
-          </div>
+                  {/* Cancel Button */}
+                  <button
+                    onClick={() => handleImageCancel("racBackImage")}
+                    className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              )}
+            </div>
+            <div className="row-start-5 rounded-lg shadow-lg">
+              <InputBox
+                LabelName="Upload Pollution Certificate:"
+                Name="pollutionImage"
+                Type="file"
+                Placeholder="Insurance Image"
+                Required={false}
+                className="w-full h-full border-none"
+                onChange={(e) => {
+                  handleImageFileChange(e);
+                }}
+              />
+              {imagePreviews.pollutionImage && (
+                <div className="flex justify-center items-center gap-3">
+                  <img
+                    src={imagePreviews.pollutionImage}
+                    alt="Preview"
+                    className="w-16 h-16 object-cover rounded-md border"
+                  />
 
-          {/* Insurance Image */}
-          <div className="mb-3">
-            <InputBox
-              LabelName="Insurance Number:"
-              Name="insuranceNumber"
-              Placeholder="Policy Number"
-            />
-            <InputBox
-              LabelName="Insurance Expiry:"
-              Name="insuranceExpiry"
-              Type="date"
-              Placeholder="Policy Expiry Date"
-            />
-
-            <InputBox
-              LabelName="Upload Insurance Image:"
-              Name="insuranceImage"
-              Type="file"
-              Placeholder="Insurance Image"
-            />
-          </div>
-
-          {/* Pollution Certificate Image (Optional) */}
-          <div className="mb-3">
-            <InputBox
-              LabelName="Upload Pollution Certificate:"
-              Name="pollutionImage"
-              Type="file"
-              Placeholder="Insurance Image"
-              Required={false}
-            />
+                  {/* Cancel Button */}
+                  <button
+                    onClick={() => handleImageCancel("pollutionImage")}
+                    className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              )}
+            </div>
+            <div className="col-start-3 row-start-5 flex justify-end items-end">
+              <Button type="submit" className={"w-40  "} label={"Submit"} />
+            </div>
           </div>
         </div>
-
-        <Button type="submit" className={"w-40  "} label={"Submit"} />
       </form>
     </div>
   );

@@ -21,8 +21,9 @@ const RegisterDriver = asyncHandler(async (req, res) => {
     plateNumber,
     insuranceNumber,
     insuranceExpiry,
-    vendorId,
   } = req.body;
+
+  const { vendorId } = req.params;
 
   // Validate required fields
   if (
@@ -57,9 +58,9 @@ const RegisterDriver = asyncHandler(async (req, res) => {
       // Assuming maxCount is 1, so files[0]
       const file = files[0];
 
-      console.log(fieldName, files);
+      console.log("line 79", fieldName, files);
       const uploadedResult = await UploadImages(
-        file.fileName,
+        file.filename,
         {
           folderStructure: `all-delivery-partners/${vendor.name.split(" ").join("-")}/${name.split(" ").join("-")}`,
         },
@@ -134,7 +135,7 @@ const RegisterDriver = asyncHandler(async (req, res) => {
       },
     },
     vendorId: vendor._id,
-    verificationStatus: DriverVerificationStatus[0],
+    // verificationStatus: DriverVerificationStatus[0],
   });
 
   // Save the driver to the database

@@ -19,7 +19,7 @@ const router = Router();
 
 router.use(VerifyVendorUser);
 
-router.route("/register").post(
+router.route("/register/:vendorId").post(
   upload.fields([
     { name: "licenseImage", maxCount: 1 },
     { name: "aadharImage", maxCount: 1 },
