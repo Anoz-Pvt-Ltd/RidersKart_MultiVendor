@@ -5,6 +5,7 @@ import InputBox from "../../Components/InputBox";
 import LoadingUI from "../../Components/Loading";
 import { Link } from "react-router";
 import Button from "../../Components/Button";
+import { ExportExcelWithHeadersAndTitle, exportStyledExcel } from "../../Utility/ExportExcel";
 
 const VendorsOrders = ({ startLoading, stopLoading }) => {
   const user = useSelector((store) => store.UserInfo.user);
@@ -58,7 +59,7 @@ const VendorsOrders = ({ startLoading, stopLoading }) => {
             "post",
             formData
           );
-          //   console.log(response);
+          console.log(response);
           if (response.data.success) {
             setAllOrders(response.data.orders);
           } else {
@@ -77,22 +78,65 @@ const VendorsOrders = ({ startLoading, stopLoading }) => {
     fetchAllOrders();
   }, [user]);
 
-  //   useEffect(() => {
-  //     const now = new Date();
-  //     const lastWeek = new Date();
-  //     lastWeek.setDate(now.getDate() - 7);
+  function prepareVendorPayoutData(vendorData) {
+    return vendorData.map((vendor) => {
+      const vendorDetails = vendor.vendorDetails[0];
+      const bankDetails = vendorDetails.bankDetails || {};
 
-  //     const formatDate = (date) => {
-  //       return date.toISOString().split("T")[0];
-  //     };
+      // Calculate commission (assuming 10% for example, adjust as needed)
+      const commissionPercentage = 10; // You can modify this or fetch from vendor data
+      const commissionAmount =
+        (vendor.totalPayableAmount * commissionPercentage) / 100;
+      const netPayable = vendor.totalPayableAmount - commissionAmount;
 
-  //     // setToday(formatDate(now));
-  //     // setOneWeekAgo(formatDate(lastWeek));
-  //     setToday(now);
-  //     setOneWeekAgo(lastWeek);
-  //   }, []);
+      return {
+        "Vendor ID": vendorDetails._id,
+        "Vendor Name": vendorDetails.name,
+        Email: vendorDetails.email,
+        Phone: vendorDetails.contactNumber,
+        "Bank Name": bankDetails.bankName || "N/A",
+        "Account No.": bankDetails.accountNumber || "N/A",
+        IFSC: bankDetails.ifscCode || "N/A",
+        "Total Orders": vendor.Orders.length,
+        "Gross Sales": vendor.totalPayableAmount,
+        "Commission (%)": commissionPercentage,
+        "Commission Amt": commissionAmount,
+        "Net Payable": netPayable,
+        "Payout Status": "Pending", // Default status, can be updated dynamically
+        "Payout Date": "N/A", // Can be filled when payout is processed
+      };
+    });
+  }
 
-  //   console.log(today, oneWeekAgo);
+  const handleDownloadExcel = async (e) => {
+    e.preventDefault();
+
+    const excelHeader = [
+      "Vendor ID",
+      "Vendor Name",
+      "Email",
+      "Phone",
+      "Bank Name",
+      "Account No.",
+      "IFSC",
+      "Total Orders",
+      "Gross Sales",
+      "Commission (%)",
+      "Commission Amt",
+      "Net Payable",
+      "Payout Status",
+      "Payout Date",
+    ];
+
+    const data = prepareVendorPayoutData(allOrders);
+    console.log(data);
+   await exportStyledExcel(
+      data,
+      "Vendors Payout",
+      excelHeader,
+      "Vendors Payout Report"
+    );
+  };
 
   const today = new Date().toISOString().split("T")[0];
   const lastWeek = new Date();
@@ -138,7 +182,7 @@ const VendorsOrders = ({ startLoading, stopLoading }) => {
               />
             </div>
           </div>
-          <Button label={"Download sheet"} />
+          <Button label={"Download sheet"} onClick={handleDownloadExcel} />
         </form>
         <table className="min-w-full border-collapse border border-gray-300 rounded-xl">
           <thead>

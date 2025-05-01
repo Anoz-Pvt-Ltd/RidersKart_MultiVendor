@@ -1,22 +1,53 @@
-import XLSX from "xlsx";
+import ExcelJS from "exceljs";
 
-export const ExportExcel = (data, fileName) => {
-  var wb = XLSX.utils.book_new();
-  var ws = XLSX.utils.json_to_sheet(data);
+export const exportStyledExcel = async (data, fileName, headers, title) => {
+  const workbook = new ExcelJS.Workbook();
+  const worksheet = workbook.addWorksheet("Sheet1");
 
-  XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
-  XLSX.writeFile(wb, fileName + ".xlsx");
-};
+  // Add title (merged cells)
+  worksheet.mergeCells(1, 1, 2, headers.length);
+  const titleCell = worksheet.getCell(1, 1);
+  titleCell.value = title;
+  titleCell.font = { bold: true, size: 16 };
+  titleCell.fill ={
+    type: "pattern",
+    pattern: "solid",
+    fgColor: { argb: "FFB0C4DE" }, // Light blue
+  }
+  titleCell.alignment = { horizontal: "center" };
 
-export const ExportExcelWithHeadersAndTitle = (data, fileName, headers, title) => {
-  var wb = XLSX.utils.book_new();
-  var ws = XLSX.utils.json_to_sheet(data, { header: headers });
+  // Add headers (bold + background)
+  worksheet.addRow(headers);
+  const headerRow = worksheet.getRow(2);
+  headerRow.eachCell((cell) => {
+    cell.font = { bold: true, size: 14 };
+    cell.fill = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "FFD3D3D3" }, // Light gray
+    };
+  });
 
-  // Add title to the first row
-  const titleCell = XLSX.utils.encode_cell({ c: 0, r: 0 });
-  ws[titleCell] = { v: title, t: "s" };
-  ws["!merges"] = [{ s: { c: 0, r: 0 }, e: { c: headers.length - 1, r: 0 } }];
+  // Add data
+  data.forEach((row) => {
+    worksheet.addRow(headers.map((key) => row[key] || ""));
+  });
 
-  XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
-  XLSX.writeFile(wb, fileName + ".xlsx");
+  // --- Browser-Specific File Saving ---
+  if (typeof window !== "undefined") {
+    // For browsers: Generate Blob and trigger download
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${fileName}.xlsx`;
+    a.click();
+    URL.revokeObjectURL(url);
+  } else {
+    // For Node.js: Use writeFile
+    await workbook.xlsx.writeFile(`${fileName}.xlsx`);
+  }
 };
