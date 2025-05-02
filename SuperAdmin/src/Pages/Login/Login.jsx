@@ -62,7 +62,7 @@ const AdminLogin = ({ startLoading, stopLoading }) => {
   ) : (
     <div className="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg">
       <h1 className="text-2xl font-bold text-gray-800 mb-6">
-        Welcome, Login yourself as Admin
+        Welcome, Login yourself as Super Admin
       </h1>
 
       {error && <div className="text-red-500 mb-4">{error}</div>}

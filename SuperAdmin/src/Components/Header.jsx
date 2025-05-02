@@ -39,7 +39,7 @@ const Header = () => {
       </div>
       <div className="flex items-center gap-5 px-4 py-5">
         {user.length > 0 ? (
-          <div className="flex justify-center items-center gap-5">
+          <div>
             <Button
               className={` bg-white text-blue-600 hover:bg-green-500 hover:text-black`}
               label={
@@ -59,7 +59,7 @@ const Header = () => {
                   <span>
                     <User2 />
                   </span>
-                  Register a new Admin
+                  Register a new Admin{" "}
                 </h1>
               }
               onClick={NavigateToAdminRegister}

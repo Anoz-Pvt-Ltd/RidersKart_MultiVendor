@@ -52,7 +52,7 @@ const Products = ({ startLoading, stopLoading }) => {
         (product) =>
           product._id.includes(searchValueProduct) ||
           product.vendor.includes(searchValueProduct) ||
-          product.name.includes(searchValueProduct)
+          product.name.toLowerCase().includes(searchValueProduct)
       );
       setFilteredProducts(filtered);
     }
@@ -71,7 +71,7 @@ const Products = ({ startLoading, stopLoading }) => {
             "products/admin/get-all-products-admin",
             "get"
           );
-          console.log(response);
+          // console.log(response);
           if (response.data.success) {
             setAllProducts(response.data.data);
           } else {
@@ -540,12 +540,15 @@ const Products = ({ startLoading, stopLoading }) => {
             </tr>
           </thead>
           <tbody>
-            {console.log(filteredProducts)}
+            {/* {console.log(filteredProducts)} */}
             {filteredProducts?.length > 0 ? (
               filteredProducts?.map((product) => (
                 <tr key={product._id}>
                   <td className="border border-gray-500 px-4 py-2">
-                    <Link to={`/current-product/${product._id}`}>
+                    <Link
+                      className="hover:text-blue-500 underline-blue-500 hover:underline "
+                      to={`/current-product/${product._id}`}
+                    >
                       {product._id}
                     </Link>
                   </td>

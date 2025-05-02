@@ -5,57 +5,62 @@ import { FetchData } from "../../Utility/FetchFromApi";
 import { Link } from "react-router-dom";
 import InputBox from "../../Components/InputBox";
 import Button from "../../Components/Button";
-// import { useRef } from "react";
 import LoadingUI from "../../Components/Loading";
+import { useRef } from "react";
 
-const Orders = ({ startLoading, stopLoading }) => {
+const TransactionOnline = ({ startLoading, stopLoading }) => {
   const user = useSelector((store) => store.UserInfo.user);
-  const [allOrders, setAllOrders] = useState([]);
-  const tableHeadersOrder = [
-    "Order ID",
-    "User ID",
+  const [error, setError] = useState("");
+  const [allPayments, setAllPayments] = useState([]);
+  const tableHeadersPayment = [
+    "Transaction ID",
+    "Delivery Partner ID",
     "Price",
-    "Status",
+    "Payment mode",
     "Placed On",
   ];
 
-  const [searchTermOrders, setSearchTermOrders] = useState("");
-  const [filteredOrders, setFilteredOrders] = useState(allOrders);
+  const [searchTermPayments, setSearchTermPayments] = useState("");
+  const [filteredPayments, setFilteredPayments] = useState(allPayments);
 
-  const handleSearchOrder = (e) => {
-    const searchValueOrder = e.target.value;
-    setSearchTermOrders(searchValueOrder);
+  const handleSearchPayment = (e) => {
+    const searchValuePayment = e.target.value;
+    setSearchTermPayments(searchValuePayment);
 
-    if (searchValueOrder === "") {
-      setFilteredOrders(allOrders);
+    if (searchValuePayment === "") {
+      setFilteredPayments(allPayments);
     } else {
-      const filtered = allOrders.filter(
-        (order) =>
-          order._id.includes(searchValueOrder) ||
-          order.user.includes(searchValueOrder)
+      const filtered = allPayments.filter(
+        (payment) => payment._id.includes(searchValuePayment)
+        //   payment.user.includes(searchValuePayment)
       );
-      setFilteredOrders(filtered);
+      setFilteredPayments(filtered);
     }
   };
 
   useEffect(() => {
-    setFilteredOrders(allOrders);
-  }, [allOrders]);
+    setFilteredPayments(allPayments);
+  }, [allPayments]);
 
   useEffect(() => {
-    const fetchAllOrders = async () => {
+    const fetchAllTransaction = async () => {
       if (user?.length > 0) {
         try {
           startLoading();
-          const response = await FetchData("orders/admin/all-orders", "get");
-          // console.log(response);
+          const response = await FetchData(
+            "payment/admin/get-all-online-payments",
+            "get"
+          );
+          console.log(response);
           if (response.data.success) {
-            setAllOrders(response.data.data.orders);
+            setAllPayments(response.data.data);
           } else {
-            setError("Failed to Products.");
+            setError("Failed to fetch transactions.");
           }
         } catch (err) {
-          setError(err.response?.data?.message || "Failed to Products");
+          setError(
+            err.response?.data?.message || "Failed to fetch transactions"
+          );
         } finally {
           stopLoading();
         }
@@ -63,23 +68,23 @@ const Orders = ({ startLoading, stopLoading }) => {
     };
 
     // fetchAllProducts();
-    fetchAllOrders();
+    fetchAllTransaction();
   }, [user]);
 
   return (
     <section>
-      <h2 className="text-2xl font-bold mb-4">Orders</h2>
+      <h2 className="text-2xl font-bold mb-4">Online Payments</h2>
       <div className="overflow-x-auto">
         <InputBox
           Type="text"
-          Value={searchTermOrders}
-          onChange={handleSearchOrder}
-          Placeholder={"Search by Product ID or Vendor ID"}
+          Value={searchTermPayments}
+          onChange={handleSearchPayment}
+          Placeholder={"Search by Transaction ID..."}
         />
         <table className="min-w-full border-collapse border border-gray-300 rounded-xl">
           <thead>
             <tr>
-              {tableHeadersOrder.map((header, index) => (
+              {tableHeadersPayment.map((header, index) => (
                 <th
                   key={index}
                   className="border border-gray-500 px-4 py-2 bg-neutral-300"
@@ -90,38 +95,38 @@ const Orders = ({ startLoading, stopLoading }) => {
             </tr>
           </thead>
           <tbody>
-            {filteredOrders.length > 0 ? (
-              filteredOrders.map((order) => (
-                <tr key={order.id}>
+            {filteredPayments.length > 0 ? (
+              filteredPayments.map((payment) => (
+                <tr key={payment.id}>
                   <td className="border border-gray-500 px-4 py-2">
                     <Link
                       className="hover:text-blue-500 underline-blue-500 hover:underline "
-                      to={`/current-order/${order._id}`}
+                      to={`/current-transaction-detail/${payment._id}`}
                     >
-                      {order._id}
+                      {payment._id}
                     </Link>
                   </td>
                   <td className="border border-gray-500 px-4 py-2">
-                    {order?.user}
+                    {payment?.user}
                   </td>
                   <td className="border border-gray-500 px-4 py-2">
-                    {order.totalAmount}
+                    {payment.amount}
                   </td>
                   <td className="border border-gray-500 px-4 py-2">
-                    {order.orderStatus}
+                    {payment.paymentMethod}
                   </td>
                   <td className="border border-gray-500 px-4 py-2">
-                    {order.bookingDate}
+                    {payment.createdAt}
                   </td>
                 </tr>
               ))
             ) : (
               <tr>
                 <td
-                  colSpan={tableHeadersOrder.length}
+                  colSpan={tableHeadersPayment.length}
                   className="text-center py-4"
                 >
-                  No orders found.
+                  No payments found.
                 </td>
               </tr>
             )}
@@ -132,4 +137,4 @@ const Orders = ({ startLoading, stopLoading }) => {
   );
 };
 
-export default LoadingUI(Orders);
+export default LoadingUI(TransactionOnline);

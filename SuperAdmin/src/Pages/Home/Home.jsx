@@ -9,6 +9,7 @@ import {
   ScanLine,
   User,
   X,
+  Bike,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useSelector } from "react-redux";
@@ -27,6 +28,11 @@ import Orders from "../Orders/Orders";
 import Brandsverified from "../Brands_Verified/Brandsverified";
 import BrandsUnderReview from "../Brands_UnderReview/BrandsUnderReview";
 import Promotion from "../Promotions/promotion";
+import TransactionOnline from "../TransactionOnline/TransactionOnline";
+import TransactionCash from "../TransactionCash/TransactionCash";
+import VendorsOrders from "../VendorsOrders/VendorsOrders";
+import DriverVerified from "../Driver_Verified/DriverVerified";
+import DriverUnderReview from "../Driver_UnderReview/DriverUnderReview";
 
 const Dashboard = ({ startLoading, stopLoading }) => {
   const user = useSelector((store) => store.UserInfo.user);
@@ -34,6 +40,8 @@ const Dashboard = ({ startLoading, stopLoading }) => {
   const [activeSection, setActiveSection] = useState("Users");
   const [isVendorOpen, setIsVendorOpen] = useState(false);
   const [isBrandOpen, setIsBrandOpen] = useState(false);
+  const [isTransactionOpen, setIsTransactionOpen] = useState(false);
+  const [isDriverOpen, setIsDriverOpen] = useState(false);
 
   const sectionVariants = {
     hidden: { opacity: 0, x: -50 },
@@ -67,7 +75,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
         <div>
           {" "}
           <motion.aside
-            className="w-64 text-black p-4 shadow-lg fixed overscroll-auto top-0 h-screen bg-white"
+            className="w-64 text-black p-4 shadow-lg fixed overscroll-auto top-0 h-screen bg-white overflow-scroll no-scrollbar"
             initial="hidden"
             animate="visible"
             variants={sidebarVariants}
@@ -108,7 +116,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
                         Under review
                       </li>
                       <li
-                        className={`p-3 rounded-md cursor-pointer transition-all ${
+                        className={`p-3 rounded-md cursor-pointer transition-all mb-2 ${
                           activeSection === "Vendors (Verified)"
                             ? "bg-blue-600 text-white"
                             : "bg-gray-200 text-black"
@@ -116,6 +124,16 @@ const Dashboard = ({ startLoading, stopLoading }) => {
                         onClick={() => setActiveSection("Vendors (Verified)")}
                       >
                         Verified
+                      </li>
+                      <li
+                        className={`p-3 rounded-md cursor-pointer transition-all ${
+                          activeSection === "Vendors Orders"
+                            ? "bg-blue-600 text-white"
+                            : "bg-gray-200 text-black"
+                        }`}
+                        onClick={() => setActiveSection("Vendors Orders")}
+                      >
+                        Vendors Orders
                       </li>
                     </ul>
                   )}
@@ -178,6 +196,80 @@ const Dashboard = ({ startLoading, stopLoading }) => {
                 >
                   {<ScanLine />}Orders
                 </li>
+                <li className="mb-2">
+                  <div
+                    className="p-4 rounded-md cursor-pointer bg-gray-300 text-black hover:bg-gray-400 transition-all"
+                    onClick={() => setIsTransactionOpen(!isTransactionOpen)}
+                  >
+                    {<Package />}Transactions
+                  </div>
+                  {isTransactionOpen && (
+                    <ul className="ml-6 mt-2">
+                      <li
+                        className={`p-3 rounded-md cursor-pointer mb-2 transition-all ${
+                          activeSection === "Transactions (Online payment)"
+                            ? "bg-blue-600 text-white"
+                            : "bg-gray-200 text-black"
+                        }`}
+                        onClick={() =>
+                          setActiveSection("Transactions (Online payment)")
+                        }
+                      >
+                        Transactions <br />
+                        (Online payment)
+                      </li>
+                      <li
+                        className={`p-3 rounded-md cursor-pointer mb-2 transition-all ${
+                          activeSection === "Transactions (Cash on delivery)"
+                            ? "bg-blue-600 text-white"
+                            : "bg-gray-200 text-black"
+                        }`}
+                        onClick={() =>
+                          setActiveSection("Transactions (Cash on delivery)")
+                        }
+                      >
+                        Transactions <br />
+                        (Cash on delivery)
+                      </li>
+                    </ul>
+                  )}
+                </li>
+                <li className="mb-2">
+                  <div
+                    className="p-4 rounded-md cursor-pointer bg-gray-300 text-black hover:bg-gray-400 transition-all"
+                    onClick={() => setIsDriverOpen(!isDriverOpen)}
+                  >
+                    {<Bike />}Driver
+                  </div>
+                  {isDriverOpen && (
+                    <ul className="ml-6 mt-2">
+                      <li
+                        className={`p-3 rounded-md cursor-pointer mb-2 transition-all ${
+                          activeSection === "Drivers (Under review)"
+                            ? "bg-blue-600 text-white"
+                            : "bg-gray-200 text-black"
+                        }`}
+                        onClick={() =>
+                          setActiveSection("Drivers (Under review)")
+                        }
+                      >
+                        Drivers <br />
+                        (Under review)
+                      </li>
+                      <li
+                        className={`p-3 rounded-md cursor-pointer mb-2 transition-all ${
+                          activeSection === "Drivers (Verified)"
+                            ? "bg-blue-600 text-white"
+                            : "bg-gray-200 text-black"
+                        }`}
+                        onClick={() => setActiveSection("Drivers (Verified)")}
+                      >
+                        Drivers <br />
+                        (Verified)
+                      </li>
+                    </ul>
+                  )}
+                </li>
                 <li
                   className={`p-4 rounded-md cursor-pointer transition-all duration-300 ${
                     activeSection === "Promotions"
@@ -203,12 +295,23 @@ const Dashboard = ({ startLoading, stopLoading }) => {
                 <VendorUnderReview />
               )}
               {activeSection === "Vendors (Verified)" && <VendorsVerified />}
+              {activeSection === "Vendors Orders" && <VendorsOrders />}
               {activeSection === "Products" && <Products />}
               {activeSection === "Brands (Verified)" && <Brandsverified />}
               {activeSection === "Brands (Under review)" && (
                 <BrandsUnderReview />
               )}
               {activeSection === "Orders" && <Orders />}
+              {activeSection === "Transactions (Online payment)" && (
+                <TransactionOnline />
+              )}
+              {activeSection === "Transactions (Cash on delivery)" && (
+                <TransactionCash />
+              )}
+              {activeSection === "Drivers (Under review)" && (
+                <DriverUnderReview />
+              )}
+              {activeSection === "Drivers (Verified)" && <DriverVerified />}
               {activeSection === "Promotions" && <Promotion />}
             </motion.div>
           </main>
