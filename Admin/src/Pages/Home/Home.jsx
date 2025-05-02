@@ -9,6 +9,7 @@ import {
   ScanLine,
   User,
   X,
+  Bike,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useSelector } from "react-redux";
@@ -30,6 +31,8 @@ import Promotion from "../Promotions/promotion";
 import TransactionOnline from "../TransactionOnline/TransactionOnline";
 import TransactionCash from "../TransactionCash/TransactionCash";
 import VendorsOrders from "../VendorsOrders/VendorsOrders";
+import DriverVerified from "../Driver_Verified/DriverVerified";
+import DriverUnderReview from "../Driver_UnderReview/DriverUnderReview";
 
 const Dashboard = ({ startLoading, stopLoading }) => {
   const user = useSelector((store) => store.UserInfo.user);
@@ -38,6 +41,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
   const [isVendorOpen, setIsVendorOpen] = useState(false);
   const [isBrandOpen, setIsBrandOpen] = useState(false);
   const [isTransactionOpen, setIsTransactionOpen] = useState(false);
+  const [isDriverOpen, setIsDriverOpen] = useState(false);
 
   const sectionVariants = {
     hidden: { opacity: 0, x: -50 },
@@ -230,6 +234,42 @@ const Dashboard = ({ startLoading, stopLoading }) => {
                     </ul>
                   )}
                 </li>
+                <li className="mb-2">
+                  <div
+                    className="p-4 rounded-md cursor-pointer bg-gray-300 text-black hover:bg-gray-400 transition-all"
+                    onClick={() => setIsDriverOpen(!isDriverOpen)}
+                  >
+                    {<Bike />}Driver
+                  </div>
+                  {isDriverOpen && (
+                    <ul className="ml-6 mt-2">
+                      <li
+                        className={`p-3 rounded-md cursor-pointer mb-2 transition-all ${
+                          activeSection === "Drivers (Under review)"
+                            ? "bg-blue-600 text-white"
+                            : "bg-gray-200 text-black"
+                        }`}
+                        onClick={() =>
+                          setActiveSection("Drivers (Under review)")
+                        }
+                      >
+                        Drivers <br />
+                        (Under review)
+                      </li>
+                      <li
+                        className={`p-3 rounded-md cursor-pointer mb-2 transition-all ${
+                          activeSection === "Drivers (Verified)"
+                            ? "bg-blue-600 text-white"
+                            : "bg-gray-200 text-black"
+                        }`}
+                        onClick={() => setActiveSection("Drivers (Verified)")}
+                      >
+                        Drivers <br />
+                        (Verified)
+                      </li>
+                    </ul>
+                  )}
+                </li>
                 <li
                   className={`p-4 rounded-md cursor-pointer transition-all duration-300 ${
                     activeSection === "Promotions"
@@ -268,6 +308,10 @@ const Dashboard = ({ startLoading, stopLoading }) => {
               {activeSection === "Transactions (Cash on delivery)" && (
                 <TransactionCash />
               )}
+              {activeSection === "Drivers (Under review)" && (
+                <DriverUnderReview />
+              )}
+              {activeSection === "Drivers (Verified)" && <DriverVerified />}
               {activeSection === "Promotions" && <Promotion />}
             </motion.div>
           </main>

@@ -5,7 +5,8 @@ import InputBox from "../../Components/InputBox";
 import LoadingUI from "../../Components/Loading";
 import { Link } from "react-router";
 import Button from "../../Components/Button";
-import { ExportExcelWithHeadersAndTitle, exportStyledExcel } from "../../Utility/ExportExcel";
+// import { ExportExcelWithHeadersAndTitle, exportStyledExcel } from "../../Utility/ExportExcel";
+import { exportStyledExcel } from "../../Utility/ExportExcel";
 
 const VendorsOrders = ({ startLoading, stopLoading }) => {
   const user = useSelector((store) => store.UserInfo.user);
@@ -130,7 +131,7 @@ const VendorsOrders = ({ startLoading, stopLoading }) => {
 
     const data = prepareVendorPayoutData(allOrders);
     console.log(data);
-   await exportStyledExcel(
+    await exportStyledExcel(
       data,
       "Vendors Payout",
       excelHeader,

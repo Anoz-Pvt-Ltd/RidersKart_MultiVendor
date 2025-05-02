@@ -17,7 +17,7 @@ import { upload } from "../middlewares/multer.middleware.js";
 
 const router = Router();
 
-router.use(VerifyVendorUser);
+// router.use(VerifyVendorUser);
 
 router.route("/register/:vendorId").post(
   upload.fields([

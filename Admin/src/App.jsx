@@ -18,6 +18,8 @@ import { fetchCategories } from "./Utility/Slice/CategorySlice";
 import Promotion from "./Pages/Promotions/promotion";
 import CurrentTransactionOnline from "./Pages/CurrentTransactionOnline/CurrentTransactionOnline";
 import CurrentTransactionCash from "./Pages/CurrentTransactionCash/CurrentTransactionCash";
+import CurrentVerifiedDriver from "./Pages/CurrentVerifiedDriver/CurrentVerifiedDriver";
+import CurrentUnVerifiedDriver from "./Pages/Current-Un-VerifiedDriver/CurrentUnVerifiedDriver";
 
 const App = () => {
   const user = useSelector((store) => store.UserInfo.user);
@@ -87,6 +89,14 @@ const App = () => {
           <Route
             path="/current-un-verified-vendor/:vendorId"
             element={<CurrentUnVerifiedVendor />}
+          />
+          <Route
+            path="/current-verified-driver/:driverId"
+            element={<CurrentVerifiedDriver />}
+          />
+          <Route
+            path="/current-un-verified-driver/:driverId"
+            element={<CurrentUnVerifiedDriver />}
           />
           <Route path="/promotions" element={<Promotion />} />
           <Route path="*" element={<h1>Not Found</h1>} />
