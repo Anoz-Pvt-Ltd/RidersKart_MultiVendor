@@ -12,7 +12,7 @@ const BrandsUnderReview = ({ startLoading, stopLoading }) => {
   const formRef = useRef(null);
   const [showPopup, setShowPopup] = useState(false);
   const [allBrands, setAllBrands] = useState([]);
-  const [IdToVerify, setIdToVerify] = useState("");
+  // const [IdToVerify, setIdToVerify] = useState("");
   const tableHeadersBrands = [
     "Brand ID",
     "Brand name",
@@ -69,16 +69,36 @@ const BrandsUnderReview = ({ startLoading, stopLoading }) => {
     fetchBrands();
   }, [user]);
 
-  const AcceptBrand = async () => {
+  const AcceptBrand = async (id) => {
     try {
       startLoading();
       const response = await FetchData(
-        `brands/admin/verify-brand-request/${IdToVerify}`,
+        `brands/admin/verify-brand-request/${id}`,
         "post"
       );
       console.log(response);
+      alert(response.data.message);
+      window.location.reload();
     } catch (err) {
       setError(err.response?.data?.message || "Failed to add brand.");
+      console.log(err);
+    } finally {
+      stopLoading();
+    }
+  };
+  const DeleteBrand = async (id) => {
+    try {
+      startLoading();
+      const response = await FetchData(
+        `brands/admin/delete-brand/${id}`,
+        "delete"
+      );
+      console.log(response);
+      alert(response.data.message);
+      window.location.reload();
+    } catch (err) {
+      console.log(err);
+      setError(err.response?.data?.message || "Failed to delete brand.");
     } finally {
       stopLoading();
     }
@@ -133,13 +153,13 @@ const BrandsUnderReview = ({ startLoading, stopLoading }) => {
                     <Button
                       label={"Accept"}
                       onClick={() => {
-                        setIdToVerify(brand._id);
-                        AcceptBrand();
+                        AcceptBrand(brand._id);
                       }}
                     />
                     <Button
                       label={"Reject"}
                       className={"hover:bg-red-400 ml-5"}
+                      onClick={() => DeleteBrand(brand._id)}
                     />
                   </td>
                 </tr>

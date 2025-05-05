@@ -147,51 +147,6 @@ const Brands = ({ startLoading, stopLoading }) => {
 
       {/* Add/Edit Brand Form */}
       {showForm && (
-        // <form
-        //   ref={formRef}
-        //   onSubmit={addBrandRequest}
-        //   className="bg-gray-100 p-4 rounded mb-6 shadow"
-        // >
-        //   <div className="mb-4">
-        //     <label className="block text-gray-700">Brand Name</label>
-        //     <input
-        //       type="text"
-        //       name="name"
-        //       className="w-full px-3 py-2 border rounded"
-        //       required
-        //     />
-        //   </div>
-        //   <div className="mb-4">
-        //     <label className="block text-gray-700">Description</label>
-        //     <textarea
-        //       name="description"
-        //       className="w-full px-3 py-2 border rounded"
-        //       required
-        //     />
-        //   </div>
-        //   <div className="mb-4">
-        //     <label className="block text-gray-700">Brand Logo</label>
-        //     <input
-        //       type="file"
-        //       name="image"
-        //       className="w-full px-3 py-2 border rounded"
-        //     />
-        //     {newBrand.logo && (
-        //       <img
-        //         src={URL.createObjectURL(newBrand.logo)}
-        //         alt="Preview"
-        //         className="mt-2 h-20"
-        //       />
-        //     )}
-        //   </div>
-        //   <button
-        //     type="submit"
-        //     onClick={addBrandRequest}
-        //     className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-        //   >
-        //     {newBrand.id ? "Update Brand" : "Add Request"}
-        //   </button>
-        // </form>
         <form
           ref={formRef}
           onSubmit={addBrandRequest}
@@ -264,7 +219,6 @@ const Brands = ({ startLoading, stopLoading }) => {
                 />
               </th>
               <th className="py-3 px-4 border-b">Brand Name</th>
-              <th className="py-3 px-4 border-b">Description</th>
               <th className="py-3 px-4 border-b">Brand Logo</th>
               <th className="py-3 px-4 border-b">Status</th>
             </tr>
@@ -289,7 +243,6 @@ const Brands = ({ startLoading, stopLoading }) => {
                   />
                 </td>
                 <td className="py-3 px-4 font-semibold">{brand.title}</td>
-                <td className="py-3 px-4">{brand.description}</td>
                 <td className="py-3 px-4 text-center w-10 h-10">
                   <img src={brand.logo.url} />
                 </td>

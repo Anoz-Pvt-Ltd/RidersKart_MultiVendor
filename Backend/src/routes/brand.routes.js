@@ -44,7 +44,7 @@ router
   .route("/admin/link-brand-to-subcategory")
   .post(VerifyAdminUser, LinkSubcategoryToBrands);
 
-router.route("/admin/delete-brand").post(VerifyAdminUser, DeleteBrand);
+router.route("/admin/delete-brand/:brandId").delete(VerifyAdminUser, DeleteBrand);
 router.route("/admin/deactivate-brand").post(VerifyAdminUser, DeactivateBrand);
 
 // vendor routes
