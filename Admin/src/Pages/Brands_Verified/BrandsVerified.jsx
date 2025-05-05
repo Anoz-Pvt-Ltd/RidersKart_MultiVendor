@@ -17,6 +17,7 @@ const BrandsVerified = ({ startLoading, stopLoading }) => {
   const [allBrands, setAllBrands] = useState([]);
   const tableHeadersBrands = [
     "Brand ID",
+    "Brand Logo",
     "Brand name",
     "Added by",
     "Added On",
@@ -140,6 +141,10 @@ const BrandsVerified = ({ startLoading, stopLoading }) => {
                     <span className="hover:text-blue-500 underline-blue-500 hover:underline cursor-pointer">
                       {brand._id}
                     </span>
+                  </td>
+                  <td className="border border-gray-500 px-4 py-2 h-10 w-10">
+                    <img src={brand.logo.url} />
+                    
                   </td>
                   <td className="border border-gray-500 px-4 py-2">
                     {brand?.title}

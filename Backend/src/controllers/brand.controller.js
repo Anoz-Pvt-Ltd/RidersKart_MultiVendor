@@ -192,6 +192,7 @@ const DeactivateBrand = asyncHandler(async (req, res) => {
 
 const DeleteBrand = asyncHandler(async (req, res) => {
   const { brandId } = req.params;
+  if (!brandId) throw new ApiError(400, "Brand ID is required");
   const brand = await Brand.findByIdAndDelete(brandId);
   if (!brand) throw new ApiError(404, "Brand not found");
 

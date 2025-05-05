@@ -44,12 +44,12 @@ router
   .route("/admin/link-brand-to-subcategory")
   .post(VerifyAdminUser, LinkSubcategoryToBrands);
 
-router.route("/admin/delete-brand").post(VerifyAdminUser, DeleteBrand);
+router.route("/admin/delete-brand/:brandId").delete(VerifyAdminUser, DeleteBrand);
 router.route("/admin/deactivate-brand").post(VerifyAdminUser, DeactivateBrand);
 
 // vendor routes
 router
-  .route("/vendor/add-new-brand")
+  .route("/vendor/add-brand-request")
   .post(VerifyVendorUser, upload.single("image"), AddBrandRequest);
 
 export default router;
