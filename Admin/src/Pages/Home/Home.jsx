@@ -10,6 +10,9 @@ import {
   User,
   X,
   Bike,
+  IndianRupee,
+  MemoryStick,
+  ChartColumnStacked,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useSelector } from "react-redux";
@@ -33,6 +36,7 @@ import TransactionCash from "../TransactionCash/TransactionCash";
 import VendorsOrders from "../VendorsOrders/VendorsOrders";
 import DriverVerified from "../Driver_Verified/DriverVerified";
 import DriverUnderReview from "../Driver_UnderReview/DriverUnderReview";
+import CategoriesVerified from "../CategoriesVerified/CategoriesVerified";
 
 const Dashboard = ({ startLoading, stopLoading }) => {
   const user = useSelector((store) => store.UserInfo.user);
@@ -40,6 +44,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
   const [activeSection, setActiveSection] = useState("Users");
   const [isVendorOpen, setIsVendorOpen] = useState(false);
   const [isBrandOpen, setIsBrandOpen] = useState(false);
+  const [isCategoryOpen, setIsCategoryOpen] = useState(false);
   const [isTransactionOpen, setIsTransactionOpen] = useState(false);
   const [isDriverOpen, setIsDriverOpen] = useState(false);
 
@@ -145,7 +150,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
                     className="p-4 rounded-md cursor-pointer bg-gray-300 text-black hover:bg-gray-400 transition-all"
                     onClick={() => setIsBrandOpen(!isBrandOpen)}
                   >
-                    {<Package />}Brands
+                    {<MemoryStick />}Brands
                   </div>
                   {isBrandOpen && (
                     <ul className="ml-6 mt-2">
@@ -168,6 +173,40 @@ const Dashboard = ({ startLoading, stopLoading }) => {
                             : "bg-gray-200 text-black"
                         }`}
                         onClick={() => setActiveSection("Brands (Verified)")}
+                      >
+                        Verified
+                      </li>
+                    </ul>
+                  )}
+                </li>
+                <li className="mb-2">
+                  <div
+                    className="p-4 rounded-md cursor-pointer bg-gray-300 text-black hover:bg-gray-400 transition-all"
+                    onClick={() => setIsCategoryOpen(!isCategoryOpen)}
+                  >
+                    {<ChartColumnStacked />}Categories
+                  </div>
+                  {isCategoryOpen && (
+                    <ul className="ml-6 mt-2">
+                      <li
+                        className={`p-3 rounded-md cursor-pointer mb-2 transition-all ${
+                          activeSection === "Categories (Under review)"
+                            ? "bg-blue-600 text-white"
+                            : "bg-gray-200 text-black"
+                        }`}
+                        onClick={() =>
+                          setActiveSection("Categories (Under review)")
+                        }
+                      >
+                        Under review
+                      </li>
+                      <li
+                        className={`p-3 rounded-md cursor-pointer transition-all ${
+                          activeSection === "Categories (Verified)"
+                            ? "bg-blue-600 text-white"
+                            : "bg-gray-200 text-black"
+                        }`}
+                        onClick={() => setActiveSection("Categories (Verified)")}
                       >
                         Verified
                       </li>
@@ -201,7 +240,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
                     className="p-4 rounded-md cursor-pointer bg-gray-300 text-black hover:bg-gray-400 transition-all"
                     onClick={() => setIsTransactionOpen(!isTransactionOpen)}
                   >
-                    {<Package />}Transactions
+                    {<IndianRupee />}Transactions
                   </div>
                   {isTransactionOpen && (
                     <ul className="ml-6 mt-2">
@@ -301,6 +340,10 @@ const Dashboard = ({ startLoading, stopLoading }) => {
               {activeSection === "Brands (Under review)" && (
                 <BrandsUnderReview />
               )}
+              {activeSection === "Categories (Verified)" && <CategoriesVerified />}
+              {/* {activeSection === "Categories (Under review)" && (
+                <CategoriesUnderReview />
+              )} */}
               {activeSection === "Orders" && <Orders />}
               {activeSection === "Transactions (Online payment)" && (
                 <TransactionOnline />
