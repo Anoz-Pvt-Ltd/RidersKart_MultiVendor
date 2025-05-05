@@ -49,7 +49,7 @@ router.route("/admin/deactivate-brand").post(VerifyAdminUser, DeactivateBrand);
 
 // vendor routes
 router
-  .route("/vendor/add-new-brand")
+  .route("/vendor/add-brand-request")
   .post(VerifyVendorUser, upload.single("image"), AddBrandRequest);
 
 export default router;

@@ -1,30 +1,24 @@
 import React, { useEffect, useRef, useState } from "react";
 import LoadingUI from "../../components/Loading";
 import { FetchData } from "../../utils/FetchFromApi";
+import { parseErrorMessage } from "../../utils/ErrorMessageParser";
+import InputBox from "../../components/InputBox";
+import SelectBox from "../../components/SelectionBox";
+import Button from "../../components/Button";
 
 const Brands = ({ startLoading, stopLoading }) => {
   const formRef = useRef(null);
   const [brands, setBrands] = useState([]);
-  const [newBrand, setNewBrand] = useState({
-    id: "",
-    name: "",
-    description: "",
-    products: 0,
-    logo: null,
-  });
+  const [categories, setCategories] = useState([]);
   const [selectedBrands, setSelectedBrands] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("name");
+  const [selectedCategory, setSelectedCategory] = useState(null);
 
-  // Handle input changes for the form
-  const handleInputChange = (e) => {
-    const { name, value, files } = e.target;
-    setNewBrand({ ...newBrand, [name]: files ? files[0] : value });
-  };
-
+  // Fetch all brands and categories on component mount
   useEffect(() => {
-    const fetchProducts = async () => {
+    const fetchBrands = async () => {
       try {
         startLoading();
         const response = await FetchData(
@@ -39,11 +33,29 @@ const Brands = ({ startLoading, stopLoading }) => {
         stopLoading();
       }
     };
-    fetchProducts();
+
+    const fetchCategories = async () => {
+      try {
+        startLoading();
+        const response = await FetchData(
+          `categories/get-all-category-and-subcategories`,
+          "get"
+        );
+        console.log(response);
+        setCategories(response.data.data.categories);
+      } catch (err) {
+        alert(err.response?.data?.message || "Failed to fetch products.");
+      } finally {
+        stopLoading();
+      }
+    };
+    fetchBrands();
+    fetchCategories();
   }, []);
 
-  const addBrand = async () => {
-    const formData = new FormData.current();
+  const addBrandRequest = async (e) => {
+    e.preventDefault();
+    const formData = new FormData(formRef.current);
     try {
       startLoading();
       const response = await FetchData(
@@ -52,28 +64,19 @@ const Brands = ({ startLoading, stopLoading }) => {
         formData,
         true
       );
-      // console.log(response);
+      console.log(response);
       alert(
         "Your Brand is sent for approval... It might take time to get reviewed"
       );
+      formData.reset();
+      setShowForm(false);
     } catch (error) {
-      alert("error");
-      console.log("Error getting all main subcategories", error);
+      alert(parseErrorMessage(error.response.data));
+      console.log("Error in adding request for a new brand!", error);
+      setShowForm(false);
     } finally {
       stopLoading();
     }
-  };
-
-  // Handle editing a brand
-  const handleEditBrand = (brand) => {
-    setNewBrand(brand);
-    setShowForm(true);
-  };
-
-  // Handle deleting a brand
-  const handleDeleteBrand = (id) => {
-    const filteredBrands = brands.filter((brand) => brand.id !== id);
-    setBrands(filteredBrands);
   };
 
   // Handle bulk deletion
@@ -100,7 +103,6 @@ const Brands = ({ startLoading, stopLoading }) => {
   const filteredBrands = brands.filter((brand) =>
     brand?.title?.toLowerCase().includes(searchQuery.toLowerCase())
   );
-
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-lg">
@@ -131,7 +133,7 @@ const Brands = ({ startLoading, stopLoading }) => {
           className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
           onClick={() => setShowForm(!showForm)}
         >
-          {showForm ? "Cancel" : "Add Brand"}
+          {showForm ? "Cancel" : "Add Brand request"}
         </button>
         {selectedBrands.length > 0 && (
           <button
@@ -145,55 +147,104 @@ const Brands = ({ startLoading, stopLoading }) => {
 
       {/* Add/Edit Brand Form */}
       {showForm && (
+        // <form
+        //   ref={formRef}
+        //   onSubmit={addBrandRequest}
+        //   className="bg-gray-100 p-4 rounded mb-6 shadow"
+        // >
+        //   <div className="mb-4">
+        //     <label className="block text-gray-700">Brand Name</label>
+        //     <input
+        //       type="text"
+        //       name="name"
+        //       className="w-full px-3 py-2 border rounded"
+        //       required
+        //     />
+        //   </div>
+        //   <div className="mb-4">
+        //     <label className="block text-gray-700">Description</label>
+        //     <textarea
+        //       name="description"
+        //       className="w-full px-3 py-2 border rounded"
+        //       required
+        //     />
+        //   </div>
+        //   <div className="mb-4">
+        //     <label className="block text-gray-700">Brand Logo</label>
+        //     <input
+        //       type="file"
+        //       name="image"
+        //       className="w-full px-3 py-2 border rounded"
+        //     />
+        //     {newBrand.logo && (
+        //       <img
+        //         src={URL.createObjectURL(newBrand.logo)}
+        //         alt="Preview"
+        //         className="mt-2 h-20"
+        //       />
+        //     )}
+        //   </div>
+        //   <button
+        //     type="submit"
+        //     onClick={addBrandRequest}
+        //     className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+        //   >
+        //     {newBrand.id ? "Update Brand" : "Add Request"}
+        //   </button>
+        // </form>
         <form
           ref={formRef}
-          onSubmit={addBrand}
+          onSubmit={addBrandRequest}
           className="bg-gray-100 p-4 rounded mb-6 shadow"
         >
-          <div className="mb-4">
-            <label className="block text-gray-700">Brand Name</label>
-            <input
-              type="text"
-              name="name"
-              // value={newBrand.name}
-              // onChange={handleInputChange}
-              className="w-full px-3 py-2 border rounded"
-              required
+          <InputBox
+            Type="text"
+            LabelName={"Brand name"}
+            Name={"brand"}
+            Placeholder="Enter Brand Name"
+          />
+          <InputBox
+            Type="file"
+            Name={"image"}
+            LabelName="Logo "
+            Placeholder="Enter Logo URL"
+          />
+          <SelectBox
+            LabelName="Main Category"
+            Name="category"
+            onChange={(e) => setSelectedCategory(e.target.value)}
+            Placeholder="Select main category"
+            Options={categories?.map((cat) => ({
+              label: cat.title,
+              value: cat._id, // Correctly linking ID for selection
+            }))}
+          />
+
+          {selectedCategory !== null && (
+            <SelectBox
+              LabelName="subcategory"
+              Name="subcategoryId"
+              Placeholder="Select subcategory"
+              Options={categories
+                ?.find((cat) => cat._id === selectedCategory)
+                ?.subcategories.map((subcat) => ({
+                  label: subcat.title,
+                  value: subcat._id, // Correctly linking ID for selection
+                }))}
+            />
+          )}
+
+          <div className="flex flex-col gap-3">
+            <Button label={"Add request"} type={"submit"} />
+            <Button
+              className={"hover:bg-red-400"}
+              label={"Cancel"}
+              onClick={() => {
+                // Add Brand Logic
+                setShowForm(false);
+              }}
             />
           </div>
-          <div className="mb-4">
-            <label className="block text-gray-700">Description</label>
-            <textarea
-              name="description"
-              // value={newBrand.description}
-              // onChange={handleInputChange}
-              className="w-full px-3 py-2 border rounded"
-              required
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block text-gray-700">Brand Logo</label>
-            <input
-              type="file"
-              name="image"
-              // onChange={handleInputChange}
-              className="w-full px-3 py-2 border rounded"
-            />
-            {newBrand.logo && (
-              <img
-                src={URL.createObjectURL(newBrand.logo)}
-                alt="Preview"
-                className="mt-2 h-20"
-              />
-            )}
-          </div>
-          <button
-            type="submit"
-            // onClick={addBrand}
-            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-          >
-            {newBrand.id ? "Update Brand" : "Add Brand"}
-          </button>
         </form>
       )}
 
