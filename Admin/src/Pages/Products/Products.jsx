@@ -555,7 +555,7 @@ const Products = ({ startLoading, stopLoading }) => {
                   <td className="border border-gray-500 px-4 py-2">
                     {product.vendor}
                   </td>
-                  <td className="border border-gray-500 px-4 py-2 ">
+                  <td className="border border-gray-500 px-4 py-2 w-96 overflow-hidden  ">
                     {product.name}
                   </td>
                   <td className="border border-gray-500 px-4 py-2">
