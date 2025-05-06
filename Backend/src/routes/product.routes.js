@@ -10,6 +10,7 @@ import {
   getAllProductForAdmin,
   addStockQuantity,
   removeStockQuantity,
+  AddProductImages,
 } from "../controllers/product.controllers.js";
 import {
   VerifyUser,
@@ -40,6 +41,9 @@ router
   .route("/get-all-product/:category/:subcategory")
   .get(getProductByCategory);
 router.route("/edit-product").post(VerifyVendorUser, editProduct);
+router
+  .route("/add-images/:productId")
+  .patch(VerifyVendorUser, upload.array("images", 9), AddProductImages);
 router
   .route("/delete-products/:productId")
   .delete(VerifyVendorUser, deleteProduct);

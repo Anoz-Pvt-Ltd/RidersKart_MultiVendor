@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { FetchData } from "../../utils/FetchFromApi";
 import InputBox from "../../components/InputBox";
 import Button from "../../components/Button";
@@ -6,6 +7,8 @@ import { useSelector } from "react-redux";
 import SelectBox from "../../components/SelectionBox";
 import LoadingUI from "../../components/Loading";
 import TextArea from "../../components/TextWrapper";
+import { CircleFadingPlus } from "lucide-react";
+import PopUp from "../../components/PopUpWrapper";
 // import { categories } from "../../constants/AllProducts.Vendor";
 
 const Products = ({ startLoading, stopLoading }) => {
@@ -25,11 +28,14 @@ const Products = ({ startLoading, stopLoading }) => {
   const [selectedCategory, setSelectedCategory] = useState();
   const [searchQuery, setSearchQuery] = useState("");
   const [products, setProducts] = useState([]);
+  const [popup, setPopup] = useState({
+    image: false,
+  });
+  const [UrlData, setUrlData] = useSearchParams();
 
   const filteredProducts = products.filter((product) =>
     product?.name?.toLowerCase().includes(searchQuery.toLowerCase())
   );
-
   const handleImageFileChange = (e) => {
     const file = e.target.files[0];
 
@@ -62,6 +68,9 @@ const Products = ({ startLoading, stopLoading }) => {
     setImages(null);
     setImagePreview(null);
     document.getElementById("imageInput").value = "";
+  };
+  const findProductById = (id) => {
+    return products.find((product) => product._id === id);
   };
 
   // Function to calculate and update Selling Price
@@ -192,6 +201,111 @@ const Products = ({ startLoading, stopLoading }) => {
     getAllMainSubcategories();
     GetAllBrands();
   }, []);
+
+  const ImageUpdationForm = ({ onClose, imagesRequired }) => {
+    const [images, setImages] = useState([]);
+
+    const formRef = useRef(null);
+    const productId = UrlData.get("productId");
+
+    const handleAddImages = async (event) => {
+      event.preventDefault();
+
+      const formData = new FormData(formRef.current);
+
+      for (let [key, value] of formData.entries()) {
+        console.log(key, value);
+      }
+      try {
+        startLoading();
+        const response = await FetchData(
+          `products/add-images/${productId}`,
+          "patch",
+          formData,
+          true
+        );
+
+        console.log("Image uploaded", response.data);
+        alert(response.data.message);
+        onClose();
+      } catch (error) {
+        console.error("Error uploading images:", error);
+      } finally {
+        stopLoading();
+      }
+    };
+
+    return (
+      <PopUp onClose={onClose}>
+        <div className="flex justify-center items-center w-[80vw] place-self-center  ">
+          <form
+            ref={formRef}
+            onSubmit={handleAddImages}
+            className="w-full h-[90vh] p-16 flex flex-col items-center justify-center rounded-2xl  bg-white   "
+          >
+            <label
+              className="block mb-2 font-medium text-black text-2xl"
+              for="file_input"
+            >
+              Upload Images
+            </label>
+            <div className="w-full h-fit grid grid-cols-2 grid-rows-5 gap-5 justify-center items-center my-10  ">
+              {Array(imagesRequired())
+                .fill("")
+                .map((_, index) => {
+                  return (
+                    <div
+                      className={`flex items-center justify-center space-x-6 ${
+                        index + 1 == imagesRequired() && (index + 1) % 2 !== 0
+                          ? "col-span-2 "
+                          : ""
+                      }`}
+                      key={index}
+                    >
+                      <div className="shrink-0 flex justify-center items-center h-16 w-16 ">
+                        {images[index] && (
+                          <img
+                            id="preview_img"
+                            className=" object-cover rounded  "
+                            src={images[index]?.src}
+                            alt="uploaded image"
+                          />
+                        )}
+                      </div>
+                      <label className={`block  `}>
+                        <span className="sr-only">Choose photo</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          name="images"
+                          className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold   file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100 border border-neutral-200 p-2 rounded-full"
+                          onChange={(e) => {
+                            const file = e.target.files[0];
+                            const reader = new FileReader();
+                            reader.onloadend = () => {
+                              setImages((prevImages) => [
+                                ...prevImages,
+                                {
+                                  id: Math.random(),
+                                  src: reader.result,
+                                },
+                              ]);
+                            };
+                            reader.readAsDataURL(file);
+                            // console.log(images);
+                          }}
+                        />
+                      </label>
+                    </div>
+                  );
+                })}
+            </div>
+            <Button label="Submit" Type="submit" className="mt-10" />
+          </form>
+        </div>
+      </PopUp>
+    );
+  };
 
   return (
     <div className="lg:max-w-6xl lg:mx-auto lg:p-4 bg-white shadow-lg rounded-lg">
@@ -401,12 +515,23 @@ const Products = ({ startLoading, stopLoading }) => {
               >
                 <h3 className="font-bold text-gray-900 flex items-center justify-start gap-10 ">
                   {product?.name}{" "}
-                  <span className="bg-white p-1 rounded-xl shadow">
+                  <span className=" p-1 rounded-xl flex items-center  ">
                     <img
                       src={product?.images[0]?.url}
-                      className="w-20 h-20 rounded-xl shadow"
+                      className="w-20 h-20 m-1 rounded-xl  shadow"
                     />
                   </span>
+                  <button
+                    onClick={() => {
+                      setUrlData({ productId: product?._id });
+                      setPopup((prev) => {
+                        return { ...prev, image: true };
+                      });
+                    }}
+                    title="Add images"
+                  >
+                    <CircleFadingPlus />
+                  </button>
                 </h3>
                 <p className="truncate">{product?.description}</p>
                 <p>
@@ -428,6 +553,19 @@ const Products = ({ startLoading, stopLoading }) => {
               </div>
             ))}
           </div>
+          {popup.image && (
+            <ImageUpdationForm
+              onClose={() =>
+                setPopup((prev) => {
+                  return { ...prev, image: false };
+                })
+              }
+              imagesRequired={() => {
+                const product = findProductById(UrlData.get("productId"));
+                return 10 - product?.images?.length;
+              }}
+            />
+          )}
         </div>
       )}
     </div>

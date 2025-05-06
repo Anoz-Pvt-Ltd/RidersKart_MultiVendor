@@ -12,7 +12,6 @@ export const UploadImages = async (imageName, folderDetails, tags = []) => {
     // Read file asynchronously
     const data = await fs.readFile(`./public/tmp/productImages/${imageName}`);
 
-    console.log(folderDetails);
     // Upload image to ImageKit
     const uploadedImg = await imageKit.upload({
       file: data, // required

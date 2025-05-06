@@ -193,7 +193,7 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
             </div>
 
             {/* Current Image */}
-            <div className="relative h-full p-3 m-2  ">
+            <div className="relative h-full w-[40vw] p-3 m-2 ">
               <img
                 src={products?.images[currentImg]?.url}
                 alt={products?.name}
@@ -231,7 +231,7 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
                 <img
                   src={products?.images[currentImg]?.url}
                   alt=""
-                  className="w-[80vw]"
+                  className="h-[80vh]"
                 />
               </div>
             </PopUp>

@@ -273,6 +273,43 @@ const editProduct = asyncHandler(async (req, res) => {
   });
 });
 
+const AddProductImages = asyncHandler(async (req, res) => {
+  const { productId } = req.params;
+  const images = req.files; // Array of uploaded images
+
+  if (!productId) throw new ApiError(400, "Product ID is required");
+
+  // Find the product by ID
+  const product = await Product.findById(productId)
+    .populate("vendor")
+    .populate("category")
+    .populate("subcategory");
+  const { vendor, category, subcategory, name } = product;
+
+  if (!product) throw new ApiError(404, "Product not found");
+
+  // Upload each image and add to the product's images array
+  for (const image of images) {
+    const uploadedImage = await UploadImages(image.filename, {
+      folderStructure: `all-vendor/${vendor.name.split(" ").join("-")}/${category.title.split(" ").join("-")}/${subcategory.title.split(" ").join("-")}/${name.split(" ").join("-")}`,
+    });
+    product.images.push({
+      url: uploadedImage.url,
+      altText: product.name,
+      fileId: uploadedImage.fileId,
+    });
+  }
+
+  // Save the updated product
+  await product.save();
+
+  res.status(200).json({
+    success: true,
+    message: "Images added successfully",
+    data: product,
+  });
+});
+
 const deleteProduct = asyncHandler(async (req, res) => {
   const { productId } = req.params;
 
@@ -414,6 +451,7 @@ export {
   getAllProducts,
   getProduct,
   editProduct,
+  AddProductImages,
   deleteProduct,
   getProductsOfVendor,
   getProductByCategory,

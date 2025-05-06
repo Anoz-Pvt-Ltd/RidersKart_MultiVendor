@@ -2,5 +2,6 @@
   "files.autoSave": "afterDelay",
   "files.autoSaveDelay": 0,
   "editor.wordWrap": "on",
-  "postman.settings.dotenv-detection-notification-visibility": false
+  "postman.settings.dotenv-detection-notification-visibility": false,
+  "cSpell.words": ["Updation"]
 }
