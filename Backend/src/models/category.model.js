@@ -13,7 +13,7 @@ const categorySchema = new Schema(
       type: String,
       required: true,
       default: "under-review",
-      enum: ["verified", "under-review"],
+      enum: ["Verified", "under-review"],
     },
   },
   { timestamps: true }
