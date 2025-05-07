@@ -23,12 +23,6 @@ const deliveryPartnerSchema = new Schema(
       trim: true,
     },
 
-    email: {
-      type: String,
-      unique: true,
-      trim: true,
-    },
-
     password: {
       type: String,
       required: true,
