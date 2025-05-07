@@ -70,7 +70,6 @@ const AddCategoryRequest = asyncHandler(async (req, res) => {
 
   const existingCategoryRequest = await Category.findOne({
     title: category,
-    subcategories: { $elemMatch: { title: subcategory } },
   });
   if (existingCategoryRequest)
     throw new ApiError(400, "Category request already exists!");
@@ -94,6 +93,9 @@ const AddCategoryRequest = asyncHandler(async (req, res) => {
   });
   if (!newSubCategoryRequest)
     throw new ApiError(404, "Sub Category not found!");
+
+  newCategoryRequest.subcategories.push(newSubCategoryRequest._id);
+  await newCategoryRequest.save();
 
   res
     .status(201)
@@ -214,9 +216,9 @@ const getAllMainSubcategories = asyncHandler(async (req, res) => {
 const editSubcategory = asyncHandler(async (req, res) => {
   const { subcategoryId } = req.params;
   const { newTitle } = req.body;
-  console.log("controller reached");
-  console.log("newTitle", newTitle);
-  console.log("subcategoryId", subcategoryId);
+  // console.log("controller reached");
+  // console.log("newTitle", newTitle);
+  // console.log("subcategoryId", subcategoryId);
 
   if (!subcategoryId) {
     throw new ApiError(400, "Subcategory ID is required");
@@ -234,11 +236,11 @@ const editSubcategory = asyncHandler(async (req, res) => {
   const imageFile = req.file;
   if (!imageFile) throw new ApiError(404, "Image file not found");
 
-  if (subcategory.image.fileId) {
-    const deletedImage = await DeleteImage(subcategory.image.fileId);
-    if (!deletedImage)
-      throw new ApiError(500, "Failed to delete previous image");
+  if (!subcategory.image.fileId) {
+    throw new ApiError(404, "Image fileId is missing");
   }
+  const deletedImage = await DeleteImage(subcategory.image.fileId);
+  if (!deletedImage) throw new ApiError(500, "Failed to delete previous image");
 
   const image = await UploadImages(imageFile.filename, {
     folderStructure: `images-Of-Subcategory/${newTitle.split(" ").join("-")}`,

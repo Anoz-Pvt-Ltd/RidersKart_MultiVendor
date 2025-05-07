@@ -5,6 +5,7 @@ import { useSelector } from "react-redux";
 import LoadingUI from "../../components/Loading";
 import Button from "../../components/Button";
 import InputBox from "../../components/InputBox";
+import { parseErrorMessage } from "../../utils/ErrorMessageParser";
 
 const Categories = ({ startLoading, stopLoading }) => {
   const user = useSelector((store) => store.UserInfo.user);
@@ -101,6 +102,7 @@ const Categories = ({ startLoading, stopLoading }) => {
       alert("Your category request has been added successfully");
     } catch (err) {
       console.log(err);
+      alert(parseErrorMessage(err.response?.data));
     } finally {
       stopLoading();
     }
