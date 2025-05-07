@@ -6,30 +6,35 @@ import InputBox from "../../Components/InputBox";
 import Button from "../../Components/Button";
 // import { useRef } from "react";
 import LoadingUI from "../../Components/Loading";
+import { Check, Trash } from "lucide-react";
 
-const CategoriesUnderReview = () => {
+const CategoriesUnderReview = ({ startLoading, stopLoading }) => {
   const { categories, status, error } = useSelector(
     (state) => state.categoryList
+  );
+  const UnVerifiedCategories = categories.filter(
+    (category) => category.status.toLowerCase() === "under-review"
   );
   const tableHeadersCategories = [
     "Category ID",
     "Category Name",
-    // "Price",
+    "Subcategory Name",
     "Status",
-    "Creation date",
+    "Action",
   ];
 
   const [searchTermCategories, setSearchTermCategories] = useState("");
-  const [filteredCategory, setFilteredCategory] = useState(categories);
+  const [filteredCategory, setFilteredCategory] =
+    useState(UnVerifiedCategories);
 
   const handleSearchCategory = (e) => {
     const searchValueCategory = e.target.value;
     setSearchTermCategories(searchValueCategory);
 
     if (searchValueCategory === "") {
-      setFilteredCategory(categories);
+      setFilteredCategory(UnVerifiedCategories);
     } else {
-      const filtered = categories.filter(
+      const filtered = UnVerifiedCategories.filter(
         (category) =>
           category._id.includes(searchValueCategory) ||
           category.title.toLowerCase().includes(searchValueCategory)
@@ -39,12 +44,47 @@ const CategoriesUnderReview = () => {
   };
 
   useEffect(() => {
-    setFilteredCategory(categories);
-  }, [categories]);
+    setFilteredCategory(UnVerifiedCategories);
+  }, [UnVerifiedCategories]);
+
+  const AcceptCategory = async (id) => {
+    try {
+      startLoading();
+      const response = await FetchData(
+        `categories/category/accept/${id}`,
+        "post"
+      );
+      console.log(response);
+      alert(response.data.message);
+      window.location.reload();
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to add brand.");
+      console.log(err);
+    } finally {
+      stopLoading();
+    }
+  };
+  const RejectCategory = async (id) => {
+    try {
+      startLoading();
+      const response = await FetchData(
+        `categories/category/delete/${id}`,
+        "delete"
+      );
+      console.log(response);
+      alert(response.data.message);
+      window.location.reload();
+    } catch (err) {
+      console.log(err);
+      setError(err.response?.data?.message || "Failed to delete brand.");
+    } finally {
+      stopLoading();
+    }
+  };
 
   return (
     <section>
-      <h2 className="text-2xl font-bold mb-4">Orders</h2>
+      <h2 className="text-2xl font-bold mb-4">Categories</h2>
       <div className="overflow-x-auto">
         <InputBox
           Type="text"
@@ -81,10 +121,26 @@ const CategoriesUnderReview = () => {
                     {category?.title}
                   </td>
                   <td className="border border-gray-500 px-4 py-2">
+                    {category?.title}
+                  </td>
+                  <td className="border border-gray-500 px-4 py-2">
                     {category.status}
                   </td>
                   <td className="border border-gray-500 px-4 py-2">
-                    {category.createdAt}
+                    <div className="flex gap-2">
+                      <Button
+                        label={<Check />}
+                        onClick={() => {
+                          AcceptCategory(category._id);
+                        }}
+                      />
+                      <Button
+                        label={<Trash />}
+                        onClick={() => {
+                          RejectCategory(category._id);
+                        }}
+                      />
+                    </div>
                   </td>
                 </tr>
               ))
@@ -105,4 +161,4 @@ const CategoriesUnderReview = () => {
   );
 };
 
-export default CategoriesUnderReview;
+export default LoadingUI(CategoriesUnderReview);

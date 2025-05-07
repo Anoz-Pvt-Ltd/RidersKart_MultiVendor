@@ -94,9 +94,9 @@ const Products = ({ startLoading, stopLoading }) => {
     const formData = new FormData(categoryFormRef.current);
     // formData.append("image", image);
 
-    for (let [key, value] of formData.entries()) {
-      console.log(`${key}: ${value}`);
-    }
+    // for (let [key, value] of formData.entries()) {
+    //   console.log(`${key}: ${value}`);
+    // }
 
     try {
       startLoading();
@@ -119,28 +119,6 @@ const Products = ({ startLoading, stopLoading }) => {
       stopLoading();
     }
   };
-
-  // useEffect(() => {
-  //   const getAllMainSubcategories = async () => {
-  //     try {
-  //       startLoading();
-  //       const response = await FetchData(
-  //         "categories/get-all-category-and-subcategories",
-  //         "get"
-  //       );
-  //       // console.log(response);
-
-  //       // Ensure categories exist before setting state
-  //       setAllCategories(response.data?.data?.categories || []);
-  //     } catch (error) {
-  //       console.log("Error getting all main subcategories", error);
-  //     } finally {
-  //       stopLoading();
-  //     }
-  //   };
-
-  //   getAllMainSubcategories();
-  // }, []);
 
   const submitSubCategory = async (e, categoryId) => {
     e.preventDefault();

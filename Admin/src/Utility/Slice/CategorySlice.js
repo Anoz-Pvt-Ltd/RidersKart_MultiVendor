@@ -53,6 +53,13 @@ const CategoryList = createSlice({
     resetCategories: (state) => {
       state.categories = [];
     },
+
+    GetVerifiedCategories: (state) => {
+      const VerifiedCategories = state.categories.filter(
+        (category) => category.status === "verified"
+      );
+      return VerifiedCategories;
+    },
   },
   extraReducers: (builder) => {
     builder

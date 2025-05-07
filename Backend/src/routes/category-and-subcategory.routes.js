@@ -7,6 +7,8 @@ import {
   editSubcategory,
   getAllMainSubcategories,
   AddCategoryRequest,
+  UnderReviewCategoryRequest,
+  VerifyCategory,
 } from "../controllers/category-and-subcategory.controller.js";
 import {
   VerifyAdminUser,
@@ -22,7 +24,12 @@ router
 router
   .route("/category-request-vendor/add")
   .post(VerifyVendorUser, upload.single("image"), AddCategoryRequest);
-router.route("/category/delete").delete(VerifyAdminUser, DeleteCategory);
+router
+  .route("/category/accept/:categoryId")
+  .post(VerifyAdminUser, VerifyCategory);
+router
+  .route("/category/delete/:categoryId")
+  .delete(VerifyAdminUser, DeleteCategory);
 router
   .route("/sub-category/add")
   .post(VerifyAdminUser, upload.single("image"), AddSubcategory);
@@ -33,5 +40,6 @@ router
 router
   .route("/edit-sub-category/:subcategoryId")
   .post(VerifyAdminUser, upload.single("image"), editSubcategory);
+router.route("/under-review-category").get(UnderReviewCategoryRequest);
 
 export default router;

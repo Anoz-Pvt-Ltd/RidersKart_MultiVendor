@@ -21,6 +21,7 @@ const AddCategory = asyncHandler(async (req, res) => {
 
   const newCategory = await Category.create({
     title: category,
+    status: "verified",
   });
 
   const imageFile = req.file;
@@ -36,7 +37,6 @@ const AddCategory = asyncHandler(async (req, res) => {
   const newSubcategory = await Subcategory.create({
     title: subcategory,
     category: newCategory._id,
-    status: "Verified",
     image: { url: image.url, alt: subcategory, fileId: image.fileId },
   });
   if (!newCategory || !newSubcategory)
@@ -256,12 +256,47 @@ const editSubcategory = asyncHandler(async (req, res) => {
     );
 });
 
+const UnderReviewCategoryRequest = asyncHandler(async (req, res) => {
+  const categories = await Category.find({ status: "under-review" });
+
+  if (!categories || categories.length === 0) {
+    return res.status(404).json({
+      status: "error",
+      message: "No categories found under review",
+    });
+  }
+  res.status(200).json({
+    status: "success",
+    data: categories,
+  });
+});
+
+const VerifyCategory = asyncHandler(async (req, res) => {
+  const { categoryId } = req.params;
+  const category = await Category.findById(categoryId);
+  if (!category) throw new ApiError(404, "Category not found");
+
+  if (category.status === "verified")
+    throw new ApiError(400, "Category is already Verified");
+
+  category.status = "verified";
+  await category.save();
+
+  res
+    .status(200)
+    .json(
+      new ApiResponse(200, category, "Category status updated successfully")
+    );
+});
+
 export {
   AddCategory,
   AddCategoryRequest,
+  VerifyCategory,
   DeleteCategory,
   AddSubcategory,
   DeleteSubcategory,
   getAllMainSubcategories,
   editSubcategory,
+  UnderReviewCategoryRequest,
 };
