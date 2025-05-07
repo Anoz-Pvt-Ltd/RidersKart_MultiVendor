@@ -37,6 +37,7 @@ import VendorsOrders from "../VendorsOrders/VendorsOrders";
 import DriverVerified from "../Driver_Verified/DriverVerified";
 import DriverUnderReview from "../Driver_UnderReview/DriverUnderReview";
 import CategoriesVerified from "../CategoriesVerified/CategoriesVerified";
+import CategoriesUnderReview from "../CategoriesUnderReview/CategoriesUnderReview";
 
 const Dashboard = ({ startLoading, stopLoading }) => {
   const user = useSelector((store) => store.UserInfo.user);
@@ -341,9 +342,9 @@ const Dashboard = ({ startLoading, stopLoading }) => {
                 <BrandsUnderReview />
               )}
               {activeSection === "Categories (Verified)" && <CategoriesVerified />}
-              {/* {activeSection === "Categories (Under review)" && (
+              {activeSection === "Categories (Under review)" && (
                 <CategoriesUnderReview />
-              )} */}
+              )}
               {activeSection === "Orders" && <Orders />}
               {activeSection === "Transactions (Online payment)" && (
                 <TransactionOnline />

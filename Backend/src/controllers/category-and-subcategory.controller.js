@@ -36,6 +36,7 @@ const AddCategory = asyncHandler(async (req, res) => {
   const newSubcategory = await Subcategory.create({
     title: subcategory,
     category: newCategory._id,
+    status: "Verified",
     image: { url: image.url, alt: subcategory, fileId: image.fileId },
   });
   if (!newCategory || !newSubcategory)
