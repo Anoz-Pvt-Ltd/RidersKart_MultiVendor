@@ -27,11 +27,19 @@ const Header = () => {
 
   return (
     <header className="flex justify-between items-center px-5 py-3  shadow-md relative">
+      {/* Hamburger opening button */}
+      <motion.button
+        className="md:hidden lg:hidden flex justify-center items-center gap-2"
+        onClick={toggleMenu}
+        whileTap={{ scale: 0.9 }}
+      >
+        {isOpen ? <X size={28} /> : <Menu size={28} />}
+      </motion.button>
       {/* Logo */}
       <div className="flex items-center lg:pl-20 justify-center">
         <Link to={"/"} className="flex items-center justify-center">
-          <img src={logo} alt="Logo" className="h-20" />
-          <h1 className="text-xl font-bold">{PlatformName}</h1>
+          <img src={logo} alt="Logo" className="lg:h-20 h-12" />
+          <h1 className="lg:text-xl  font-bold">{PlatformName}</h1>
         </Link>
       </div>
 
@@ -81,13 +89,18 @@ const Header = () => {
       </div>
 
       {/* Mobile Hamburger Button */}
-      <motion.button
-        className="md:hidden lg:hidden"
-        onClick={toggleMenu}
-        whileTap={{ scale: 0.9 }}
-      >
-        {isOpen ? <X size={28} /> : <Menu size={28} />}
-      </motion.button>
+
+      <motion.div whileHover={{ scale: 1.1 }}>
+        <Link
+          to={`/cart/${user?.[0]?._id}`}
+          className="text-blue-600 px-4 py-2 rounded  duration-300 ease-in-out hover:shadow-md shadow-neutral-600 hover:translate-y-1 border border-neutral-300 hover:border-none flex  bg-white hover:bg-green-500 hover:text-black lg:hidden"
+        >
+          <ShoppingCart />{" "}
+          <span className="bg-red-400 px-2 rounded-full text-black">
+            {cartCount}
+          </span>
+        </Link>
+      </motion.div>
 
       {/* Mobile Menu */}
       {isOpen && (
