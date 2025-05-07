@@ -112,7 +112,7 @@ const CategoriesUnderReview = ({ startLoading, stopLoading }) => {
                   <td className="border border-gray-500 px-4 py-2">
                     <Link
                       className="hover:text-blue-500 underline-blue-500 hover:underline "
-                      to={`/current-order/${category._id}`}
+                      // to={`/current-order/${category._id}`}
                     >
                       {category._id}
                     </Link>
