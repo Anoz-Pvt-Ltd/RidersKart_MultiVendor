@@ -8,13 +8,15 @@ import { useDispatch } from "react-redux";
 import InputBox from "../../components/InputBox";
 import SelectBox from "../../components/SelectionBox";
 import { useSelector } from "react-redux";
+import LoadingUI from "../../components/Loading";
 
-export default function RegisterDriver({ startLoading, stopLoading }) {
+const RegisterDriver = ({ startLoading, stopLoading }) => {
   // variables----------------------------------------------------------------
   const FormRef = useRef();
   const navigate = useNavigate();
   const Dispatch = useDispatch();
   const user = useSelector((store) => store.UserInfo.user);
+  console.log(user);
   const [imagePreviews, setImagePreviews] = useState({
     licenseImage: null,
     aadharImage: null,
@@ -125,6 +127,7 @@ export default function RegisterDriver({ startLoading, stopLoading }) {
     // }
 
     try {
+      startLoading();
       const response = await FetchData(
         `driver/register/${user[0]._id}`,
         "post",
@@ -145,16 +148,15 @@ export default function RegisterDriver({ startLoading, stopLoading }) {
     } catch (error) {
       console.log(error);
       // alertError(parseErrorMessage(error.response.data));
+    } finally {
+      stopLoading();
     }
   };
 
   return (
     <div className="w-full  rounded-lg  shadow-white-300 p-8  flex flex-col justify-center items-center">
       <h1 className="text-3xl font-bold mb-6 text-white">
-        Personal Details <br />
-        <span className="bg-red-600 font-thin text-sm rounded-xl px-2 py-1">
-          **All fields are Required
-        </span>
+        Personal Details 
       </h1>
       <form
         onSubmit={handleSubmit}
@@ -307,6 +309,7 @@ export default function RegisterDriver({ startLoading, stopLoading }) {
               LabelName="Any Physical Disability:"
               Name="physicallyDisabled"
               Type="checkbox"
+              Required={false}
             />
           </div>
         </div>
@@ -501,3 +504,5 @@ export default function RegisterDriver({ startLoading, stopLoading }) {
     </div>
   );
 }
+
+export default LoadingUI(RegisterDriver);
