@@ -193,7 +193,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
               </div>
               <div className="p-4 bg-white shadow rounded">
                 <h3 className="text-gray-500">Transactions (₹)</h3>
-                <p className="text-2xl font-bold">2,02,14,448.18</p>
+                <p className="text-2xl font-bold">0</p>
               </div>
             </div>
 
