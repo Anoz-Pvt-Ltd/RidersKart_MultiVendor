@@ -47,7 +47,7 @@ const Header = () => {
                   {user?.[0]?.name}
                 </h1>
               }
-              onClick={NavigateToProfile}
+              // onClick={NavigateToProfile}
             />
             <Button
               className={` bg-white text-blue-600 hover:bg-green-500 hover:text-black`}
