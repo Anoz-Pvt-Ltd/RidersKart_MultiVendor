@@ -69,7 +69,7 @@ const CartPage = ({ startLoading, stopLoading }) => {
       stopLoading();
     }
   };
-  
+
   const OrderConfirmation = async (orderId) => {
     // const orderId = localStorage.getItem("orderId");
     if (!orderId) {
@@ -154,11 +154,11 @@ const CartPage = ({ startLoading, stopLoading }) => {
     e.preventDefault();
   };
 
-
   const HandleCashOnDelivery = async (e) => {
     e.preventDefault();
     if (!selectedAddress || !paymentMethod) {
       alert("Please select an address and payment method.");
+      console.log("Not selected address or payment method");
       return;
     }
 
@@ -447,11 +447,10 @@ const CartPage = ({ startLoading, stopLoading }) => {
                     label={"Proceed for payment"}
                   />
                 )}
-                {paymentMethod === "cash" && (
+                {paymentMethod != "online" && (
                   <Button
                     className={` bg-white text-blue-600 hover:bg-green-500 hover:text-black mt-10`}
                     onClick={HandleCashOnDelivery}
-                    Disabled={!selectedAddress || !paymentMethod}
                     label={"Place order"}
                   />
                 )}
@@ -462,7 +461,7 @@ const CartPage = ({ startLoading, stopLoading }) => {
       ) : (
         <p className="text-gray-600">Your cart is empty.</p>
       )}
-
+      {/* 
       <h1 className="text-xl mx-4 my-10 w-full text-center border-t border-neutral-400 font-bold">
         Recommendations
       </h1>
@@ -506,7 +505,7 @@ const CartPage = ({ startLoading, stopLoading }) => {
             ))}
           </div>
         </>
-      )}
+      )} */}
     </div>
   );
 };
