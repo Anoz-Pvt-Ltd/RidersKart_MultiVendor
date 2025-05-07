@@ -16,7 +16,7 @@ const BrandsUnderReview = ({ startLoading, stopLoading }) => {
   const tableHeadersBrands = [
     "Brand ID",
     "Brand name",
-    "Added by",
+    "Logo",
     "Added On",
     "Action",
   ];
@@ -134,7 +134,7 @@ const BrandsUnderReview = ({ startLoading, stopLoading }) => {
                   <td className="border border-gray-500 px-4 py-2">
                     <Link
                       className="hover:text-blue-500 underline-blue-500 hover:underline "
-                      to={`/current-brand/${brand._id}`}
+                      // to={`/current-brand/${brand._id}`}
                     >
                       {brand._id}
                     </Link>
@@ -143,7 +143,7 @@ const BrandsUnderReview = ({ startLoading, stopLoading }) => {
                     {brand?.title}
                   </td>
                   <td className="border border-gray-500 px-4 py-2">
-                    {brand.adminName}
+                    <img src={brand.logo.url} className="w-12"/>
                   </td>
                   <td className="border border-gray-500 px-4 py-2">
                     {brand.createdAt}
