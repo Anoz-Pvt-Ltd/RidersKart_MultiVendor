@@ -18,6 +18,7 @@ import VendorRegistrationForm from "../src/Pages/VendorRegister/Registration";
 import { fetchCart } from "./Utility/Slice/CartSlice";
 import { fetchPromotions } from "./Utility/Slice/PromotionsSlice";
 import RegisterDriver from "./Pages/DriverRegister/driverRegister";
+import Footer from "./Components/Footer";
 // import { io } from "socket.io-client";
 
 const App = () => {
@@ -129,6 +130,7 @@ const App = () => {
             element={<RegisterDriver />}
           />
         </Routes>
+        <Footer/>
       </div>
     </div>
   );
