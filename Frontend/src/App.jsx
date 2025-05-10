@@ -21,6 +21,7 @@ import RegisterDriver from "./Pages/DriverRegister/driverRegister";
 import TermsAndConditions from "./Pages/Terms-and-Conditions/Terms-&-condition";
 import RefundPolicy from "./Pages/Refund-Process/RefundProcess";
 import DeliveryInstructions from "./Pages/Delivery-Instructions/DeliveryInstructions";
+import Footer from "./Components/Footer";
 // import { io } from "socket.io-client";
 
 const App = () => {
@@ -144,6 +145,7 @@ const App = () => {
             element={<DeliveryInstructions />}
           />
         </Routes>
+        <Footer/>
       </div>
     </div>
   );
