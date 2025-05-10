@@ -8,13 +8,18 @@ const RefundPolicy = () => {
 
         <div className="mb-8">
           <h2 className="text-xl font-semibold text-gray-700 mb-3">
-            Our Refund Policy
+            Refund Timelines
           </h2>
           <p className="text-gray-600 mb-4">
-            You can request a refund within{" "}
-            <span className="font-semibold">30 days</span> of purchase if the
-            item is unused and in its original packaging.
+            Once the returned product is received and inspected by the seller,
+            the refund process will be initiated. Refunds will be processed
+            within
+            <span className="font-semibold">7–10 business days</span> to the
+            original payment method.
           </p>
+          <ul>
+            
+          </ul>
         </div>
 
         <div className="mb-8">

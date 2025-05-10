@@ -12,24 +12,14 @@ const Footer = () => {
   const cities = [
     "Delhi NCR",
     "Chandigarh",
-    "Ahmedabad",
-    "Coimbatore",
     "Hyderabad",
     "Jaipur",
-    "Surat",
-    "Ludhiana",
     "Bangalore",
     "Chennai",
-    "Nagpur",
-    "Kochi",
     "Mumbai",
     "Kolkata",
-    "Lucknow",
-    "Nashik",
-    "Vadodara",
     "Indore",
     "Pune",
-    "Kanpur",
   ];
 
   const [isOpen, setIsOpen] = useState(false);
@@ -126,18 +116,6 @@ const Footer = () => {
           <li className="small-footer-text">
             <Link> Packers & Movers</Link>
           </li>
-          <li className="small-footer-text">
-            <Link to={"#Booking_Input"} onClick={handleNavigate}>
-              {" "}
-              Two Wheelers
-            </Link>
-          </li>
-          <li className="small-footer-text">
-            <Link to={"#Booking_Input"} onClick={handleNavigate}>
-              {" "}
-              Trucks{" "}
-            </Link>
-          </li>
         </ul>
       </div>
       <div className="Support ">
@@ -147,20 +125,24 @@ const Footer = () => {
             <Link>Contact Us</Link>
           </li>
           <li className="small-footer-text">
-            <Link>Privacy Policy</Link>
+            <Link to={"/terms-and-conditions"}>Privacy Policy</Link>
+          </li>
+
+          <li className="small-footer-text">
+            <Link to={"/terms-and-conditions"}>
+              Terms of Services for users
+            </Link>
           </li>
           <li className="small-footer-text">
-            <Link>Terms of Services</Link>
+            <Link to={"/vendor-policy"}>Terms of Services for vendors</Link>
           </li>
           <li className="small-footer-text">
-            <Link>Insurance FAQS</Link>
+            <Link to={"/refund-process"}>Refund Process</Link>
           </li>
           <li className="small-footer-text">
-            <Link>Driver Partner Terms & Conditions</Link>
+            <Link to={""}>Delivery Instructions</Link>
           </li>
-          <li className="small-footer-text">
-            <Link>Zero Tolerance Policy</Link>
-          </li>
+         
         </ul>
       </div>
       <section className="Social flex gap-5 p-5 w-full justify-center items-center">

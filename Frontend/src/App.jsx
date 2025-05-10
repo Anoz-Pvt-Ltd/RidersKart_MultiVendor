@@ -18,7 +18,7 @@ import VendorRegistrationForm from "../src/Pages/VendorRegister/Registration";
 import { fetchCart } from "./Utility/Slice/CartSlice";
 import { fetchPromotions } from "./Utility/Slice/PromotionsSlice";
 import RegisterDriver from "./Pages/DriverRegister/driverRegister";
-import TermsAndConditions from "./Pages/Terms-and-Conditions/Terms-&-condition";
+import TermsAndConditions from "./Pages/Terms-and-Conditions/Terms-&-condition-users";
 import RefundPolicy from "./Pages/Refund-Process/RefundProcess";
 import DeliveryInstructions from "./Pages/Delivery-Instructions/DeliveryInstructions";
 import Footer from "./Components/Footer";
@@ -137,15 +137,16 @@ const App = () => {
             element={<TermsAndConditions />}
           />
           <Route
-            path="/refund-process"
-            element={<RefundPolicy />}
+            path="/vendor-policy"
+            element={<TermsAndConditions />}
           />
+          <Route path="/refund-process" element={<RefundPolicy />} />
           <Route
             path="/delivery-instructions"
             element={<DeliveryInstructions />}
           />
         </Routes>
-        <Footer/>
+        <Footer />
       </div>
     </div>
   );
