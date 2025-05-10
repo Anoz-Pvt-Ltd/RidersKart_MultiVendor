@@ -38,13 +38,13 @@ const Header = () => {
         {user.length > 0 ? (
           <div>
             <Button
-              className={` bg-white text-blue-600 hover:bg-green-500 hover:text-black`}
+              className={`  hover:bg-green-500 hover:text-black`}
               label={
                 <h1 className="flex justify-start gap-2">
                   <span>
                     <User2 />
                   </span>
-                  {user?.[0]?.name}
+                  {user?.[0]?.name} 
                 </h1>
               }
               // onClick={NavigateToProfile}

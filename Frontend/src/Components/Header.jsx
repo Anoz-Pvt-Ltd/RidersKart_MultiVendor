@@ -44,7 +44,7 @@ const Header = () => {
       </div>
 
       {/* Search Bar - Hidden in Mobile */}
-      <div className="hidden md:block w-[60%]">
+      <div className="hidden md:block w-[50%]">
         <InputBox Placeholder="Search for products..." className="w-full" />
       </div>
 
@@ -55,7 +55,7 @@ const Header = () => {
             <Button
               className={` bg-white text-blue-600 hover:bg-green-500 hover:text-black`}
               label={
-                <h1 className="flex gap-2">
+                <h1 className="flex justify-center items-center gap-2 text-sm">
                   <User2 /> {user?.[0]?.name}
                 </h1>
               }

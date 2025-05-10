@@ -3,7 +3,7 @@ import { FetchData } from "../../Utility/FetchFromApi";
 import InputBox from "../../Components/InputBox";
 import Button from "../../Components/Button";
 import { addUser, clearUser } from "../../Utility/Slice/UserInfoSlice";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import LoadingUI from "../../Components/Loading";
 
@@ -183,6 +183,16 @@ const UserRegister = ({ startLoading, stopLoading }) => {
           Placeholder="Enter Postal Code"
           onChange={handleChange}
         />
+        <div className="flex justify-start items-center gap-5">
+          <div className="w-fit h-fit  ">
+            <InputBox Name="privacyPolicy" className="" Type="checkbox" />
+          </div>
+          <Link to={"/terms-and-conditions"}>
+            <span className="text-blue-600 hover:text-blue-800 hover:underline">
+              Read our terms and conditions
+            </span>
+          </Link>
+        </div>
 
         <div className="md:col-span-2">
           <Button
