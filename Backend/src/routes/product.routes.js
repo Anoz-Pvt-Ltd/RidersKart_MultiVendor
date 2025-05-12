@@ -13,6 +13,7 @@ import {
   AddProductImages,
 } from "../controllers/product.controllers.js";
 import {
+  VerifyAdminUser,
   VerifyUser,
   VerifyVendorUser,
 } from "../middlewares/auth.middleware.js";
@@ -49,9 +50,15 @@ router
   .delete(VerifyVendorUser, deleteProduct);
 
 //routes for admin
-router.route("/admin/get-all-products").get(getAllProducts);
-router.route("/admin/get-all-products-admin").get(getAllProductForAdmin);
-router.route("/admin/get-single-product/:productId").get(getProduct);
-router.route("/admin/single-product/:productId").delete(deleteProduct);
+router.route("/admin/get-all-products").get(VerifyAdminUser, getAllProducts);
+router
+  .route("/admin/get-all-products-admin")
+  .get(VerifyAdminUser, getAllProductForAdmin);
+router
+  .route("/admin/get-single-product/:productId")
+  .get(VerifyAdminUser, getProduct);
+router
+  .route("/admin/single-product/:productId")
+  .delete(VerifyAdminUser, deleteProduct);
 
 export default router;

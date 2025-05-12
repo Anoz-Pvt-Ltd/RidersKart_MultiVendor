@@ -32,7 +32,7 @@ const Products = ({ startLoading, stopLoading }) => {
 
   const tableHeadersProducts = [
     "Product ID",
-    "Vendor ID",
+    "Vendor",
     "Product Name",
     "Category ID",
     "Subcategory ID",
@@ -196,17 +196,19 @@ const Products = ({ startLoading, stopLoading }) => {
     }
   };
 
+  // console.log("allProducts", allProducts);
+
   return (
     <section>
-      <h2 className="text-2xl font-bold mb-4">Products</h2>
+      <h2 className='text-2xl font-bold mb-4'>Products</h2>
       <InputBox
-        Type="test"
+        Type='test'
         Value={searchTermProduct}
         onChange={handleSearchProduct}
         Placeholder={"Search by Product Name, Product ID, Vendor ID"}
       />
-      <div className="overflow-x-auto">
-        <div className="py-4 flex w-full justify-start items-center gap-5">
+      <div className='overflow-x-auto'>
+        <div className='py-4 flex w-full justify-start items-center gap-5 '>
           <Button
             label={"Add Category"}
             onClick={() =>
@@ -225,8 +227,8 @@ const Products = ({ startLoading, stopLoading }) => {
           />
         </div>
         {handlePopup.addCategoryPopup && (
-          <div className="backdrop-blur-xl absolute top-0 w-full h-full flex justify-center items-center flex-col left-0">
-            <div className="bg-white shadow-2xl rounded-xl w-fit h-fit px-10 py-10 flex justify-center items-center">
+          <div className='backdrop-blur-xl absolute top-0 w-full h-full flex justify-center items-center flex-col left-0'>
+            <div className='bg-white shadow-2xl rounded-xl w-fit h-fit px-10 py-10 flex justify-center items-center'>
               <form
                 ref={categoryFormRef}
                 onSubmit={submitCategory}
@@ -234,7 +236,7 @@ const Products = ({ startLoading, stopLoading }) => {
                 //   e.preventDefault();
                 //   submitCategory;
                 // }}
-                className="flex flex-col gap-2 "
+                className='flex flex-col gap-2 '
               >
                 <h1>Add Main & Sub category</h1>
                 <InputBox
@@ -249,15 +251,15 @@ const Products = ({ startLoading, stopLoading }) => {
                   Name={"subcategory"}
                   Required
                 />
-                <div className="mt-4">
-                  <label className="block text-sm font-medium text-gray-700">
+                <div className='mt-4'>
+                  <label className='block text-sm font-medium text-gray-700'>
                     Upload Image
                   </label>
                   <input
-                    name="image"
-                    type="file"
-                    accept="image/*"
-                    className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                    name='image'
+                    type='file'
+                    accept='image/*'
+                    className='mt-1 block w-full border border-gray-300 rounded-md p-2'
                     // onChange={(e) =>
                     //   setImage(e.target.files[0])
                     // }
@@ -278,7 +280,7 @@ const Products = ({ startLoading, stopLoading }) => {
           </div>
         )}
         {handlePopup.allCategoryPopup && (
-          <div className="backdrop-blur-3xl absolute top-0 h-screen w-full left-0 px-10 py-5 overflow-scroll">
+          <div className='backdrop-blur-3xl absolute top-0 h-screen w-full left-0 px-10 py-5 overflow-scroll'>
             <Button
               label={<X />}
               onClick={() =>
@@ -289,14 +291,14 @@ const Products = ({ startLoading, stopLoading }) => {
             />
             {status === "succeeded" &&
               categories.map((category) => (
-                <div key={category._id} className="p-4 rounded ">
-                  <div className="flex justify-between items-center bg-white p-2 rounded-xl ">
+                <div key={category._id} className='p-4 rounded '>
+                  <div className='flex justify-between items-center bg-white p-2 rounded-xl '>
                     <div>
-                      <h2 className="text-sm font-semibold">
+                      <h2 className='text-sm font-semibold'>
                         Main category:{" "}
-                        <span className="text-xl">{category.title}</span>
+                        <span className='text-xl'>{category.title}</span>
                       </h2>
-                      <p className="text-gray-600">
+                      <p className='text-gray-600'>
                         Category ID: {category._id}
                       </p>
                     </div>
@@ -315,7 +317,7 @@ const Products = ({ startLoading, stopLoading }) => {
 
                   {/* Dropdown for Subcategories */}
                   {handlePopup[category._id] && (
-                    <div className="mt-3 bg-white p-4 rounded-xl">
+                    <div className='mt-3 bg-white p-4 rounded-xl'>
                       {/* Add Subcategory Button */}
                       <Button
                         label={<h1>Add more in {category.title}</h1>}
@@ -331,18 +333,18 @@ const Products = ({ startLoading, stopLoading }) => {
                       {/* Form Popup */}
                       {handlePopup.addSubCategory &&
                         selectedCategoryId === category._id && (
-                          <div className="h-full w-full bg-opacity-90 bg-neutral-300 absolute top-0 left-0 flex justify-center items-center">
+                          <div className='h-full w-full bg-opacity-90 bg-neutral-300 absolute top-0 left-0 flex justify-center items-center'>
                             <form
                               ref={subcategoryFormRef}
-                              className="flex flex-col justify-center px-10 rounded-xl gap-2 bg-white py-10"
+                              className='flex flex-col justify-center px-10 rounded-xl gap-2 bg-white py-10'
                               onSubmit={(e) => {
                                 e.preventDefault();
                                 submitSubCategory(e, category._id);
                               }}
                             >
-                              <h2 className="text-sm font-semibold">
+                              <h2 className='text-sm font-semibold'>
                                 Main category:{" "}
-                                <span className="text-xl">
+                                <span className='text-xl'>
                                   {category.title}
                                 </span>
                               </h2>
@@ -357,7 +359,7 @@ const Products = ({ startLoading, stopLoading }) => {
                                 LabelName={
                                   <h1>
                                     Paste the main category ID below{" "}
-                                    <span className="text-blue-600 font-semibold">
+                                    <span className='text-blue-600 font-semibold'>
                                       {category._id}
                                     </span>
                                     <button
@@ -367,7 +369,7 @@ const Products = ({ startLoading, stopLoading }) => {
                                         );
                                         alert("Category ID copied!");
                                       }}
-                                      className="ml-2 p-1 border rounded bg-gray-200 hover:bg-gray-300 transition"
+                                      className='ml-2 p-1 border rounded bg-gray-200 hover:bg-gray-300 transition'
                                     >
                                       <ClipboardCopy size={16} />
                                     </button>
@@ -377,22 +379,22 @@ const Products = ({ startLoading, stopLoading }) => {
                                 Name={"categoryId"}
                                 Required
                               />
-                              <div className="mt-4">
-                                <label className="block text-sm font-medium text-gray-700">
+                              <div className='mt-4'>
+                                <label className='block text-sm font-medium text-gray-700'>
                                   Upload Image
                                 </label>
                                 <input
-                                  name="image"
-                                  type="file"
-                                  accept="image/*"
-                                  className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                                  name='image'
+                                  type='file'
+                                  accept='image/*'
+                                  className='mt-1 block w-full border border-gray-300 rounded-md p-2'
                                   onChange={(e) =>
                                     console.log(e.target.files[0])
                                   }
                                 />
                               </div>
 
-                              <Button label={"Add"} type="submit" />
+                              <Button label={"Add"} type='submit' />
                               <Button
                                 className={"hover:bg-red-500"}
                                 label={"Cancel"}
@@ -410,11 +412,11 @@ const Products = ({ startLoading, stopLoading }) => {
                       {/* Display Subcategories */}
                       {category.subcategories.length > 0 ? (
                         <>
-                          <h3 className="font-medium">Subcategories:</h3>
-                          <ul className="list-disc pl-5">
+                          <h3 className='font-medium'>Subcategories:</h3>
+                          <ul className='list-disc pl-5'>
                             {category.subcategories.map((sub) => (
-                              <div className="flex justify-start items-center">
-                                <li key={sub._id} className="text-gray-700">
+                              <div className='flex justify-start items-center'>
+                                <li key={sub._id} className='text-gray-700'>
                                   {sub.title} (ID: {sub._id})
                                 </li>
 
@@ -428,13 +430,13 @@ const Products = ({ startLoading, stopLoading }) => {
                                     }))
                                   }
                                 >
-                                  <PencilLine className="font-thin h-5 w-5" />
+                                  <PencilLine className='font-thin h-5 w-5' />
                                 </button>
                               </div>
                             ))}
                           </ul>
                           {handlePopup.editSubcategory && (
-                            <div className="absolute top-0 left-0 h-full w-full p-20 bg-white shadow-lg rounded-md">
+                            <div className='absolute top-0 left-0 h-full w-full p-20 bg-white shadow-lg rounded-md'>
                               {/* Close Button */}
 
                               {/* Edit Form */}
@@ -443,10 +445,10 @@ const Products = ({ startLoading, stopLoading }) => {
                                 onSubmit={handleEditSubcategory}
                               >
                                 {/* Display Selected Subcategory ID */}
-                                <p className="text-gray-700 font-medium">
+                                <p className='text-gray-700 font-medium'>
                                   Editing Subcategory Name:{" "}
                                   {handlePopup.selectedSubcategoryTitle}
-                                  <span className="mx-5">
+                                  <span className='mx-5'>
                                     Editing Subcategory ID:
                                     {handlePopup.selectedSubcategoryId}
                                   </span>
@@ -455,26 +457,26 @@ const Products = ({ startLoading, stopLoading }) => {
                                 {/* Input for Subcategory Title */}
                                 <InputBox
                                   Placeholder={"Enter new Subcategory name"}
-                                  LabelName="Edit Subcategory"
-                                  Name="newTitle"
+                                  LabelName='Edit Subcategory'
+                                  Name='newTitle'
                                   Required
                                 />
 
                                 {/* Input for Image Upload */}
-                                <div className="mt-4">
-                                  <label className="block text-sm font-medium text-gray-700">
+                                <div className='mt-4'>
+                                  <label className='block text-sm font-medium text-gray-700'>
                                     Upload Image
                                   </label>
                                   <input
-                                    name="image"
-                                    type="file"
-                                    accept="image/*"
-                                    className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                                    name='image'
+                                    type='file'
+                                    accept='image/*'
+                                    className='mt-1 block w-full border border-gray-300 rounded-md p-2'
                                   />
                                 </div>
 
                                 {/* Submit Button */}
-                                <div className="flex justify-start my-10 items-center w-full gap-20">
+                                <div className='flex justify-start my-10 items-center w-full gap-20'>
                                   <Button label={"Update"} type={"submit"} />
                                   <Button
                                     label={"Cancel"}
@@ -494,7 +496,7 @@ const Products = ({ startLoading, stopLoading }) => {
                           )}
                         </>
                       ) : (
-                        <p className="text-gray-500">
+                        <p className='text-gray-500'>
                           No subcategories available
                         </p>
                       )}
@@ -504,13 +506,13 @@ const Products = ({ startLoading, stopLoading }) => {
               ))}
           </div>
         )}
-        <table className="min-w-full border-collapse border border-gray-300 rounded-xl ">
+        <table className='min-w-full border-collapse border border-gray-300 rounded-xl '>
           <thead>
             <tr>
               {tableHeadersProducts.map((header, index) => (
                 <th
                   key={index}
-                  className="border border-gray-500 px-4 py-2 bg-neutral-300"
+                  className='border border-gray-500 px-4 py-2 bg-neutral-300'
                 >
                   {header}
                 </th>
@@ -522,25 +524,61 @@ const Products = ({ startLoading, stopLoading }) => {
             {filteredProducts?.length > 0 ? (
               filteredProducts?.map((product) => (
                 <tr key={product._id}>
-                  <td className="border border-gray-500 px-4 py-2">
+                  <td className='border border-gray-500 px-4 py-2'>
                     <Link
-                      className="hover:text-blue-500 underline-blue-500 hover:underline "
+                      className='hover:text-blue-500 underline-blue-500 hover:underline '
                       to={`/current-product/${product._id}`}
                     >
                       {product._id}
                     </Link>
                   </td>
-                  <td className="border border-gray-500 px-4 py-2">
-                    {product.vendor}
+                  <td className='border border-gray-500 px-4 py-2'>
+                    <div className='flex flex-col justify-center items-center'>
+                      <h2 className=''> {product.vendor?.name}</h2>
+                      <span className='text-gray-500 text-xs'>
+                        {product.vendor?._id}
+                      </span>
+                    </div>
                   </td>
-                  <td className="border border-gray-500 px-4 py-2 w-96 overflow-hidden  ">
-                    {product.name}
+                  <td className='border border-gray-500 px-4 py-2 w-96 overflow-hidden  '>
+                    <div className='flex justify-between'>
+                      <div>
+                        <h2>{product.name}</h2>
+                        <div className="flex gap-5">
+                          <span className='text-gray-500 text-xs'>
+                            {product.brand?.title}
+                          </span>
+                          <img
+                            src={product.brand?.logo.url}
+                            alt=''
+                            className=' w-10'
+                          />
+                        </div>
+                      </div>
+                      <span className=''>
+                        <img
+                          src={product.images[0].url}
+                          alt=''
+                          className='h-20 w-20'
+                        />
+                      </span>
+                    </div>
                   </td>
-                  <td className="border border-gray-500 px-4 py-2">
-                    {product.category}
+                  <td className='border border-gray-500 px-4 py-2'>
+                    <div className='flex flex-col justify-center items-center'>
+                      <h2 className=''> {product.category?.title}</h2>
+                      <span className='text-gray-500 text-xs'>
+                        {product.category?._id}
+                      </span>
+                    </div>
                   </td>
-                  <td className="border border-gray-500 px-4 py-2">
-                    {product.subcategory}
+                  <td className='border border-gray-500 px-4 py-2'>
+                    <div className='flex flex-col justify-center items-center'>
+                      <h2 className=''> {product.subcategory?.title}</h2>
+                      <span className='text-gray-500 text-xs'>
+                        {product.subcategory?._id}
+                      </span>
+                    </div>
                   </td>
                 </tr>
               ))
@@ -548,7 +586,7 @@ const Products = ({ startLoading, stopLoading }) => {
               <tr>
                 <td
                   colSpan={tableHeadersProducts.length}
-                  className="text-center py-4"
+                  className='text-center py-4'
                 >
                   No products found.
                 </td>

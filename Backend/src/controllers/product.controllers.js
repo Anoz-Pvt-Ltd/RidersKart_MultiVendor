@@ -145,7 +145,12 @@ const registerProduct = asyncHandler(async (req, res) => {
 });
 
 const getAllProductForAdmin = asyncHandler(async (req, res) => {
-  const products = await Product.find().populate("");
+  const products = await Product.find()
+    .populate("category", "title")
+    .populate("subcategory", "title")
+    .populate("vendor", "name email")
+    .populate("brand", "title logo")
+    .sort({ createdAt: -1 });
 
   if (!products || products.length === 0) {
     throw new ApiError(404, "No products found");
