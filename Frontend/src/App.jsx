@@ -57,7 +57,6 @@ const App = () => {
         return user;
       } catch (error) {
         console.log(error);
-        alert(parseErrorMessage(error));
       }
     }
 
