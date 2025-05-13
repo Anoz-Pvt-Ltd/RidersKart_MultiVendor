@@ -6,6 +6,8 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { User } from "../models/user.model.js";
+import SendMail from "../utils/Nodemailer.js";
+import { OrderConformation } from "../utils/Email_UI/Register_ui.js";
 
 const CreateOrder = asyncHandler(async (req, res) => {
   const { userId, products, totalAmount } = req.body;
@@ -63,6 +65,9 @@ const CreateOrder = asyncHandler(async (req, res) => {
       await product.save();
     }
   }
+
+  const user = await User.findById(userId);
+  if (!user) throw new ApiError(404, "User not found!");
 
   const order = await Order.create({
     user: userId,
@@ -382,18 +387,68 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Order not found");
   }
 
-  order.orderStatus = status;
-  order.shippingAddress = address; // Update shipping address if provided
-  await order.save();
-
   const user = await User.findById(order.user);
 
   if (!user) {
     throw new ApiError(404, "User not found");
   }
 
+  order.orderStatus = status;
+  order.shippingAddress = address; // Update shipping address if provided
+  await order.save();
+
+  // TODO: If I instantly bought some product using buy now then my carts will be cleared!
+  // thats a problem
   user.CartProducts = [];
   await user.save();
+
+  // this address is for sending user from mail.
+  const UserAddress = [
+    `${address.street}, ${address.city}`,
+    `${address.state}, ${address.country}`,
+    `${address.pinCode}`,
+  ];
+
+  // Finding products for sending user via mail
+  const orderedProducts = await Promise.all(
+    order.products.map(async (item) => {
+      const product = await Product.findById(item.product, {
+        name: 1,
+        images: { $slice: 1 },
+      });
+
+      if (!product) return null; // Skip if the product is not found
+
+      return {
+        name: product.name,
+        image: product.images[0] || "", // Handle empty image array
+        quantity: item.quantity,
+      };
+    })
+  );
+
+  const OrderConformationEmailBody = OrderConformation(
+    user.name,
+    order._id,
+    UserAddress,
+    orderedProducts
+  );
+
+  // Send email to user about the order
+  if (status === "confirmed")
+    await SendMail(
+      user.email,
+      "Order placed successfully",
+      "Order Conformation",
+      OrderConformationEmailBody
+    );
+  else
+    await SendMail(
+      user.email,
+      "Your Order Status",
+      `Order ${status}`,
+      OrderConformationEmailBody
+    );
 
   res.json(new ApiResponse(200, order, "Order status updated successfully"));
 });
