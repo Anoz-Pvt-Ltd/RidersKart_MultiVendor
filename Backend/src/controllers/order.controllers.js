@@ -122,33 +122,55 @@ const GetVendorOrders = asyncHandler(async (req, res) => {
   // Find all orders where the vendor matches the provided ID
   const orders = await Order.aggregate([
     // Unwind the products array to deal with each item individually
-    { $unwind: "$products" },
-
+    {
+      $unwind: "$products",
+    },
+    {
+      $match:
+        /**
+         * query: The query in MQL.
+         */
+        {
+          orderStatus: {
+            $not: {
+              $eq: "pending",
+            },
+          },
+        },
+    },
     // Lookup to populate the product field
     {
       $lookup: {
-        from: "products", // collection name in MongoDB
+        from: "products",
+        // collection name in MongoDB
         localField: "products.product",
         foreignField: "_id",
         as: "productDetails",
       },
     },
-    { $unwind: "$productDetails" }, // Get single object from array
-
+    {
+      $unwind: "$productDetails",
+    },
+    // Get single object from array
     // Match only products belonging to the specified vendor
     {
       $match: {
         "productDetails.vendor": vendorId,
       },
     },
-
     // Optionally group back to reconstruct orders if needed
     {
       $group: {
         _id: "$_id",
-        user: { $first: "$user" },
-        createdAt: { $first: "$createdAt" },
-        updatedAt: { $first: "$updatedAt" },
+        user: {
+          $first: "$user",
+        },
+        createdAt: {
+          $first: "$createdAt",
+        },
+        updatedAt: {
+          $first: "$updatedAt",
+        },
         products: {
           $push: {
             product: "$productDetails",
@@ -158,9 +180,12 @@ const GetVendorOrders = asyncHandler(async (req, res) => {
         },
       },
     },
-
     // Optional: sort orders
-    { $sort: { createdAt: -1 } },
+    {
+      $sort: {
+        createdAt: -1,
+      },
+    },
   ]);
 
   if (orders.length === 0) {
@@ -176,9 +201,10 @@ const GetVendorOrders = asyncHandler(async (req, res) => {
 const getUserAllOrders = asyncHandler(async (req, res) => {
   const { userId } = req.params;
 
-  const orders = await Order.find({ user: userId }).populate(
-    "products.product"
-  );
+  const orders = await Order.find({
+    user: userId,
+    orderStatus: "confirmed",
+  }).populate("products.product");
 
   if (!orders || orders.length === 0) {
     return res.status(404).json({ message: "No orders found for this user" });
@@ -204,6 +230,19 @@ const getVendorAllOrders = asyncHandler(async (req, res) => {
 
   // Fetch all orders for the specified user
   const orders = await Order.aggregate([
+    {
+      $match:
+        /**
+         * query: The query in MQL.
+         */
+        {
+          orderStatus: {
+            $not: {
+              $eq: "pending",
+            },
+          },
+        },
+    },
     {
       $unwind: {
         path: "$products",
@@ -341,7 +380,7 @@ const getVendorAllOrders = asyncHandler(async (req, res) => {
 const getAllOrders = asyncHandler(async (req, res) => {
   // const { orderId } = req.body;
   try {
-    const orders = await Order.find({});
+    const orders = await Order.find({ orderStatus: "confirmed" });
     res.json(
       new ApiResponse(200, { orders }, "All users fetched successfully")
     );
@@ -474,7 +513,10 @@ const updatePaymentStatus = asyncHandler(async (req, res) => {
 });
 
 const allCashOnDeliveryOrders = asyncHandler(async (req, res) => {
-  const orders = await Order.find({ paymentMethod: "cash" });
+  const orders = await Order.find({
+    paymentMethod: "cash",
+    orderStatus: "confirmed",
+  });
   if (!orders || orders.length === 0) {
     return res
       .status(404)
@@ -496,6 +538,19 @@ const getVendorsOrderReport = asyncHandler(async (req, res) => {
   }
 
   const orders = await Order.aggregate([
+    {
+      $match:
+        /**
+         * query: The query in MQL.
+         */
+        {
+          orderStatus: {
+            $not: {
+              $eq: "pending",
+            },
+          },
+        },
+    },
     {
       $match:
         /**
