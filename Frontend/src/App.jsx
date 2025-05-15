@@ -104,41 +104,41 @@ const App = () => {
   // }, [notifications]);
 
   return (
-    <div className='absolute top-0 z-[-2] h-screen w-screen bg-white bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.3),rgba(255,255,255,0))] overflow-x-hidden antialiased selection:bg-cyan-500 selection:text-cyan-900 font-Fredoka'>
-      <div className='text-black'>
+    <div className="absolute top-0 z-[-2] h-screen w-screen bg-white bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.3),rgba(255,255,255,0))] overflow-x-hidden antialiased selection:bg-cyan-500 selection:text-cyan-900 font-Fredoka font-Fredoka">
+      <div className="text-black">
         <Header />
         <Routes>
-          <Route path='/' element={<Home />} />
-          <Route path='/login' element={<Login />} />
-          <Route path='/register' element={<UserRegister />} />
-          <Route path='/vendor-register' element={<VendorRegistrationForm />} />
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<UserRegister />} />
+          <Route path="/vendor-register" element={<VendorRegistrationForm />} />
           <Route
-            path='/user-profile/dashboard/:userId'
+            path="/user-profile/dashboard/:userId"
             element={<Dashboard />}
           />
           <Route
-            path='/all-products/:category/:subcategory/:category_title/:subcategory_title'
+            path="/all-products/:category/:subcategory/:category_title/:subcategory_title"
             element={<AllProducts />}
           />
           <Route
-            path='/current-product/:productId'
+            path="/current-product/:productId"
             element={<CurrentProduct />}
           />
-          <Route path='/cart/:userId' element={<CartPage />} />
+          <Route path="/cart/:userId" element={<CartPage />} />
           {/* <Route path="/cart/:userId/buy-now-product" element={<BuyNow />} /> */}
-          <Route path='/checkout/:productId/:orderId' element={<BuyNow />} />
+          <Route path="/checkout/:productId/:orderId" element={<BuyNow />} />
           <Route
-            path='/register-delivery-partner'
+            path="/register-delivery-partner"
             element={<RegisterDriver />}
           />
           <Route
-            path='/terms-and-conditions'
+            path="/terms-and-conditions"
             element={<TermsAndConditions />}
           />
-          <Route path='/vendor-policy' element={<TermsConditionsVendors />} />
-          <Route path='/refund-process' element={<RefundPolicy />} />
+          <Route path="/vendor-policy" element={<TermsConditionsVendors />} />
+          <Route path="/refund-process" element={<RefundPolicy />} />
           <Route
-            path='/delivery-instructions'
+            path="/delivery-instructions"
             element={<DeliveryInstructions />}
           />
         </Routes>

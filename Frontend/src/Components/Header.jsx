@@ -6,6 +6,7 @@ import {
   User2,
   Menu,
   X,
+  Home,
 } from "lucide-react";
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -36,10 +37,19 @@ const Header = () => {
         {isOpen ? <X size={28} /> : <Menu size={28} />}
       </motion.button>
       {/* Logo */}
-      <div className="flex items-center lg:pl-20 justify-center">
+      <div className="flex items-center lg:pl-20 justify-center gap-5">
         <Link to={"/"} className="flex items-center justify-center">
           <img src={logo} alt="Logo" className="lg:h-20 h-12" />
-          <h1 className="lg:text-xl  font-bold">{PlatformName}</h1>
+          <h1 className="lg:text-xl   font-Exo">{PlatformName}</h1>
+        </Link>
+        <Link
+          to={"/"}
+          className="flex items-center justify-center hover:scale-110 duration-300 ease-in-out hover:text-red-500"
+        >
+          {/* <img src={logo} alt="Logo" className="lg:h-20 h-12" /> */}
+          <h1 className="font-Exo">
+            <Home />
+          </h1>
         </Link>
       </div>
 
@@ -69,7 +79,7 @@ const Header = () => {
                 className="text-blue-600 px-4 py-2 rounded  duration-300 ease-in-out hover:shadow-md shadow-neutral-600 hover:translate-y-1 border border-neutral-300 hover:border-none flex  bg-white hover:bg-green-500 hover:text-black"
               >
                 <ShoppingCart />{" "}
-                <span className="bg-red-400 px-2 rounded-full text-black">
+                <span className="bg-[#DF3F33] px-2 rounded-full text-white">
                   {cartCount}
                 </span>
               </Link>
@@ -93,10 +103,10 @@ const Header = () => {
       <motion.div whileHover={{ scale: 1.1 }}>
         <Link
           to={`/cart/${user?.[0]?._id}`}
-          className="text-blue-600 px-4 py-2 rounded  duration-300 ease-in-out hover:shadow-md shadow-neutral-600 hover:translate-y-1 border border-neutral-300 hover:border-none flex  bg-white hover:bg-green-500 hover:text-black lg:hidden"
+          className="text-blue-600  rounded  duration-300 ease-in-out shadow-neutral-600 flex lg:hidden"
         >
           <ShoppingCart />{" "}
-          <span className="bg-red-400 px-2 rounded-full text-black">
+          <span className="bg-[#DF3F33] px-2 rounded-full text-white text-xs text-center flex justify-center items-center">
             {cartCount}
           </span>
         </Link>

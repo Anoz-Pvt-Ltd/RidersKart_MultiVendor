@@ -280,7 +280,7 @@ const CartPage = ({ startLoading, stopLoading }) => {
 
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-6">Your Cart</h1>
+      {/* <h1 className="text-2xl font-bold mb-6">Your Cart</h1> */}
 
       {cart.length > 0 ? (
         <div className="flex flex-col w-full gap-4 justify-between items-center">
@@ -459,7 +459,20 @@ const CartPage = ({ startLoading, stopLoading }) => {
           </div>
         </div>
       ) : (
-        <p className="text-gray-600">Your cart is empty.</p>
+        <div className="flex flex-col justify-center items-center">
+          <img
+            src={`https://ik.imagekit.io/RiderKart/no%20item%20in%20the%20shopping%20cart,%20click%20to%20go%20shopping%20now%20concept%20illustration%20flat%20design%20vector%20eps10_%20modern%20graphic%20element%20for%20landing%20page,%20empty%20state%20ui,%20infographic,%20icon.jpeg?updatedAt=1747207669157`}
+            alt="Empty Cart"
+            className="lg:w-1/4 lg:mx-auto"
+          />
+          <h1 className="text-2xl mb-6">Your Cart is Empty</h1>
+          <h1>Add products to cart to proceed checkout.</h1>
+          <Button
+            className={` bg-white text-blue-600 hover:bg-green-500 hover:text-black`}
+            onClick={HandleHome}
+            label={"Go to Home"}
+          />
+        </div>
       )}
       {/* 
       <h1 className="text-xl mx-4 my-10 w-full text-center border-t border-neutral-400 font-bold">

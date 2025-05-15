@@ -1,1 +1,1 @@
-export const PlatformName = "RIDER'S KART"
+export const PlatformName = "Rider's Kart";
