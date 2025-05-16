@@ -24,6 +24,7 @@ import { useNavigate } from "react-router";
 import { clearUser } from "../../Utility/Slice/UserInfoSlice";
 import ProductCardMobile from "../../Components/ProductCardMobile";
 import LoadingUI from "../../Components/Loading";
+import ProfileSection from "./ProfileSection";
 
 const Dashboard = ({ startLoading, stopLoading }) => {
   const user = useSelector((store) => store.UserInfo.user);
@@ -36,57 +37,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
   const [wishlistProducts, setWishlistProducts] = useState();
   const fromRef = useRef(null);
   const [allOrders, setAllOrders] = useState([]);
-  const [newAddress, setNewAddress] = useState({
-    street: "",
-    city: "",
-    country: "",
-    postalCode: "",
-    state: "",
-  });
-  const [editProfile, setEditProfile] = useState({
-    name: "",
-    email: "",
-    phoneNumber: "",
-    password: "",
-  });
-
-  const handleAddressInputChange = (e) => {
-    const { name, value } = e.target;
-    setNewAddress((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
-  };
-  const handleAddressInputChange2 = (e) => {
-    const { name, value } = e.target;
-    setEditProfile((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
-  };
-
-  const addAddress = async () => {
-    try {
-      startLoading();
-      const response = await FetchData(
-        `users/${user?.[0]?._id}/addresses`,
-        "post",
-        newAddress
-      );
-      if (response.data.success) {
-        // Assuming the response includes the new list of addresses
-        console.log(response.data.data);
-        alert("Address added successfully");
-        setShowModal(false); // Close modal after success
-      } else {
-        setError("Failed to add address.");
-      }
-    } catch (err) {
-      setError(err.response?.data?.message || "Failed to add address.");
-    } finally {
-      stopLoading();
-    }
-  };
+  
 
   const openModal = () => {
     setShowModal(true);
@@ -129,9 +80,6 @@ const Dashboard = ({ startLoading, stopLoading }) => {
     visible: { opacity: 1, x: 0, transition: { duration: 0.8 } },
   };
 
-  const handleAddressChange = (index) => {
-    setSelectedAddressIndex(index);
-  };
   // console.log(user?.[0]?._id);
   useEffect(() => {
     const fetchAllOrders = async () => {
@@ -233,7 +181,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
             <li
               className={`lg:p-4 rounded-md lg:mb-2 cursor-pointer transition-all duration-300 p-2 flex flex-col justify-center items-center lg:justify-start lg:items-start lg:w-full ${
                 activeSection === "profile"
-                  ? "bg-blue-600 text-white"
+                  ? "bg-[#DF3F33] text-white"
                   : "bg-gray-300 text-black"
               }`}
               onClick={() => setActiveSection("profile")}
@@ -243,7 +191,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
             <li
               className={`lg:p-4 rounded-md lg:mb-2 cursor-pointer transition-all duration-300 p-2 flex flex-col justify-center items-center lg:justify-start lg:items-start lg:w-full ${
                 activeSection === "orders"
-                  ? "bg-blue-600 text-white"
+                  ? "bg-[#DF3F33] text-white"
                   : "bg-gray-300 text-black"
               }`}
               onClick={() => setActiveSection("orders")}
@@ -253,7 +201,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
             <li
               className={`lg:p-4 rounded-md lg:mb-2 cursor-pointer transition-all duration-300 p-2 flex flex-col justify-center items-center lg:justify-start lg:items-start lg:w-full ${
                 activeSection === "coupons"
-                  ? "bg-blue-600 text-white"
+                  ? "bg-[#DF3F33] text-white"
                   : "bg-gray-300 text-black"
               }`}
               onClick={() => setActiveSection("coupons")}
@@ -263,7 +211,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
             <li
               className={`lg:p-4 rounded-md cursor-pointer transition-all duration-300 p-2 flex flex-col justify-center items-center lg:justify-start lg:items-start lg:w-full ${
                 activeSection === "wishlist"
-                  ? "bg-blue-600 text-white"
+                  ? "bg-[#DF3F33] text-white"
                   : "bg-gray-300 text-black"
               }`}
               onClick={() => setActiveSection("wishlist")}
@@ -280,287 +228,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
           variants={sectionVariants}
           transition={{ duration: 0.5 }}
         >
-          {activeSection === "profile" && (
-            <section className="flex justify-center items-center flex-col">
-              <div className="flex lg:flex-row flex-col w-full justify-evenly items-center lg:shadow py-2 rounded-xl">
-                <div className="name">
-                  <h2 className="text-2xl font-bold lg:flex justify-center items-center hidden">
-                    <span>
-                      <UserCheck className="mr-5" />
-                    </span>
-                    Your Profile
-                  </h2>
-                  <p>
-                    Name:{" "}
-                    <span className="lg:text-2xl font-bold">
-                      {user?.[0]?.name}
-                    </span>
-                  </p>
-                  <p>
-                    Email:{" "}
-                    <span className="lg:text-2xl font-bold">
-                      {user?.[0]?.email}
-                    </span>
-                  </p>
-                  <p>
-                    Number:{" "}
-                    <span className="lg:text-2xl font-bold">
-                      {user?.[0]?.phoneNumber}
-                    </span>
-                  </p>
-                </div>
-                <div className="flex flex-col gap-5 justify-center items-center mt-10 lg:mt-0">
-                  <div className="button flex flex-col justify-evenly items-center gap-5 w-full">
-                    <Button
-                      className={` bg-white text-blue-600 hover:bg-green-500 hover:text-black w-full`}
-                      onClick={navigateHome}
-                      // label={<ShoppingBag/>"Continue Shopping"}
-                      label={
-                        <h1 className="flex justify-start gap-2">
-                          <span>
-                            <ShoppingBag />
-                          </span>
-                          Continue Shopping{" "}
-                        </h1>
-                      }
-                    />
-                    <Button
-                      className={` bg-white text-blue-600 hover:bg-orange-500  hover:text-black w-full`}
-                      onClick={() => {
-                        Dispatch(clearUser());
-                        localStorage.removeItem("AccessToken");
-                        localStorage.removeItem("RefreshToken");
-                        alert("You are logged out! Please log in.");
-                        setTimeout(() => navigate("/login"), 100);
-                        console.log(localStorage.getItem("RefreshToken"));
-                      }}
-                      label={
-                        <h1 className="flex justify-start gap-2">
-                          <span>
-                            <LogOut />
-                          </span>
-                          Log Out{" "}
-                        </h1>
-                      }
-                    />
-                    {/* <Button label={"Add Address"} /> */}
-                  </div>
-                  <div className="button flex flex-col justify-evenly items-center gap-5 w-full">
-                    <Button
-                      className={` bg-white text-blue-600 hover:bg-green-500 hover:text-black w-full`}
-                      onClick={openModal}
-                      label={
-                        <h1 className="flex justify-start gap-2">
-                          <span>
-                            <Plus />
-                          </span>
-                          Add Address{" "}
-                        </h1>
-                      }
-                    />
-                    <Button
-                      className={` bg-white text-blue-600 hover:bg-green-500 hover:text-black w-full`}
-                      onClick={openModal2}
-                      label={
-                        <h1 className="flex justify-start gap-2 w-full">
-                          <span>
-                            <Edit />
-                          </span>
-                          Edit Profile{" "}
-                        </h1>
-                      }
-                    />
-                    {/* <Button label={"Add Address"} /> */}
-                  </div>
-                </div>
-              </div>
-              <div className="address flex flex-wrap flex-col">
-                <p className=" font-bold text-xl lg:hidden block">Address:</p>
-                <p className=" font-bold text-xl hidden lg:block">
-                  Select a Default Address:
-                </p>
-                <div className="flex lg:flex-row flex-col">
-                  {user?.[0]?.address?.map((address, index) => (
-                    <div
-                      key={address._id}
-                      className="gap-5 flex justify-center items-center flex-row flex-wrap"
-                    >
-                      <input
-                        className="hidden lg:block"
-                        type="radio"
-                        name="address"
-                        value={index}
-                        checked={selectedAddressIndex === index}
-                        onChange={() => handleAddressChange(index)}
-                      />
-                      <span className="shadow m-2 p-4 rounded-xl">
-                        <li className="ml-4 font-semibold list-none">
-                          Street:{" "}
-                          <span className="font-thin font-serif">
-                            {address.street}
-                          </span>
-                        </li>
-                        <li className="ml-4 font-semibold list-none">
-                          City:{" "}
-                          <span className="font-thin font-serif">
-                            {address.city}
-                          </span>
-                        </li>
-                        <li className="ml-4 font-semibold list-none">
-                          Country:{" "}
-                          <span className="font-thin font-serif">
-                            {address.country}
-                          </span>
-                        </li>
-                        <li className="ml-4 font-semibold list-none">
-                          Postal Code:{" "}
-                          <span className="font-thin font-serif">
-                            {address.postalCode}
-                          </span>
-                        </li>
-                        <li className="ml-4 font-semibold list-none">
-                          State:{" "}
-                          <span className="font-thin font-serif">
-                            {address.state}
-                          </span>
-                        </li>
-                      </span>
-                      <Button
-                        className={` bg-white text-blue-600 hover:bg-green-500 hover:text-black`}
-                        label={<PencilLine />}
-                      />
-                      <Button
-                        className={` bg-white text-blue-600 hover:bg-green-500 hover:text-black`}
-                        label={<Trash />}
-                      />
-                    </div>
-                  ))}
-                </div>
-
-                {/* <button onClick={openModal}>Add Address</button> */}
-
-                {showModal && (
-                  <div className="modal backdrop-blur-lg fixed top-0 left-0 w-full h-full flex justify-center items-center">
-                    <div className="modal-content flex  justify-center items-center gap-20 bg-white p-4 rounded-xl">
-                      <span
-                        className="close cursor-pointer bg-neutral-300 rounded-full p-2 flex justify-center items-center text-3xl w-fit"
-                        onClick={closeModal}
-                      >
-                        &times;
-                      </span>
-                      <h3>Add New Address</h3>
-                      <form>
-                        <InputBox
-                          LabelName="Street"
-                          Placeholder="Enter street address"
-                          Name="street"
-                          Value={newAddress.street}
-                          onChange={handleAddressInputChange}
-                        />
-                        <InputBox
-                          LabelName="City"
-                          Placeholder="Enter city"
-                          Name="city"
-                          Value={newAddress.city}
-                          onChange={handleAddressInputChange}
-                        />
-                        <InputBox
-                          LabelName="Country"
-                          Placeholder="Enter country"
-                          Name="country"
-                          Value={newAddress.country}
-                          onChange={handleAddressInputChange}
-                        />
-                        <InputBox
-                          LabelName="Postal Code"
-                          Placeholder="Enter postal code"
-                          Name="postalCode"
-                          Value={newAddress.postalCode}
-                          onChange={handleAddressInputChange}
-                        />
-                        <InputBox
-                          LabelName="State"
-                          Placeholder="Enter state"
-                          Name="state"
-                          Value={newAddress.state}
-                          onChange={handleAddressInputChange}
-                        />
-                        <Button
-                          className={`mt-4 bg-white text-blue-600 hover:bg-green-500 hover:text-black`}
-                          type="button"
-                          onClick={addAddress}
-                          label="Add Address"
-                        />
-                      </form>
-                      {error && <p className="text-red-500">{error}</p>}
-                    </div>
-                  </div>
-                )}
-                {showModal2 && (
-                  <div className=" fixed top-0 left-0 w-full h-full flex flex-col justify-center items-center backdrop-blur-lg">
-                    <h1 className="mb-5">
-                      Hello{" "}
-                      <span className="text-2xl font-bold ">
-                        {user?.[0]?.name}
-                      </span>{" "}
-                      you can edit your account details here
-                    </h1>
-                    <div className="flex justify-center items-center gap-10 w-1/2 rounded-xl shadow py-10 whiteSoftBG">
-                      <div className="w-1/2">
-                        <form ref={fromRef} onSubmit={handleEditProfileSubmit}>
-                          <InputBox
-                            LabelName="Name"
-                            Placeholder="Name"
-                            Name="name"
-                            Value={editProfile.name}
-                            Type="name"
-                            onChange={handleAddressInputChange2}
-                          />
-                          <InputBox
-                            LabelName="Email Address"
-                            Placeholder="Email Address"
-                            Name="email"
-                            Value={editProfile.email}
-                            Type="email"
-                            onChange={handleAddressInputChange2}
-                          />
-                          <InputBox
-                            LabelName="Contact Number"
-                            Placeholder="Contact Number"
-                            Name="phoneNumber"
-                            Type="number"
-                            Value={editProfile.phoneNumber}
-                            onChange={handleAddressInputChange2}
-                          />
-                          <InputBox
-                            LabelName="Password"
-                            Placeholder="Password"
-                            Name="password"
-                            Value={editProfile.password}
-                            Type="password"
-                            onChange={handleAddressInputChange2}
-                          />
-                          <Button
-                            className={`mt-4 bg-white text-blue-600 hover:bg-green-500 hover:text-black`}
-                            type="submit"
-                            label="Update Profile"
-                          />
-                        </form>
-                      </div>
-                      <div className="flex flex-col gap-5">
-                        <Button
-                          type="button"
-                          onClick={closeModal2}
-                          label="Cancel"
-                          className="mt-4 hover:bg-orange-500"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </section>
-          )}
+          {activeSection === "profile" && <ProfileSection />}
           {activeSection === "orders" && (
             <section>
               <h2 className="text-2xl font-bold mb-4">Orders</h2>
@@ -571,9 +239,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
                     Image={product?.products[0]?.product?.images[0]?.url}
                     key={index}
                     ProductName={product?.products[0]?.product?.name}
-                    CurrentPrice={
-                      product?.products?.[0]?.price?.sellingPrice
-                    }
+                    CurrentPrice={product?.products?.[0]?.price?.sellingPrice}
                     Mrp={product?.products?.[0]?.price?.MRP}
                     Discount={product?.products?.[0]?.price?.discount}
                     Rating={product?.products?.[0]?.product?.Rating}
