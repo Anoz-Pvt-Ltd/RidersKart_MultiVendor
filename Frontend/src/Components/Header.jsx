@@ -63,7 +63,7 @@ const Header = () => {
         {user.length ? (
           <div className="flex items-center gap-5">
             <Button
-              className={` bg-white text-blue-600 hover:bg-green-500 hover:text-black`}
+              className={`hover:bg-green-500 hover:text-black`}
               label={
                 <h1 className="flex justify-center items-center gap-2 text-sm">
                   <User2 /> {user?.[0]?.name}
@@ -87,7 +87,7 @@ const Header = () => {
           </div>
         ) : (
           <Button
-            className={` bg-white text-blue-600 hover:bg-green-500 hover:text-black`}
+            className={`hover:bg-green-500 hover:text-black`}
             label={
               <h1 className="flex gap-2">
                 <LogIn /> Login
@@ -126,7 +126,7 @@ const Header = () => {
           </button>
           {user.length ? (
             <Button
-              className={` bg-white text-blue-600 hover:bg-green-500 hover:text-black`}
+              className={` hover:bg-green-500 hover:text-black`}
               label={
                 <h1 className="flex gap-2">
                   <User2 /> {user?.[0]?.name}
@@ -139,7 +139,7 @@ const Header = () => {
             />
           ) : (
             <Button
-              className={` bg-white text-blue-600 hover:bg-green-500 hover:text-black`}
+              className={` hover:bg-green-500 hover:text-black`}
               label={
                 <h1 className="flex gap-2">
                   <LogIn /> Login

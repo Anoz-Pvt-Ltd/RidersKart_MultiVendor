@@ -109,7 +109,7 @@ const Login = ({ startLoading, stopLoading }) => {
               className={"w-full"}
             /> */}
             <Button
-              className={`w-full bg-white text-blue-600 hover:bg-green-500 hover:text-black`}
+              className={`w-full hover:bg-green-500 hover:text-black`}
               label={"Login"}
               onClick={handleSubmit}
             />
@@ -118,7 +118,7 @@ const Login = ({ startLoading, stopLoading }) => {
             <Button
               label={"Register Here"}
               onClick={NavigateRegister}
-              className={`w-1/2 hover:bg-green-500 bg-white text-blue-600  hover:text-black`}
+              className={`w-1/2 hover:bg-green-500  hover:text-black`}
             />
             <p className="text-xs text-neutral-500 text-center">
               ** By continuing, you agree to our Terms of Use and Privacy

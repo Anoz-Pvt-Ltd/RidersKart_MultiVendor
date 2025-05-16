@@ -335,7 +335,7 @@ const CartPage = ({ startLoading, stopLoading }) => {
                             <Button
                               onClick={() => removeFromCart(item?.product?._id)}
                               label="Remove"
-                              className="bg-white hover:bg-orange-500 hover:text-white w-full"
+                              className=" hover:bg-orange-500  w-full"
                             />
                           </div>
                         </div>
@@ -442,14 +442,14 @@ const CartPage = ({ startLoading, stopLoading }) => {
                 </select>
                 {paymentMethod === "online" && (
                   <Button
-                    className={`mt-5 bg-white text-blue-600 hover:bg-green-500 hover:text-black`}
+                    className={`mt-5 hover:bg-green-500 hover:text-black`}
                     onClick={OnlinePayment}
                     label={"Proceed for payment"}
                   />
                 )}
                 {paymentMethod != "online" && (
                   <Button
-                    className={` bg-white text-blue-600 hover:bg-green-500 hover:text-black mt-10`}
+                    className={` hover:bg-green-500 hover:text-black mt-10`}
                     onClick={HandleCashOnDelivery}
                     label={"Place order"}
                   />
@@ -468,7 +468,7 @@ const CartPage = ({ startLoading, stopLoading }) => {
           <h1 className="text-2xl mb-6">Your Cart is Empty</h1>
           <h1>Add products to cart to proceed checkout.</h1>
           <Button
-            className={` bg-white text-blue-600 hover:bg-green-500 hover:text-black`}
+            className={` hover:bg-green-500 hover:text-black`}
             onClick={HandleHome}
             label={"Go to Home"}
           />

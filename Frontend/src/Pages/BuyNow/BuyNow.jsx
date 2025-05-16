@@ -289,40 +289,45 @@ const BuyNow = ({ startLoading, stopLoading }) => {
           <Login />
         </div>
       ) : (
-        <div className="buy-now-page flex flex-col lg:flex-row justify-center items-center gap-20 mt-10 h-full">
+        <div className="buy-now-page flex flex-col lg:flex-row justify-center items-center gap-20 lg:mt-10 h-full">
           {product && (
-            <div className="w-fit px-10">
-              <div className="grid grid-cols-5 grid-rows-4 gap-4 w-full rounded-lg  px-5 py-6 shadow-lg shadow-neutral-300">
-                <div className="col-span-2 row-span-4 ">
+            <div className="w-fit px-10 lg:py-10">
+              
+              <div className="w-full rounded-lg px-4 py-6 shadow-lg shadow-neutral-300 grid grid-cols-1 gap-4 md:grid-cols-5 md:grid-rows-4 ">
+                {/* Image - full width on mobile, left column on desktop */}
+                <div className="w-full h-64 md:h-full md:col-span-2 md:row-span-4">
                   <div className="flex justify-center items-center w-full h-full rounded">
                     <img
                       src={product?.images[0].url}
                       alt={product?.name}
-                      className=" object-cover rounded shadow-lg shadow-neutral-600 "
+                      className="object-cover w-full h-full rounded shadow-lg shadow-neutral-600"
                     />
                   </div>
                 </div>
-                <div className="col-span-3 col-start-3 row-start-1 w-full border rounded-xl shadow-xl shadow-neutral-300">
-                  <h2 className="font-medium text-2xl px-5 w-full h-full flex items-center">
-                    {product?.name}
-                  </h2>
+
+                {/* Product Name */}
+                <div className="w-full border rounded-xl shadow-xl shadow-neutral-300 px-5 py-3 md:col-span-3 md:col-start-3 md:row-start-1 flex items-center">
+                  <h2 className="font-medium text-2xl">{product?.name}</h2>
                 </div>
-                <div className="col-span-3 col-start-3 row-start-2  w-full">
-                  <h2 className="text-sm w-full h-full flex items-center truncate">
-                    {/* Seller name: {item?.product?.name} */}
+
+                {/* Description */}
+                <div className="w-full px-2 md:px-0 md:col-span-3 md:col-start-3 md:row-start-2 flex items-center">
+                  <h2 className="text-sm truncate">
                     Description: {product?.description}
                   </h2>
                 </div>
-                <div className="col-span-3 col-start-3 row-start-3  w-full ">
-                  <div className="flex justify-evenly items-center gap-5">
+
+                {/* Pricing Info */}
+                <div className="w-full px-2 md:px-0 md:col-span-3 md:col-start-3 md:row-start-3">
+                  <div className="flex flex-col md:flex-row justify-start md:justify-evenly items-start md:items-center gap-2 md:gap-5">
                     <span className="text-sm line-through">
-                      MRP: ₹ {product?.price.MRP}
+                      MRP: ₹{product?.price.MRP}
                     </span>
                     <span className="font-semibold">
                       Current price: ₹{product?.price.sellingPrice}
                     </span>
                     <span className="text-green-500 font-semibold">
-                      {product?.price.discount}%off
+                      {product?.price.discount}% off
                     </span>
                   </div>
                 </div>
@@ -331,11 +336,11 @@ const BuyNow = ({ startLoading, stopLoading }) => {
           )}
 
           <div className="address-selection flex flex-col gap-5 justify-evenly items-center">
-            <div>
+            {/* <div>
               <h1 className="font-semibold text-2xl">
                 Hello, {user?.[0]?.name}
               </h1>
-            </div>
+            </div> */}
             <div className="w-4/5 ">
               <h2 className="mb-5 font-semibold">Select Shipping Address</h2>
               {addresses?.length > 0 ? (
@@ -391,29 +396,6 @@ const BuyNow = ({ startLoading, stopLoading }) => {
               />
             )}
           </div>
-
-          {/* <div className="bg-white shadow-md rounded-md p-4 w-full">
-            <h2 className="text-xl font-bold mb-4">Order Summary</h2>
-            <div className="flex justify-between mb-2">
-              <p>Subtotal</p>
-              <p>₹ {getTotalPayablePrice()}</p>
-            </div>
-            <div className="flex justify-between mb-2">
-              <p>Tax</p>
-              <p>₹ {(getTotalPayablePrice() * 0.1).toFixed(2)}</p>
-            </div>
-            <div className="flex justify-between font-bold mb-4">
-              <p>Total</p>
-              <p>₹ {(getTotalPayablePrice() * 1.1).toFixed(2)}</p>
-            </div>
-          </div> */}
-
-          {/* <Button
-            className={` bg-white text-blue-600 hover:bg-green-500 hover:text-black`}
-            onClick={handleOrderConfirmation}
-            // Disabled={!selectedAddress || !paymentMethod}
-            label={"Place order"}
-          /> */}
         </div>
       )}
     </div>
