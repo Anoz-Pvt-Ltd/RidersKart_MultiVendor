@@ -25,50 +25,14 @@ import { clearUser } from "../../Utility/Slice/UserInfoSlice";
 import ProductCardMobile from "../../Components/ProductCardMobile";
 import LoadingUI from "../../Components/Loading";
 import ProfileSection from "./ProfileSection";
+import OrderSection from "./OrderSection";
 
 const Dashboard = ({ startLoading, stopLoading }) => {
   const user = useSelector((store) => store.UserInfo.user);
-  const Dispatch = useDispatch();
   const [error, setError] = useState(null);
   const [activeSection, setActiveSection] = useState("profile");
-  const [selectedAddressIndex, setSelectedAddressIndex] = useState(0);
-  const [showModal, setShowModal] = useState(false);
-  const [showModal2, setShowModal2] = useState(false);
   const [wishlistProducts, setWishlistProducts] = useState();
-  const fromRef = useRef(null);
   const [allOrders, setAllOrders] = useState([]);
-  
-
-  const openModal = () => {
-    setShowModal(true);
-  };
-  const openModal2 = () => {
-    setShowModal2(true);
-  };
-
-  // Close modal
-  const closeModal = () => {
-    setShowModal(false);
-    setNewAddress({
-      street: "",
-      city: "",
-      country: "",
-      postalCode: "",
-      state: "",
-    });
-    setError(null); // Reset any errors
-  };
-  // Close modal
-  const closeModal2 = () => {
-    setShowModal2(false);
-    setEditProfile({
-      name: "",
-      email: "",
-      phoneNumber: "",
-      password: "",
-    });
-    setError(null); // Reset any errors
-  };
 
   const sectionVariants = {
     hidden: { opacity: 0, x: -50 },
@@ -79,32 +43,6 @@ const Dashboard = ({ startLoading, stopLoading }) => {
     hidden: { opacity: 0, x: -100 },
     visible: { opacity: 1, x: 0, transition: { duration: 0.8 } },
   };
-
-  // console.log(user?.[0]?._id);
-  useEffect(() => {
-    const fetchAllOrders = async () => {
-      if (user?.length > 0) {
-        try {
-          startLoading();
-          const response = await FetchData(
-            `orders/all-products-of/${user?.[0]?._id}`,
-            "get"
-          );
-          console.log(response);
-          if (response.data.success) {
-            setAllOrders(response.data.orders);
-          } else {
-            setError("Failed to load orders.");
-          }
-        } catch (err) {
-          setError(err.response?.data?.message || "Failed to fetch orders.");
-        } finally {
-          stopLoading();
-        }
-      }
-    };
-    fetchAllOrders();
-  }, [user]);
 
   const fetchWishlistProducts = async () => {
     if (user?.length > 0) {
@@ -132,31 +70,6 @@ const Dashboard = ({ startLoading, stopLoading }) => {
   useEffect(() => {
     fetchWishlistProducts();
   }, [user]);
-
-  const handleEditProfileSubmit = async (e) => {
-    e.preventDefault();
-    const formData = new FormData(fromRef.current);
-    try {
-      startLoading();
-      const response = await FetchData(
-        `users/edit-user-profile/${user?.[0]?._id}`,
-        "post",
-        formData
-      );
-      console.log(response);
-      if (response.data.success) {
-        alert("Profile updated successfully");
-        closeModal2();
-        window.location.reload();
-      } else {
-        setError("Failed to update profile.");
-      }
-    } catch (err) {
-      setError(err.response?.data?.message || "Failed to update profile.");
-    } finally {
-      stopLoading();
-    }
-  };
 
   const navigate = useNavigate();
 
@@ -229,28 +142,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
           transition={{ duration: 0.5 }}
         >
           {activeSection === "profile" && <ProfileSection />}
-          {activeSection === "orders" && (
-            <section>
-              <h2 className="text-2xl font-bold mb-4">Orders</h2>
-              <div className="flex justify-start items-start gap-5 flex-wrap p-5 ">
-                {console.log(allOrders)}
-                {allOrders?.map((product, index) => (
-                  <ProductCard
-                    Image={product?.products[0]?.product?.images[0]?.url}
-                    key={index}
-                    ProductName={product?.products[0]?.product?.name}
-                    CurrentPrice={product?.products?.[0]?.price?.sellingPrice}
-                    Mrp={product?.products?.[0]?.price?.MRP}
-                    Discount={product?.products?.[0]?.price?.discount}
-                    Rating={product?.products?.[0]?.product?.Rating}
-                    Offer={product?.products?.[0]?.product?.off}
-                    Description={product?.products?.[0]?.product?.description}
-                    productId={product?.products?.[0]?.product?._id}
-                  />
-                ))}
-              </div>
-            </section>
-          )}
+          {activeSection === "orders" && <OrderSection />}
           {activeSection === "coupons" && (
             <section>
               <h2 className="text-2xl font-bold mb-4">Available Coupons</h2>

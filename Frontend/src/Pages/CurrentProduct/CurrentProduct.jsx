@@ -211,9 +211,9 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
               <div className='absolute top-0 right-0'>
                 <Button
                   label={
-                    <Heart className='hover:text-red-500 overflow-hidden' />
+                    <Heart className=' overflow-hidden' />
                   }
-                  className={`bg-white rounded-full`}
+                  className={`hover:bg-white hover:text-red-500 rounded-full`}
                   onClick={addProductToWishlist}
                 />
               </div>
