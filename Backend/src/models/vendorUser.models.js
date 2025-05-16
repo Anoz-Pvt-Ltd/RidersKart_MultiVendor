@@ -79,9 +79,21 @@ const vendorSchema = new mongoose.Schema({
     },
   ],
 
+  canceledCheque: {
+    fileId: {
+      type: String, //  ImageKit file ID
+      default: null,
+      required: true, // The unique identifier for the uploaded image file
+    },
+    url: {
+      type: String,
+      required: true,
+    },
+  },
+
   image: {
     fileId: {
-      type: String, // ImageKit file ID
+      type: String, //  ImageKit file ID
       default: null,
       required: true, // The unique identifier for the uploaded image file
     },

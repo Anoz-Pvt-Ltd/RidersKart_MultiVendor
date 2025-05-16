@@ -24,7 +24,13 @@ const router = Router();
 
 // router.use(VerifyVendorUser);
 
-router.route("/register").post(upload.single("image"), registerVendor);
+router.route("/register").post(
+  upload.fields([
+    { name: "image", maxCount: 1 },
+    { name: "canceledCheque", maxCount: 1 },
+  ]),
+  registerVendor
+);
 router.route("/login").post(loginVendor);
 router.route("/re-login").post(regenerateRefreshToken);
 router.route("/vendor-profile/:vendorId").get(getVendorData);

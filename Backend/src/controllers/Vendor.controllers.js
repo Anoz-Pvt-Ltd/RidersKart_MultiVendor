@@ -53,8 +53,12 @@ const registerVendor = asyncHandler(async (req, res, next) => {
     return next(new ApiError(400, "A vendor with this email already exists"));
   }
 
-  const imageFile = req.file;
+  const imageFile = req.files["image"][0];
+  const canceledChequeFile = req.files["canceledCheque"][0];
+
   if (!imageFile) throw new ApiError(404, "Image file not found!");
+  if (!canceledChequeFile)
+    throw new ApiError(404, "canceled cheque image file not found!");
 
   const image = await UploadImages(
     imageFile.filename,
@@ -63,11 +67,23 @@ const registerVendor = asyncHandler(async (req, res, next) => {
     },
     [`${name.split(" ").join("-")}-GST-Id`, `${gstNumber}`]
   );
+  const canceledChequeImage = await UploadImages(
+    canceledChequeFile.filename,
+    {
+      folderStructure: `all-vendor/${name.split(" ").join("-")}/canceled-Cheque-Image`,
+    },
+    [`${name.split(" ").join("-")}-canceled-Cheque`]
+  );
 
   if (!image)
     throw new ApiError(
       500,
       "Failed to upload image due to internal error! Please try again"
+    );
+  if (!canceledChequeImage)
+    throw new ApiError(
+      500,
+      "Failed to upload canceled cheque image due to internal error! Please try again"
     );
 
   // Create new vendor instance
@@ -99,6 +115,10 @@ const registerVendor = asyncHandler(async (req, res, next) => {
       altText: name,
     },
     password, // Password will be hashed in the pre-save middleware
+    canceledCheque: {
+      fileId: canceledChequeImage.fileId,
+      url: canceledChequeImage.url,
+    },
   });
 
   // Save the vendor to the database

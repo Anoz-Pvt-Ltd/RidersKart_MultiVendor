@@ -393,10 +393,12 @@ const getAllOrders = asyncHandler(async (req, res) => {
 const getCurrentOrder = asyncHandler(async (req, res) => {
   const { orderId } = req.params;
   try {
-    const orders = await Order.findById({ _id: orderId });
-    res.json(
-      new ApiResponse(200, { orders }, "All users fetched successfully")
+    const order = await Order.findById({ _id: orderId }).populate(
+      "products.product"
     );
+    if (!order) throw new ApiError(405, "Order not found!");
+
+    res.json(new ApiResponse(200, { order }, "Order fetched successfully"));
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: "Server error" });
