@@ -33,6 +33,7 @@ const ProfileSection = ({ startLoading, stopLoading }) => {
   const user = useSelector((store) => store.UserInfo.user);
   const [showModal, setShowModal] = useState(false);
   const [showModal2, setShowModal2] = useState(false);
+  const [showModal3, setShowModal3] = useState(false);
   const [selectedAddressIndex, setSelectedAddressIndex] = useState(0);
   const [newAddress, setNewAddress] = useState({
     street: "",
@@ -47,6 +48,16 @@ const ProfileSection = ({ startLoading, stopLoading }) => {
     phoneNumber: "",
     password: "",
   });
+
+  const [editAddress, setEditAddress] = useState({
+    street: "",
+    city: "",
+    country: "",
+    state: "",
+    postalCode: "",
+  });
+  const [editAddressId, setEditAddressId] = useState(null); // (optional)
+
   const handleAddressInputChange = (e) => {
     const { name, value } = e.target;
     setNewAddress((prevState) => ({
@@ -97,6 +108,9 @@ const ProfileSection = ({ startLoading, stopLoading }) => {
   const openModal2 = () => {
     setShowModal2(true);
   };
+  const openModal3 = () => {
+    setShowModal3(true);
+  };
 
   // Close modal
   const closeModal = () => {
@@ -121,6 +135,17 @@ const ProfileSection = ({ startLoading, stopLoading }) => {
     });
     setError(null); // Reset any errors
   };
+  const closeModal3 = () => {
+    setShowModal3(false);
+    setEditAddress({
+      name: "",
+      email: "",
+      phoneNumber: "",
+      password: "",
+    });
+    setError(null); // Reset any errors
+  };
+
   const handleEditProfileSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData(fromRef.current);
@@ -150,6 +175,53 @@ const ProfileSection = ({ startLoading, stopLoading }) => {
     }
   };
   const navigate = useNavigate();
+
+  const DeleteAddress = async (addressId) => {
+    try {
+      startLoading();
+      const response = await FetchData(
+        `users/${user?.[0]?._id}/addresses/${addressId}`,
+        "delete"
+      );
+      if (response.data.success) {
+        alert("Address deleted successfully");
+        window.location.reload();
+      } else {
+        setError("Failed to delete address.");
+      }
+    } catch (err) {
+      console.log(err);
+      alert(err.response?.data?.message || "Failed to delete address.");
+      setError(err.response?.data?.message || "Failed to delete address.");
+    } finally {
+      stopLoading();
+    }
+  };
+
+  const handleEditAddress = async (e) => {
+    e.preventDefault();
+    try {
+      startLoading();
+      const response = await FetchData(
+        `users/${user?.[0]?._id}/addresses/${editAddressId}`,
+        "put",
+        editAddress
+      );
+      if (response.data.success) {
+        alert("Address updated successfully");
+        window.location.reload();
+      } else {
+        setError("Failed to update address.");
+      }
+    } catch (err) {
+      console.log(err);
+      alert(err.response?.data?.message || "Failed to update address.");
+      setError(err.response?.data?.message || "Failed to update address.");
+    } finally {
+      stopLoading();
+    }
+  };
+  // console.log(user?.[0]?.address);
 
   return (
     <section className="flex justify-center items-center flex-col">
@@ -250,14 +322,6 @@ const ProfileSection = ({ startLoading, stopLoading }) => {
               key={address._id}
               className="gap-5 flex justify-center items-center flex-row flex-wrap"
             >
-              {/* <input
-                className="hidden lg:block"
-                type="radio"
-                name="address"
-                value={index}
-                checked={selectedAddressIndex === index}
-                onChange={() => handleAddressChange(index)}
-              /> */}
               <span className="shadow m-2 p-4 rounded-xl">
                 <li className="ml-4 font-semibold list-none">
                   Street:{" "}
@@ -284,26 +348,29 @@ const ProfileSection = ({ startLoading, stopLoading }) => {
                   <span className="font-normal text-lg ">{address.state}</span>
                 </li>
                 <div className="flex justify-center items-center gap-5 pt-5">
-                  <button className="flex justify-center items-center gap-2 hover:text-green-500">
+                  <button
+                    className="flex justify-center items-center gap-2 hover:text-green-500"
+                    onClick={() => {
+                      setEditAddress(address); // Set the address to edit
+                      setEditAddressId(address._id); // (optional) if you need the id
+                      openModal3();
+                    }}
+                  >
                     <PencilLine /> <span className="lg:hidden">Edit</span>
                   </button>
-                  <button className="flex justify-center items-center gap-2 hover:text-red-500">
+                  <button
+                    className="flex justify-center items-center gap-2 hover:text-red-500 "
+                    onClick={() => DeleteAddress(address?._id)}
+                  >
                     <Trash />
                     <span className="lg:hidden">Delete</span>
                   </button>
                 </div>
               </span>
-              {/* <Button
-                className={` bg-white text-blue-600 hover:bg-green-500 hover:text-black`}
-                label={<PencilLine />}
-              />
-              <Button
-                className={` bg-white text-blue-600 hover:bg-green-500 hover:text-black`}
-                label={<Trash />}
-              /> */}
             </div>
           ))}
         </div>
+        {/* <AddressList/> */}
       </div>
       {/* Add address modal */}
       {showModal && (
@@ -430,6 +497,95 @@ const ProfileSection = ({ startLoading, stopLoading }) => {
               <Button
                 type="button"
                 onClick={closeModal2}
+                label="Cancel"
+                className="mt-4 hover:bg-orange-500 hidden lg:block"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+      {showModal3 && (
+        <div className=" fixed top-0 left-0 w-full h-full flex flex-col justify-center items-center backdrop-blur-lg">
+          <h1 className="mb-5 text-center">
+            Hello <span className="text-2xl font-bold ">{user?.[0]?.name}</span>{" "}
+            you can edit your address here
+          </h1>
+
+          <div className="flex justify-center items-center gap-10 lg:w-1/2 w-full  rounded-xl shadow lg:py-10 whiteSoftBG">
+            <div className="lg:w-1/2 w-full">
+              <form
+                ref={fromRef}
+                onSubmit={handleEditAddress}
+                className="w-full flex flex-col justify-center items-center px-5 py-2"
+              >
+                <InputBox
+                  LabelName="Street"
+                  Placeholder={editAddress.street}
+                  Name="street"
+                  Value={editAddress.street}
+                  onChange={(e) =>
+                    setEditAddress({ ...editAddress, street: e.target.value })
+                  }
+                />
+                <InputBox
+                  LabelName="City"
+                  Placeholder={editAddress.city}
+                  Name="city"
+                  Value={editAddress.city}
+                  onChange={(e) =>
+                    setEditAddress({ ...editAddress, city: e.target.value })
+                  }
+                />
+                <InputBox
+                  LabelName="State"
+                  Placeholder={editAddress.state}
+                  Name="state"
+                  Value={editAddress.state}
+                  onChange={(e) =>
+                    setEditAddress({ ...editAddress, state: e.target.value })
+                  }
+                />
+                <InputBox
+                  LabelName="Postal Code"
+                  Placeholder={editAddress.postalCode}
+                  Name="postalCode"
+                  Value={editAddress.postalCode}
+                  onChange={(e) =>
+                    setEditAddress({
+                      ...editAddress,
+                      postalCode: e.target.value,
+                    })
+                  }
+                />
+                <InputBox
+                  LabelName="Country"
+                  Placeholder={editAddress.country}
+                  Name="country"
+                  Value={editAddress.country}
+                  onChange={(e) =>
+                    setEditAddress({ ...editAddress, country: e.target.value })
+                  }
+                />
+
+                <div className="flex justify-center items-center gap-5">
+                  <Button
+                    type="button"
+                    onClick={closeModal3}
+                    label="Cancel"
+                    className="mt-4 hover:bg-orange-500 lg:hidden block"
+                  />
+                  <Button
+                    className={`mt-4 hover:bg-green-500 hover:text-black`}
+                    type="submit"
+                    label="Update Profile"
+                  />
+                </div>
+              </form>
+            </div>
+            <div className="flex flex-col gap-5">
+              <Button
+                type="button"
+                onClick={closeModal3}
                 label="Cancel"
                 className="mt-4 hover:bg-orange-500 hidden lg:block"
               />
