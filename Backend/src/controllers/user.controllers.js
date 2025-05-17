@@ -489,8 +489,9 @@ const addAddress = asyncHandler(async (req, res, next) => {
     .status(200)
     .json(new ApiResponse(200, user, "Address added successfully"));
 });
+
 // Controller to edit an existing address
-const editAddress = asyncHandler(async (req, res, next) => {
+const editAddress = asyncHandler(async (req, res) => {
   const { userId, addressId } = req.params;
   const updatedAddress = req.body;
 
@@ -513,10 +514,17 @@ const editAddress = asyncHandler(async (req, res, next) => {
 
   res
     .status(200)
-    .json(new ApiResponse(200, user, "Address updated successfully"));
+    .json(
+      new ApiResponse(
+        200,
+        { address: user.address },
+        "Address updated successfully"
+      )
+    );
 });
+
 // Controller to delete an address
-const deleteAddress = asyncHandler(async (req, res, next) => {
+const deleteAddress = asyncHandler(async (req, res) => {
   const { userId, addressId } = req.params;
 
   const user = await User.findById(userId);
@@ -534,8 +542,15 @@ const deleteAddress = asyncHandler(async (req, res, next) => {
 
   res
     .status(200)
-    .json(new ApiResponse(200, user, "Address deleted successfully"));
+    .json(
+      new ApiResponse(
+        200,
+        { address: user.address },
+        "Address deleted successfully"
+      )
+    );
 });
+
 const getUserAddresses = async (req, res) => {
   try {
     const userId = req.user._id;
