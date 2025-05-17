@@ -11,7 +11,13 @@ const CurrentOrder = ({ startLoading, stopLoading }) => {
   const [error, setError] = useState("");
   const [currentOrder, setCurrentOrder] = useState([]);
   const [currentOrderProducts, setCurrentOrderProducts] = useState([]);
-  const [CurrentOrderAddress, setCurrentOrderAddress] = useState();
+  const [CurrentOrderAddress, setCurrentOrderAddress] = useState([]);
+
+  // console.log(orderId);
+  // console.log(user);
+  console.log(currentOrder);
+  console.log(currentOrderProducts);
+  console.log(CurrentOrderAddress);
 
   useEffect(() => {
     const fetchOrder = async () => {
@@ -22,10 +28,11 @@ const CurrentOrder = ({ startLoading, stopLoading }) => {
             `orders/admin/current-order/${orderId}`,
             "get"
           );
+          console.log(response);
           if (response.data.success) {
-            setCurrentOrder(response.data.data.orders);
-            setCurrentOrderProducts(response.data.data.orders.products);
-            setCurrentOrderAddress(response.data.data.orders.shippingAddress);
+            setCurrentOrder(response.data.data.order);
+            setCurrentOrderProducts(response.data.data.order.products);
+            setCurrentOrderAddress(response.data.data.order.shippingAddress);
           } else {
             setError("Failed to load orders.");
           }
@@ -57,10 +64,10 @@ const CurrentOrder = ({ startLoading, stopLoading }) => {
           <span className="text-2xl font-semibold">{currentOrder?._id}</span>
         </h1>
         <div className="flex justify-center items-center gap-20 mt-10">
-          <Button label={"Return Order"} />
+          {/* <Button label={"Return Order"} />
           <Button label={"Replace Order"} />
           <Button label={"Make Order Pending"} />
-          <Button label={"Cancel Order"} />
+          <Button label={"Cancel Order"} /> */}
         </div>
         <div className="p-6 mx-auto bg-white shadow-md rounded-lg">
           <h2 className="text-2xl font-semibold text-gray-800 mb-4">
@@ -76,7 +83,7 @@ const CurrentOrder = ({ startLoading, stopLoading }) => {
               { label: "Payment Status", value: currentOrder?.paymentStatus },
               {
                 label: "Price",
-                value: `₹ ${currentOrderProducts?.[0]?.price}`,
+                value: `₹ ${currentOrder?.totalAmount}`,
               },
               { label: "Vendor", value: currentOrder?.vendor },
             ].map((item, index) => (

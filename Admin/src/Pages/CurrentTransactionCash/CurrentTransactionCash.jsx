@@ -28,7 +28,7 @@ const CurrentTransactionCash = ({ startLoading, stopLoading }) => {
           // console.log(response);
           if (response.data.success) {
             setCurrentTransaction(response.data.data);
-            setOrder(response.data.data.orders);
+            setOrder(response.data.data.order);
             setProduct(response.data.data.order.products);
           } else {
             setError("Failed to load transaction details.");

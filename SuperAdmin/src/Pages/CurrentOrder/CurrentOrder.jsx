@@ -24,8 +24,8 @@ const CurrentOrder = ({ startLoading, stopLoading }) => {
           );
           if (response.data.success) {
             setCurrentOrder(response.data.data.orders);
-            setCurrentOrderProducts(response.data.data.orders.products);
-            setCurrentOrderAddress(response.data.data.orders.shippingAddress);
+            setCurrentOrderProducts(response.data.data.order.products);
+            setCurrentOrderAddress(response.data.data.order.shippingAddress);
           } else {
             setError("Failed to load orders.");
           }
