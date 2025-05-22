@@ -450,6 +450,240 @@ const showAllStockQuantity = asyncHandler(async (req, res) => {
   res.status(response.statusCode).json(response);
 });
 
+// Search functionality
+const searchProducts1 = asyncHandler(async (req, res) => {
+  const { query, page = 1, limit = 15 } = req.query;
+  const skip = (page - 1) * limit;
+
+  if (!query || query.trim() === "") {
+    const randomProducts = await Product.aggregate([
+      { $match: { status: "active" } },
+      { $sample: { size: 10 } },
+    ]);
+    return res.json({
+      products: randomProducts,
+      totalResults: randomProducts.length,
+      currentPage: 1,
+      totalPages: 1,
+    });
+  }
+
+  // Step 1: Find exact matches first
+  const exactMatches = await Product.find({
+    status: "active",
+    $text: { $search: `"${query}"` }, // Exact phrase match
+  }).sort({ score: { $meta: "textScore" } });
+
+  // Step 2: Find related products (even if we found exact matches)
+  const searchTerms = query
+    .toLowerCase()
+    .split(/\s+/)
+    .filter((term) => term.length > 2);
+  const regexPatterns = searchTerms.map((term) => new RegExp(term, "i"));
+
+  const relatedQuery = {
+    status: "active",
+    $or: [
+      { name: { $in: regexPatterns } },
+      { description: { $in: regexPatterns } },
+      { "specifications.details": { $in: regexPatterns } },
+      { tags: { $in: searchTerms } },
+    ],
+  };
+
+  // If we found exact matches, exclude them from related results
+  if (exactMatches.length > 0) {
+    relatedQuery._id = { $nin: exactMatches.map((p) => p._id) };
+  }
+
+  const relatedProducts = await Product.find(relatedQuery).limit(
+    limit - exactMatches.length
+  ); // Reserve space for exact matches
+
+  // Combine results (exact matches first, then related products)
+  const combinedResults = [...exactMatches, ...relatedProducts].slice(0, limit);
+  const totalResults = combinedResults.length;
+
+  // If no results found, return random products
+  if (combinedResults.length === 0) {
+    const randomProducts = await Product.aggregate([
+      { $match: { status: "active" } },
+      { $sample: { size: 10 } },
+    ]);
+    return res.json({
+      products: randomProducts,
+      totalResults: randomProducts.length,
+      currentPage: 1,
+      totalPages: 1,
+    });
+  }
+
+  res.json({
+    products: combinedResults,
+    totalResults,
+    currentPage: parseInt(page),
+    totalPages: Math.ceil(totalResults / limit),
+    hasNextPage: skip + limit < totalResults,
+  });
+});
+
+const searchProducts = async (req, res) => {
+  try {
+    const { query, page = 1, limit = 20 } = req.query;
+    const skip = (page - 1) * limit;
+
+    if (!query || query.trim() === "") {
+      const randomProducts = await getRandomProducts(10);
+      return sendPaginatedResponse(
+        res,
+        randomProducts,
+        1,
+        randomProducts.length
+      );
+    }
+
+    // Phase 1: Direct matches (exact and partial)
+    const { exactMatches, partialMatches } = await getDirectMatches(query);
+    const allDirectMatches = [...exactMatches, ...partialMatches];
+    const foundProductIds = allDirectMatches.map((p) => p._id);
+
+    // If no direct matches found, return random products
+    if (allDirectMatches.length === 0) {
+      const randomProducts = await getRandomProducts(limit);
+      return sendPaginatedResponse(
+        res,
+        randomProducts,
+        page,
+        randomProducts.length
+      );
+    }
+
+    // Phase 2: Get tags from matched products for expansion
+    const expansionTags = await getExpansionTags(foundProductIds);
+
+    // Phase 3: Get expanded results (from same categories/subcategories)
+    const expandedMatches = await getExpandedMatches({
+      excludeIds: foundProductIds,
+      tags: expansionTags,
+      categoryIds: [...new Set(allDirectMatches.map((p) => p.category))],
+      subcategoryIds: [...new Set(allDirectMatches.map((p) => p.subcategory))],
+      limit: limit - allDirectMatches.length,
+    });
+
+    // Combine and paginate results
+    const allResults = [...allDirectMatches, ...expandedMatches];
+    const paginatedResults = allResults.slice(skip, skip + limit);
+
+    return sendPaginatedResponse(
+      res,
+      paginatedResults,
+      page,
+      allResults.length,
+      limit
+    );
+  } catch (error) {
+    console.error("Search error:", error);
+    res.status(500).json({
+      message: "Server error during search",
+      error: error.message,
+    });
+  }
+};
+
+// Helper functions
+async function getDirectMatches(query) {
+  // Get exact matches (phrase search)
+  const exactMatches = await Product.find({
+    status: "active",
+    $text: { $search: `"${query}"` }, // Exact phrase match
+  }).sort({ score: { $meta: "textScore" } });
+
+  // Get partial matches if query has multiple words
+  const searchTerms = query
+    .toLowerCase()
+    .split(/\s+/)
+    .filter((term) => term.length > 2);
+  const regexPatterns = searchTerms.map((term) => new RegExp(term, "i"));
+
+  const partialMatches =
+    searchTerms.length > 1
+      ? await Product.find({
+          status: "active",
+          _id: { $nin: exactMatches.map((p) => p._id) },
+          $or: [
+            { name: { $in: regexPatterns } },
+            { description: { $in: regexPatterns } },
+            { "specifications.details": { $in: regexPatterns } },
+            { tags: { $in: searchTerms } },
+          ],
+        }).limit(20)
+      : []; // Limit to prevent too many partial matches
+
+  return { exactMatches, partialMatches };
+}
+
+async function getExpansionTags(productIds) {
+  if (productIds.length === 0) return [];
+
+  // Get most common tags from matched products
+  const tagResults = await Product.aggregate([
+    { $match: { _id: { $in: productIds } } },
+    { $unwind: "$tags" },
+    { $group: { _id: "$tags", count: { $sum: 1 } } },
+    { $sort: { count: -1 } },
+    { $limit: 5 }, // Get top 5 most common tags
+  ]);
+
+  return tagResults.map((t) => t._id);
+}
+
+async function getExpandedMatches({
+  excludeIds,
+  tags,
+  categoryIds,
+  subcategoryIds,
+  limit,
+}) {
+  if (tags.length === 0 || limit <= 0) return [];
+
+  return await Product.find({
+    status: "active",
+    _id: { $nin: excludeIds },
+    tags: { $in: tags },
+    $or: [
+      { category: { $in: categoryIds } },
+      { subcategory: { $in: subcategoryIds } },
+    ],
+  })
+    .sort({ createdAt: -1 }) // Show newer products first
+    .limit(limit);
+}
+
+async function getRandomProducts(limit) {
+  return await Product.aggregate([
+    { $match: { status: "active" } },
+    { $sample: { size: limit } },
+  ]);
+}
+
+function sendPaginatedResponse(res, products, page, totalResults, limit = 20) {
+  const totalPages = Math.ceil(totalResults / limit);
+
+  return res.json({
+    products,
+    totalResults,
+    currentPage: parseInt(page),
+    totalPages,
+    hasNextPage: page * limit < totalResults,
+    searchStrategy:
+      products.length > 0
+        ? products[0]._score
+          ? "direct"
+          : "expanded"
+        : "random",
+  });
+}
+
 export {
   registerProduct,
   getAllProductForAdmin,
@@ -462,4 +696,5 @@ export {
   getProductByCategory,
   addStockQuantity,
   removeStockQuantity,
+  searchProducts,
 };

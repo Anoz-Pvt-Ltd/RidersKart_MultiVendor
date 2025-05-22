@@ -493,62 +493,79 @@ const addAddress = asyncHandler(async (req, res, next) => {
 // Controller to edit an existing address
 const editAddress = asyncHandler(async (req, res) => {
   const { userId, addressId } = req.params;
-  const updatedAddress = req.body;
+  const updateData = req.body;
 
-  if (!updatedAddress || Object.keys(updatedAddress).length === 0) {
-    throw new ApiError(400, "Updated address details are required");
+  // Validate required fields
+  if (!userId || !addressId) {
+    throw new ApiError(400, "User ID and Address ID are required");
   }
 
-  const user = await User.findById(userId);
-  if (!user) {
-    throw new ApiError(404, "User not found");
+  // Construct update object dynamically
+  const updateObject = {};
+  Object.keys(updateData).forEach((key) => {
+    if (updateData[key] !== undefined) {
+      updateObject[`address.$.${key}`] = updateData[key];
+    }
+  });
+
+  // Update the specific address
+  const result = await User.updateOne(
+    {
+      _id: userId,
+      "address._id": addressId,
+    },
+    {
+      $set: updateObject,
+    }
+  );
+
+  if (result.matchedCount === 0) {
+    throw new ApiError(404, "User or address not found");
   }
 
-  const address = user.address.id(addressId);
-  if (!address) {
-    throw new ApiError(404, "Address not found");
+  if (result.modifiedCount === 0) {
+    return res
+      .status(200)
+      .json(new ApiResponse(200, null, "No changes detected"));
   }
 
-  Object.assign(address, updatedAddress);
-  await user.save();
-
+  // Return the updated user
+  const updatedUser = await User.findById(userId);
   res
     .status(200)
-    .json(
-      new ApiResponse(
-        200,
-        { address: user.address },
-        "Address updated successfully"
-      )
-    );
+    .json(new ApiResponse(200, updatedUser, "Address edited successfully"));
 });
 
 // Controller to delete an address
 const deleteAddress = asyncHandler(async (req, res) => {
   const { userId, addressId } = req.params;
 
-  const user = await User.findById(userId);
-  if (!user) {
+  // Validate required fields
+  if (!userId || !addressId) {
+    throw new ApiError(400, "User ID and Address ID are required");
+  }
+
+  // Remove the address from the array
+  const result = await User.updateOne(
+    { _id: userId },
+    {
+      $pull: {
+        address: { _id: addressId },
+      },
+    }
+  );
+
+  if (result.matchedCount === 0) {
     throw new ApiError(404, "User not found");
   }
 
-  const address = user.address.id(addressId);
-  if (!address) {
-    throw new ApiError(404, "Address not found");
+  if (result.modifiedCount === 0) {
+    throw new ApiError(404, "Address not found or already deleted");
   }
-
-  address.remove();
-  await user.save();
 
   res
     .status(200)
-    .json(
-      new ApiResponse(
-        200,
-        { address: user.address },
-        "Address deleted successfully"
-      )
-    );
+    .json(new ApiResponse(200, null, "Address deleted successfully"));
 });
 
 const getUserAddresses = async (req, res) => {

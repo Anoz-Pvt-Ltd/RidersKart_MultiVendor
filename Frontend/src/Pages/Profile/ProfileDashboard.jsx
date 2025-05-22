@@ -1,28 +1,17 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { motion } from "framer-motion";
 import { FetchData } from "../../Utility/FetchFromApi";
-import Button from "../../Components/Button";
-import InputBox from "../../Components/InputBox";
 import ProductCard from "../../Components/ProductCard";
 import {
-  Edit,
   Heart,
   ListOrdered,
-  LogOut,
   Newspaper,
-  PencilLine,
-  Plus,
-  ShoppingBag,
-  Trash,
   User,
-  UserCheck,
 } from "lucide-react";
 import Lottie from "lottie-react";
 import Loading from "../../assets/Loading/Loading.json";
 import { useNavigate } from "react-router";
-import { clearUser } from "../../Utility/Slice/UserInfoSlice";
-import ProductCardMobile from "../../Components/ProductCardMobile";
 import LoadingUI from "../../Components/Loading";
 import ProfileSection from "./ProfileSection";
 import OrderSection from "./OrderSection";
