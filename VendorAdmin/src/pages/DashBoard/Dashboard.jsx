@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Bar, Pie } from "react-chartjs-2";
 import "chart.js/auto";
-import { barData } from "../../constants/VendorDashboard.Home";
 import Orders from "../Orders/Orders";
 import Categories from "../Category/Category";
 import Brands from "../Brands/Brands";
@@ -17,6 +16,7 @@ import { motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import LoadingUI from "../../components/Loading";
 import VerifiedDrivers from "../Delivery-partner/VerifiedDrivers";
+import dayjs from "dayjs";
 
 const Dashboard = ({ startLoading, stopLoading }) => {
   const user = useSelector((store) => store.UserInfo.user);
@@ -29,6 +29,59 @@ const Dashboard = ({ startLoading, stopLoading }) => {
   const [allOrders, setAllOrders] = useState([]);
 
   console.log(user?.[0]?._id);
+
+  const [barData, setBarData] = useState({
+    labels: [],
+    datasets: [
+      {
+        label: "Orders per Month",
+        data: [],
+        backgroundColor: "#8E44AD",
+      },
+    ],
+  });
+
+  useEffect(() => {
+    if (!allOrders || allOrders.length === 0) return;
+
+    // Get months
+    const months = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+
+    // Initialize counts
+    const orderCounts = Array(12).fill(0);
+
+    allOrders.forEach((order) => {
+      const date = dayjs(order.createdAt);
+      if (date.isValid()) {
+        const month = date.month(); // 0-indexed
+        orderCounts[month]++;
+      }
+    });
+
+    setBarData({
+      labels: months,
+      datasets: [
+        {
+          label: "Orders per Month",
+          data: orderCounts,
+          backgroundColor: "#8E44AD",
+        },
+      ],
+    });
+  }, [allOrders]);
 
   useEffect(() => {
     const fetchAllOrders = async () => {
@@ -175,33 +228,33 @@ const Dashboard = ({ startLoading, stopLoading }) => {
       default:
         return (
           <div className="flex flex-col gap-5">
-            <div className="flex flex-col lg:flex-row gap-4 lg:gap-0 lg:justify-evenly lg:w-full lg:items-center">
-              <div className="p-4 bg-white shadow rounded">
-                <h3 className="text-gray-500">Total Orders</h3>
+            <div className="flex flex-col lg:flex-row gap-4 lg:gap-0 lg:justify-evenly lg:w-full lg:items-center shadow-lg p-4 bg-white rounded-lg ">
+              <div className="p-4 bg-[#B5BD63]  shadow-xl rounded">
+                <h3 className="text-black">Total Orders</h3>
                 <p className="text-2xl font-bold">{allOrders?.length}</p>
               </div>
-              <div className="p-4 bg-white shadow rounded">
-                <h3 className="text-gray-500">Products</h3>
+              <div className="p-4 bg-[#19465C] shadow-xl text-white rounded">
+                <h3 className="">Products</h3>
                 <p className="text-2xl font-bold">{products?.length}</p>
               </div>
-              <div className="p-4 bg-white shadow rounded">
+              <div className="p-4 bg-[#8EBD9D] shadow-xl rounded">
                 <h3 className="text-gray-500">Rating</h3>
                 <p className="text-2xl font-bold">
                   Avg:{user?.[0]?.ratings?.average}/Total:
                   {user?.[0]?.ratings?.reviewsCount}
                 </p>
               </div>
-              <div className="p-4 bg-white shadow rounded">
-                <h3 className="text-gray-500">Transactions (₹)</h3>
+              <div className="p-4 text-white bg-[#8E44AD] shadow-xl rounded">
+                <h3 className="">Transactions (₹)</h3>
                 <p className="text-2xl font-bold">0</p>
               </div>
             </div>
 
             <div className="flex justify-center items-center ">
-              {/* <div className="bg-white shadow rounded p-4">
+              <div className="bg-white shadow rounded p-4">
                 <h3 className="text-gray-500 mb-4">Monthly Orders</h3>
                 <Bar data={barData} />
-              </div> */}
+              </div>
               <div className="bg-white shadow rounded p-4 lg:w-1/2 w-full ">
                 <h3 className="text-gray-500 mb-4">
                   Category Wise Product's Count
