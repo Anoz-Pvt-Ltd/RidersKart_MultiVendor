@@ -52,7 +52,7 @@ router.route("/:userId/wishlist-products").get(VerifyUser, getWishlistProducts);
 //modification routes
 router.route("/:userId/addresses").post(VerifyUser, addAddress);
 router.route("/:userId/addresses").get(VerifyUser, getUserAddresses);
-router.route("/:userId/addresses/:addressId").put(VerifyUser, editAddress);
+router.route("/:userId/addresses/:addressId").post(VerifyUser, editAddress);
 router.route("/:userId/addresses/:addressId").delete(VerifyUser, deleteAddress);
 router.route("/edit-user-profile/:userId").post(VerifyUser, editUserDetails);
 // router.route("/user-profile/:userId").get(getUserProfile);

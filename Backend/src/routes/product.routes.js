@@ -11,6 +11,7 @@ import {
   addStockQuantity,
   removeStockQuantity,
   AddProductImages,
+  searchProducts,
 } from "../controllers/product.controllers.js";
 import {
   VerifyAdminUser,
@@ -27,6 +28,8 @@ router
   .post(VerifyVendorUser, upload.single("image"), registerProduct);
 router.route("/get-all-products").get(getAllProducts);
 router.route("/get-single-product/:productId").get(getProduct);
+
+router.route("/search-product").get(searchProducts);
 
 //routes with authorization (private)
 router

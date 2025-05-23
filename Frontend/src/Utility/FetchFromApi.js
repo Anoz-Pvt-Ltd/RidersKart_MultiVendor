@@ -1,8 +1,5 @@
 import axios from "axios";
 
-// export const DomainUrl = "http://localhost:3000";
-// export const DomainUrl = "https://multi-vendor-e-commerce.onrender.com";
-
 export const FetchData = async (url, method, data, file = false) => {
   const Base_URL = `${process.env.DomainUrl}/api/v1`;
   const AccessToken = localStorage.getItem("AccessToken");
@@ -12,11 +9,17 @@ export const FetchData = async (url, method, data, file = false) => {
       "Content-Type": file ? "multipart/form-data" : "application/json",
       Authorization: `Bearer ${AccessToken}`,
     },
-    // withCredentials: true,
+    withCredentials: true,
   };
 
   if (method === "get") {
-    const response = await axios.get(`${Base_URL}/${url}`, options);
+    const response = await axios.get(`${Base_URL}/${url}`, {
+      params: data,
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${AccessToken}`,
+      },
+    });
     return response;
   } else if (method === "post") {
     const response = await axios.post(`${Base_URL}/${url}`, data, options);

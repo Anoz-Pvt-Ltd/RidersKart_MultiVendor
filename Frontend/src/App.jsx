@@ -23,6 +23,7 @@ import DeliveryInstructions from "./Pages/Delivery-Instructions/DeliveryInstruct
 import Footer from "./Components/Footer";
 import TermsConditionsVendors from "./Pages/Terms-and-Conditions/Terms-&-conditions-vendors";
 import CurrentOrder from "./Pages/CurrentOrder/CurrentOrder";
+import SearchPage from "./Pages/Search-Products/searchFeed";
 // import { io } from "socket.io-client";
 
 const App = () => {
@@ -129,6 +130,7 @@ const App = () => {
           <Route path="/cart/:userId" element={<CartPage />} />
           {/* <Route path="/cart/:userId/buy-now-product" element={<BuyNow />} /> */}
           <Route path="/checkout/:productId/:orderId" element={<BuyNow />} />
+          <Route path="/search-page/:searchData" element={<SearchPage />} />
           <Route
             path="/register-delivery-partner"
             element={<RegisterDriver />}
