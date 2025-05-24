@@ -250,8 +250,8 @@ const Dashboard = ({ startLoading, stopLoading }) => {
               </div>
             </div>
 
-            <div className="flex justify-center items-center ">
-              <div className="bg-white shadow rounded p-4">
+            <div className="flex justify-center items-center flex-col lg:flex-row gap-4">
+              <div className="bg-white shadow rounded p-4 lg:w-1/2 w-full ">
                 <h3 className="text-gray-500 mb-4">Monthly Orders</h3>
                 <Bar data={barData} />
               </div>

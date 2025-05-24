@@ -163,7 +163,7 @@ const Categories = ({ startLoading, stopLoading }) => {
               <th className="py-3 px-4 border-b">Category ID</th>
               <th className="py-3 px-4 border-b">Category Name</th>
               <th className="py-3 px-4 border-b">Product Name</th>
-              <th className="py-3 px-4 border-b">Number of Products</th>
+              <th className="py-3 px-4 border-b">Stock Quantity</th>
               <th className="py-3 px-4 border-b">Status</th>
             </tr>
           </thead>

@@ -1,14 +1,14 @@
-import { useRef, useState } from "react";
-import Button from "../../components/Button";
-import { FetchData } from "../../utils/FetchFromApi";
+import { useEffect, useRef, useState } from "react";
+import Button from "../../Components/Button";
+import { FetchData } from "../../Utility/FetchFromApi";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 // import { alertError, alertSuccess } from "../../Utility/";
 // import { parseErrorMessage } from "../../../utility/ErrorMessageParser";
-import InputBox from "../../components/InputBox";
-import SelectBox from "../../components/SelectionBox";
+import InputBox from "../../Components/InputBox";
+import SelectBox from "../../Components/SelectionBox";
 import { useSelector } from "react-redux";
-import LoadingUI from "../../components/Loading";
+import LoadingUI from "../../Components/Loading";
 
 const RegisterDriver = ({ startLoading, stopLoading }) => {
   // variables----------------------------------------------------------------
@@ -16,7 +16,9 @@ const RegisterDriver = ({ startLoading, stopLoading }) => {
   const navigate = useNavigate();
   const Dispatch = useDispatch();
   const user = useSelector((store) => store.UserInfo.user);
-  console.log(user);
+  const [allVendors, setAllVendors] = useState([]);
+  const [selectedVendor, setSelectedVendor] = useState("");
+  console.log(selectedVendor);
   const [imagePreviews, setImagePreviews] = useState({
     licenseImage: null,
     aadharImage: null,
@@ -77,6 +79,32 @@ const RegisterDriver = ({ startLoading, stopLoading }) => {
     document.getElementsByName(name)[0].value = "";
   };
 
+  useEffect(() => {
+    const fetchAllVerifiedVendors = async () => {
+      if (user?.length > 0) {
+        try {
+          startLoading();
+          const response = await FetchData(
+            "vendor/admin/get-all-verified-vendor",
+            "get"
+          );
+          // console.log(response);
+          if (response.data.success) {
+            setAllVendors(response.data.data.vendor);
+          } else {
+            setError("Failed to load vendors.");
+          }
+        } catch (err) {
+          setError(err.response?.data?.message || "Failed to fetch vendors.");
+        } finally {
+          stopLoading();
+        }
+      }
+    };
+
+    fetchAllVerifiedVendors();
+  }, [user]);
+
   // Handel submission
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -129,7 +157,7 @@ const RegisterDriver = ({ startLoading, stopLoading }) => {
     try {
       startLoading();
       const response = await FetchData(
-        `driver/register/${user[0]._id}`,
+        `driver/register/${selectedVendor}`,
         "post",
         formData,
         true
@@ -138,13 +166,15 @@ const RegisterDriver = ({ startLoading, stopLoading }) => {
 
       console.log(response);
 
-      alert(response.data.message);
+      alert(
+        "Driver registered successfully, approve the partner from Under Review Section"
+      );
 
       // Reset form fields and clear image previews
       FormRef.current.reset();
 
       // Navigate to home page and show success message
-      navigate("/dashboard");
+      navigate("/home");
     } catch (error) {
       console.log(error);
       // alertError(parseErrorMessage(error.response.data));
@@ -302,9 +332,28 @@ const RegisterDriver = ({ startLoading, stopLoading }) => {
               Placeholder="Your Password"
             />
           </div>
-          <div className="col-start-3 row-start-5">
+          <div className="col-start-3 row-start-5 flex justify-center items-center">
+            <div className="w-full">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Select Vendor
+              </label>
+              <select
+                name="vendorId"
+                value={selectedVendor}
+                onChange={(e) => setSelectedVendor(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-md"
+                required
+              >
+                <option value="">Select Vendor</option>
+                {allVendors.map((vendor) => (
+                  <option key={vendor._id} value={vendor._id}>
+                    {vendor.name}
+                  </option>
+                ))}
+              </select>
+            </div>
             <InputBox
-              LabelName="Any Physical Disability:"
+              LabelName="Physical Disability"
               Name="physicallyDisabled"
               Type="checkbox"
               Required={false}

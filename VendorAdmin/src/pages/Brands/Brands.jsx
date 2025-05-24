@@ -208,7 +208,7 @@ const Brands = ({ startLoading, stopLoading }) => {
         <table className="min-w-full bg-white border border-gray-200 rounded-lg">
           <thead>
             <tr className="bg-gray-100 text-gray-600 text-left text-sm font-medium">
-              <th className="py-3 px-4 border-b">
+              {/* <th className="py-3 px-4 border-b">
                 <input
                   type="checkbox"
                   onChange={(e) =>
@@ -217,7 +217,7 @@ const Brands = ({ startLoading, stopLoading }) => {
                     )
                   }
                 />
-              </th>
+              </th> */}
               <th className="py-3 px-4 border-b">Brand Name</th>
               <th className="py-3 px-4 border-b">Brand Logo</th>
               <th className="py-3 px-4 border-b">Status</th>
@@ -229,7 +229,7 @@ const Brands = ({ startLoading, stopLoading }) => {
                 key={brand._id}
                 className="text-sm text-gray-700 border-b hover:bg-gray-50"
               >
-                <td className="py-3 px-4">
+                {/* <td className="py-3 px-4">
                   <input
                     type="checkbox"
                     checked={selectedBrands.includes(brand._id)}
@@ -241,7 +241,7 @@ const Brands = ({ startLoading, stopLoading }) => {
                       )
                     }
                   />
-                </td>
+                </td> */}
                 <td className="py-3 px-4 font-semibold">{brand.title}</td>
                 <td className="py-3 px-4 text-center w-10 h-10">
                   <img src={brand.logo.url} />

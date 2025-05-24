@@ -80,7 +80,7 @@ const VerifiedDrivers = ({ startLoading, stopLoading }) => {
               ) : (
                 <tr>
                   <td colSpan="11" className="py-2 px-4 text-center">
-                    No orders found.
+                    No data found.
                   </td>
                 </tr>
               )}

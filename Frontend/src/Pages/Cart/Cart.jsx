@@ -291,97 +291,104 @@ const CartPage = ({ startLoading, stopLoading }) => {
                   item?.product === null ? (
                     <div key={item?._id}></div>
                   ) : (
-                    <div
-                      key={item?._id}
-                      className="flex flex-col gap-5 md:flex-row items-center justify-between border-b pb-4 mb-4"
-                    >
-                      <div className="grid grid-cols-5 grid-rows-5 gap-4 w-full rounded">
-                        <div className="col-span-2 row-span-4 ">
-                          <div className="flex justify-center items-center w-full h-full rounded">
-                            <img
-                              src={item?.product?.images[0].url}
-                              alt={item?.product?.name}
-                              className="w-40 object-cover rounded shadow-lg shadow-neutral-600 "
-                            />
+                    <div>
+                      <div
+                        key={item?._id}
+                        className="flex flex-col gap-5 md:flex-row items-center justify-between border-b pb-4 mb-4"
+                      >
+                        <div className="grid grid-cols-5 grid-rows-5 gap-4 w-full rounded">
+                          <div className="col-span-2 row-span-4 ">
+                            <div className="flex justify-center items-center w-full h-full rounded">
+                              <img
+                                src={item?.product?.images[0].url}
+                                alt={item?.product?.name}
+                                className="w-40 object-cover rounded shadow-lg shadow-neutral-600 "
+                              />
+                            </div>
                           </div>
-                        </div>
-                        <div className="col-span-5 col-start-1 row-start-5 w-full">
-                          <div className="flex justify-evenly items-center gap-5">
-                            <span className="text-sm line-through">
-                              MRP: ₹ {item?.product?.price.MRP}
-                            </span>
-                            <span className="font-semibold">
-                              Current price: ₹
-                              {item?.product?.price.sellingPrice}
-                            </span>
-                            <span className="text-green-500 font-semibold">
-                              {item?.product?.price.discount}%off
-                            </span>
+                          <div className="col-span-5 col-start-1 row-start-5 w-full">
+                            <div className="flex justify-evenly items-center gap-5">
+                              <span className="text-sm line-through">
+                                MRP: ₹ {item?.product?.price.MRP}
+                              </span>
+                              <span className="font-semibold">
+                                Current price: ₹
+                                {item?.product?.price.sellingPrice}
+                              </span>
+                              <span className="text-green-500 font-semibold">
+                                {item?.product?.price.discount}%off
+                              </span>
+                            </div>
                           </div>
-                        </div>
-                        <div className="col-span-3 col-start-3 row-start-1 w-full border rounded-xl shadow-xl shadow-neutral-300">
-                          <h2 className="font-medium text-2xl px-5 w-full h-full flex items-center">
-                            {item?.product?.name}
-                          </h2>
-                        </div>
-                        <div className="col-span-3 col-start-3 row-start-2  w-full">
-                          <h2 className="text-sm w-full h-full flex items-center truncate">
-                            {/* Seller name: {item?.product?.name} */}
-                            Description: {item?.product?.description}
-                          </h2>
-                        </div>
-                        <div className="col-span-2 col-start-4 row-start-4  w-full">
-                          <div className="w-full h-full flex items-center justify-center ">
-                            <Button
-                              onClick={() => removeFromCart(item?.product?._id)}
-                              label="Remove"
-                              className=" hover:bg-orange-500  w-full"
-                            />
+                          <div className="col-span-3 col-start-3 row-start-1 w-full border rounded-xl shadow-xl shadow-neutral-300">
+                            <h2 className="font-medium text-2xl px-5 w-full h-full flex items-center">
+                              {item?.product?.name}
+                            </h2>
                           </div>
-                        </div>
-                        <div className="col-start-3 row-start-4 w-full">
-                          <div className="flex items-center justify-center gap-2 w-full h-full">
-                            <button
-                              onClick={() => {
-                                dispatch(subtractQuantity(item?.product?._id));
-                                handelAddQuantity(
-                                  item?.product?._id,
-                                  item?.quantity - 1
-                                );
-                              }}
-                              className="px-2 flex justify-center items-center bg-gray-200 rounded-full"
-                            >
-                              -
-                            </button>
-                            <span>{item?.quantity}</span>
-                            <button
-                              onClick={() => {
-                                dispatch(addQuantity(item?.product?._id));
-                                handelAddQuantity(
-                                  item?.product?._id,
-                                  item?.quantity + 1
-                                );
-                              }}
-                              className="px-2 flex justify-center items-center bg-gray-200 rounded-full"
-                            >
-                              +
-                            </button>
+                          <div className="col-span-3 col-start-3 row-start-2  w-full">
+                            <h2 className="text-sm w-full h-full flex items-center truncate">
+                              {/* Seller name: {item?.product?.name} */}
+                              Description: {item?.product?.description}
+                            </h2>
                           </div>
-                        </div>
-                        <div className="col-span-3 col-start-3 row-start-3  w-full ">
-                          <div className="flex justify-evenly items-center gap-5 w-full h-full text-xl">
-                            <span>Total Quantity: {item?.quantity}</span>
-                            <span>
-                              Total value: ₹
-                              {item?.product?.price.sellingPrice *
-                                item?.quantity}
-                            </span>
+                          <div className="col-span-2 col-start-4 row-start-4  w-full">
+                            <div className="w-full h-full flex items-center justify-center ">
+                              <Button
+                                onClick={() =>
+                                  removeFromCart(item?.product?._id)
+                                }
+                                label="Remove"
+                                className=" hover:bg-orange-500  w-full"
+                              />
+                            </div>
+                          </div>
+                          <div className="col-start-3 row-start-4 w-full">
+                            <div className="flex items-center justify-center gap-2 w-full h-full">
+                              <button
+                                onClick={() => {
+                                  dispatch(
+                                    subtractQuantity(item?.product?._id)
+                                  );
+                                  handelAddQuantity(
+                                    item?.product?._id,
+                                    item?.quantity - 1
+                                  );
+                                }}
+                                className="px-2 flex justify-center items-center bg-gray-200 rounded-full"
+                              >
+                                -
+                              </button>
+                              <span>{item?.quantity}</span>
+                              <button
+                                onClick={() => {
+                                  dispatch(addQuantity(item?.product?._id));
+                                  handelAddQuantity(
+                                    item?.product?._id,
+                                    item?.quantity + 1
+                                  );
+                                }}
+                                className="px-2 flex justify-center items-center bg-gray-200 rounded-full"
+                              >
+                                +
+                              </button>
+                            </div>
+                          </div>
+                          <div className="col-span-3 col-start-3 row-start-3  w-full ">
+                            <div className="flex justify-evenly items-center gap-5 w-full h-full text-xl">
+                              <span>Total Quantity: {item?.quantity}</span>
+                              <span>
+                                Total value: ₹
+                                {item?.product?.price.sellingPrice *
+                                  item?.quantity}
+                              </span>
+                            </div>
                           </div>
                         </div>
                       </div>
                     </div>
                   )
                 )}
+                <Button label={"Shop more"} onClick={HandleHome} />
               </div>
             </div>
 

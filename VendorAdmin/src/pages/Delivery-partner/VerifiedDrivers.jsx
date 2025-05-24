@@ -47,7 +47,11 @@ const VerifiedDrivers = ({ startLoading, stopLoading }) => {
       />
       {isOpen && (
         <div className="flex justify-centre items-start absolute top-0 left-0 h-screen w-full bg-black/70 backdrop-blur-sm overflow-scroll">
-          <Button label={<X />} onClick={() => setIsOpen(false)} className={"fixed top-0 left-0"} />
+          <Button
+            label={<X />}
+            onClick={() => setIsOpen(false)}
+            className={"fixed top-0 left-0"}
+          />
           <RegisterDriver />
         </div>
       )}
@@ -100,7 +104,7 @@ const VerifiedDrivers = ({ startLoading, stopLoading }) => {
               ) : (
                 <tr>
                   <td colSpan="11" className="py-2 px-4 text-center">
-                    No orders found.
+                    No data found.
                   </td>
                 </tr>
               )}
@@ -108,7 +112,9 @@ const VerifiedDrivers = ({ startLoading, stopLoading }) => {
           </table>
         </div>
       </div>
-      <div><PendingDrivers/></div>
+      <div>
+        <PendingDrivers />
+      </div>
     </div>
   );
 };
