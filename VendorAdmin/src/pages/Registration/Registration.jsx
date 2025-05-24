@@ -249,6 +249,11 @@ const VendorRegistrationForm = ({ startLoading, stopLoading, onClose }) => {
                 Name="ifscCode"
                 Placeholder="Enter IFSC Code"
               />
+              <InputBox
+                Type="file"
+                Name={"image"}
+                LabelName={"Cancelled Cheque"}
+              />
             </>
           )}
 
