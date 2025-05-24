@@ -21,6 +21,7 @@ const RegisterDriver = asyncHandler(async (req, res) => {
     plateNumber,
     insuranceNumber,
     insuranceExpiry,
+    verificationStatus = "pending",
   } = req.body;
 
   const { vendorId } = req.params;
@@ -135,7 +136,7 @@ const RegisterDriver = asyncHandler(async (req, res) => {
       },
     },
     vendorId: vendor._id,
-    // verificationStatus: DriverVerificationStatus[0],
+    verificationStatus,
   });
 
   // Save the driver to the database
