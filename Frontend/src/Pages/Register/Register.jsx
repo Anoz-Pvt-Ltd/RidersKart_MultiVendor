@@ -196,7 +196,7 @@ const UserRegister = ({ startLoading, stopLoading }) => {
 
         <div className="md:col-span-2">
           <Button
-            className={`w-full bg-white text-blue-600 hover:bg-green-500 hover:text-black`}
+            className={`w-full text-blue-600 hover:bg-green-500`}
             label={"Register"}
             Type={"submit"}
           />

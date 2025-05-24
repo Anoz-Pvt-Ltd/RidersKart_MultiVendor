@@ -8,6 +8,28 @@ const Orders = ({ startLoading, stopLoading }) => {
   const user = useSelector((store) => store.UserInfo.user);
   const [error, setError] = useState(null);
   const [allOrders, setAllOrders] = useState([]);
+  const [selectedDate, setSelectedDate] = useState("");
+  const [sortedOrders, setSortedOrders] = useState([]);
+
+  useEffect(() => {
+    setSortedOrders(allOrders);
+  }, [allOrders]);
+
+  const handleDateChange = (e) => {
+    setSelectedDate(e.target.value);
+  };
+
+  const handleSort = () => {
+    if (!selectedDate) {
+      setSortedOrders(allOrders);
+      return;
+    }
+    const filtered = allOrders.filter((order) => {
+      const orderDate = new Date(order.updatedAt).toISOString().split("T")[0];
+      return orderDate === selectedDate;
+    });
+    setSortedOrders(filtered);
+  };
 
   useEffect(() => {
     const fetchAllOrders = async () => {
@@ -42,12 +64,41 @@ const Orders = ({ startLoading, stopLoading }) => {
   console.log(allOrders);
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-lg">
+    <div className="bg-white p-6 rounded-lg shadow-lg  h-screen overflow-scroll">
       <h2 className="text-2xl font-bold text-gray-700 mb-4">Orders</h2>
+      <div className="flex items-center mb-4 gap-2">
+        <label htmlFor="date" className="font-medium">
+          Sort by Date:
+        </label>
+        <input
+          type="date"
+          id="date"
+          value={selectedDate}
+          onChange={handleDateChange}
+          className="border rounded px-2 py-1"
+        />
+        <button
+          onClick={handleSort}
+          className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+        >
+          Sort
+        </button>
+        {selectedDate && (
+          <button
+            onClick={() => {
+              setSelectedDate("");
+              setSortedOrders(allOrders);
+            }}
+            className="ml-2 text-sm text-gray-600 underline"
+          >
+            Clear
+          </button>
+        )}
+      </div>
       {/* Detailed Order List */}
       <div className="container mx-auto p-4">
         <div className="overflow-x-auto">
-          <table className="min-w-full bg-white border border-gray-200">
+          <table className="min-w-full bg-white border border-gray-200 ">
             <thead>
               <tr>
                 <th className="py-2 px-4 border-b">Order ID</th>
@@ -65,8 +116,8 @@ const Orders = ({ startLoading, stopLoading }) => {
               </tr>
             </thead>
             <tbody>
-              {allOrders.length > 0 ? (
-                allOrders.map((order) => (
+              {sortedOrders.length > 0 ? (
+                sortedOrders.map((order) => (
                   <tr key={order._id} className="hover:bg-gray-100">
                     <td className="py-2 px-4 border-b">{order._id}</td>
                     <td className="py-2 px-4 border-b">
@@ -98,7 +149,8 @@ const Orders = ({ startLoading, stopLoading }) => {
                     </td>
 
                     <td className="py-2 px-4 border-b">
-                      {new Date(order.placedAt).toLocaleDateString()}
+                      {new Date(order.updatedAt).toLocaleDateString()}
+                      {/* {order.updatedAt} */}
                     </td>
                     <td className="py-2 px-4 border-b">
                       <button className="bg-blue-500 text-white py-1 px-3 rounded hover:bg-blue-600">
