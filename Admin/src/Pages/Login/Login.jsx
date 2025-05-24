@@ -6,6 +6,8 @@ import { FetchData } from "../../Utility/FetchFromApi";
 import { useDispatch, useSelector } from "react-redux";
 import { addUser, clearUser } from "../../Utility/Slice/UserInfoSlice";
 import LoadingUI from "../../Components/Loading";
+import BackGround from "../../assets/HomeBackground.jpg";
+import LOGO from "../../assets/Logo.png";
 
 const AdminLogin = ({ startLoading, stopLoading }) => {
   const [error, setError] = useState("");
@@ -60,39 +62,47 @@ const AdminLogin = ({ startLoading, stopLoading }) => {
   return user.length > 0 ? (
     navigate("/home")
   ) : (
-    <div className="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg">
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">
-        Welcome, Login yourself as Admin
-      </h1>
-
-      {error && <div className="text-red-500 mb-4">{error}</div>}
-      {success && <div className="text-green-500 mb-4">{success}</div>}
-
-      <form
-        ref={formRef}
-        onSubmit={handleSubmit}
-        className="grid grid-cols-1 md:grid-cols-2 gap-6"
-      >
-        <InputBox
-          LabelName="Email"
-          Type="email"
-          Name="email"
-          Value={formData.email}
-          Placeholder="Enter Email"
-          onChange={handleChange}
-        />
-        <InputBox
-          LabelName="Password"
-          Type="password"
-          Name="password"
-          Value={formData.password}
-          Placeholder="Enter Password"
-          onChange={handleChange}
-        />
-        <div className="md:col-span-2">
-          <Button label={"Login"} Type={"submit"} className={"w-full"} />
+    <div className="absolute top-0 left-0 w-full h-full ">
+      <img src={BackGround} />
+      <div className="max-w-4xl mx-auto p-6 shadow-2xl rounded-lg absolute top-0 left-0 right-0 bottom-0 m-auto h-fit backdrop-blur-sm">
+        <div className="flex justify-center items-center w-full ">
+          <img src={LOGO} className="w-20" />
         </div>
-      </form>
+        <h1 className="text-2xl font-bold mb-6 text-center">
+          Welcome, Login yourself as Rider's Kart E-com Admin
+        </h1>
+
+        {error && <div className="text-red-500 mb-4">{error}</div>}
+        {success && <div className="text-green-500 mb-4">{success}</div>}
+
+        <form
+          ref={formRef}
+          onSubmit={handleSubmit}
+          className="grid grid-cols-1 md:grid-cols-2 gap-6"
+        >
+          <InputBox
+            classNameLabel="text-black"
+            LabelName="Email"
+            Type="email"
+            Name="email"
+            Value={formData.email}
+            Placeholder="Enter Email"
+            onChange={handleChange}
+          />
+          <InputBox
+            classNameLabel="text-black"
+            LabelName="Password"
+            Type="password"
+            Name="password"
+            Value={formData.password}
+            Placeholder="Enter Password"
+            onChange={handleChange}
+          />
+          <div className="md:col-span-2">
+            <Button label={"Login"} Type={"submit"} className={"w-full"} />
+          </div>
+        </form>
+      </div>
     </div>
   );
 };

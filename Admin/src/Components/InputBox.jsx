@@ -4,6 +4,7 @@ const InputBox = ({
   LabelName,
   Placeholder,
   className = "",
+  classNameLabel = "",
   Type = "text",
   Name,
   Value,
@@ -18,7 +19,7 @@ const InputBox = ({
       <div className="py-4 w-full">
         <label
           htmlFor={Name}
-          className="block text-sm font-medium text-gray-700 mb-2"
+          className={`block text-sm font-medium text-gray-700 mb-2 ${classNameLabel}`}
         >
           {LabelName}
         </label>

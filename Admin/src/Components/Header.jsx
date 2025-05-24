@@ -4,6 +4,7 @@ import { Link, Navigate, useNavigate } from "react-router";
 import Button from "./Button";
 import { useDispatch, useSelector } from "react-redux";
 import { clearUser } from "../Utility/Slice/UserInfoSlice";
+import LOGO from "../assets/Logo.png";
 
 const Header = () => {
   const user = useSelector((store) => store.UserInfo.user);
@@ -27,11 +28,7 @@ const Header = () => {
       {/* Logo */}
       <div className="flex items-center">
         <Link to={"/home"}>
-          <img
-            src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Flipkart_logo.png/800px-Flipkart_logo.png"
-            alt="Logo"
-            className="h-8"
-          />
+          <img src={LOGO} alt="Logo" className="w-20" />
         </Link>
       </div>
       <div className="flex items-center gap-5 px-4 py-5">
@@ -44,7 +41,7 @@ const Header = () => {
                   <span>
                     <User2 />
                   </span>
-                  {user?.[0]?.name} 
+                  {user?.[0]?.name}
                 </h1>
               }
               // onClick={NavigateToProfile}
