@@ -7,6 +7,10 @@
 
 /* Define your custom styles here */
 @layer components {
+  .small-footer-text {
+    @apply text-sm my-2 w-fit text-gray-300 hover:scale-105 hover:underline transition duration-150 ease-in-out cursor-pointer;
+  }
+
   .headerBg {
     @apply bg-[#2974F0];
   }

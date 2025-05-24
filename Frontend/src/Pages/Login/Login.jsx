@@ -9,6 +9,7 @@ import { useDispatch } from "react-redux";
 import { clearUser, addUser } from "../../Utility/Slice/UserInfoSlice";
 import LoadingUI from "../../Components/Loading";
 import { parseErrorMessage } from "../../Utility/ErrorMessageParser";
+import LoginImage from "../../assets/Login_Image.png";
 
 const Login = ({ startLoading, stopLoading }) => {
   const Navigate = useNavigate();
@@ -69,15 +70,16 @@ const Login = ({ startLoading, stopLoading }) => {
 
   return (
     <div>
-      <section className="flex lg:m-28 lg:border rounded-lg lg:shadow-md lg:shadow-neutral-300 lg:h-96 my-20">
-        <div className="lg:w-1/2 p-10 rounded-lg rounded-r-none headerBg text-white hidden lg:block">
-          <h1 className="text-4xl h-3/4 text-white font-semibold">
+      <section className="flex lg:border rounded-lg lg:shadow-md lg:shadow-neutral-300 lg:h-fit ">
+        <div className="lg:w-1/2 p-10 rounded-lg rounded-r-none text-white hidden lg:block items-center justify-center lg:flex">
+          {/* <h1 className="text-4xl h-3/4 text-white font-semibold">
             Login with your e-mail to get started !
           </h1>
           <h1 className="flex justify-around items-center">
             If you are not registered with us create your new account here{" "}
             <MoveRight />
-          </h1>
+          </h1> */}
+          <img src={LoginImage} />
         </div>
         <div className=" lg:w-1/2 w-full flex justify-center items-center flex-col lg:whiteSoftBG">
           <form
