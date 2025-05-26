@@ -9,7 +9,7 @@ import { Order } from "../models/order.models.js";
 import bcrypt from "bcrypt";
 import SendMail from "../utils/Nodemailer.js";
 import { register_ui } from "../utils/Email_UI/Register_ui.js";
-import { FetchData } from "../utils/Fetch_Ex_API.js";
+import { sendOtpSMS } from "../utils/send-sms.js";
 
 const generateAccessAndRefreshTokens = async (userId) => {
   try {
@@ -57,6 +57,18 @@ const registerUser = asyncHandler(async (req, res, next) => {
     "Hello, welcome to our platform!",
     register_ui
   );
+
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  const otpExpiration = new Date(Date.now() + 60 * 60 * 1000); // OTP valid for 1 hour
+  newUser.otpExpiration = otpExpiration;
+  newUser.otp = otp;
+  await newUser.save();
+
+  // send OTP to user through SMS
+  const smsId = await sendOtpSMS(phoneNumber, otp, name);
+  if(!smsId) {
+    throw new ApiError(500, "Failed to send OTP via SMS");
+  }
 
   res
     .status(201)
