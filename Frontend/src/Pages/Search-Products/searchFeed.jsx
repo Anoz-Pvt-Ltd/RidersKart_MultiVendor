@@ -7,7 +7,7 @@ import { FetchData } from "../../Utility/FetchFromApi";
 export default function SearchPage() {
   const searchInput = useParams().searchData;
 
-  console.log(searchInput);
+  console.log("searchInput", searchInput);
 
   const [searchedResponse, setSearchedResponse] = useState(null);
 
@@ -20,7 +20,7 @@ export default function SearchPage() {
         console.log(response);
         setSearchedResponse(response.data);
       } catch (error) {
-        console.error(error);
+        console.error("Error fetching search results:", error);
       }
     };
 
@@ -96,7 +96,7 @@ export default function SearchPage() {
     <div className='max-w-6xl mx-auto px-4 py-4'>
       {/* Search Results */}
       <h1 className='text-xl font-medium mb-4'>
-        Showing {searchedResponse.totalResults?? 0} results for "{searchInput}"
+        Showing {searchedResponse?.totalResults ?? 0} results for "{searchInput}"
       </h1>
 
       {/* Sort Options */}
