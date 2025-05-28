@@ -146,6 +146,7 @@ const Categories = ({ startLoading, stopLoading }) => {
 
       <div className="py-2">
         <Button
+          className="z-0"
           label={"Request to add for new category"}
           onClick={() =>
             setHandlePopup((prev) => {

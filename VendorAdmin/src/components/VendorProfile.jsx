@@ -58,7 +58,7 @@ const VendorProfile = () => {
       {/* Profile Header */}
       <div className="flex gap-4 justify-evenly items-center border-b-2 pb-5 lg:hidden">
         <Button label="Home" onClick={handleHome} />
-        <Button label="Edit Profile" />
+        {/* <Button label="Edit Profile" /> */}
       </div>
       <motion.div
         className="flex items-center justify-between border-b pb-4 mb-6"
@@ -82,7 +82,7 @@ const VendorProfile = () => {
         </div>
         <div className="lg:flex gap-4 hidden ">
           <Button label="Home" onClick={handleHome} />
-          <Button label="Edit Profile" onClick={handleHome} />
+          {/* <Button label="Edit Profile" onClick={handleHome} /> */}
         </div>
       </motion.div>
 
