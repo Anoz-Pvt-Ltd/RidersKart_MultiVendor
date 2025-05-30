@@ -131,21 +131,21 @@ const Policies = ({ startLoading, stopLoading }) => {
         </thead>
         <tbody>
           {policies?.length > 0 ? (
-            policies?.map((policie) => (
-              <tr key={policie._id}>
+            policies?.map((policy) => (
+              <tr key={policy._id}>
                 <td className="border border-gray-500 px-4 py-2">
                   <span className="hover:text-blue-500 underline-blue-500 hover:underline cursor-pointer">
-                    {policie._id}
+                    {policy._id}
                   </span>
                 </td>
                 <td className="border border-gray-500 px-4 py-2">
-                  {policie?.title}
+                  {policy?.title}
                 </td>
                 <td className="border border-gray-500 px-4 py-2">
-                  {policie.expiryDate}
+                  {policy.expiryDate}
                 </td>
                 <td className="border border-gray-500 px-4 py-2">
-                  {policie.createdAt}
+                  {policy.createdAt}
                 </td>
               </tr>
             ))
