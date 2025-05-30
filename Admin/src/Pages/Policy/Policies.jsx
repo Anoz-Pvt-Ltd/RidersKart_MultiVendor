@@ -161,7 +161,7 @@ const Policies = ({ startLoading, stopLoading }) => {
       </table>
 
       {modalOpen1 && (
-        <div className="fixed top-0 left-0 w-full h-full ">
+        <div className="fixed top-0 left-0 w-full h-full z-50">
           <div className="bg-white p-6 rounded-lg shadow-md max-h-screen overflow-y-auto">
             <h2 className="text-2xl font-bold mb-6 text-black">
               Create New Product Policy
