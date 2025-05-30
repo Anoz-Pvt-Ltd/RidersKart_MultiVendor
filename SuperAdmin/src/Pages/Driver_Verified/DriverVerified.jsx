@@ -1,16 +1,19 @@
 import React from "react";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { FetchData } from "../../Utility/FetchFromApi";
 import { Link } from "react-router-dom";
 import InputBox from "../../Components/InputBox";
 import Button from "../../Components/Button";
-import { useRef } from "react";
+// import { useRef } from "react";
 import LoadingUI from "../../Components/Loading";
-import SelectBox from "../../Components/SelectionBox";
+import { X } from "lucide-react";
+import RegisterDriver from "./DriverRegister";
+import { FetchData } from "../../Utility/FetchFromApi";
 
 const DriversVerified = ({ startLoading, stopLoading }) => {
   const user = useSelector((store) => store.UserInfo.user);
+  const [isOpen, setIsOpen] = useState(false);
+  const [error, setError] = useState("");
 
   const [allDrivers, setAllDrivers] = useState([]);
   const tableHeadersDrivers = [
@@ -77,6 +80,20 @@ const DriversVerified = ({ startLoading, stopLoading }) => {
           onChange={handleSearchDrivers}
           Placeholder={"Search by Driver name"}
         />
+        <Button
+          label={"Add new delivery partner"}
+          onClick={() => setIsOpen(true)}
+        />
+        {isOpen && (
+          <div className="flex justify-centre items-start absolute top-0 left-0 h-screen w-full bg-black/70 backdrop-blur-sm overflow-scroll">
+            <Button
+              label={<X />}
+              onClick={() => setIsOpen(false)}
+              className={"fixed top-0 left-0"}
+            />
+            <RegisterDriver />
+          </div>
+        )}
 
         <table className="min-w-full border-collapse border border-gray-300 rounded-xl">
           <thead>

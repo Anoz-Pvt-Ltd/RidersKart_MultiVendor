@@ -10,6 +10,10 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
   const user = useSelector((store) => store.UserInfo.user);
   const [error, setError] = useState("");
   const [currentProduct, setCurrentProduct] = useState([]);
+  const [currentBrand, setCurrentBrand] = useState([]);
+  const [currentSubCategory, setCurrentSubCategory] = useState([]);
+  const [currentCategory, setCurrentCategory] = useState([]);
+  const [currentVendor, setCurrentVendor] = useState([]);
   const navigate = useNavigate();
   const handleHome = () => {
     navigate("/home");
@@ -26,6 +30,10 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
           console.log(response);
           if (response.data.success) {
             setCurrentProduct(response.data.data);
+            setCurrentBrand(response.data.data.brand);
+            setCurrentSubCategory(response.data.data.subcategory);
+            setCurrentVendor(response.data.data.vendor);
+            setCurrentCategory(response.data.data.category);
           } else {
             setError("Failed to load orders.");
           }
@@ -91,15 +99,64 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
           </h1>
           {[
             { label: "Name", value: currentProduct?.name },
+            {
+              label: " Product Image",
+              value: (
+                <div className="w-full flex justify-end items-center">
+                  <img
+                    src={currentProduct?.images[0]?.url}
+                    alt="no image found"
+                    className="w-20 h-20 "
+                  />
+                </div>
+              ),
+            },
+            { label: "Brand", value: currentBrand?.title },
+            {
+              label: "Brand Logo",
+              value: (
+                <div className="w-full flex justify-end items-center">
+                  <img src={currentBrand?.logo?.url} className="w-20 h-20 " />
+                </div>
+              ),
+            },
             { label: "Description", value: currentProduct?.description },
+            { label: "SubCategory", value: currentSubCategory?.title },
+            {
+              label: "SubCategory Image",
+              value: (
+                <div className="w-full flex justify-end items-center">
+                  <img
+                    src={currentSubCategory?.image?.url}
+                    className="w-20 h-20 "
+                  />
+                </div>
+              ),
+            },
+            { label: "SubCategory ID", value: currentSubCategory?._id },
+            { label: "Category", value: currentCategory?.title },
+
+            { label: "Category ID", value: currentCategory?._id },
             {
               label: "Price",
               value: `₹ ${currentProduct?.price?.sellingPrice}`,
             },
             { label: "Quantity", value: currentProduct?.stockQuantity },
-            { label: "Created At", value: currentProduct?.createdAt },
-            { label: "Category", value: currentProduct?.category?._id },
-            { label: "Sub-Category", value: currentProduct?.subcategory?._id },
+            { label: "SKU", value: currentProduct?.sku },
+            {
+              label: "Specifications",
+              value: currentProduct?.specifications?.details,
+            },
+            { label: "Product Created At", value: currentProduct?.createdAt },
+            { label: "Vendor Name", value: currentVendor?.name },
+            { label: "Vendor Email", value: currentVendor?.email },
+            {
+              label: "Vendor Contact Number",
+              value: currentVendor?.contactNumber,
+            },
+
+            // { label: "Category", value: currentProduct?.category?._id },
+            // { label: "Sub-Category", value: currentProduct?.subcategory?._id },
           ].map((item, index) => (
             <h2
               key={index}

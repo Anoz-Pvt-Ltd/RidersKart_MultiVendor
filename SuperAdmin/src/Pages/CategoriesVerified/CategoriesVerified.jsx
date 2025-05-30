@@ -15,7 +15,7 @@ const CategoriesVerified = ({ startLoading, stopLoading }) => {
   const VerifiedCategories = categories.filter(
     (category) => category.status.toLowerCase() === "verified"
   );
-  console.log("Categories:", categories);
+  // console.log("Categories:", categories);
   const user = useSelector((store) => store.UserInfo.user);
   const tableHeadersCategories = [
     "Category ID",
@@ -58,7 +58,7 @@ const CategoriesVerified = ({ startLoading, stopLoading }) => {
 
   useEffect(() => {
     setFilteredCategory(VerifiedCategories);
-  }, [VerifiedCategories]);
+  }, []);
 
   const submitCategory = async (e) => {
     e.preventDefault();
@@ -167,6 +167,23 @@ const CategoriesVerified = ({ startLoading, stopLoading }) => {
     }
   };
 
+  const handleDeleteCategory = async (categoryId) => {
+    try {
+      startLoading();
+      const response = await FetchData(
+        `categories/category/delete/${categoryId}`,
+        "delete",
+      );
+      console.log(response);    
+      alert("category has been deleted successfully");
+      window.location.reload()
+    } catch (err) {
+      console.log(err);
+    } finally {
+      stopLoading();
+    }
+  }
+
   return (
     <section>
       <h2 className="text-2xl font-bold mb-4">Categories</h2>
@@ -232,11 +249,7 @@ const CategoriesVerified = ({ startLoading, stopLoading }) => {
                       />
                       <Button
                         label={<Trash2 />}
-                        onClick={() =>
-                          setHandlePopup((prev) => {
-                            return { ...prev, allCategoryPopup: true };
-                          })
-                        }
+                        onClick={()=>handleDeleteCategory(category._id)}
                       />
                     </div>
                   </td>

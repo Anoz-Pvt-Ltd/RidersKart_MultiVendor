@@ -28,7 +28,35 @@ const Dashboard = ({ startLoading, stopLoading }) => {
   const [error, setError] = useState(null);
   const [allOrders, setAllOrders] = useState([]);
 
-  console.log(user?.[0]?._id);
+  const [selectedDate, setSelectedDate] = useState("");
+  const [sortedOrders, setSortedOrders] = useState([]);
+
+  useEffect(() => {
+    const today = new Date().toISOString().split("T")[0]; // Get today's date in YYYY-MM-DD
+    const todaysOrders = allOrders.filter((order) => {
+      const orderDate = new Date(order.updatedAt).toISOString().split("T")[0];
+      return orderDate === today;
+    });
+    setSortedOrders(todaysOrders);
+  }, [allOrders]);
+
+  // const handleDateChange = (e) => {
+  //   setSelectedDate(e.target.value);
+  // };
+
+  // const handleSort = () => {
+  //   if (!selectedDate) {
+  //     setSortedOrders(allOrders);
+  //     return;
+  //   }
+  //   const filtered = allOrders.filter((order) => {
+  //     const orderDate = new Date(order.updatedAt).toISOString().split("T")[0];
+  //     return orderDate === selectedDate;
+  //   });
+  //   setSortedOrders(filtered);
+  // };
+
+  // console.log(user?.[0]?._id);
 
   const [barData, setBarData] = useState({
     labels: [],
@@ -250,16 +278,104 @@ const Dashboard = ({ startLoading, stopLoading }) => {
               </div>
             </div>
 
-            <div className="flex justify-center items-center flex-col lg:flex-row gap-4">
-              <div className="bg-white shadow rounded p-4 lg:w-1/2 w-full ">
-                <h3 className="text-gray-500 mb-4">Monthly Orders</h3>
-                <Bar data={barData} />
+            <div className="flex lg:flex-row flex-col lg:gap-0 gap-5">
+              <div className="bg-white p-6 rounded-lg shadow-lg lg:w-full lg:h-[70vh] h-fit overflow-scroll">
+                <h2 className="text-2xl font-bold text-gray-700">
+                  Todays Orders
+                </h2>
+                {/* Detailed Order List */}
+                <div className="container p-4">
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full bg-white border border-gray-200 ">
+                      <thead>
+                        <tr>
+                          <th className="py-2 px-4 border-b">Order ID</th>
+                          <th className="py-2 px-4 border-b">Product Name</th>
+                          <th className="py-2 px-4 border-b">
+                            Category ID / Subcategory ID
+                          </th>
+                          <th className="py-2 px-4 border-b">Quantity</th>
+                          <th className="py-2 px-4 border-b">MRP</th>
+                          <th className="py-2 px-4 border-b">Sold at</th>
+                          <th className="py-2 px-4 border-b">Order Status</th>
+                          <th className="py-2 px-4 border-b">Payment Status</th>
+                          <th className="py-2 px-4 border-b">Placed At</th>
+                          {/* <th className="py-2 px-4 border-b">Actions</th> */}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {sortedOrders.length > 0 ? (
+                          sortedOrders.map((order) => (
+                            <tr key={order._id} className="hover:bg-gray-100">
+                              <td className="py-2 px-4 border-b">
+                                {order._id}
+                              </td>
+                              <td className="py-2 px-4 border-b">
+                                {order.products[0]?.product.name || "N/A"}
+                              </td>
+                              <td className="py-2 px-4 border-b truncate">
+                                Category ID:{" "}
+                                <span className="text-xs">
+                                  {order.products[0]?.product.category || "N/A"}
+                                </span>{" "}
+                                <br />
+                                Subcategory ID:
+                                <span className="text-xs">
+                                  {order.products[0]?.product.subcategory ||
+                                    "N/A"}
+                                </span>
+                              </td>
+                              <td className="py-2 px-4 border-b">
+                                {order.products[0]?.quantity}
+                              </td>
+                              <td className="py-2 px-4 border-b">
+                                {order.products[0]?.price?.MRP}
+                              </td>
+                              <td className="py-2 px-4 border-b">
+                                {order.products[0]?.price?.sellingPrice}
+                              </td>
+                              <td className="py-2 px-4 border-b">
+                                {order.orderStatus}
+                              </td>
+                              <td className="py-2 px-4 border-b">
+                                {order.paymentStatus}
+                              </td>
+
+                              <td className="py-2 px-4 border-b">
+                                {new Date(order.updatedAt).toLocaleDateString()}
+                                {/* {order.updatedAt} */}
+                              </td>
+                              {/* <td className="py-2 px-4 border-b">
+                              <button className="bg-blue-500 text-white py-1 px-3 rounded hover:bg-blue-600">
+                                View
+                              </button>
+                            </td> */}
+                            </tr>
+                          ))
+                        ) : (
+                          <tr>
+                            <td colSpan="11" className="py-2 px-4 text-center">
+                              No orders found.
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
               </div>
-              <div className="bg-white shadow rounded p-4 lg:w-1/2 w-full ">
-                <h3 className="text-gray-500 mb-4">
-                  Category Wise Product's Count
-                </h3>
-                <Pie data={pieData} />
+
+              <div className="flex justify-center flex-col items-center gap-4 lg:w-3/4 w-full">
+                <div className="bg-white shadow rounded p-4 lg:w-3/4 w-full">
+                  <h3 className="text-gray-500">Monthly Orders</h3>
+                  <Bar data={barData} />
+                </div>
+                <div className="bg-white shadow rounded p-4 lg:w-3/4 w-full">
+                  <h3 className="text-gray-500">
+                    Category Wise Product's Count
+                  </h3>
+                  <Pie data={pieData} />
+                </div>
               </div>
             </div>
           </div>
@@ -283,7 +399,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
       },
     };
     return (
-      <div className="  w-full lg:hidden bg-purple-600 flex justify-start py-5 ">
+      <div className="  w-full lg:hidden bg-purple-600 flex justify-start py-5 z-50">
         <div className="flex justify-start items-center w-full gap-10">
           <button
             className={`ml-5 border rounded-lg p-1 text-white`}
@@ -302,7 +418,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
             initial="hidden"
             animate="visible"
             exit="exit"
-            className="dashboard w-full h-screen bg-gray-800 text-white flex flex-col absolute top-0 "
+            className="dashboard w-full h-screen bg-gray-800 text-white flex flex-col absolute top-0 z-50"
           >
             <div className="p-4 text-2xl font-bold bg-purple-600 flex justify-between items-center">
               <h1>Dashboard</h1>

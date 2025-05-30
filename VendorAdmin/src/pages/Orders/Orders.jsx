@@ -112,7 +112,7 @@ const Orders = ({ startLoading, stopLoading }) => {
                 <th className="py-2 px-4 border-b">Order Status</th>
                 <th className="py-2 px-4 border-b">Payment Status</th>
                 <th className="py-2 px-4 border-b">Placed At</th>
-                <th className="py-2 px-4 border-b">Actions</th>
+                {/* <th className="py-2 px-4 border-b">Actions</th> */}
               </tr>
             </thead>
             <tbody>
@@ -152,11 +152,11 @@ const Orders = ({ startLoading, stopLoading }) => {
                       {new Date(order.updatedAt).toLocaleDateString()}
                       {/* {order.updatedAt} */}
                     </td>
-                    <td className="py-2 px-4 border-b">
+                    {/* <td className="py-2 px-4 border-b">
                       <button className="bg-blue-500 text-white py-1 px-3 rounded hover:bg-blue-600">
                         View
                       </button>
-                    </td>
+                    </td> */}
                   </tr>
                 ))
               ) : (

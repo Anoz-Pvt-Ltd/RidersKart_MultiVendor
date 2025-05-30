@@ -81,7 +81,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
         <div>
           {" "}
           <motion.aside
-            className="w-64 text-black p-4 shadow-lg fixed overscroll-auto top-0 h-screen bg-white overflow-scroll no-scrollbar"
+            className="w-64 text-black p-4 shadow-lg fixed overscroll-auto top-0 h-screen bg-black/50 overflow-scroll no-scrollbar"
             initial="hidden"
             animate="visible"
             variants={sidebarVariants}
@@ -91,7 +91,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
                 <li
                   className={`p-4 rounded-md mb-2 cursor-pointer transition-all duration-300 ${
                     activeSection === "Users"
-                      ? "bg-blue-600 text-white"
+                      ? "bg-[#DF3F33] text-white"
                       : "bg-gray-300 text-black"
                   }`}
                   onClick={() => setActiveSection("Users")}
@@ -112,7 +112,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
                       <li
                         className={`p-3 rounded-md cursor-pointer mb-2 transition-all ${
                           activeSection === "Vendors (Under review)"
-                            ? "bg-blue-600 text-white"
+                            ? "bg-[#DF3F33] text-white"
                             : "bg-gray-200 text-black"
                         }`}
                         onClick={() =>
@@ -124,7 +124,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
                       <li
                         className={`p-3 rounded-md cursor-pointer transition-all mb-2 ${
                           activeSection === "Vendors (Verified)"
-                            ? "bg-blue-600 text-white"
+                            ? "bg-[#DF3F33] text-white"
                             : "bg-gray-200 text-black"
                         }`}
                         onClick={() => setActiveSection("Vendors (Verified)")}
@@ -134,7 +134,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
                       <li
                         className={`p-3 rounded-md cursor-pointer transition-all ${
                           activeSection === "Vendors Orders"
-                            ? "bg-blue-600 text-white"
+                            ? "bg-[#DF3F33] text-white"
                             : "bg-gray-200 text-black"
                         }`}
                         onClick={() => setActiveSection("Vendors Orders")}
@@ -158,7 +158,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
                       <li
                         className={`p-3 rounded-md cursor-pointer mb-2 transition-all ${
                           activeSection === "Brands (Under review)"
-                            ? "bg-blue-600 text-white"
+                            ? "bg-[#DF3F33] text-white"
                             : "bg-gray-200 text-black"
                         }`}
                         onClick={() =>
@@ -170,7 +170,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
                       <li
                         className={`p-3 rounded-md cursor-pointer transition-all ${
                           activeSection === "Brands (Verified)"
-                            ? "bg-blue-600 text-white"
+                            ? "bg-[#DF3F33] text-white"
                             : "bg-gray-200 text-black"
                         }`}
                         onClick={() => setActiveSection("Brands (Verified)")}
@@ -192,7 +192,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
                       <li
                         className={`p-3 rounded-md cursor-pointer mb-2 transition-all ${
                           activeSection === "Categories (Under review)"
-                            ? "bg-blue-600 text-white"
+                            ? "bg-[#DF3F33] text-white"
                             : "bg-gray-200 text-black"
                         }`}
                         onClick={() =>
@@ -204,10 +204,12 @@ const Dashboard = ({ startLoading, stopLoading }) => {
                       <li
                         className={`p-3 rounded-md cursor-pointer transition-all ${
                           activeSection === "Categories (Verified)"
-                            ? "bg-blue-600 text-white"
+                            ? "bg-[#DF3F33] text-white"
                             : "bg-gray-200 text-black"
                         }`}
-                        onClick={() => setActiveSection("Categories (Verified)")}
+                        onClick={() =>
+                          setActiveSection("Categories (Verified)")
+                        }
                       >
                         Verified
                       </li>
@@ -219,7 +221,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
                 <li
                   className={`p-4 rounded-md mb-2 cursor-pointer transition-all duration-300 ${
                     activeSection === "Products"
-                      ? "bg-blue-600 text-white"
+                      ? "bg-[#DF3F33] text-white"
                       : "bg-gray-300 text-black"
                   }`}
                   onClick={() => setActiveSection("Products")}
@@ -229,7 +231,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
                 <li
                   className={`p-4 rounded-md mb-2 cursor-pointer transition-all duration-300 ${
                     activeSection === "Orders"
-                      ? "bg-blue-600 text-white"
+                      ? "bg-[#DF3F33] text-white"
                       : "bg-gray-300 text-black"
                   }`}
                   onClick={() => setActiveSection("Orders")}
@@ -248,7 +250,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
                       <li
                         className={`p-3 rounded-md cursor-pointer mb-2 transition-all ${
                           activeSection === "Transactions (Online payment)"
-                            ? "bg-blue-600 text-white"
+                            ? "bg-[#DF3F33] text-white"
                             : "bg-gray-200 text-black"
                         }`}
                         onClick={() =>
@@ -261,7 +263,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
                       <li
                         className={`p-3 rounded-md cursor-pointer mb-2 transition-all ${
                           activeSection === "Transactions (Cash on delivery)"
-                            ? "bg-blue-600 text-white"
+                            ? "bg-[#DF3F33] text-white"
                             : "bg-gray-200 text-black"
                         }`}
                         onClick={() =>
@@ -286,7 +288,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
                       <li
                         className={`p-3 rounded-md cursor-pointer mb-2 transition-all ${
                           activeSection === "Drivers (Under review)"
-                            ? "bg-blue-600 text-white"
+                            ? "bg-[#DF3F33] text-white"
                             : "bg-gray-200 text-black"
                         }`}
                         onClick={() =>
@@ -299,7 +301,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
                       <li
                         className={`p-3 rounded-md cursor-pointer mb-2 transition-all ${
                           activeSection === "Drivers (Verified)"
-                            ? "bg-blue-600 text-white"
+                            ? "bg-[#DF3F33] text-white"
                             : "bg-gray-200 text-black"
                         }`}
                         onClick={() => setActiveSection("Drivers (Verified)")}
@@ -313,7 +315,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
                 <li
                   className={`p-4 rounded-md cursor-pointer transition-all duration-300 ${
                     activeSection === "Promotions"
-                      ? "bg-blue-600 text-white"
+                      ? "bg-[#DF3F33] text-white"
                       : "bg-gray-300 text-black"
                   }`}
                   onClick={() => setActiveSection("Promotions")}
@@ -341,7 +343,9 @@ const Dashboard = ({ startLoading, stopLoading }) => {
               {activeSection === "Brands (Under review)" && (
                 <BrandsUnderReview />
               )}
-              {activeSection === "Categories (Verified)" && <CategoriesVerified />}
+              {activeSection === "Categories (Verified)" && (
+                <CategoriesVerified />
+              )}
               {activeSection === "Categories (Under review)" && (
                 <CategoriesUnderReview />
               )}
