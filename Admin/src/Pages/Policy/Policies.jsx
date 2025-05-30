@@ -14,6 +14,7 @@ const Policies = ({ startLoading, stopLoading }) => {
   const [subcategories, setSubcategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState();
   const [brands, setBrands] = useState([]);
+  const [policyFor, setPolicyFor] = useState("");
   const [modalOpen1, setModalOpen1] = useState(false);
   const formRef = useRef(null);
   const tableHeaders = [
@@ -133,7 +134,6 @@ const Policies = ({ startLoading, stopLoading }) => {
             policies?.map((policie) => (
               <tr key={policie._id}>
                 <td className="border border-gray-500 px-4 py-2">
-                  {/* <Link to={`/current-policie/${policie._id}`}>{policie._id}</Link> */}
                   <span className="hover:text-blue-500 underline-blue-500 hover:underline cursor-pointer">
                     {policie._id}
                   </span>
@@ -147,7 +147,6 @@ const Policies = ({ startLoading, stopLoading }) => {
                 <td className="border border-gray-500 px-4 py-2">
                   {policie.createdAt}
                 </td>
-                
               </tr>
             ))
           ) : (
@@ -195,28 +194,26 @@ const Policies = ({ startLoading, stopLoading }) => {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="block text-sm font-medium text-black">
-                    Applies To* <span className="text-red-500">*</span>
+                  <label className="block text-sm font-medium text-black mb-1">
+                    Applies To <span className="text-red-500">*</span>
                   </label>
                   <select
                     name="policyFor"
                     required
                     className="w-full p-2 border border-gray-300 rounded-md text-black bg-white"
+                    onChange={(e) => {
+                      console.log(e.target.value);
+                      setPolicyFor(e.target.value);
+                    }}
                   >
+                    <option value="">Select an option </option>
                     <option value="all">All Products</option>
-                    <option value="product">Specific Products</option>
+                    {/* <option value="product">Specific Products</option> */}
                     <option value="category">Category</option>
+                    <option value="subcategory">Subcategory</option>
                     <option value="brand">Brand</option>
                   </select>
                 </div>
-
-                <InputBox
-                  LabelName="Version"
-                  Placeholder="e.g., 1.0"
-                  Name="version"
-                  Type="number"
-                  Value="1"
-                />
               </div>
 
               {/* ==================== POLICY CONTENT ==================== */}
@@ -252,63 +249,57 @@ const Policies = ({ startLoading, stopLoading }) => {
 
               {/* ==================== SCOPE SELECTION ==================== */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <SelectBox
-                    className2="w-full"
-                    LabelName="Main Category"
-                    Name="category"
-                    onChange={(e) => setSelectedCategory(e.target.value)}
-                    Placeholder="Select main category"
-                    Options={categories?.map((cat) => ({
-                      label: cat.title,
-                      value: cat._id, // Correctly linking ID for selection
-                    }))}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  {subcategories.length > 0 && (
+                {policyFor != "all" && (
+                  <div className="space-y-2">
                     <SelectBox
                       className2="w-full"
-                      LabelName="Subcategory"
-                      Name="subcategory"
-                      Placeholder="Select subcategory"
-                      Options={subcategories
-                        .filter(
-                          (subs) => subs.category._id === selectedCategory
-                        )
-                        .map((sub) => ({
-                          label: sub.title,
-                          value: sub._id, // Ensure unique key
-                        }))}
+                      LabelName="Main Category"
+                      Name="category"
+                      onChange={(e) => setSelectedCategory(e.target.value)}
+                      Placeholder="Select main category"
+                      Options={categories?.map((cat) => ({
+                        label: cat.title,
+                        value: cat._id, // Correctly linking ID for selection
+                      }))}
                     />
-                  )}
-                </div>
+                  </div>
+                )}
 
-                <div className="space-y-2">
-                  <SelectBox
-                    className2="w-full"
-                    LabelName="Brand"
-                    Name="brand"
-                    Placeholder="Select main category"
-                    Options={brands?.map((brand) => ({
-                      label: brand.title,
-                      value: brand._id, // Correctly linking ID for selection
-                    }))}
-                  />
-                </div>
+                {policyFor === "subcategory" && (
+                  <div className="space-y-2">
+                    {subcategories.length > 0 && (
+                      <SelectBox
+                        className2="w-full"
+                        LabelName="Subcategory"
+                        Name="subcategory"
+                        Placeholder="Select subcategory"
+                        Options={subcategories
+                          .filter(
+                            (subs) => subs.category._id === selectedCategory
+                          )
+                          .map((sub) => ({
+                            label: sub.title,
+                            value: sub._id, // Ensure unique key
+                          }))}
+                      />
+                    )}
+                  </div>
+                )}
 
-                <div className="space-y-2">
-                  {/* <label className="block text-sm font-medium text-black">
-                    Products (IDs)
-                  </label>
-                  <input
-                    type="text"
-                    name="products"
-                    placeholder="Comma-separated product IDs"
-                    className="w-full p-2 border border-gray-300 rounded-md text-black bg-white"
-                  /> */}
-                </div>
+                {policyFor === "brand" && (
+                  <div className="space-y-2">
+                    <SelectBox
+                      className2="w-full"
+                      LabelName="Brand"
+                      Name="brand"
+                      Placeholder="Select main category"
+                      Options={brands?.map((brand) => ({
+                        label: brand.title,
+                        value: brand._id, // Correctly linking ID for selection
+                      }))}
+                    />
+                  </div>
+                )}
               </div>
 
               {/* ==================== DATES & ACTIVATION ==================== */}
@@ -325,19 +316,6 @@ const Policies = ({ startLoading, stopLoading }) => {
                   Name="expiryDate"
                   Type="date"
                 />
-
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    name="isActive"
-                    id="isActive"
-                    defaultChecked
-                    className="h-4 w-4 text-black border-gray-300 rounded"
-                  />
-                  <label htmlFor="isActive" className="text-sm text-black">
-                    Active Policy
-                  </label>
-                </div>
               </div>
 
               {/* ==================== REGIONAL SETTINGS ==================== */}
@@ -378,45 +356,11 @@ const Policies = ({ startLoading, stopLoading }) => {
 
                 <InputBox
                   LabelName="Language*"
-                  Placeholder="e.g., en"
+                  Placeholder="e.g., English"
                   Name="language"
                   Value="en"
                   Required={true}
                 />
-              </div>
-
-              {/* ==================== DISPLAY SETTINGS ==================== */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    name="displayOnWebsite"
-                    id="displayOnWebsite"
-                    defaultChecked
-                    className="h-4 w-4 text-black border-gray-300 rounded"
-                  />
-                  <label
-                    htmlFor="displayOnWebsite"
-                    className="text-sm text-black"
-                  >
-                    Display on Website
-                  </label>
-                </div>
-
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    name="displayInCheckout"
-                    id="displayInCheckout"
-                    className="h-4 w-4 text-black border-gray-300 rounded"
-                  />
-                  <label
-                    htmlFor="displayInCheckout"
-                    className="text-sm text-black"
-                  >
-                    Display During Checkout
-                  </label>
-                </div>
               </div>
 
               {/* ==================== BULK APPLY TOGGLE ==================== */}
@@ -467,14 +411,10 @@ const Policies = ({ startLoading, stopLoading }) => {
                 </div>
               </div>
 
-              {/* <button
-                type="submit"
-                className="w-full bg-black text-white py-3 px-4 rounded-md hover:bg-gray-800 transition-colors font-medium"
-              >
-                Create Policy
-              </button> */}
-              <Button label={"Create Policy"} type="submit" />
-              <Button label={"Cancel"} onClick={() => setModalOpen1(false)} />
+              <div className="flex gap-5 justify-center items-center">
+                <Button label={"Create Policy"} type="submit" />
+                <Button label={"Cancel"} onClick={() => setModalOpen1(false)} />
+              </div>
             </form>
           </div>
         </div>
