@@ -76,6 +76,7 @@ import brandRouter from "./routes/brand.routes.js";
 import paymentRouter from "./routes/payment.routes.js";
 import promotionRouter from "./routes/promotion.routes.js";
 import driverRouter from "./routes/delivery-partner.routes.js";
+import productPolicyRouter from "./routes/productPolicy.route.js";
 
 //vendor routes
 app.use("/api/v1/vendor", vendorRouter);
@@ -106,5 +107,8 @@ app.use("/api/v1/promotion", promotionRouter);
 
 // driver routes
 app.use("/api/v1/driver", driverRouter);
+
+// Product Policy routes
+app.use("/api/v1/policies", productPolicyRouter);
 
 export { app };
