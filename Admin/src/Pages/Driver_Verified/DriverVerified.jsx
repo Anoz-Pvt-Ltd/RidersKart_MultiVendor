@@ -85,7 +85,7 @@ const DriversVerified = ({ startLoading, stopLoading }) => {
           onClick={() => setIsOpen(true)}
         />
         {isOpen && (
-          <div className="flex justify-centre items-start absolute top-0 left-0 h-screen w-full bg-black/70 backdrop-blur-sm overflow-scroll">
+          <div className="flex justify-centre items-start absolute top-0 left-0 h-screen w-full bg-black/70 backdrop-blur-sm overflow-scroll z-50">
             <Button
               label={<X />}
               onClick={() => setIsOpen(false)}

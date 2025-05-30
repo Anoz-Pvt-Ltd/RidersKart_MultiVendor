@@ -249,7 +249,7 @@ const CategoriesVerified = ({ startLoading, stopLoading }) => {
                       />
                       <Button
                         label={<Trash2 />}
-                        onClick={()=>handleDeleteCategory(category._id)}
+                        onClick={() => handleDeleteCategory(category._id)}
                       />
                     </div>
                   </td>
@@ -268,7 +268,7 @@ const CategoriesVerified = ({ startLoading, stopLoading }) => {
           </tbody>
         </table>
         {handlePopup.addCategoryPopup && (
-          <div className="backdrop-blur-xl absolute top-0 w-full h-full flex justify-center items-center flex-col left-0">
+          <div className="backdrop-blur-xl absolute top-0 w-full h-full flex justify-center items-center flex-col left-0 z-50">
             <div className="bg-white shadow-2xl rounded-xl w-fit h-fit px-10 py-10 flex justify-center items-center">
               <form
                 ref={categoryFormRef}

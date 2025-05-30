@@ -13,6 +13,7 @@ import {
   IndianRupee,
   MemoryStick,
   ChartColumnStacked,
+  Vote,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useSelector } from "react-redux";
@@ -38,6 +39,7 @@ import DriverVerified from "../Driver_Verified/DriverVerified";
 import DriverUnderReview from "../Driver_UnderReview/DriverUnderReview";
 import CategoriesVerified from "../CategoriesVerified/CategoriesVerified";
 import CategoriesUnderReview from "../CategoriesUnderReview/CategoriesUnderReview";
+import Policies from "../Policy/Policies";
 
 const Dashboard = ({ startLoading, stopLoading }) => {
   const user = useSelector((store) => store.UserInfo.user);
@@ -81,7 +83,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
         <div>
           {" "}
           <motion.aside
-            className="w-64 text-black p-4 shadow-lg fixed overscroll-auto top-0 h-screen bg-black/50 overflow-scroll no-scrollbar"
+            className="w-64 text-black p-4 shadow-lg fixed overscroll-auto top-0 h-screen bg-black/50 overflow-scroll no-scrollbar z-10"
             initial="hidden"
             animate="visible"
             variants={sidebarVariants}
@@ -313,7 +315,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
                   )}
                 </li>
                 <li
-                  className={`p-4 rounded-md cursor-pointer transition-all duration-300 ${
+                  className={`p-4 rounded-md cursor-pointer transition-all duration-300 mb-2 ${
                     activeSection === "Promotions"
                       ? "bg-[#DF3F33] text-white"
                       : "bg-gray-300 text-black"
@@ -321,6 +323,16 @@ const Dashboard = ({ startLoading, stopLoading }) => {
                   onClick={() => setActiveSection("Promotions")}
                 >
                   {<Heart />}Promotions
+                </li>
+                <li
+                  className={`p-4 rounded-md cursor-pointer transition-all duration-300 ${
+                    activeSection === "Policies"
+                      ? "bg-[#DF3F33] text-white"
+                      : "bg-gray-300 text-black"
+                  }`}
+                  onClick={() => setActiveSection("Policies")}
+                >
+                  {<Vote />}Policies
                 </li>
               </ul>
             </nav>
@@ -361,6 +373,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
               )}
               {activeSection === "Drivers (Verified)" && <DriverVerified />}
               {activeSection === "Promotions" && <Promotion />}
+              {activeSection === "Policies" && <Policies />}
             </motion.div>
           </main>
         </div>

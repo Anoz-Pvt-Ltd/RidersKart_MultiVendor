@@ -144,7 +144,6 @@ const BrandsVerified = ({ startLoading, stopLoading }) => {
                   </td>
                   <td className="border border-gray-500 px-4 py-2 h-10 w-10">
                     <img src={brand.logo.url} />
-                    
                   </td>
                   <td className="border border-gray-500 px-4 py-2">
                     {brand?.title}
@@ -174,7 +173,7 @@ const BrandsVerified = ({ startLoading, stopLoading }) => {
         </table>
       </div>
       {showPopup && (
-        <div className="absolute top-0 left-0 backdrop-blur-xl w-screen h-screen flex justify-center items-center ">
+        <div className="absolute top-0 left-0 backdrop-blur-xl w-screen h-screen flex justify-center items-center z-50">
           <div className="top-16 left-16 w-4/5 max-w-md bg-white shadow-md rounded-md p-4">
             <h2 className="text-xl font-bold mb-4">Add new Brand</h2>
             <form ref={formRef} onSubmit={addBrand}>
