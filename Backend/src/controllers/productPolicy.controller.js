@@ -137,6 +137,63 @@ const getProductPolicyById = asyncHandler(async (req, res) => {
 });
 
 /**
+ * @desc    Get policies for a specific category, subcategory, or brand
+ * @route   GET /api/v1/policies/:id
+ * @access  Public (or Private if needed)
+ */
+const getPoliciesByCategorySubcategoryBrand = asyncHandler(async (req, res) => {
+  const { categoryId, subcategoryId, brandId } = req.query;
+
+  if (!categoryId && !subcategoryId && !brandId) {
+    throw new ApiError(
+      400,
+      "At least one filter (category, subcategory, brand) is required"
+    );
+  }
+
+  // Build the query dynamically
+  const query = {};
+
+  if (categoryId) {
+    query.$or = [{ category: categoryId }, { appliesToAllCategories: true }];
+  }
+
+  if (subcategoryId) {
+    query.$or = [
+      ...(query.$or || []),
+      { subcategory: subcategoryId },
+      { appliesToAllSubcategory: true },
+    ];
+  }
+  if (brandId) {
+    query.$or = [
+      ...(query.$or || []),
+      { brand: brandId },
+      { appliesToAllBrands: true },
+    ];
+  }
+
+  // const policies = await ProductPolicy.find({
+  //   ...(categoryId && { category: categoryId }),
+  //   ...(subcategoryId && { subcategory: subcategoryId }),
+  //   ...(brandId && { brand: brandId }),
+  // }).populate(["createdBy", "updatedBy"]);
+
+  const policies = await ProductPolicy.find(query)
+    .populate("category", "name")
+    .populate("brand", "name")
+    .lean();
+
+  if (policies.length === 0) {
+    throw new ApiError(404, "No policies found for the given filters");
+  }
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, policies, "Policies fetched successfully"));
+});
+
+/**
  * @desc    Update a product policy
  * @route   PUT /api/v1/policies/:id
  * @access  Private (Admin/SuperAdmin)
@@ -206,11 +263,11 @@ const deleteProductPolicy = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, null, "Policy deleted successfully"));
 });
 
-
 export {
   createProductPolicy,
   getAllProductPolicies,
   getProductPolicyById,
+  getPoliciesByCategorySubcategoryBrand,
   updateProductPolicy,
   deleteProductPolicy,
 };

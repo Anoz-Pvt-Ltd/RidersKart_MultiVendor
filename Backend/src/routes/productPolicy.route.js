@@ -3,9 +3,10 @@ import {
   createProductPolicy,
   deleteProductPolicy,
   getAllProductPolicies,
+  getPoliciesByCategorySubcategoryBrand,
   getProductPolicyById,
   updateProductPolicy,
-} from "../controllers/productPolicy.controller";
+} from "../controllers/productPolicy.controller.js";
 import {
   VerifyAdminUser,
   VerifyVendorUser,
@@ -23,5 +24,7 @@ router
   .get(getProductPolicyById)
   .patch(VerifyAdminUser, updateProductPolicy)
   .delete(VerifyAdminUser, deleteProductPolicy);
+
+router.route("/policy-by-category").get(getPoliciesByCategorySubcategoryBrand);
 
 export default router;

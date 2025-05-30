@@ -31,9 +31,10 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
   const [isLiked, setIsLiked] = useState(false);
   const [imgPopup, setImgPopup] = useState(false);
   const [currentImg, setCurrentImg] = useState(0);
-  const [products, setProducts] = useState();
+  const [products, setProducts] = useState(null);
   const [AllProducts, setAllProducts] = useState();
   const [specifications, setSpecifications] = useState("");
+  const [productPolicy, setProductPolicy] = useState([]);
 
   const productRef = useRef(null);
   // console.log(user[0]?._id);
@@ -91,6 +92,29 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
 
     getCurrentProduct(productId);
   }, [productId]);
+
+  useEffect(() => {
+    if (!products) return;
+
+    async function fetchProductPolicy() {
+      try {
+        startLoading();
+        const response = await FetchData(`policies/policy-by-category`, "get", {
+          category: products.category._id,
+          subcategoryId: products.subcategory._id,
+          brandId: products.brand._id,
+        });
+        console.log(response);
+        setProductPolicy(response.data.data);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        stopLoading();
+      }
+    }
+
+    fetchProductPolicy();
+  }, [products]);
 
   // Fetching all products
   useEffect(() => {
@@ -210,9 +234,7 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
               />
               <div className='absolute top-0 right-0'>
                 <Button
-                  label={
-                    <Heart className=' overflow-hidden' />
-                  }
+                  label={<Heart className=' overflow-hidden' />}
                   className={`hover:bg-white hover:text-red-500 rounded-full`}
                   onClick={addProductToWishlist}
                 />
@@ -336,6 +358,14 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
                   </button>
                 )}
               </span>
+            </div>
+            <div>
+              <h1 className='font-semibold'>Product Policies</h1>
+              <ul>
+                {productPolicy.map((policy, index) => {
+                  return <li key={index}>{policy.title}</li>;
+                })}
+              </ul>
             </div>
           </div>
         </div>
