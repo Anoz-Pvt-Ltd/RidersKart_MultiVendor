@@ -19,8 +19,16 @@ const Home = ({ startLoading, stopLoading }) => {
   const [categories, setCategories] = useState([]);
   const [subcategories, setSubcategories] = useState([]);
   const { promotions, status } = useSelector((store) => store.PromotionList);
+  const user = useSelector((store) => store.UserInfo.user);
+  const [userCity, setUserCity] = useState(null);
 
-  // console.log(promotions, status);
+  useEffect(() => {
+    if (user && user[0]?.address) {
+      setUserCity(user[0]?.address[0]?.city);
+    }
+  }, [user]);
+
+  console.log(userCity);
 
   const arrayOfGridItems = [];
 
@@ -28,7 +36,11 @@ const Home = ({ startLoading, stopLoading }) => {
     const fetchProducts = async () => {
       try {
         startLoading();
-        const response = await FetchData("products/get-all-products", "get");
+        const response = await FetchData(
+          "products/get-all-products",
+          "get",
+          userCity
+        );
         // console.log(response);
         setProducts(response.data.data.products);
       } catch (err) {
