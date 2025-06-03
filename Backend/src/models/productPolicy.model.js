@@ -31,7 +31,7 @@ const productPolicySchema = new Schema(
 
     policyFor: {
       type: String,
-      enum: ["product", "category", "brand", "all"],
+      enum: ["product", "category", "subcategory", "brand", "all"],
       default: "all",
       required: true,
     },
@@ -40,7 +40,6 @@ const productPolicySchema = new Schema(
       {
         type: Schema.Types.ObjectId,
         ref: "Category",
-        required: true,
       },
     ],
     subcategory: [

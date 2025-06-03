@@ -12,6 +12,7 @@ import LoadingUI from "../../Components/Loading";
 import PopUp from "../../Components/PopUpWrapper";
 import { addCart } from "../../Utility/Slice/CartSlice";
 import { parseErrorMessage } from "../../Utility/ErrorMessageParser";
+import Policies from "./policies";
 
 const CurrentProduct = ({ startLoading, stopLoading }) => {
   const [isReadMoreDescription, setIsReadMoreDescription] = useState(false);
@@ -93,6 +94,7 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
     getCurrentProduct(productId);
   }, [productId]);
 
+  // Fetching policies for this product.
   useEffect(() => {
     if (!products) return;
 
@@ -100,11 +102,12 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
       try {
         startLoading();
         const response = await FetchData(`policies/policy-by-category`, "get", {
-          category: products.category._id,
+          categoryId: products.category._id,
           subcategoryId: products.subcategory._id,
           brandId: products.brand._id,
+          productId,
         });
-        console.log(response);
+        console.log(response.data.data);
         setProductPolicy(response.data.data);
       } catch (err) {
         console.error(err);
@@ -360,11 +363,11 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
               </span>
             </div>
             <div>
-              <h1 className='font-semibold'>Product Policies</h1>
+              {/* <h1 className='font-semibold'>Product Policies</h1> */}
               <ul>
-                {productPolicy.map((policy, index) => {
-                  return <li key={index}>{policy.title}</li>;
-                })}
+                <Policies
+                  categorizedPolicies={productPolicy.categorizedPolicies}
+                />
               </ul>
             </div>
           </div>

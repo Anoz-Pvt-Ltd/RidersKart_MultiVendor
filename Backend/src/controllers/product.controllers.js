@@ -166,7 +166,40 @@ const getAllProductForAdmin = asyncHandler(async (req, res) => {
 
 const getAllProducts = asyncHandler(async (req, res) => {
   try {
-    const { category, subcategory, vendor, page = 1, limit = 10 } = req.query;
+    const {
+      category,
+      subcategory,
+      vendor,
+      page = 1,
+      limit = 10,
+      userCity,
+    } = req.query;
+
+    if (userCity) {
+      const vendorsInCity = await VendorUser.find({
+        "location.city": userCity,
+      }).populate("products");
+      if (vendorsInCity || vendorsInCity.length > 0) {
+        const productsInCity = vendorsInCity.reduce((acc, vendor) => {
+          if (vendor.products && vendor.products.length > 0) {
+            acc.push(...vendor.products);
+          }
+          return acc;
+        }, []);
+        return res.status(200).json(
+          new ApiResponse(
+            200,
+            {
+              total: productsInCity.length,
+              page: 1,
+              limit: productsInCity.length,
+              products: productsInCity,
+            },
+            `Products fetched successfully for ${userCity}`
+          )
+        );
+      }
+    }
 
     const filter = {};
     if (category) filter.category = category;

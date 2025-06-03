@@ -3,7 +3,7 @@ import {
   createProductPolicy,
   deleteProductPolicy,
   getAllProductPolicies,
-  getPoliciesByCategorySubcategoryBrand,
+  getApplicablePolicies,
   getProductPolicyById,
   updateProductPolicy,
 } from "../controllers/productPolicy.controller.js";
@@ -25,6 +25,6 @@ router
   .patch(VerifyAdminUser, updateProductPolicy)
   .delete(VerifyAdminUser, deleteProductPolicy);
 
-router.route("/policy-by-category").get(getPoliciesByCategorySubcategoryBrand);
+router.route("/policy-by-category").get(getApplicablePolicies);
 
 export default router;

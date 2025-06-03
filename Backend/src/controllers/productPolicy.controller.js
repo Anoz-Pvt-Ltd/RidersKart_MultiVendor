@@ -2,6 +2,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { ProductPolicy } from "../models/productPolicy.model.js";
+import mongoose from "mongoose";
 
 /**
  * @desc    Create a new product policy
@@ -137,60 +138,81 @@ const getProductPolicyById = asyncHandler(async (req, res) => {
 });
 
 /**
- * @desc    Get policies for a specific category, subcategory, or brand
- * @route   GET /api/v1/policies/:id
- * @access  Public (or Private if needed)
+ * @desc    Get policies applicable to a specific product, category, subcategory, or brand
+ * @route   GET /api/v1/policies/applicable
+ * @access  Public
+ * @query   {productId?, categoryId?, subcategoryId?, brandId?}
  */
-const getPoliciesByCategorySubcategoryBrand = asyncHandler(async (req, res) => {
-  const { categoryId, subcategoryId, brandId } = req.query;
+const getApplicablePolicies = asyncHandler(async (req, res) => {
+  const { productId, categoryId, subcategoryId, brandId } = req.query;
 
-  if (!categoryId && !subcategoryId && !brandId) {
-    throw new ApiError(
-      400,
-      "At least one filter (category, subcategory, brand) is required"
-    );
+  if (!productId && !categoryId && !subcategoryId && !brandId) {
+    throw new ApiError(400, "At least one entity ID is required");
   }
 
-  // Build the query dynamically
-  const query = {};
+  const idsToCheck = [productId, categoryId, subcategoryId, brandId].filter(
+    Boolean
+  );
 
-  if (categoryId) {
-    query.$or = [{ category: categoryId }, { appliesToAllCategories: true }];
+  for (const id of idsToCheck) {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      throw new ApiError(400, `Invalid MongoDB ID: ${id}`);
+    }
   }
 
-  if (subcategoryId) {
-    query.$or = [
-      ...(query.$or || []),
-      { subcategory: subcategoryId },
-      { appliesToAllSubcategory: true },
-    ];
-  }
-  if (brandId) {
-    query.$or = [
-      ...(query.$or || []),
-      { brand: brandId },
-      { appliesToAllBrands: true },
-    ];
-  }
+  // console.log([{ productId }, { categoryId }, { subcategoryId }, { brandId }]);
 
-  // const policies = await ProductPolicy.find({
-  //   ...(categoryId && { category: categoryId }),
-  //   ...(subcategoryId && { subcategory: subcategoryId }),
-  //   ...(brandId && { brand: brandId }),
-  // }).populate(["createdBy", "updatedBy"]);
+  // 1. First fetch all policies that match ANY of these criteria
+  const baseQuery = {
+    $or: [
+      { policyFor: "all" },
+      ...(productId ? [{ policyFor: "product", products: productId }] : []),
+      ...(categoryId ? [{ policyFor: "category", category: categoryId }] : []),
+      ...(subcategoryId
+        ? [{ policyFor: "subcategory", subcategory: subcategoryId }]
+        : []),
+      ...(brandId ? [{ policyFor: "brand", brand: brandId }] : []),
+    ],
+    isActive: true,
+  };
 
-  const policies = await ProductPolicy.find(query)
+  // 2. Also include policies that apply to all categories/brands if relevant
+  const enhancedQuery = {
+    $or: [
+      baseQuery,
+      ...(categoryId ? [{ appliesToAllCategories: true }] : []),
+      ...(brandId ? [{ appliesToAllBrands: true }] : []),
+    ],
+  };
+
+  const policies = await ProductPolicy.find(baseQuery)
     .populate("category", "name")
+    .populate("subcategory", "name")
     .populate("brand", "name")
-    .lean();
+    .populate("products", "name")
+    .sort({ priority: -1 }); // Higher priority policies first
 
-  if (policies.length === 0) {
-    throw new ApiError(404, "No policies found for the given filters");
-  }
+  console.log("policies", policies.length);
+
+  // 3. Categorize policies by type for frontend convenience
+  const categorizedPolicies = policies.reduce((acc, policy) => {
+    const { policyType } = policy;
+    if (!acc[policyType]) {
+      acc[policyType] = [];
+    }
+    acc[policyType].push(policy);
+    return acc;
+  }, {});
 
   return res
     .status(200)
-    .json(new ApiResponse(200, policies, "Policies fetched successfully"));
+    .json(
+      new ApiResponse(
+        200,
+        { policies, categorizedPolicies },
+        "Applicable policies fetched successfully"
+      )
+    );
 });
 
 /**
@@ -267,7 +289,7 @@ export {
   createProductPolicy,
   getAllProductPolicies,
   getProductPolicyById,
-  getPoliciesByCategorySubcategoryBrand,
+  getApplicablePolicies,
   updateProductPolicy,
   deleteProductPolicy,
 };
