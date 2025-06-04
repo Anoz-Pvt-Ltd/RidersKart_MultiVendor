@@ -175,6 +175,10 @@ const getAllProducts = asyncHandler(async (req, res) => {
       userCity,
     } = req.query;
 
+    console.log({ query: req.query, params: req.params, body: req.body });
+
+    console.log("userCity", userCity);
+
     if (userCity) {
       const vendorsInCity = await VendorUser.find({
         "location.city": userCity,
