@@ -25,6 +25,11 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
     setIsReadMoreSpecification(!isReadMoreSpecification);
   };
   const user = useSelector((store) => store.UserInfo.user);
+  const isProductAvailableForUser = useSelector(
+    (store) => store.UserInfo.isProductAvailableForUser
+  );
+  console.log(isProductAvailableForUser);
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [error, setError] = useState();
@@ -205,46 +210,46 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
   };
 
   return (
-    <div className='mt-2'>
-      <div className='flex flex-col lg:flex-row justify-between items-start p-4'>
+    <div className="mt-2">
+      <div className="flex flex-col lg:flex-row justify-between items-start p-4">
         <section
           ref={productRef}
-          className='ImageSection w-full lg:w-[40vw] lg:h-[70vh]'
+          className="ImageSection w-full lg:w-[40vw] lg:h-[70vh]"
         >
-          <div className='flex flex-col-reverse lg:flex-row h-5/6 lg:mb-10 '>
+          <div className="flex flex-col-reverse lg:flex-row h-5/6 lg:mb-10 ">
             {/* Image Array */}
-            <div className='lg:w-20 lg:h-full  '>
-              <div className='overflow-x-auto flex flex-col justify-center items-center mt-2  gap-2'>
+            <div className="lg:w-20 lg:h-full  ">
+              <div className="overflow-x-auto flex flex-col justify-center items-center mt-2  gap-2">
                 {products?.images.map((image, index) => (
                   <img
                     key={index}
                     onClick={() => setCurrentImg(index)}
                     src={image.url}
                     alt={products?.name}
-                    className='h-20 w-20 cursor-pointer'
+                    className="h-20 w-20 cursor-pointer"
                   />
                 ))}
               </div>
             </div>
 
             {/* Current Image */}
-            <div className='relative h-full w-[40vw] p-3 m-2 '>
+            <div className="relative h-full w-[40vw] p-3 m-2 ">
               <img
                 src={products?.images[currentImg]?.url}
                 alt={products?.name}
-                className='h-full'
+                className="h-full"
                 onClick={() => setImgPopup(true)}
               />
-              <div className='absolute top-0 right-0'>
+              <div className="absolute top-0 right-0">
                 <Button
-                  label={<Heart className=' overflow-hidden' />}
+                  label={<Heart className=" overflow-hidden" />}
                   className={`hover:bg-white hover:text-red-500 rounded-full`}
                   onClick={addProductToWishlist}
                 />
               </div>
             </div>
           </div>
-          <div className='flex gap-10 lg:gap-52 justify-center items-center lg:ml-20 '>
+          <div className="flex gap-10 lg:gap-52 justify-center items-center lg:ml-20 ">
             <Button
               label={"Buy Now"}
               className={
@@ -263,8 +268,8 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
               <div>
                 <img
                   src={products?.images[currentImg]?.url}
-                  alt=''
-                  className='h-[80vh]'
+                  alt=""
+                  className="h-[80vh]"
                 />
               </div>
             </PopUp>
@@ -286,29 +291,29 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
             />
           </div> */}
         </section>
-        <div className='flex-1 px-4 py-10'>
-          <h3 className='text-2xl font-semibold mb-2'>{products?.name}</h3>
+        <div className="flex-1 px-4 py-10">
+          <h3 className="text-2xl font-semibold mb-2">{products?.name}</h3>
           {/* <p className="text-gray-600 mb-4">{products?.description}</p> */}
 
-          <div className='flex items-center mt-4 mb-4'>
-            <span className='text-lg font-semibold mr-2'>4.3</span>
-            <span className='text-gray-500'>4,486 Ratings & 494 Reviews</span>
+          <div className="flex items-center mt-4 mb-4">
+            <span className="text-lg font-semibold mr-2">4.3</span>
+            <span className="text-gray-500">4,486 Ratings & 494 Reviews</span>
           </div>
-          <div className='flex items-baseline mb-4'>
-            <span className='text-3xl font-bold mr-4'>
+          <div className="flex items-baseline mb-4">
+            <span className="text-3xl font-bold mr-4">
               ₹ {products?.price.sellingPrice}
             </span>
-            <span className='text-gray-500 line-through mr-4'>
+            <span className="text-gray-500 line-through mr-4">
               ₹{products?.price.MRP}
             </span>
             {products?.price.discount > 0 && (
-              <span className='bg-green-500 text-white px-2 py-1 rounded-sm'>
+              <span className="bg-green-500 text-white px-2 py-1 rounded-sm">
                 {products?.price.discount}% off
               </span>
             )}
           </div>
-          <h4 className='text-lg font-semibold mb-2'>Available offers</h4>
-          <ul className='list-disc list-inside'>
+          <h4 className="text-lg font-semibold mb-2">Available offers</h4>
+          <ul className="list-disc list-inside">
             <li>
               Bank Offer 5% Unlimited Cashback on Flipkart Axis Bank Credit Card
               T&C
@@ -327,17 +332,17 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
             </li>
           </ul>
 
-          <div className='mt-5'>
+          <div className="mt-5">
             <div>
-              <h1 className='font-semibold'>Product Description</h1>
+              <h1 className="font-semibold">Product Description</h1>
               <span>
-                <p className='text-gray-600'>
+                <p className="text-gray-600">
                   {isReadMoreDescription
                     ? products?.description
                     : `${products?.description.substring(0, maxLength)}...`}
                 </p>
                 {products?.description.length > maxLength && (
-                  <button className='text-blue-500' onClick={toggleReadMore}>
+                  <button className="text-blue-500" onClick={toggleReadMore}>
                     {isReadMoreDescription ? "Read Less.." : "Read More..."}
                   </button>
                 )}
@@ -345,16 +350,16 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
             </div>
 
             <div>
-              <h1 className='font-semibold'>Product Specifications</h1>
+              <h1 className="font-semibold">Product Specifications</h1>
               <span>
-                <p className='text-gray-600'>
+                <p className="text-gray-600">
                   {isReadMoreSpecification
                     ? specifications?.details
                     : `${specifications?.details?.substring(0, maxLength)}...`}
                 </p>
                 {specifications?.details?.length > maxLength && (
                   <button
-                    className='text-blue-500'
+                    className="text-blue-500"
                     onClick={toggleReadMoreSpecification}
                   >
                     {isReadMoreSpecification ? "Read Less.." : "Read More..."}
@@ -375,21 +380,21 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
       </div>
 
       <section>
-        <h1 className='text-2xl font-semibold mb-2 ml-10'>
+        <h1 className="text-2xl font-semibold mb-2 ml-10">
           People Also visited
         </h1>
       </section>
-      <div className='relative'>
+      <div className="relative">
         {/* Left Arrow Button */}
         <button
           onClick={scrollLeft}
-          className='absolute left-0 top-1/2 transform -translate-y-1/2 bg-gray-600 text-white p-2 rounded-full'
+          className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-gray-600 text-white p-2 rounded-full"
         >
           ←
         </button>
 
         <div
-          className='flex overflow-x-scroll no-scrollbar justify-start items-center gap-6 py-10 px-10'
+          className="flex overflow-x-scroll no-scrollbar justify-start items-center gap-6 py-10 px-10"
           ref={sliderRef}
         >
           {AllProducts?.map((product, index) => (
@@ -412,7 +417,7 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
         {/* Right Arrow Button */}
         <button
           onClick={scrollRight}
-          className='absolute right-0 top-1/2 transform -translate-y-1/2 bg-gray-600 text-white p-2 rounded-full'
+          className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-gray-600 text-white p-2 rounded-full"
         >
           →
         </button>

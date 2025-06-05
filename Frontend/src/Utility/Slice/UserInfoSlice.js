@@ -4,10 +4,14 @@ const UserInfo = createSlice({
   name: "userinfo",
   initialState: {
     user: [],
+    isProductAvailableForUser: true,
   },
   reducers: {
     addUser: (state, action) => {
       state.user.push(action.payload);
+    },
+    toggleProductAvailability: (state, action) => {
+      state.isProductAvailableForUser = action.payload;
     },
     clearUser: (state) => {
       state.user = [];
@@ -15,6 +19,7 @@ const UserInfo = createSlice({
   },
 });
 
-export const { addUser, clearUser } = UserInfo.actions;
+export const { addUser, clearUser, toggleProductAvailability } =
+  UserInfo.actions;
 
 export default UserInfo.reducer;
