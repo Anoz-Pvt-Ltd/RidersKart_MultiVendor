@@ -249,20 +249,27 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
               </div>
             </div>
           </div>
-          <div className="flex gap-10 lg:gap-52 justify-center items-center lg:ml-20 ">
-            <Button
-              label={"Buy Now"}
-              className={
-                "bg-[#ff741b]  hover:bg-[#ff924e] text-white w-36 h-12"
-              }
-              onClick={HandleBuyNow}
-            />
-            <Button
-              label={"Add to Cart"}
-              className={`bg-[#ff9f00] hover:bg-[#ffbb4e] text-white w-36 h-12`}
-              onClick={addProductToCart}
-            />
-          </div>
+          {isProductAvailableForUser === true ? (
+            <div className="flex gap-10 lg:gap-52 justify-center items-center lg:ml-20 ">
+              <Button
+                label={"Buy Now"}
+                className={
+                  "bg-[#ff741b]  hover:bg-[#ff924e] text-white w-36 h-12"
+                }
+                onClick={HandleBuyNow}
+              />
+              <Button
+                label={"Add to Cart"}
+                className={`bg-[#ff9f00] hover:bg-[#ffbb4e] text-white w-36 h-12`}
+                onClick={addProductToCart}
+              />
+            </div>
+          ) : (
+            <div className="flex gap-10 lg:gap-52 justify-center items-center lg:ml-20 bg-[#DF3F33] text-white p-4 rounded-lg">
+              This product is not available for your location
+            </div>
+          )}
+
           {imgPopup && (
             <PopUp onClose={() => setImgPopup(false)}>
               <div>
