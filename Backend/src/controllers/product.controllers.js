@@ -173,7 +173,9 @@ const getAllProducts = asyncHandler(async (req, res) => {
       page = 1,
       limit = 10,
       userCity,
+      userAddress,
     } = req.query;
+    // const { userAddress } = req.params;
 
     // console.log({ query: req.query, params: req.params, body: req.body });
 
@@ -203,6 +205,57 @@ const getAllProducts = asyncHandler(async (req, res) => {
           )
         );
       }
+    }
+
+    if (userAddress) {
+      const aggregationPipeline = [
+        // First, match products by category and subcategory (more efficient to do this first)
+        {
+          $match: {
+            category: mongoose.Types.ObjectId(category),
+            subcategory: mongoose.Types.ObjectId(subcategory),
+          },
+        },
+        // Then join with the VendorUser collection to access location data
+        {
+          $lookup: {
+            from: "VendorUser", // Make sure this matches your VendorUser collection name
+            localField: "vendor",
+            foreignField: "_id",
+            as: "vendorData",
+          },
+        },
+        // Unwind the vendorData array (since lookup returns an array)
+        {
+          $unwind: "$vendorData",
+        },
+        // Now filter by city
+        {
+          $match: {
+            "vendorData.location.city": userAddress,
+          },
+        },
+        // Optionally project only the fields you need
+        {
+          $project: {
+            name: 1,
+            description: 1,
+            price: 1,
+            stockQuantity: 1,
+            images: 1,
+            status: 1,
+            // Include other fields you need
+            "vendorData.location.city": 1,
+            "vendorData.location.address": 1,
+          },
+        },
+      ];
+
+      const filteredProducts = await Product.aggregate(aggregationPipeline);
+      return res.status(200).json({
+        success: true,
+        data: filteredProducts,
+      });
     }
 
     const filter = {};

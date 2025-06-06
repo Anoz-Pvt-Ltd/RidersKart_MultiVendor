@@ -185,9 +185,9 @@ const Home = ({ startLoading, stopLoading }) => {
   return (
     <div className='container mx-auto py-4'>
       {user && userCity && productsAvailableForUser === false && (
-        <div className='border border-black w-full h-10 bg-red-500'>
+        <div className='w-full h-10 bg-red-500 text-white'>
           <h3 className='text-center'>
-            Products are not available at your address
+            Limited Products are available at your location...
           </h3>
         </div>
       )}
