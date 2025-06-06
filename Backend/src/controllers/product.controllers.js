@@ -175,9 +175,9 @@ const getAllProducts = asyncHandler(async (req, res) => {
       userCity,
     } = req.query;
 
-    console.log({ query: req.query, params: req.params, body: req.body });
+    // console.log({ query: req.query, params: req.params, body: req.body });
 
-    console.log("userCity", userCity);
+    // console.log("userCity", userCity);
 
     if (userCity) {
       const vendorsInCity = await VendorUser.find({
@@ -377,13 +377,67 @@ const deleteProduct = asyncHandler(async (req, res) => {
 const getProductByCategory = asyncHandler(async (req, res) => {
   // console.log("Fetching products by category");
 
-  const { category, subcategory } = req.params;
+  const { category, subcategory, userAddress } = req.params;
 
   // Check if both category and subcategory are provided
   if (!category || !subcategory) {
     return res.status(400).json({
       success: false,
       message: "Category and subcategory are required.",
+    });
+  }
+
+  console.log({ query: req.query, params: req.params, body: req.body });
+  console.log("userAddress: ", userAddress);
+
+  if (userAddress) {
+    const aggregationPipeline = [
+      // First, match products by category and subcategory (more efficient to do this first)
+      {
+        $match: {
+          category: mongoose.Types.ObjectId(category),
+          subcategory: mongoose.Types.ObjectId(subcategory),
+        },
+      },
+      // Then join with the VendorUser collection to access location data
+      {
+        $lookup: {
+          from: "VendorUser", // Make sure this matches your VendorUser collection name
+          localField: "vendor",
+          foreignField: "_id",
+          as: "vendorData",
+        },
+      },
+      // Unwind the vendorData array (since lookup returns an array)
+      {
+        $unwind: "$vendorData",
+      },
+      // Now filter by city
+      {
+        $match: {
+          "vendorData.location.city": userAddress,
+        },
+      },
+      // Optionally project only the fields you need
+      {
+        $project: {
+          name: 1,
+          description: 1,
+          price: 1,
+          stockQuantity: 1,
+          images: 1,
+          status: 1,
+          // Include other fields you need
+          "vendorData.location.city": 1,
+          "vendorData.location.address": 1,
+        },
+      },
+    ];
+
+    const filteredProducts = await Product.aggregate(aggregationPipeline);
+    return res.status(200).json({
+      success: true,
+      data: filteredProducts,
     });
   }
 

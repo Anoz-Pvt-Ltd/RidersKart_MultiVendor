@@ -3,6 +3,7 @@ import ProductCard from "../../Components/ProductCard";
 import { useEffect, useState } from "react";
 import { FetchData } from "../../Utility/FetchFromApi";
 import LoadingUI from "../../Components/Loading";
+import { useSelector } from "react-redux";
 
 const AllProducts = ({ startLoading, stopLoading }) => {
   const [products, setProducts] = useState([]);
@@ -10,6 +11,8 @@ const AllProducts = ({ startLoading, stopLoading }) => {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+
+  const user = useSelector((store) => store.UserInfo.user);
 
   const { category, subcategory, category_title, subcategory_title } =
     useParams();
@@ -24,6 +27,7 @@ const AllProducts = ({ startLoading, stopLoading }) => {
         subcategory: subcategory || "",
         page,
         limit: 10,
+        userAddress: user.length > 0 ? user.address.city : null,
       }).toString();
 
       const response = await FetchData(
@@ -52,12 +56,12 @@ const AllProducts = ({ startLoading, stopLoading }) => {
   console.log(products);
 
   return (
-    <div className="flex flex-col flex-wrap justify-center gap-6 p-4">
+    <div className='flex flex-col flex-wrap justify-center gap-6 p-4'>
       <div>
-        <h1 className="text-3xl font-bold">
+        <h1 className='text-3xl font-bold'>
           {category_title || "All Products"}{" "}
           {subcategory_title && (
-            <span className="text-xl font-medium ml-4">
+            <span className='text-xl font-medium ml-4'>
               {" "}
               - {subcategory_title}
             </span>
@@ -65,7 +69,7 @@ const AllProducts = ({ startLoading, stopLoading }) => {
         </h1>
       </div>
 
-      <div className="flex flex-wrap justify-start items-center gap-6 p-4">
+      <div className='flex flex-wrap justify-start items-center gap-6 p-4'>
         {products.length > 0 ? (
           products.map((product, index) => (
             <ProductCard
@@ -83,25 +87,25 @@ const AllProducts = ({ startLoading, stopLoading }) => {
             />
           ))
         ) : (
-          <p className="text-center text-gray-500">No products found.</p>
+          <p className='text-center text-gray-500'>No products found.</p>
         )}
       </div>
 
       {/* Pagination Controls */}
       {totalPages > 1 && (
-        <div className="flex justify-center items-center mt-4">
+        <div className='flex justify-center items-center mt-4'>
           <button
-            className="px-4 py-2 bg-gray-300 rounded-md mr-2 disabled:opacity-50"
+            className='px-4 py-2 bg-gray-300 rounded-md mr-2 disabled:opacity-50'
             onClick={() => setPage(page - 1)}
             disabled={page === 1}
           >
             Previous
           </button>
-          <span className="text-lg font-medium">
+          <span className='text-lg font-medium'>
             {page} / {totalPages}
           </span>
           <button
-            className="px-4 py-2 bg-gray-300 rounded-md ml-2 disabled:opacity-50"
+            className='px-4 py-2 bg-gray-300 rounded-md ml-2 disabled:opacity-50'
             onClick={() => setPage(page + 1)}
             disabled={page === totalPages}
           >

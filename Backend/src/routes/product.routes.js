@@ -42,7 +42,7 @@ router
   .route("/remove-stock-quantity/:productId")
   .post(VerifyVendorUser, removeStockQuantity);
 router
-  .route("/get-all-product/:category/:subcategory")
+  .route("/get-all-product/:category/:subcategory/:userAddress")
   .get(getProductByCategory);
 router.route("/edit-product").post(VerifyVendorUser, editProduct);
 router
