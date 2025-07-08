@@ -53,8 +53,10 @@ const registerVendor = asyncHandler(async (req, res, next) => {
     return next(new ApiError(400, "A vendor with this email already exists"));
   }
 
+  // console.log(req.files);
+
   const imageFile = req.files["image"][0];
-  const canceledChequeFile = req.files["canceledCheque"][0];
+  const canceledChequeFile = req.files["canceledCheque"]?.[0];
 
   if (!imageFile) throw new ApiError(404, "Image file not found!");
   if (!canceledChequeFile)

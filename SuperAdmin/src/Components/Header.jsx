@@ -59,7 +59,7 @@ const Header = () => {
                   <span>
                     <User2 />
                   </span>
-                  Register a new Admin{" "}
+                  Register a new Admin
                 </h1>
               }
               onClick={NavigateToAdminRegister}

@@ -91,6 +91,7 @@ const vendorSchema = new mongoose.Schema({
     },
   },
 
+  // For gst certificate
   image: {
     fileId: {
       type: String, //  ImageKit file ID
@@ -140,6 +141,7 @@ const vendorSchema = new mongoose.Schema({
       type: String,
       required: true,
     },
+    
   },
   status: {
     type: String,

@@ -58,7 +58,7 @@ const Promotion = ({ startLoading, stopLoading }) => {
             })
           }
         >
-          <div className="p-6 bg-white shadow-md rounded-lg flex flex-col justify-center items-center ">
+          <div className="p-6 bg-white shadow-md rounded-lg flex flex-col justify-center items-center z-50">
             <form
               ref={formRef}
               onSubmit={handleSubmit}
