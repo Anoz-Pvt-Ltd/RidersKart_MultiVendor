@@ -128,7 +128,7 @@ const CurrentUnVerifiedVendor = ({ startLoading, stopLoading }) => {
       label: "Canceled Cheque",
       value: (
         <div className='flex justify-center items-start'>
-          <img src={currentVendor.canceledCheque.url} className='h-[40vh]' />
+          <img src={currentVendor?.canceledCheque?.url} className='h-[40vh]' />
           {/* <Button label={<ArrowDownToLine />} /> */}
         </div>
       ),

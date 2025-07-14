@@ -104,7 +104,7 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
               value: (
                 <div className="w-full flex justify-end items-center">
                   <img
-                    src={currentProduct?.images[0]?.url}
+                    src={currentProduct?.images?.[0]?.url}
                     alt="no image found"
                     className="w-20 h-20 "
                   />
