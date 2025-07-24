@@ -30,25 +30,25 @@ const VendorRegistrationForm = ({ startLoading, stopLoading, onClose }) => {
       formObject[key] = value;
     });
 
-    // Retrieve existing data from localStorage
-    const existingData = localStorage.getItem("vendorRegistrationForm");
-
-    let existingObject = {};
-
-    if (existingData) {
-      // Parse existing JSON and merge new data
-      existingObject = JSON.parse(existingData);
+    // Check for empty fields and alert for the first empty field
+    for (const [key, value] of Object.entries(formObject)) {
+      if (!value || value.trim() === "") {
+        alert(`Please fill the "${key}" field.`);
+        return;
+      }
     }
 
-    // Append new form data to existing data
+    // Retrieve existing data from localStorage
+    const existingData = localStorage.getItem("vendorRegistrationForm");
+    let existingObject = {};
+    if (existingData) {
+      existingObject = JSON.parse(existingData);
+    }
     Object.assign(existingObject, formObject);
-
-    // Save the updated object back to localStorage
     localStorage.setItem(
       "vendorRegistrationForm",
       JSON.stringify(existingObject)
     );
-
     console.log(existingObject);
     setStep((prev) => prev + 1);
     console.log(step);
