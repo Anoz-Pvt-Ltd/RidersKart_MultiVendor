@@ -20,6 +20,7 @@ import CurrentTransactionOnline from "./Pages/CurrentTransactionOnline/CurrentTr
 import CurrentTransactionCash from "./Pages/CurrentTransactionCash/CurrentTransactionCash";
 import CurrentVerifiedDriver from "./Pages/CurrentVerifiedDriver/CurrentVerifiedDriver";
 import CurrentUnVerifiedDriver from "./Pages/Current-Un-VerifiedDriver/CurrentUnVerifiedDriver";
+import CurrentCategory from "./Pages/CurrentCategory/CurrentCategory";
 
 const App = () => {
   const user = useSelector((store) => store.UserInfo.user);
@@ -74,6 +75,10 @@ const App = () => {
             element={<CurrentProduct />}
           />
           <Route path="/current-order/:orderId" element={<CurrentOrder />} />
+          <Route
+            path="/current-category/:categoryId"
+            element={<CurrentCategory />}
+          />
           <Route
             path="/current-transaction-detail/:transactionId"
             element={<CurrentTransactionOnline />}

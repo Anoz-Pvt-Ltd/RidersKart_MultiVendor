@@ -15,6 +15,7 @@ const CategoriesVerified = ({ startLoading, stopLoading }) => {
   const VerifiedCategories = categories.filter(
     (category) => category.status.toLowerCase() === "verified"
   );
+  console.log(VerifiedCategories);
   // console.log("Categories:", categories);
   const user = useSelector((store) => store.UserInfo.user);
   const tableHeadersCategories = [
@@ -22,7 +23,8 @@ const CategoriesVerified = ({ startLoading, stopLoading }) => {
     "Category Name",
     "Status",
     "Creation date",
-    "Actions",
+    "No. of Subcategory",
+    "Delete",
   ];
   const [handlePopup, setHandlePopup] = useState({
     addCategoryPopup: false,
@@ -150,7 +152,7 @@ const CategoriesVerified = ({ startLoading, stopLoading }) => {
         true
       );
 
-      console.log("Response:", response);
+      // console.log("Response:", response);
       alert("Subcategory Edited Successfully!");
       window.location.reload(); // Refresh page to reflect changes
 
@@ -167,21 +169,24 @@ const CategoriesVerified = ({ startLoading, stopLoading }) => {
     }
   };
 
-  const handleDeleteCategory = async (categoryId) => {
+  const handleDeleteCategory = async ({ categoryId }) => {
     try {
       startLoading();
       const response = await FetchData(
         `categories/category/delete/${categoryId}`,
-        "delete",
+        "delete"
       );
-      console.log(response);    
+      console.log(response);
       alert("category has been deleted successfully");
-      window.location.reload()
+      // window.location.reload();
     } catch (err) {
       console.log(err);
     } finally {
       stopLoading();
     }
+  };
+  {
+    console.log(filteredCategory);
   }
 
   return (
@@ -222,7 +227,7 @@ const CategoriesVerified = ({ startLoading, stopLoading }) => {
                   <td className="border border-gray-500 px-4 py-2">
                     <Link
                       className="hover:text-blue-500 underline-blue-500 hover:underline "
-                      // to={`/current-order/${category._id}`}
+                      to={`/current-category/${category._id}`}
                     >
                       {category._id}
                     </Link>
@@ -237,19 +242,24 @@ const CategoriesVerified = ({ startLoading, stopLoading }) => {
                     {category.createdAt}
                   </td>
                   <td className="border border-gray-500 px-4 py-2">
+                    {category.subcategories.length}
+                  </td>
+                  <td className="border border-gray-500 px-4 py-2">
                     <div>
                       {" "}
-                      <Button
+                      {/* <Button
                         label={<PencilLine />}
                         onClick={() =>
                           setHandlePopup((prev) => {
                             return { ...prev, addCategoryPopup: true };
                           })
                         }
-                      />
+                      /> */}
                       <Button
                         label={<Trash2 />}
-                        onClick={() => handleDeleteCategory(category._id)}
+                        onClick={() =>
+                          handleDeleteCategory({ categoryId: category._id })
+                        }
                       />
                     </div>
                   </td>
