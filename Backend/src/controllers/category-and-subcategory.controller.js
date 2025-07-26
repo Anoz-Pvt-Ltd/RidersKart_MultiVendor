@@ -291,6 +291,27 @@ const VerifyCategory = asyncHandler(async (req, res) => {
     );
 });
 
+const getCategoryById = asyncHandler(async (req, res) => {
+  const { categoryId } = req.params;
+  const category = await Category.findById(categoryId).populate({
+    path: "subcategories",
+    populate: {
+      path: "category",
+      model: "Category",
+    },
+  });
+
+  if (!category) throw new ApiError(404, "Category not found");
+
+  res.json(
+    new ApiResponse(
+      200,
+      { category },
+      "Category with subcategories fetched successfully"
+    )
+  );
+});
+
 export {
   AddCategory,
   AddCategoryRequest,
@@ -301,4 +322,5 @@ export {
   getAllMainSubcategories,
   editSubcategory,
   UnderReviewCategoryRequest,
+  getCategoryById,
 };
