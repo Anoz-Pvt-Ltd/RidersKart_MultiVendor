@@ -187,7 +187,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
                     className="p-4 rounded-md cursor-pointer bg-gray-300 text-black hover:bg-gray-400 transition-all"
                     onClick={() => setIsCategoryOpen(!isCategoryOpen)}
                   >
-                    {<ChartColumnStacked />}Categories
+                    {<ChartColumnStacked />}Category & Subcategory
                   </div>
                   {isCategoryOpen && (
                     <ul className="ml-6 mt-2">

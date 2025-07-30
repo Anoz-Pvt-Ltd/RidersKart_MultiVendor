@@ -9,6 +9,7 @@ import {
   AddCategoryRequest,
   UnderReviewCategoryRequest,
   VerifyCategory,
+  getCategoryById,
 } from "../controllers/category-and-subcategory.controller.js";
 import {
   VerifyAdminUser,
@@ -33,10 +34,13 @@ router
 router
   .route("/sub-category/add")
   .post(VerifyAdminUser, upload.single("image"), AddSubcategory);
-router.route("/sub-category/delete").delete(VerifyAdminUser, DeleteSubcategory);
+router
+  .route("/sub-category/delete/:subcategoryId")
+  .delete(VerifyAdminUser, DeleteSubcategory);
 router
   .route("/get-all-category-and-subcategories")
   .get(getAllMainSubcategories);
+router.route("/get-category-by-id/:categoryId").get(getCategoryById);
 router
   .route("/edit-sub-category/:subcategoryId")
   .post(VerifyAdminUser, upload.single("image"), editSubcategory);
