@@ -133,6 +133,8 @@ const registerProduct = asyncHandler(async (req, res) => {
   vendor.products.push(newProduct._id);
   await vendor.save();
 
+  console.log("product uploaded");
+
   res
     .status(200)
     .json(
