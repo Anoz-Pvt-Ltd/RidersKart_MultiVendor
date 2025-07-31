@@ -134,7 +134,7 @@ const CurrentCategory = ({ startLoading, stopLoading }) => {
               </h2>
               <h2>
                 <span className="font-semibold ">Created at: </span>
-                {subcategory.createdAt}
+                {new Date(subcategory.createdAt).toLocaleDateString()}
               </h2>
               <h2>
                 <span className="font-semibold ">Last Updated at: </span>

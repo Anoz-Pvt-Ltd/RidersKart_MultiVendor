@@ -113,7 +113,8 @@ const DriversUnVerified = ({ startLoading, stopLoading }) => {
                     {driver.number}
                   </td>
                   <td className="border border-gray-500 px-4 py-2">
-                    {driver.createdAt}
+                    {/* {.createdAt} */}
+                    {new Date(driver.createdAt).toLocaleDateString()}
                   </td>
                   <td className="border border-gray-500 px-4 py-2">
                     {driver.verificationStatus}

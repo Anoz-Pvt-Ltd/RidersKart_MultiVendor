@@ -239,7 +239,7 @@ const CategoriesVerified = ({ startLoading, stopLoading }) => {
                     {category.status}
                   </td>
                   <td className="border border-gray-500 px-4 py-2">
-                    {category.createdAt}
+                    {new Date(category.createdAt).toLocaleDateString()}
                   </td>
                   <td className="border border-gray-500 px-4 py-2">
                     {category.subcategories.length}

@@ -145,7 +145,7 @@ const Policies = ({ startLoading, stopLoading }) => {
                   {policy.expiryDate}
                 </td>
                 <td className="border border-gray-500 px-4 py-2">
-                  {policy.createdAt}
+                  {new Date(policy.createdAt).toLocaleDateString()}
                 </td>
               </tr>
             ))

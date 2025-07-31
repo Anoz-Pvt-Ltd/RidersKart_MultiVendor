@@ -116,7 +116,7 @@ const TransactionOnline = ({ startLoading, stopLoading }) => {
                     {payment.paymentMethod}
                   </td>
                   <td className="border border-gray-500 px-4 py-2">
-                    {payment.createdAt}
+                    {new Date(payment.createdAt).toLocaleDateString()}
                   </td>
                 </tr>
               ))

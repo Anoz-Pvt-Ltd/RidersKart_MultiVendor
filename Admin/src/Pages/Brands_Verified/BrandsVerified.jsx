@@ -152,7 +152,7 @@ const BrandsVerified = ({ startLoading, stopLoading }) => {
                     {brand.adminName}
                   </td>
                   <td className="border border-gray-500 px-4 py-2">
-                    {brand.createdAt}
+                    {new Date(brand.createdAt).toLocaleDateString()}
                   </td>
                   <td className="border border-gray-500 px-4 py-2">
                     {brand.status}

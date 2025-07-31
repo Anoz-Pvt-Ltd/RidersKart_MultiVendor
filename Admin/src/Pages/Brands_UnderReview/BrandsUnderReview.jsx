@@ -143,10 +143,11 @@ const BrandsUnderReview = ({ startLoading, stopLoading }) => {
                     {brand?.title}
                   </td>
                   <td className="border border-gray-500 px-4 py-2">
-                    <img src={brand.logo.url} className="w-12"/>
+                    <img src={brand.logo.url} className="w-12" />
                   </td>
                   <td className="border border-gray-500 px-4 py-2">
-                    {brand.createdAt}
+                    {/* {brand.createdAt} */}
+                    {new Date(brand.createdAt).toLocaleDateString()}
                   </td>
                   <td className="border border-gray-500 px-4 py-2 ">
                     {/* {brand.status} */}

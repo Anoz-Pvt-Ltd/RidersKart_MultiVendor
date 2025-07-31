@@ -48,10 +48,10 @@ const Products = ({ startLoading, stopLoading }) => {
     if (searchValueProduct === "") {
       setFilteredProducts(allProducts);
     } else {
-      const filtered = allProducts?.filter(
+      const filtered = allProducts.filter(
         (product) =>
           product._id.includes(searchValueProduct) ||
-          product.vendor.includes(searchValueProduct) ||
+          product.vendor.name.toLowerCase().includes(searchValueProduct) ||
           product.name.toLowerCase().includes(searchValueProduct)
       );
       setFilteredProducts(filtered);
