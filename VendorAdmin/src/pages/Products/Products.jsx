@@ -238,19 +238,19 @@ const Products = ({ startLoading, stopLoading }) => {
 
     return (
       <PopUp onClose={onClose}>
-        <div className="flex justify-center items-center w-[80vw] place-self-center  ">
+        <div className='flex justify-center items-center w-[80vw] place-self-center  '>
           <form
             ref={formRef}
             onSubmit={handleAddImages}
-            className="w-full h-[90vh] p-16 flex flex-col items-center justify-center rounded-2xl  bg-white   "
+            className='w-full h-[90vh] p-16 flex flex-col items-center justify-center rounded-2xl  bg-white   '
           >
             <label
-              className="block mb-2 font-medium text-black text-2xl"
-              for="file_input"
+              className='block mb-2 font-medium text-black text-2xl'
+              for='file_input'
             >
               Upload Images
             </label>
-            <div className="w-full h-fit grid grid-cols-2 grid-rows-5 gap-5 justify-center items-center my-10  ">
+            <div className='w-full h-fit grid grid-cols-2 grid-rows-5 gap-5 justify-center items-center my-10  '>
               {Array(imagesRequired())
                 .fill("")
                 .map((_, index) => {
@@ -263,23 +263,23 @@ const Products = ({ startLoading, stopLoading }) => {
                       }`}
                       key={index}
                     >
-                      <div className="shrink-0 flex justify-center items-center h-16 w-16 ">
+                      <div className='shrink-0 flex justify-center items-center h-16 w-16 '>
                         {images[index] && (
                           <img
-                            id="preview_img"
-                            className=" object-cover rounded  "
+                            id='preview_img'
+                            className=' object-cover rounded  '
                             src={images[index]?.src}
-                            alt="uploaded image"
+                            alt='uploaded image'
                           />
                         )}
                       </div>
                       <label className={`block  `}>
-                        <span className="sr-only">Choose photo</span>
+                        <span className='sr-only'>Choose photo</span>
                         <input
-                          type="file"
-                          accept="image/*"
-                          name="images"
-                          className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold   file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100 border border-neutral-200 p-2 rounded-full"
+                          type='file'
+                          accept='image/*'
+                          name='images'
+                          className='block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold   file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100 border border-neutral-200 p-2 rounded-full'
                           onChange={(e) => {
                             const file = e.target.files[0];
                             const reader = new FileReader();
@@ -301,7 +301,7 @@ const Products = ({ startLoading, stopLoading }) => {
                   );
                 })}
             </div>
-            <Button label="Submit" Type="submit" className="mt-10" />
+            <Button label='Submit' Type='submit' className='mt-10' />
           </form>
         </div>
       </PopUp>
@@ -309,53 +309,54 @@ const Products = ({ startLoading, stopLoading }) => {
   };
   const handleProductNameChange = (e) => {
     const rawValue = e.target.value;
-    const sanitizedValue = rawValue.replace(/[^a-zA-Z0-9 ]/g, ""); // allow letters, numbers, and space
-    setProductName(sanitizedValue); // your state setter
+    // allow letters, numbers, space, and hyphen
+    const sanitizedValue = rawValue.replace(/[^a-zA-Z0-9 \-]/g, "");
+    setProductName(sanitizedValue);
   };
 
   return (
-    <div className="lg:max-w-6xl lg:mx-auto lg:p-4 bg-white shadow-lg rounded-lg">
-      <h1 className="text-2xl font-bold text-gray-800 mb-4 sm:mb-6 mx-4">
+    <div className='lg:max-w-6xl lg:mx-auto lg:p-4 bg-white shadow-lg rounded-lg'>
+      <h1 className='text-2xl font-bold text-gray-800 mb-4 sm:mb-6 mx-4'>
         Your Products
       </h1>
 
-      {error && <div className="text-red-500 mb-4">{error}</div>}
-      {success && <div className="text-green-500 mb-4">{success}</div>}
+      {error && <div className='text-red-500 mb-4'>{error}</div>}
+      {success && <div className='text-green-500 mb-4'>{success}</div>}
 
       <Button
-        label="Add New Product"
-        Type="button"
-        className="mb-6 mx-4"
+        label='Add New Product'
+        Type='button'
+        className='mb-6 mx-4'
         onClick={() => setIsModalOpen(true)}
       />
 
       {isModalOpen && (
-        <div className="fixed inset-0 flex items-start lg:items-center justify-center  backdrop-blur-xl p-4 h-screen w-screen overflow-auto top-0 left-0  z-50">
-          <div className="bg-white flex flex-col rounded-lg shadow-lg w-fit h-[90vh] overflow-x-scroll lg:px-20 lg:py-10 py-4">
-            <h2 className="text-lg font-semibold text-gray-800 lg:mb-4 w-full text-center">
+        <div className='fixed inset-0 flex items-start lg:items-center justify-center  backdrop-blur-xl p-4 h-screen w-screen overflow-auto top-0 left-0  z-50'>
+          <div className='bg-white flex flex-col rounded-lg shadow-lg w-fit h-[90vh] overflow-x-scroll lg:px-20 lg:py-10 py-4'>
+            <h2 className='text-lg font-semibold text-gray-800 lg:mb-4 w-full text-center'>
               Add New Product
             </h2>
             <form
               ref={formRef}
               onSubmit={handleAddProduct}
-              className="flex flex-col  w-full justify-evenly items-center"
+              className='flex flex-col  w-full justify-evenly items-center'
             >
-              <div className="grid grid-cols-3 grid-rows-5 gap-x-5 w-full ">
-                <div className="flex items-start justify-center">
+              <div className='grid grid-cols-3 grid-rows-5 gap-x-5 w-full '>
+                <div className='flex items-start justify-center'>
                   <InputBox
-                    LabelName="Product Name"
-                    Name="name"
-                    Placeholder="Enter product name"
+                    LabelName='Product Name (No special characters)'
+                    Name='name'
+                    Placeholder='Enter product name'
                     Value={productName}
                     onChange={handleProductNameChange}
                   />
                 </div>
-                <div className="flex items-start justify-center">
+                <div className='flex items-start justify-center'>
                   <SelectBox
-                    className2="w-full "
-                    LabelName="Brand"
-                    Name="brand"
-                    Placeholder="Select main category"
+                    className2='w-full '
+                    LabelName='Brand'
+                    Name='brand'
+                    Placeholder='Select main category'
                     Options={brands?.map((brand) => ({
                       label: brand.title,
                       value: brand._id, // Correctly linking ID for selection
@@ -363,13 +364,13 @@ const Products = ({ startLoading, stopLoading }) => {
                   />
                 </div>
 
-                <div className="flex items-start justify-center">
+                <div className='flex items-start justify-center'>
                   <SelectBox
-                    className2="w-full "
-                    LabelName="Main Category"
-                    Name="category"
+                    className2='w-full '
+                    LabelName='Main Category'
+                    Name='category'
                     onChange={(e) => setSelectedCategory(e.target.value)}
-                    Placeholder="Select main category"
+                    Placeholder='Select main category'
                     Options={categories?.map((cat) => ({
                       label: cat.title,
                       value: cat._id, // Correctly linking ID for selection
@@ -377,13 +378,13 @@ const Products = ({ startLoading, stopLoading }) => {
                   />
                 </div>
 
-                <div className="flex items-start justify-center">
+                <div className='flex items-start justify-center'>
                   {subcategories.length > 0 && (
                     <SelectBox
-                      className2="w-full "
-                      LabelName="Subcategory"
-                      Name="subcategory"
-                      Placeholder="Select subcategory"
+                      className2='w-full '
+                      LabelName='Subcategory'
+                      Name='subcategory'
+                      Placeholder='Select subcategory'
                       Options={subcategories
                         .filter(
                           (subs) => subs.category._id === selectedCategory
@@ -396,83 +397,83 @@ const Products = ({ startLoading, stopLoading }) => {
                   )}
                 </div>
 
-                <div className="flex items-start justify-center">
+                <div className='flex items-start justify-center'>
                   <InputBox
-                    LabelName="MRP"
-                    Type="number"
-                    Name="MRP"
-                    Placeholder="Enter price"
+                    LabelName='MRP'
+                    Type='number'
+                    Name='MRP'
+                    Placeholder='Enter price'
                     Ref={mrpRef}
                     OnInput={updateSellingPrice}
-                    className=""
+                    className=''
                   />
                 </div>
 
-                <div className="flex items-start justify-center">
+                <div className='flex items-start justify-center'>
                   <InputBox
-                    LabelName="Discount(%)"
-                    Type="number"
-                    Name="discount"
-                    Placeholder="Enter Discount percentage"
+                    LabelName='Discount(%)'
+                    Type='number'
+                    Name='discount'
+                    Placeholder='Enter Discount percentage'
                     Ref={discountRef}
                     OnInput={updateSellingPrice}
                     max={100}
                   />
                 </div>
-                <div className="flex items-start justify-center">
+                <div className='flex items-start justify-center'>
                   <InputBox
-                    LabelName="Selling Price (Optional)"
-                    Type="number"
-                    Name="SP"
-                    Value={""}
-                    Placeholder="Enter Discount"
+                    LabelName='Selling Price (Optional)'
+                    Type='number'
+                    Name='SP'
+                    Value={updateSellingPrice}
+                    Placeholder='Enter Discount'
                     Disabled={true}
                     Ref={spRef}
-                    className=""
+                    className=''
                   />
                 </div>
 
-                <div className="flex items-start justify-center">
+                <div className='flex items-start justify-center'>
                   <InputBox
-                    LabelName="Stock Quantity"
-                    Type="number"
-                    Name="stockQuantity"
-                    Placeholder="Enter stock quantity"
-                    className=""
+                    LabelName='Stock Quantity'
+                    Type='number'
+                    Name='stockQuantity'
+                    Placeholder='Enter stock quantity'
+                    className=''
                   />
                 </div>
 
-                <div className="flex items-start justify-center">
+                <div className='flex items-start justify-center'>
                   <InputBox
-                    LabelName="Stock keeping unit (SKU)"
-                    Name="sku"
-                    Placeholder="Enter SKU"
-                    className=""
+                    LabelName='Stock keeping unit (SKU)'
+                    Name='sku'
+                    Placeholder='Enter SKU'
+                    className=''
                   />
                 </div>
 
-                <div className="px-2 row-span-5">
+                <div className='px-2 row-span-5'>
                   <InputBox
-                    LabelName="Upload Image"
-                    Type="file"
+                    LabelName='Upload Image'
+                    Type='file'
                     Name={`image`}
-                    Placeholder="Enter image URL"
+                    Placeholder='Enter image URL'
                     onChange={(e) => {
                       handleImageFileChange(e);
                     }}
                   />
                   {imagePreview && (
-                    <div className="flex items-center gap-3">
+                    <div className='flex items-center gap-3'>
                       <img
                         src={imagePreview}
-                        alt="Preview"
-                        className="w-32 h-32 object-cover rounded-md "
+                        alt='Preview'
+                        className='w-32 h-32 object-cover rounded-md '
                       />
 
                       {/* Cancel Button */}
                       <button
                         onClick={handleImageCancel}
-                        className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition"
+                        className='bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition'
                       >
                         Cancel
                       </button>
@@ -480,76 +481,76 @@ const Products = ({ startLoading, stopLoading }) => {
                   )}
                 </div>
 
-                <div className="flex items-start justify-center">
+                <div className='flex items-start justify-center'>
                   <TextArea
-                    LabelName="Description"
-                    Name="description"
-                    Placeholder="Enter product description"
-                    className="max-h-20 min-h-20"
+                    LabelName='Description'
+                    Name='description'
+                    Placeholder='Enter product description'
+                    className='max-h-20 min-h-20'
                   />
                 </div>
 
-                <div className="flex items-start justify-center">
+                <div className='flex items-start justify-center'>
                   <TextArea
-                    LabelName="Specification"
-                    Name="specifications"
-                    Placeholder="Enter Specification"
-                    className="max-h-20 min-h-20"
+                    LabelName='Specification'
+                    Name='specifications'
+                    Placeholder='Enter Specification'
+                    className='max-h-20 min-h-20'
                   />
                 </div>
 
-                <div className="flex items-start justify-center">
+                <div className='flex items-start justify-center'>
                   <TextArea
-                    LabelName="Tags"
-                    Name="tags"
-                    Placeholder="Enter Tags"
-                    className="max-h-20 min-h-20"
+                    LabelName='Tags'
+                    Name='tags'
+                    Placeholder='Enter Tags'
+                    className='max-h-20 min-h-20'
                   />
                 </div>
               </div>
-              <div className="button flex lg:flex-row flex-col w-full lg:w-fit px-2 justify-end gap-2">
+              <div className='button flex lg:flex-row flex-col w-full lg:w-fit px-2 justify-end gap-2'>
                 <Button
-                  label="Cancel"
-                  Type="button"
-                  className="bg-gray-300"
+                  label='Cancel'
+                  Type='button'
+                  className='bg-gray-300'
                   onClick={() => setIsModalOpen(false)}
                 />
-                <Button label="Add Product" Type="submit" />
+                <Button label='Add Product' Type='submit' />
               </div>
             </form>
           </div>
         </div>
       )}
 
-      <h2 className="text-lg font-semibold text-gray-800 mb-4 mx-4">
+      <h2 className='text-lg font-semibold text-gray-800 mb-4 mx-4'>
         Product List{" "}
-        <span className="text-xs font-light">({products.length})</span>
+        <span className='text-xs font-light'>({products.length})</span>
       </h2>
       {products.length === 0 ? (
         <div>No products available.</div>
       ) : (
         <div>
-          <div className="mb-4">
+          <div className='mb-4'>
             <input
-              type="text"
-              placeholder="Search by Product name..."
+              type='text'
+              placeholder='Search by Product name...'
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full px-4 py-2 text-gray-700 bg-white  border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 outline-none transition duration-200 ease-in-out hover:shadow-md"
+              className='w-full px-4 py-2 text-gray-700 bg-white  border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 outline-none transition duration-200 ease-in-out hover:shadow-md'
             />
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'>
             {filteredProducts.map((product) => (
               <div
                 key={product?._id}
-                className="mx-2 p-4 border rounded-lg shadow-md bg-gray-100"
+                className='mx-2 p-4 border rounded-lg shadow-md bg-gray-100'
               >
-                <h3 className="font-bold text-gray-900 flex items-center justify-start gap-10 ">
+                <h3 className='font-bold text-gray-900 flex items-center justify-start gap-10 '>
                   {product?.name}{" "}
-                  <span className=" p-1 rounded-xl flex items-center  ">
+                  <span className=' p-1 rounded-xl flex items-center  '>
                     <img
                       src={product?.images[0]?.url}
-                      className="w-20 h-20 m-1 rounded-xl  shadow"
+                      className='w-20 h-20 m-1 rounded-xl  shadow'
                     />
                   </span>
                   <button
@@ -559,12 +560,12 @@ const Products = ({ startLoading, stopLoading }) => {
                         return { ...prev, image: true };
                       });
                     }}
-                    title="Add images"
+                    title='Add images'
                   >
                     <CircleFadingPlus />
                   </button>
                 </h3>
-                <p className="truncate">{product?.description}</p>
+                <p className='truncate'>{product?.description}</p>
                 <p>
                   <strong>Category:</strong> {product?.category?.title} -{" "}
                   {product?.subcategory?.title}
@@ -576,9 +577,9 @@ const Products = ({ startLoading, stopLoading }) => {
                   <strong>Stock:</strong> {product?.stockQuantity}
                 </p>
                 <Button
-                  label="Delete"
-                  Type="button"
-                  className="mt-2 w-full hover:bg-red-500"
+                  label='Delete'
+                  Type='button'
+                  className='mt-2 w-full hover:bg-red-500'
                   onClick={() => handleDeleteProduct(product?._id)}
                 />
               </div>
