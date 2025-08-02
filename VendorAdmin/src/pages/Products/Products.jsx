@@ -7,7 +7,7 @@ import { useSelector } from "react-redux";
 import SelectBox from "../../components/SelectionBox";
 import LoadingUI from "../../components/Loading";
 import TextArea from "../../components/TextWrapper";
-import { CircleFadingPlus } from "lucide-react";
+import { CircleFadingPlus, RotateCcw, RotateCw } from "lucide-react";
 import PopUp from "../../components/PopUpWrapper";
 // import { categories } from "../../constants/AllProducts.Vendor";
 
@@ -87,22 +87,22 @@ const Products = ({ startLoading, stopLoading }) => {
     }
   };
 
+  const fetchProducts = async () => {
+    try {
+      startLoading();
+      const response = await FetchData(
+        `products/get-all-product-of-vendor/${user?.[0]?._id}`,
+        "get"
+      );
+      console.log(response);
+      if (response.data.success) setProducts(response.data.data);
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to fetch products.");
+    } finally {
+      stopLoading();
+    }
+  };
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        startLoading();
-        const response = await FetchData(
-          `products/get-all-product-of-vendor/${user?.[0]?._id}`,
-          "get"
-        );
-        console.log(response);
-        if (response.data.success) setProducts(response.data.data);
-      } catch (err) {
-        setError(err.response?.data?.message || "Failed to fetch products.");
-      } finally {
-        stopLoading();
-      }
-    };
     fetchProducts();
   }, []);
 
@@ -522,10 +522,15 @@ const Products = ({ startLoading, stopLoading }) => {
         </div>
       )}
 
-      <h2 className='text-lg font-semibold text-gray-800 mb-4 mx-4'>
-        Product List{" "}
-        <span className='text-xs font-light'>({products.length})</span>
-      </h2>
+      <div className='flex justify-center items-center gap-5 w-fit '>
+        <h2 className='text-lg font-semibold text-gray-800'>
+          Product List{" "}
+          <span className='text-xs font-light'>({products.length})</span>
+        </h2>
+        <button onClick={fetchProducts} className=''>
+          <RotateCw size={20} color='green' />
+        </button>
+      </div>
       {products.length === 0 ? (
         <div>No products available.</div>
       ) : (
