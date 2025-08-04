@@ -7,7 +7,7 @@ import { useSelector } from "react-redux";
 import SelectBox from "../../components/SelectionBox";
 import LoadingUI from "../../components/Loading";
 import TextArea from "../../components/TextWrapper";
-import { CircleFadingPlus, RotateCcw, RotateCw } from "lucide-react";
+import { CircleFadingPlus, MonitorUp, RotateCcw, RotateCw } from "lucide-react";
 import PopUp from "../../components/PopUpWrapper";
 // import { categories } from "../../constants/AllProducts.Vendor";
 
@@ -18,9 +18,13 @@ const Products = ({ startLoading, stopLoading }) => {
   const mrpRef = useRef(null);
   const discountRef = useRef(null);
   const spRef = useRef(null);
+  const mrpUpdRef = useRef(null);
+  const discountUpdRef = useRef(null);
+  const spUpdRef = useRef(null);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
   const [categories, setCategories] = useState([]);
   const [subcategories, setSubcategories] = useState([]);
   const [brands, setBrands] = useState([]);
@@ -33,6 +37,8 @@ const Products = ({ startLoading, stopLoading }) => {
     image: false,
   });
   const [UrlData, setUrlData] = useSearchParams();
+  const [editProductData, setEditProductData] = useState(null);
+  const editFormRef = useRef(null);
 
   const filteredProducts = products.filter((product) =>
     product?.name?.toLowerCase().includes(searchQuery.toLowerCase())
@@ -86,6 +92,17 @@ const Products = ({ startLoading, stopLoading }) => {
       spRef.current.value = ""; // Clear if invalid input
     }
   };
+  const updateSellingPriceUpdateForm = () => {
+    const mrp = parseFloat(mrpUpdRef.current?.value) || 0;
+    const discount = parseFloat(discountUpdRef.current?.value) || 0;
+
+    if (mrp > 0 && discount >= 0 && discount <= 100) {
+      const sellingPrice = mrp - (mrp * discount) / 100;
+      spUpdRef.current.value = sellingPrice.toFixed(2); // Update the Selling Price field
+    } else {
+      spUpdRef.current.value = ""; // Clear if invalid input
+    }
+  };
 
   const fetchProducts = async () => {
     try {
@@ -135,7 +152,11 @@ const Products = ({ startLoading, stopLoading }) => {
       setIsModalOpen(false);
     } catch (err) {
       console.log(err);
-      alert("Product is not uploaded properly! try again later");
+      alert(
+        parseErrorMessage(
+          err.response?.data || "An error occurred while adding the product."
+        )
+      );
     } finally {
       stopLoading();
     }
@@ -312,6 +333,101 @@ const Products = ({ startLoading, stopLoading }) => {
     // allow letters, numbers, space, and hyphen
     const sanitizedValue = rawValue.replace(/[^a-zA-Z0-9 \-]/g, "");
     setProductName(sanitizedValue);
+  };
+
+  // Open edit modal and set product data
+  const handleEditProduct = (product) => {
+    setEditProductData({
+      ...product,
+      name: product.name || "",
+      brand: product.brand?._id || product.brand || "",
+      category: product.category?._id || product.category || "",
+      subcategory: product.subcategory?._id || product.subcategory || "",
+      MRP: product.price?.MRP || "",
+      discount: product.price?.discount || "",
+      // SP: product.price?.sellingPrice || "",
+      stockQuantity: product.stockQuantity || "",
+      sku: product.sku || "",
+      description: product.description || "",
+      specifications: product.specifications?.details || "",
+      tags: Array.isArray(product.tags)
+        ? product.tags.join(",")
+        : product.tags || "",
+    });
+    setEditModalOpen(true);
+  };
+
+  // Handle changes in edit form
+  const handleEditChange = (e) => {
+    const { name, value } = e.target;
+    setEditProductData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+    // If MRP or discount changes, update SP
+    if (name === "MRP" || name === "discount") {
+      const mrp = name === "MRP" ? value : prev.MRP;
+      const discount = name === "discount" ? value : prev.discount;
+      const sellingPrice =
+        (parseFloat(mrp) || 0) -
+        ((parseFloat(mrp) || 0) * (parseFloat(discount) || 0)) / 100;
+      setEditProductData((prev) => ({
+        ...prev,
+        SP: sellingPrice > 0 ? sellingPrice.toFixed(2) : "",
+      }));
+    }
+  };
+
+  // Handle update product
+  const handleUpdateProduct = async (e) => {
+    e.preventDefault();
+    setError("");
+    setSuccess("");
+    if (!editProductData) return;
+
+    const payload = {
+      id: editProductData._id,
+      name: editProductData.name,
+      brand: editProductData.brand,
+      category: editProductData.category,
+      subcategory: editProductData.subcategory,
+      price: {
+        MRP: editProductData.MRP,
+        sellingPrice: editProductData.SP,
+        discount: editProductData.discount,
+      },
+      stockQuantity: editProductData.stockQuantity,
+      sku: editProductData.sku,
+      description: editProductData.description,
+      specifications: { details: editProductData.specifications },
+      tags: editProductData.tags.split(",").map((t) => t.trim()),
+    };
+
+    try {
+      startLoading();
+      const response = await FetchData(
+        `products/edit-product/${editProductData._id}`,
+        "post",
+        payload
+      );
+      setSuccess("Product updated successfully!");
+      // Update product in local state
+      setProducts((prev) =>
+        prev.map((p) =>
+          p._id === editProductData._id
+            ? { ...p, ...payload, price: payload.price }
+            : p
+        )
+      );
+      setEditModalOpen(false);
+      alert("Product updated successfully!");
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to update the product.");
+      alert("Product updation failed.");
+      console.log(err);
+    } finally {
+      stopLoading();
+    }
   };
 
   return (
@@ -522,6 +638,181 @@ const Products = ({ startLoading, stopLoading }) => {
         </div>
       )}
 
+      {/* Edit Product Modal */}
+      {editModalOpen && editProductData && (
+        <div className='fixed inset-0 flex items-start lg:items-center justify-center  backdrop-blur-xl p-4 h-screen w-screen overflow-auto top-0 left-0  z-50'>
+          <div className='bg-white flex flex-col rounded-lg shadow-lg w-fit h-[90vh] overflow-x-scroll lg:px-20 lg:py-10 py-4'>
+            <h2 className='text-lg font-semibold text-gray-800 lg:mb-4 w-full text-center'>
+              Edit Product
+            </h2>
+            <form
+              ref={editFormRef}
+              onSubmit={handleUpdateProduct}
+              className='flex flex-col  w-full justify-evenly items-center'
+            >
+              <div className='grid grid-cols-3 grid-rows-5 gap-x-5 w-full '>
+                <div className='flex items-start justify-center'>
+                  <InputBox
+                    LabelName='Product Name (No special characters)'
+                    Name='name'
+                    Placeholder='Enter product name'
+                    Value={editProductData.name}
+                    onChange={handleEditChange}
+                  />
+                </div>
+                <div className='flex items-start justify-center'>
+                  <SelectBox
+                    className2='w-full '
+                    LabelName='Brand'
+                    Name='brand'
+                    Placeholder='Select main category'
+                    Value={editProductData.brand}
+                    onChange={handleEditChange}
+                    Options={brands?.map((brand) => ({
+                      label: brand.title,
+                      value: brand._id,
+                    }))}
+                  />
+                </div>
+                <div className='flex items-start justify-center'>
+                  <SelectBox
+                    className2='w-full '
+                    LabelName='Main Category'
+                    Name='category'
+                    Value={editProductData.category}
+                    onChange={(e) => {
+                      handleEditChange(e);
+                      setSelectedCategory(e.target.value);
+                    }}
+                    Placeholder='Select main category'
+                    Options={categories?.map((cat) => ({
+                      label: cat.title,
+                      value: cat._id,
+                    }))}
+                  />
+                </div>
+                <div className='flex items-start justify-center'>
+                  {subcategories.length > 0 && (
+                    <SelectBox
+                      className2='w-full '
+                      LabelName='Subcategory'
+                      Name='subcategory'
+                      Value={editProductData.subcategory}
+                      onChange={handleEditChange}
+                      Placeholder='Select subcategory'
+                      Options={subcategories
+                        .filter(
+                          (subs) =>
+                            subs.category._id ===
+                            (editProductData.category || selectedCategory)
+                        )
+                        .map((sub) => ({
+                          label: sub.title,
+                          value: sub._id,
+                        }))}
+                    />
+                  )}
+                </div>
+                <div className='flex items-start justify-center'>
+                  <InputBox
+                    LabelName='MRP'
+                    Type='number'
+                    Name='MRP'
+                    Placeholder='Enter price'
+                    Value={editProductData.MRP}
+                    onChange={handleEditChange}
+                    Ref={mrpUpdRef}
+                    OnInput={updateSellingPriceUpdateForm}
+                  />
+                </div>
+                <div className='flex items-start justify-center'>
+                  <InputBox
+                    LabelName='Discount(%)'
+                    Type='number'
+                    Name='discount'
+                    Placeholder='Enter Discount percentage'
+                    Value={editProductData.discount}
+                    onChange={handleEditChange}
+                    max={100}
+                    Ref={discountUpdRef}
+                    OnInput={updateSellingPriceUpdateForm}
+                  />
+                </div>
+                <div className='flex items-start justify-center'>
+                  <InputBox
+                    LabelName='Selling Price (Optional)'
+                    Type='number'
+                    Name='SP'
+                    // Value={updateSellingPriceUpdateForm}
+                    Placeholder='Enter Discount'
+                    Disabled={true}
+                    Ref={spUpdRef}
+                  />
+                </div>
+                <div className='flex items-start justify-center'>
+                  <InputBox
+                    LabelName='Stock Quantity'
+                    Type='number'
+                    Name='stockQuantity'
+                    Placeholder='Enter stock quantity'
+                    Value={editProductData.stockQuantity}
+                    onChange={handleEditChange}
+                  />
+                </div>
+                <div className='flex items-start justify-center'>
+                  <InputBox
+                    LabelName='Stock keeping unit (SKU)'
+                    Name='sku'
+                    Placeholder='Enter SKU'
+                    Value={editProductData.sku}
+                    onChange={handleEditChange}
+                  />
+                </div>
+                <div className='flex items-start justify-center'>
+                  <TextArea
+                    LabelName='Description'
+                    Name='description'
+                    Placeholder='Enter product description'
+                    Value={editProductData.description}
+                    onChange={handleEditChange}
+                    className='max-h-20 min-h-20'
+                  />
+                </div>
+                <div className='flex items-start justify-center'>
+                  <TextArea
+                    LabelName='Specification'
+                    Name='specifications'
+                    Placeholder='Enter Specification'
+                    Value={editProductData.specifications}
+                    onChange={handleEditChange}
+                    className='max-h-20 min-h-20'
+                  />
+                </div>
+                <div className='flex items-start justify-center'>
+                  <TextArea
+                    LabelName='Tags'
+                    Name='tags'
+                    Placeholder='Enter Tags'
+                    Value={editProductData.tags}
+                    onChange={handleEditChange}
+                    className='max-h-20 min-h-20'
+                  />
+                </div>
+              </div>
+              <div className='button flex lg:flex-row flex-col w-full lg:w-fit px-2 justify-end gap-2'>
+                <Button
+                  label='Cancel'
+                  Type='button'
+                  className='bg-gray-300'
+                  onClick={() => setEditModalOpen(false)}
+                />
+                <Button label='Update' Type='submit' />
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       <div className='flex justify-center items-center gap-5 w-fit '>
         <h2 className='text-lg font-semibold text-gray-800'>
           Product List{" "}
@@ -552,24 +843,36 @@ const Products = ({ startLoading, stopLoading }) => {
               >
                 <h3 className='font-bold text-gray-900 flex items-center justify-start gap-10 '>
                   {product?.name}{" "}
+                </h3>
+                <div className='flex'>
                   <span className=' p-1 rounded-xl flex items-center  '>
                     <img
                       src={product?.images[0]?.url}
-                      className='w-20 h-20 m-1 rounded-xl  shadow'
+                      className='min-w-20 h-20 m-1 rounded-xl  shadow'
                     />
                   </span>
-                  <button
-                    onClick={() => {
-                      setUrlData({ productId: product?._id });
-                      setPopup((prev) => {
-                        return { ...prev, image: true };
-                      });
-                    }}
-                    title='Add images'
-                  >
-                    <CircleFadingPlus />
-                  </button>
-                </h3>
+                  <div className='flex flex-col items-center justify-evenly px-1'>
+                    <button
+                      onClick={() => {
+                        setUrlData({ productId: product?._id });
+                        setPopup((prev) => {
+                          return { ...prev, image: true };
+                        });
+                      }}
+                      title='Add images'
+                    >
+                      <CircleFadingPlus />
+                    </button>
+                    <button
+                      onClick={() => handleEditProduct(product)}
+                      title='Edit product'
+                      className=' text-black '
+                    >
+                      <MonitorUp />
+                    </button>
+                  </div>
+                </div>
+
                 <p className='truncate'>{product?.description}</p>
                 <p>
                   <strong>Category:</strong> {product?.category?.title} -{" "}

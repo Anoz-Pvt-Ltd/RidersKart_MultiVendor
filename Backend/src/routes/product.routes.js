@@ -44,7 +44,7 @@ router
 router
   .route("/get-all-product/:category/:subcategory/:userAddress")
   .get(getProductByCategory);
-router.route("/edit-product").post(VerifyVendorUser, editProduct);
+router.route("/edit-product/:id").post(VerifyVendorUser, editProduct);
 router
   .route("/add-images/:productId")
   .patch(VerifyVendorUser, upload.array("images", 9), AddProductImages);
