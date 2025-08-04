@@ -47,14 +47,14 @@ const Header = () => {
       <div className='flex items-center lg:pl-20 justify-center gap-5'>
         <Link to={"/"} className='flex items-center justify-center'>
           <img src={logo} alt='Logo' className='lg:h-20 h-12' />
-          <h1 className='lg:text-xl   font-Exo'>{PlatformName}</h1>
+          <h1 className='lg:text-xl   '>{PlatformName}</h1>
         </Link>
         <Link
           to={"/"}
           className='flex items-center justify-center hover:scale-110 duration-300 ease-in-out hover:text-red-500'
         >
           {/* <img src={logo} alt="Logo" className="lg:h-20 h-12" /> */}
-          <h1 className='font-Exo'>
+          <h1 className=''>
             <Home />
           </h1>
         </Link>

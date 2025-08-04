@@ -299,6 +299,16 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
           </div> */}
         </section>
         <div className="flex-1 px-4 py-10">
+          <h3 className="font-semibold mb-2 flex justify-start items-center gap-5">
+            <span className="font-light">Brand: </span>
+            {products?.brand?.title}
+            <span>
+              <img
+                src={products?.brand?.logo?.url}
+                className="w-20 rounded-full"
+              />
+            </span>
+          </h3>
           <h3 className="text-2xl font-semibold mb-2">{products?.name}</h3>
           {/* <p className="text-gray-600 mb-4">{products?.description}</p> */}
 

@@ -185,9 +185,6 @@ const CategoriesVerified = ({ startLoading, stopLoading }) => {
       stopLoading();
     }
   };
-  {
-    console.log(filteredCategory);
-  }
 
   return (
     <section>

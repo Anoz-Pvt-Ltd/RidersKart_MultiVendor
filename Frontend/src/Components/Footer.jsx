@@ -18,9 +18,9 @@ const Footer = () => {
       <section className="Upper-part pt-10 flex justify-around phone:gap-10 flex-wrap z-50">
         <div className="Logo-and-slogan ">
           <h1 className="text-[2rem] font-serif">Rider's Kart</h1>
-          <h3 className="text-lg text-gray-300 font-Exo">Send anything,</h3>
-          <h3 className="text-lg text-gray-300 font-Exo">Anywhere,</h3>
-          <h3 className="text-lg text-gray-300 font-Exo">Anytime</h3>
+          <h3 className="text-lg text-gray-300">Send anything,</h3>
+          <h3 className="text-lg text-gray-300">Anywhere,</h3>
+          <h3 className="text-lg text-gray-300">Anytime</h3>
         </div>
         {/* <div className="Company">
           <h1 className="text-xl">Company</h1>

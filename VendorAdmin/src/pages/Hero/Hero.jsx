@@ -11,7 +11,7 @@ const Hero = () => {
       <div className="absolute h-screen w-screen object-fill overflow-hidden hidden lg:block">
         <img src={background} />
       </div>
-      <div className="lg:flex justify-center items-center text-black lg:text-4xl text-base font-bold font-sans lg:absolute relative backdrop-blur lg:h-20 w-full">
+      <div className="lg:flex justify-center items-center text-black lg:text-4xl text-base font-bold lg:absolute relative backdrop-blur lg:h-20 w-full">
         <h1 className="w-full text-center">
           Welcome to Rider's Kart Vendor Hub
         </h1>
