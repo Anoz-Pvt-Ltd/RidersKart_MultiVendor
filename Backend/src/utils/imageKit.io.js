@@ -33,6 +33,11 @@ export const UploadImages = async (imageName, folderDetails, tags = []) => {
 };
 
 export const DeleteImage = async (fileId = "") => {
+  console.log(fileId);
+  if (!fileId) {
+    console.error("No fileId provided for deletion.");
+    return;
+  }
   imageKit.deleteFile(fileId, function (error, result) {
     if (error) console.log(error);
     else console.log(result);

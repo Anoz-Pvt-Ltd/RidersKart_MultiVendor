@@ -69,41 +69,7 @@ const App = () => {
     dispatch(fetchPromotions()); // Fetch categories when the component mounts
   }, [dispatch, user]);
 
-  // Socket connection
-  // useEffect(() => {
-  //   if (!socketRef.current) {
-  //     socketRef.current = io("http://localhost:3000", {
-  //       withCredentials: true, // ✅ Ensures cross-origin cookies and headers work
-  //       transports: ["websocket"], // ✅ Forces WebSocket instead of polling (better for performance)
-  //     });
-
-  //     socketRef.current.on("newOrder", (notification) => {
-  //       console.log("New order received:", notification);
-  //       setNotifications((prev) => [...prev, notification]);
-  //     });
-
-  //     socketRef.current.on("connect", () => {
-  //       console.log("Connected with socket ID:", socketRef.current.id);
-  //     });
-
-  //     socketRef.current.on("disconnect", () => {
-  //       console.log("Disconnected from socket");
-  //     });
-  //   }
-
-  //   return () => {
-  //     if (socketRef.current) {
-  //       socketRef.current.disconnect();
-  //       socketRef.current = null;
-  //     }
-  //   };
-  // }, []);
-
-  // useEffect(() => {
-  //   if (notifications.length > 0) {
-  //     alertSuccess(notifications[notifications.length - 1]?.title);
-  //   }
-  // }, [notifications]);
+  
 
   return (
     <div className="absolute top-0 z-[-2] h-screen w-screen bg-white bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.3),rgba(255,255,255,0))] overflow-x-hidden antialiased selection:bg-cyan-500 selection:text-cyan-900">

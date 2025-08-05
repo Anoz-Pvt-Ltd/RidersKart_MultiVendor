@@ -240,6 +240,7 @@ const editSubcategory = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Image fileId is missing");
   }
   const deletedImage = await DeleteImage(subcategory.image.fileId);
+  console.log("deletedImage", deletedImage);
   if (!deletedImage) throw new ApiError(500, "Failed to delete previous image");
 
   const image = await UploadImages(imageFile.filename, {

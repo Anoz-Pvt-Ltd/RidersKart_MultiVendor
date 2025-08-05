@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { Brand } from "../models/brand.model.js";
 import { Category } from "../models/category.model.js";
 import { Product } from "../models/products.models.js";
