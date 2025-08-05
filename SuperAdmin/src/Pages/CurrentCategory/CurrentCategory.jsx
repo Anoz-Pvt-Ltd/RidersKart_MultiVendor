@@ -5,14 +5,26 @@ import { FetchData } from "../../Utility/FetchFromApi";
 import Button from "../../Components/Button";
 import LoadingUI from "../../Components/Loading";
 import { Trash } from "lucide-react";
+import { useRef } from "react";
 
 const CurrentCategory = ({ startLoading, stopLoading }) => {
   const { categoryId } = useParams();
+  const editSubcategoryFormRef = useRef(null);
   const user = useSelector((store) => store.UserInfo.user);
   const [error, setError] = useState("");
   const [CurrentCategory, setCurrentCategory] = useState();
   const [CurrentSubCategory, setCurrentSubCategory] = useState([]);
-  console.log(CurrentSubCategory);
+  const [handlePopup, setHandlePopup] = useState({
+    addCategoryPopup: false,
+    allCategoryPopup: false,
+    allSubCategoryPopup: false,
+    addSubCategory: false,
+    editSubcategory: false,
+    selectedSubcategoryId: null,
+    selectedSubcategoryTitle: null,
+  });
+  // const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editData, setEditData] = useState({ id: "", title: "", image: "" });
 
   useEffect(() => {
     const fetchAllOrders = async () => {
@@ -58,6 +70,52 @@ const CurrentCategory = ({ startLoading, stopLoading }) => {
     } finally {
       stopLoading();
     }
+  };
+
+  const handleEditSubcategory = async (e) => {
+    e.preventDefault(); // Prevent form submission
+
+    try {
+      startLoading();
+
+      if (!handlePopup.selectedSubcategoryId) {
+        alert("Subcategory ID is missing!");
+        return;
+      }
+
+      const formData = new FormData(editSubcategoryFormRef.current);
+
+      const response = await FetchData(
+        `categories/edit-sub-category/${handlePopup.selectedSubcategoryId}`,
+        "post",
+        formData,
+        true // Make sure your FetchData handles multipart/form-data when true
+      );
+
+      alert("Subcategory Edited Successfully!");
+      window.location.reload(); // or update state without reload
+
+      // Close popup and reset state
+      setHandlePopup({
+        editSubcategory: false,
+        selectedSubcategoryId: null,
+      });
+    } catch (error) {
+      console.error("Error editing subcategory:", error);
+      alert("Failed to edit subcategory.");
+    } finally {
+      stopLoading();
+    }
+  };
+
+  const handleOpenEditModal = (subcategory) => {
+    setHandlePopup({
+      editSubcategory: true,
+      selectedSubcategoryId: subcategory._id,
+    });
+    setEditData({
+      title: subcategory.title,
+    });
   };
 
   const details = [
@@ -134,7 +192,7 @@ const CurrentCategory = ({ startLoading, stopLoading }) => {
               </h2>
               <h2>
                 <span className="font-semibold ">Created at: </span>
-                {subcategory.createdAt}
+                {new Date(subcategory.createdAt).toLocaleDateString()}
               </h2>
               <h2>
                 <span className="font-semibold ">Last Updated at: </span>
@@ -149,11 +207,55 @@ const CurrentCategory = ({ startLoading, stopLoading }) => {
                   handleDeleteSubcategory({ subcategoryId: subcategory._id })
                 }
               />
-              {/* <Button label={"Edit Subcategory"} /> */}
+              <Button
+                label="Edit Subcategory"
+                onClick={() => handleOpenEditModal(subcategory)}
+              />
             </div>
           </div>
         ))}
       </div>
+      {handlePopup.editSubcategory && (
+        <div className="fixed top-0 left-0 bg-black bg-opacity-50 flex items-center justify-center z-50 w-full h-full">
+          <form
+            ref={editSubcategoryFormRef}
+            onSubmit={handleEditSubcategory}
+            className="bg-white p-6 rounded-lg shadow-lg w-96 relative "
+          >
+            <h2 className="text-xl font-bold mb-4">Edit Subcategory</h2>
+
+            <label className="block mb-2 text-sm font-medium">Title</label>
+            <input
+              type="text"
+              name="newTitle"
+              defaultValue={editData.title}
+              className="w-full p-2 border border-gray-300 rounded mb-4"
+              required
+            />
+
+            <label className="block mb-2 text-sm font-medium">Image</label>
+            <input
+              type="file"
+              name="image"
+              accept="image/*"
+              className="w-full p-2 border border-gray-300 rounded mb-4"
+            />
+
+            <div className="flex justify-end gap-2">
+              <Button
+                label="Cancel"
+                onClick={() =>
+                  setHandlePopup({
+                    editSubcategory: false,
+                    selectedSubcategoryId: null,
+                  })
+                }
+              />
+              <Button type="submit" label="Update" />
+            </div>
+          </form>
+        </div>
+      )}
     </div>
   );
 };

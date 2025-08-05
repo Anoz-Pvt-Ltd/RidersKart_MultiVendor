@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Heart,
   ListOrdered,
@@ -33,11 +33,15 @@ import Policies from "../Policy/Policies";
 
 const Dashboard = ({ startLoading, stopLoading }) => {
   const user = useSelector((store) => store.UserInfo.user);
-  const [error, setError] = useState("");
+
+  // State for sidebar collapsible sections
+  const [isVendorOpen, setIsVendorOpen] = useState(false);
+  const [isBrandOpen, setIsBrandOpen] = useState(false);
+  const [isCategoryOpen, setIsCategoryOpen] = useState(false);
+  const [isTransactionOpen, setIsTransactionOpen] = useState(false);
+  const [isDriverOpen, setIsDriverOpen] = useState(false);
 
   const localActiveSection = localStorage.getItem("activeSection");
-  console.log(localActiveSection);
-
   const [activeSection, setActiveSection] = useState(
     localActiveSection ?? "Users"
   );
@@ -50,16 +54,6 @@ const Dashboard = ({ startLoading, stopLoading }) => {
     hidden: { opacity: 0, x: -100 },
     visible: { opacity: 1, x: 0, transition: { duration: 0.8 } },
   };
-
-  const tableHeadersBrands = [
-    "Brand ID",
-    "Brand name",
-    "Added by",
-    "Added On",
-    "Status",
-  ];
-
-  //filtering functions for each entities
 
   const sidebarSections = [
     {
@@ -75,8 +69,8 @@ const Dashboard = ({ startLoading, stopLoading }) => {
         { label: "Verified", section: "Vendors (Verified)" },
         { label: "Vendors Orders", section: "Vendors Orders" },
       ],
-      isOpen: "isVendorOpen",
-      setOpen: "setIsVendorOpen",
+      isOpen: isVendorOpen,
+      setOpen: setIsVendorOpen,
     },
     {
       label: "Brands",
@@ -85,8 +79,8 @@ const Dashboard = ({ startLoading, stopLoading }) => {
         { label: "Under review", section: "Brands (Under review)" },
         { label: "Verified", section: "Brands (Verified)" },
       ],
-      isOpen: "isBrandOpen",
-      setOpen: "setIsBrandOpen",
+      isOpen: isBrandOpen,
+      setOpen: setIsBrandOpen,
     },
     {
       label: "Category & Subcategory",
@@ -95,8 +89,8 @@ const Dashboard = ({ startLoading, stopLoading }) => {
         { label: "Under review", section: "Categories (Under review)" },
         { label: "Verified", section: "Categories (Verified)" },
       ],
-      isOpen: "isCategoryOpen",
-      setOpen: "setIsCategoryOpen",
+      isOpen: isCategoryOpen,
+      setOpen: setIsCategoryOpen,
     },
     {
       label: "Products",
@@ -131,8 +125,8 @@ const Dashboard = ({ startLoading, stopLoading }) => {
           section: "Transactions (Cash on delivery)",
         },
       ],
-      isOpen: "isTransactionOpen",
-      setOpen: "setIsTransactionOpen",
+      isOpen: isTransactionOpen,
+      setOpen: setIsTransactionOpen,
     },
     {
       label: "Driver",
@@ -157,8 +151,8 @@ const Dashboard = ({ startLoading, stopLoading }) => {
           section: "Drivers (Verified)",
         },
       ],
-      isOpen: "isDriverOpen",
-      setOpen: "setIsDriverOpen",
+      isOpen: isDriverOpen,
+      setOpen: setIsDriverOpen,
     },
     {
       label: "Promotions",
@@ -192,7 +186,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
   };
 
   return (
-    <div className='flex min-h-screen overflow-scroll'>
+    <div className="flex min-h-screen overflow-scroll">
       {user === null || user.length === 0 ? (
         <div>
           <h1>
@@ -202,16 +196,15 @@ const Dashboard = ({ startLoading, stopLoading }) => {
         </div>
       ) : (
         <div>
-          {" "}
           <motion.aside
-            className='w-64 text-black p-4 shadow-lg fixed overscroll-auto top-0 h-screen bg-black/50 overflow-scroll no-scrollbar z-10'
-            initial='hidden'
-            animate='visible'
+            className="w-64 text-black p-4 shadow-lg fixed overscroll-auto top-0 h-screen bg-black/50 overflow-scroll no-scrollbar z-10"
+            initial="hidden"
+            animate="visible"
             variants={sidebarVariants}
           >
             <nav>
               <ul>
-                {sidebarSections.map((item, idx) => {
+                {sidebarSections.map((item) => {
                   if (!item.nested) {
                     return (
                       <li
@@ -232,19 +225,17 @@ const Dashboard = ({ startLoading, stopLoading }) => {
                     );
                   }
                   // Handle nested sections
-                  const isOpen = eval(item.isOpen);
-                  const setOpen = eval(item.setOpen);
                   return (
-                    <li className='mb-2' key={item.label}>
+                    <li className="mb-2" key={item.label}>
                       <div
-                        className='p-4 rounded-md cursor-pointer bg-gray-300 text-black hover:bg-gray-400 transition-all'
-                        onClick={() => setOpen(!isOpen)}
+                        className="p-4 rounded-md cursor-pointer bg-gray-300 text-black hover:bg-gray-400 transition-all"
+                        onClick={() => item.setOpen(!item.isOpen)}
                       >
                         {item.icon}
                         {item.label}
                       </div>
-                      {isOpen && (
-                        <ul className='ml-6 mt-2'>
+                      {item.isOpen && (
+                        <ul className="ml-6 mt-2">
                           {item.nested.map((nestedItem) => (
                             <li
                               key={nestedItem.section}
@@ -272,10 +263,10 @@ const Dashboard = ({ startLoading, stopLoading }) => {
               </ul>
             </nav>
           </motion.aside>
-          <main className='flex-1 p-6 ml-64 w-full'>
+          <main className="flex-1 p-6 ml-64 w-full">
             <motion.div
-              initial='hidden'
-              animate='visible'
+              initial="hidden"
+              animate="visible"
               variants={sectionVariants}
               transition={{ duration: 0.5 }}
             >
@@ -289,3 +280,4 @@ const Dashboard = ({ startLoading, stopLoading }) => {
 };
 
 export default LoadingUI(Dashboard);
+// ...existing code...
