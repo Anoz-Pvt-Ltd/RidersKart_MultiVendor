@@ -6,10 +6,12 @@ import Button from "../../Components/Button";
 import LoadingUI from "../../Components/Loading";
 import { Trash } from "lucide-react";
 import { useRef } from "react";
+import InputBox from "../../components/InputBox";
 
 const CurrentCategory = ({ startLoading, stopLoading }) => {
   const { categoryId } = useParams();
   const editSubcategoryFormRef = useRef(null);
+  const SubcategoryFormRef = useRef(null);
   const user = useSelector((store) => store.UserInfo.user);
   const [error, setError] = useState("");
   const [CurrentCategory, setCurrentCategory] = useState();
@@ -53,6 +55,36 @@ const CurrentCategory = ({ startLoading, stopLoading }) => {
 
     fetchAllOrders();
   }, [user]);
+
+  const submitSubcategory = async (e) => {
+    e.preventDefault();
+    const formData = new FormData(SubcategoryFormRef.current);
+
+    // for (let [key, value] of formData.entries()) {
+    // console.log(`${key}: ${value}`);
+    // }
+    try {
+      startLoading();
+      const response = await FetchData(
+        `categories/sub-category/add`,
+        "post",
+        formData,
+        true
+      );
+      // console.log(response);
+      setHandlePopup((prev) => ({
+        ...prev,
+        addSubCategory: false,
+      }));
+      alert("Your Subcategory has been added successfully, kindly refresh !");
+    } catch (err) {
+      console.log(err);
+      // alert(parseErrorMessage(err.response?.data));
+      alert("Failed to add new Subcategory.");
+    } finally {
+      stopLoading();
+    }
+  };
 
   const handleDeleteSubcategory = async ({ subcategoryId }) => {
     // console.log(subcategoryId);
@@ -120,8 +152,14 @@ const CurrentCategory = ({ startLoading, stopLoading }) => {
 
   const details = [
     { label: "Name", value: CurrentCategory?.title },
-    { label: "Created At", value: CurrentCategory?.createdAt },
-    { label: "Updated At", value: CurrentCategory?.updatedAt },
+    {
+      label: "Created At",
+      value: new Date(CurrentCategory?.createdAt).toLocaleDateString(),
+    },
+    {
+      label: "Updated At",
+      value: new Date(CurrentCategory?.updatedAt).toLocaleDateString(),
+    },
     { label: "Status", value: CurrentCategory?.status },
     { label: "Number of Subcategories", value: CurrentSubCategory?.length },
   ];
@@ -130,10 +168,18 @@ const CurrentCategory = ({ startLoading, stopLoading }) => {
       <div className="flex justify-center items-center gap-10 pb-5">
         {/* <Button label={"Ban User"} onClick={HandleUserBan} /> */}
         {/* <Button label={"Edit User"} /> */}
-        <div>
+        <div className="flex justify-center items-center gap-20">
           <h1>
             Category Id: <span className="text-xl font-bold">{categoryId}</span>
           </h1>
+          <Button
+            label={"Add more Subcategory"}
+            onClick={() =>
+              setHandlePopup((prev) => {
+                return { ...prev, addSubCategory: true };
+              })
+            }
+          />
         </div>
       </div>
       {/* <h1>current User</h1> */}
@@ -144,7 +190,7 @@ const CurrentCategory = ({ startLoading, stopLoading }) => {
         <div className="overflow-x-auto">
           <table className="min-w-full border border-gray-300">
             <thead>
-              <tr className="bg-gray-200">
+              <tr className="bg-gray-200 w-fit">
                 <th className="border px-4 py-2 text-left text-gray-700">
                   Contents
                 </th>
@@ -172,7 +218,7 @@ const CurrentCategory = ({ startLoading, stopLoading }) => {
         <h1>
           All the Subcategories under{" "}
           <span className="font-semibold ">
-            {CurrentCategory?.title} Category
+            {CurrentCategory?.title} 
           </span>
           {""} are listed below
         </h1>
@@ -196,7 +242,7 @@ const CurrentCategory = ({ startLoading, stopLoading }) => {
               </h2>
               <h2>
                 <span className="font-semibold ">Last Updated at: </span>
-                {subcategory.updatedAt}
+                {new Date(subcategory.updatedAt).toLocaleDateString()}
               </h2>
             </div>
             <img src={subcategory.image.url} className="w-20 rounded-full " />
@@ -254,6 +300,69 @@ const CurrentCategory = ({ startLoading, stopLoading }) => {
               <Button type="submit" label="Update" />
             </div>
           </form>
+        </div>
+      )}
+      {handlePopup.addSubCategory && (
+        <div
+          initial={{ opacity: 0, scale: 0.1 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.1 }}
+          transition={{ duration: 0.4, ease: "easeInOut" }}
+          className="backdrop-blur-xl absolute top-0 w-full h-full flex justify-center items-center flex-col left-0"
+        >
+          <div className="grayBG shadow-2xl rounded-xl w-fit h-fit px-10 py-10 flex justify-center items-center">
+            <form
+              ref={SubcategoryFormRef}
+              onSubmit={submitSubcategory}
+              className="flex flex-col gap-2 "
+            >
+              <h1>Add new Subcategory</h1>
+              <InputBox
+                LabelName={"Subcategory"}
+                Placeholder={"New Subcategory"}
+                Name={"subcategory"}
+                Required
+              />
+              {/* {console.log(CurrentCategory)} */}
+              <InputBox
+                LabelName={"Category Id"}
+                Value={CurrentCategory?._id}
+                // Placeholder={CurrentCategory?._id}
+                Name={"categoryId"}
+                Required
+              />
+              {/* <InputBox
+                  LabelName={"Sub Category"}
+                  Placeholder={"Add Sub Category"}
+                  Name={"subcategory"}
+                  Required
+                /> */}
+              <div className="mt-4">
+                <label className="block text-sm font-medium">
+                  Upload Image
+                </label>
+                <input
+                  name="image"
+                  type="file"
+                  accept="image/*"
+                  className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                  // onChange={(e) =>
+                  //   setImage(e.target.files[0])
+                  // }
+                />
+              </div>
+              <Button label={"Confirm"} type={"submit"} />
+              <Button
+                label={"Cancel"}
+                onClick={() =>
+                  setHandlePopup((prev) => {
+                    return { ...prev, addSubCategory: false };
+                  })
+                }
+                className={"hover:bg-red-500"}
+              />
+            </form>
+          </div>
         </div>
       )}
     </div>
