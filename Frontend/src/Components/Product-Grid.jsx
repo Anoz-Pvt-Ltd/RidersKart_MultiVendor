@@ -7,7 +7,7 @@ export const ThreeProductGrid = ({ heading = "", products = [] }) => {
 
   return (
     <div className="product-grid lg:h-[30vw] lg:w-[30vw] flex flex-col justify-evenly bg-white rounded-xl drop-shadow-2xl">
-      <h2 className="text-lg font-semibold text-gray-800 p-2">{heading}</h2>
+      <h2 className=" font-semibold text-gray-800 p-2">{heading}</h2>
       <div className="grid grid-cols-2 grid-rows-2 h-5/6 ">
         {products.map((product, index) => (
           <Link
@@ -37,18 +37,16 @@ export const ThreeProductGrid = ({ heading = "", products = [] }) => {
               />
             </div>
             <div className="flex flex-col justify-center items-center ">
-              <h3 className="text-xs font-semibold text-gray-800">
+              <h3 className=" font-semibold text-gray-800">
                 {truncateString(product.name, 20)}
               </h3>
               <div className="flex gap-4">
-                <span className="line-through text-xs ">
-                  {product.price.MRP}
-                </span>
-                <span className="text-sm font-bold">
+                <span className="line-through ">{product.price.MRP}</span>
+                <span className=" font-bold">
                   ₹{product.price.sellingPrice}
                 </span>
                 {product.price.discount > 0 && (
-                  <span className="text-sm text-green-600">
+                  <span className=" text-green-600">
                     {product.price.discount}% off
                   </span>
                 )}
@@ -63,4 +61,3 @@ export const ThreeProductGrid = ({ heading = "", products = [] }) => {
     </div>
   );
 };
-
