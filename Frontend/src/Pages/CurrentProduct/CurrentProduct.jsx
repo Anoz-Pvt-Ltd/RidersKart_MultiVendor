@@ -329,7 +329,7 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
               </span>
             )}
           </div>
-          <h4 className="text-lg font-semibold mb-2">Available offers</h4>
+          {/* <h4 className="text-lg font-semibold mb-2">Available offers</h4>
           <ul className="list-disc list-inside">
             <li>
               Bank Offer 5% Unlimited Cashback on Flipkart Axis Bank Credit Card
@@ -347,7 +347,7 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
               Special Price Get extra 20% off (price inclusive of
               cashback/coupon) T&C
             </li>
-          </ul>
+          </ul> */}
 
           <div className="mt-5">
             <div>
