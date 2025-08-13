@@ -27,7 +27,7 @@ const AllProducts = ({ startLoading, stopLoading }) => {
         subcategory: subcategory || "",
         page,
         limit: 10,
-        userAddress: user.length > 0 ? user.address.city : null,
+        // userAddress: user.length > 0 ? user.address.city : null,
       }).toString();
 
       const response = await FetchData(
