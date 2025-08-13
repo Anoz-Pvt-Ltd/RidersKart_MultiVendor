@@ -7,7 +7,13 @@ import { useSelector } from "react-redux";
 import SelectBox from "../../components/SelectionBox";
 import LoadingUI from "../../components/Loading";
 import TextArea from "../../components/TextWrapper";
-import { CircleFadingPlus, MonitorUp, RotateCcw, RotateCw } from "lucide-react";
+import {
+  CircleFadingPlus,
+  MonitorUp,
+  Pencil,
+  RotateCcw,
+  RotateCw,
+} from "lucide-react";
 import PopUp from "../../components/PopUpWrapper";
 // import { categories } from "../../constants/AllProducts.Vendor";
 
@@ -861,14 +867,14 @@ const Products = ({ startLoading, stopLoading }) => {
                       }}
                       title='Add images'
                     >
-                      <CircleFadingPlus />
+                      <CircleFadingPlus /> <span> Add Image</span>
                     </button>
                     <button
                       onClick={() => handleEditProduct(product)}
                       title='Edit product'
                       className=' text-black '
                     >
-                      <MonitorUp />
+                      <Pencil /> <span>Edit Product</span>
                     </button>
                   </div>
                 </div>
