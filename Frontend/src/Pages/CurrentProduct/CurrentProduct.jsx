@@ -219,21 +219,21 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
           <div className="flex flex-col-reverse lg:flex-row h-5/6 lg:mb-10 ">
             {/* Image Array */}
             <div className="lg:w-20 lg:h-full  ">
-              <div className="overflow-x-auto flex flex-col justify-center items-center mt-2  gap-2">
+              <div className="overflow-x-auto flex flex-col justify-center items-center mt-2  gap-2 bg-neutral-400 rounded-xl m-4 lg:m-0">
                 {products?.images.map((image, index) => (
                   <img
                     key={index}
                     onClick={() => setCurrentImg(index)}
                     src={image.url}
                     alt={products?.name}
-                    className="h-20 w-20 cursor-pointer"
+                    className="h-10 w-10 m-2 cursor-pointer"
                   />
                 ))}
               </div>
             </div>
 
             {/* Current Image */}
-            <div className="relative h-full w-[40vw] p-3 m-2 ">
+            <div className="relative h-full lg:w-[40vw] p-3 m-2 ">
               <img
                 src={products?.images[currentImg]?.url}
                 alt={products?.name}
