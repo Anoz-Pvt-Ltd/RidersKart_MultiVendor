@@ -122,8 +122,10 @@ const CurrentOrder = ({ startLoading, stopLoading }) => {
               <span className="font-normal">{order?.orderStatus}</span>
             </h1>
             <h1 className="font-semibold">
-              Order date:{" "}
-              <span className="font-normal">{order?.bookingDate}</span>
+              Order date <span className="text-xs font-light">(MMDDYY)</span>:{" "}
+              <span className="font-normal">
+                {new Date(order?.bookingDate).toLocaleDateString()}
+              </span>
             </h1>
             <h1 className="font-semibold">
               Amount: <span className="font-normal">₹{order?.totalAmount}</span>
