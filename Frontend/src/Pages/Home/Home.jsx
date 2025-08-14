@@ -123,7 +123,8 @@ const Home = ({ startLoading, stopLoading }) => {
     { products: youMayLike, title: "You May Like" },
     { products: topSelection, title: "Top Selection" }
   );
-  const FamousSubcategory = subcategories.slice(0, 9);
+  const FamousSubcategory = subcategories.slice(17);
+  // console.log(FamousSubcategory);
 
   const BannerSlider = () => {
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -194,7 +195,7 @@ const Home = ({ startLoading, stopLoading }) => {
         </div>
       )} */}
 
-      <div className="lg:w-fit flex gap-10 p-5 lg:m-auto  w-full  overflow-x-auto flex-nowrap whitespace-nowrap no-scrollbar">
+      <div className="flex justify-center items-center flex-row-reverse gap-10 w-full overflow-x-scroll p-5 no-scrollbar">
         {FamousSubcategory.map((subcategory) => (
           <Link
             to={`/all-products/${subcategory?.category._id}/${subcategory._id}/${subcategory?.category.title}/${subcategory.title}`}
@@ -208,7 +209,7 @@ const Home = ({ startLoading, stopLoading }) => {
                 className="w-full h-full "
               />
             </div>
-            <span className="text-sm">
+            <span className="text-sm truncate">
               {truncateString(subcategory.title, 10)}
             </span>
           </Link>
