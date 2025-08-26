@@ -1,7 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import Button from "./Button";
-import React from "react";
 import { FetchData } from "../Utility/FetchFromApi";
 import { addCart } from "../Utility/Slice/CartSlice";
 
