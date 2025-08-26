@@ -216,13 +216,13 @@ const Home = ({ startLoading, stopLoading }) => {
         ))}
       </div>
 
-      <motion.div
+      {/* <motion.div
         whileInView={{ opacity: 1, x: 0 }}
         initial={{ opacity: 0, x: 100 }}
         transition={{ duration: 0.5 }}
       >
         <BannerSlider />
-      </motion.div>
+      </motion.div> */}
 
       {/* {error && (
         <div className="bg-red-500 text-white p-4 rounded">{error}</div>

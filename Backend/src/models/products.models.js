@@ -1,5 +1,4 @@
 import mongoose, { Schema } from "mongoose";
-import { categories } from "../utils/constants.js";
 
 const productSchema = new mongoose.Schema({
   name: {
