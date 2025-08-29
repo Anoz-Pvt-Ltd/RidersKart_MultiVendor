@@ -367,11 +367,26 @@ const VendorBan = asyncHandler(async (req, res) => {
   const { vendorId } = req.params;
 
   const vendor = await VendorUser.findById(vendorId);
-  if (!vendor) throw new ApiError(404, "vendor not found");
+  if (!vendor) throw new ApiError(404, "Vendor not found");
 
-  vendor.isBanned = !vendor.isBanned;
-  vendor.save();
-  res.status(200).json(new ApiResponse(200, vendor, "vendor status updated"));
+  // Delete all products belonging to this vendor
+  const result = await Product.deleteMany({ _id: { $in: vendor.products } });
+
+  // Clear the vendor's products and update status
+  vendor.products = [];
+  vendor.status = "suspended"; // better than toggle
+  await vendor.save();
+
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      {
+        vendor,
+        deletedCount: result.deletedCount,
+      },
+      "Vendor has been banned and all products deleted successfully!"
+    )
+  );
 });
 
 const rejectVendor = asyncHandler(async (req, res) => {

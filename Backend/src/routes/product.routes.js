@@ -12,6 +12,7 @@ import {
   removeStockQuantity,
   AddProductImages,
   searchProducts,
+  deleteProductsByVendor,
 } from "../controllers/product.controllers.js";
 import {
   VerifyAdminUser,
@@ -54,6 +55,9 @@ router
 
 //routes for admin
 router.route("/admin/get-all-products").get(VerifyAdminUser, getAllProducts);
+router
+  .route("/admin/delete-all-vendor-products/:vendorId")
+  .post(VerifyAdminUser, deleteProductsByVendor);
 router
   .route("/admin/get-all-products-admin")
   .get(VerifyAdminUser, getAllProductForAdmin);

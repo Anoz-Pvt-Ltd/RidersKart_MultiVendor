@@ -13,6 +13,7 @@ import {
   getUnverifiedVendors,
   rejectVendor,
   acceptVendor,
+  VendorBan,
 } from "../controllers/Vendor.controllers.js";
 import {
   VerifyVendorUser,
@@ -51,7 +52,7 @@ router
 router
   .route("/admin/get-current-vendor/:vendorId")
   .get(VerifyAdminUser, getCurrentVendor);
-router.route("/admin/ban-vendor/:vendorId").post(VerifyAdminUser, deleteVendor);
+router.route("/admin/ban-vendor/:vendorId").post(VerifyAdminUser, VendorBan);
 router
   .route("/admin/delete-vendor/:vendorId")
   .delete(VerifyAdminUser, deleteVendor);

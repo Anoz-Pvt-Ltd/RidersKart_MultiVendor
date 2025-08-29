@@ -831,6 +831,69 @@ function sendPaginatedResponse(res, products, page, totalResults, limit = 20) {
   });
 }
 
+// Delete all products of a given vendor
+// const deleteProductsByVendor = asyncHandler(async (req, res) => {
+//   const { vendorId } = req.params;
+//   console.log
+
+//   if (!vendorId) {
+//     throw new ApiError(400, "Vendor ID is required");
+//   }
+
+//   // Delete all products with this vendor ID
+//   const result = await Product.deleteMany({ vendor: vendorId });
+
+//   if (result.deletedCount === 0) {
+//     throw new ApiError(404, "No products found for this vendor");
+//   }
+
+//   return res
+//     .status(200)
+//     .json(
+//       new ApiResponse(
+//         200,
+//         { deletedCount: result.deletedCount },
+//         `${result.deletedCount} product(s) deleted successfully for vendor ${vendorId}`
+//       )
+//     );
+// });
+const deleteProductsByVendor = asyncHandler(async (req, res, next) => {
+  const { vendorId } = req.params;
+
+  if (!vendorId) {
+    throw new ApiError(400, "Vendor ID is required");
+  }
+
+  // Find vendor
+  const vendor = await VendorUser.findById(vendorId);
+
+  if (!vendor) {
+    throw new ApiError(404, "Vendor not found");
+  }
+
+  // Check if vendor has products
+  if (!vendor.products || vendor.products.length === 0) {
+    throw new ApiError(404, "No products found under this vendor");
+  }
+
+  // Delete products from Product collection
+  const result = await Product.deleteMany({ _id: { $in: vendor.products } });
+
+  // Clear the vendor's products array
+  vendor.products = [];
+  await vendor.save();
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        { deletedCount: result.deletedCount },
+        `${result.deletedCount} product(s) deleted successfully from vendor ${vendorId}`
+      )
+    );
+});
+
 export {
   registerProduct,
   getAllProductForAdmin,
@@ -844,4 +907,5 @@ export {
   addStockQuantity,
   removeStockQuantity,
   searchProducts,
+  deleteProductsByVendor,
 };

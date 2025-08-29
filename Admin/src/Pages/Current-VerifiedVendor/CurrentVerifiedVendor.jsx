@@ -4,6 +4,7 @@ import { FetchData } from "../../Utility/FetchFromApi";
 import { useSelector } from "react-redux";
 import Button from "../../Components/Button";
 import LoadingUI from "../../Components/Loading";
+import { parseErrorMessage } from "../../Utility/ErrorMessageParser";
 
 const CurrentVerifiedVendor = ({ startLoading, stopLoading }) => {
   const { vendorId } = useParams();
@@ -16,6 +17,11 @@ const CurrentVerifiedVendor = ({ startLoading, stopLoading }) => {
   const [currentVendorAddressDetails, setCurrentVendorAddressDetails] =
     useState([]);
   const [currentVendorProducts, setCurrentVendorProducts] = useState([]);
+  const [handlePopup, setHandlePopup] = useState({
+    deleteVendor: false,
+    banVendor: false,
+    deleteAllProducts: false,
+  });
 
   useEffect(() => {
     const fetchVendor = async () => {
@@ -74,15 +80,33 @@ const CurrentVerifiedVendor = ({ startLoading, stopLoading }) => {
     try {
       startLoading();
       const response = await FetchData(
-        `vendor/delete-vendor/${vendorId}`,
+        `vendor/admin/ban-vendor/${vendorId}`,
         "post"
       );
 
-      // console.log(response);
-      alert("Vendor Banned!");
+      console.log(response);
+      alert("Vendor Banned and all the products are deleted !");
+      // alert(parseErrorMessage(response.data));
       window.location.href = "/home";
     } catch (error) {
       console.error(error);
+      alert(parseErrorMessage(err.response.data));
+    } finally {
+      stopLoading();
+    }
+  };
+  const DeleteAllProducts = async () => {
+    try {
+      startLoading();
+      const response = await FetchData(
+        `products/admin/delete-all-vendor-products/${vendorId}`,
+        "post"
+      );
+      console.log(response);
+      alert("All Products are Deleted");
+    } catch (err) {
+      console.log(err);
+      alert(parseErrorMessage(err.response.data));
     } finally {
       stopLoading();
     }
@@ -169,12 +193,30 @@ const CurrentVerifiedVendor = ({ startLoading, stopLoading }) => {
         <Button
           label={"Delete Vendor"}
           className={"hover:bg-red-500"}
-          onClick={DeleteVendor}
+          // onClick={DeleteVendor}
+          onClick={() =>
+            setHandlePopup({
+              deleteVendor: true,
+            })
+          }
         />
         <Button
           label={"Ban Vendor"}
           className={"hover:bg-red-500"}
-          onClick={BanVendor}
+          onClick={() =>
+            setHandlePopup({
+              banVendor: true,
+            })
+          }
+        />
+        <Button
+          label={"Delete All Products of Vendor"}
+          className={"hover:bg-red-500"}
+          onClick={() =>
+            setHandlePopup({
+              deleteAllProducts: true,
+            })
+          }
         />
       </div>
       <div className="p-6 mx-auto bg-white shadow-md rounded-lg mt-10">
@@ -205,6 +247,61 @@ const CurrentVerifiedVendor = ({ startLoading, stopLoading }) => {
           </table>
         </div>
       </div>
+
+      {/* popups for above buttons  */}
+      {handlePopup.deleteVendor && (
+        <div className="fixed top-0 left-0 w-full h-screen bg-white/90 flex flex-col justify-center items-center gap-10">
+          <h1>
+            Are you sure you want to DELETE this vendor ? After DELETING, the
+            Vendor can register again !
+          </h1>
+          <div className="flex justify-center items-center gap-10">
+            <Button label={"Confirm"} onClick={DeleteVendor} />
+            <Button
+              label={"Cancel"}
+              onClick={() =>
+                setHandlePopup({
+                  deleteVendor: false,
+                })
+              }
+            />
+          </div>
+        </div>
+      )}
+      {handlePopup.banVendor && (
+        <div className="fixed top-0 left-0 w-full h-screen bg-white/90 flex flex-col justify-center items-center gap-10">
+          <h1>Are you sure you want to BAN this vendor ?</h1>
+          <div className="flex justify-center items-center gap-10">
+            <Button label={"Confirm"} onClick={BanVendor} />
+            <Button
+              label={"Cancel"}
+              onClick={() =>
+                setHandlePopup({
+                  banVendor: false,
+                })
+              }
+            />
+          </div>
+        </div>
+      )}
+      {handlePopup.deleteAllProducts && (
+        <div className="fixed top-0 left-0 w-full h-screen bg-white/90 flex flex-col justify-center items-center gap-10">
+          <h1>
+            Are you sure you want to DELETE all the products of this vendor ?
+          </h1>
+          <div className="flex justify-center items-center gap-10">
+            <Button label={"Confirm"} onClick={DeleteAllProducts} />
+            <Button
+              label={"Cancel"}
+              onClick={() =>
+                setHandlePopup({
+                  deleteAllProducts: false,
+                })
+              }
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };
