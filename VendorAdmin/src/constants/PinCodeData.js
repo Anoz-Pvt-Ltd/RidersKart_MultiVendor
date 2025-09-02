@@ -1,4 +1,4 @@
-export const pinCodeData = {
+export const PinCodeData = {
   "BIHAR": {
     "NALANDA": [
       "803111",

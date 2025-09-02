@@ -15,7 +15,58 @@ import {
   RotateCw,
 } from "lucide-react";
 import PopUp from "../../components/PopUpWrapper";
+import { PinCodeData } from "../../constants/PinCOdeData";
 // import { categories } from "../../constants/AllProducts.Vendor";
+import { Check } from "lucide-react";
+
+const MultiSelect = ({ label, options, selected, onChange }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const toggleOption = (value) => {
+    if (selected.includes(value)) {
+      onChange(selected.filter((item) => item !== value));
+    } else {
+      onChange([...selected, value]);
+    }
+  };
+
+  return (
+    <div className="w-full">
+      <label className="block text-sm font-medium text-gray-700 mb-1">
+        {label}
+      </label>
+
+      <div className="relative">
+        <button
+          type="button"
+          className="w-full border border-gray-300 rounded-lg px-4 py-2 text-left bg-white hover:shadow-md transition"
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          {selected.length > 0 ? selected.join(", ") : `Select ${label}`}
+        </button>
+
+        {isOpen && (
+          <ul className="absolute mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto z-50">
+            {options.map((opt) => (
+              <li
+                key={opt.value}
+                onClick={() => toggleOption(opt.value)}
+                className={`flex justify-between items-center px-4 py-2 cursor-pointer hover:bg-indigo-100 ${
+                  selected.includes(opt.value) ? "bg-indigo-50" : ""
+                }`}
+              >
+                <span>{opt.label}</span>
+                {selected.includes(opt.value) && (
+                  <Check size={18} className="text-indigo-600" />
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </div>
+  );
+};
 
 const Products = ({ startLoading, stopLoading }) => {
   const user = useSelector((store) => store.UserInfo.user);
@@ -45,6 +96,8 @@ const Products = ({ startLoading, stopLoading }) => {
   const [UrlData, setUrlData] = useSearchParams();
   const [editProductData, setEditProductData] = useState(null);
   const editFormRef = useRef(null);
+  const [deliveryScope, setDeliveryScope] = useState("all");
+  const [editDeliveryScope, setEditDeliveryScope] = useState("all");
 
   console.log(products);
 
@@ -115,6 +168,8 @@ const Products = ({ startLoading, stopLoading }) => {
   const fetchProducts = async () => {
     try {
       startLoading();
+      console.log(user);
+      console.log(user?.[0]?._id);
       const response = await FetchData(
         `products/get-all-product-of-vendor/${user?.[0]?._id}`,
         "get"
@@ -407,6 +462,9 @@ const Products = ({ startLoading, stopLoading }) => {
       description: editProductData.description,
       specifications: { details: editProductData.specifications },
       tags: editProductData.tags.split(",").map((t) => t.trim()),
+      deliveryScope: editDeliveryScope,
+      deliveryStates: editProductData.deliveryStates || [],
+      deliveryCities: editProductData.deliveryCities || [],
     };
 
     try {
@@ -622,6 +680,55 @@ const Products = ({ startLoading, stopLoading }) => {
                     className="max-h-20 min-h-20"
                   />
                 </div>
+                {/* Delivery Scope Selection */}
+                <div className="flex items-start justify-center">
+                  <SelectBox
+                    className2="w-full"
+                    LabelName="Delivery Scope"
+                    Name="deliveryScope"
+                    Options={[
+                      { label: "All India", value: "all" },
+                      { label: "State Selection", value: "state" },
+                      { label: "City Selection", value: "city" },
+                    ]}
+                    onChange={(e) => setDeliveryScope(e.target.value)}
+                  />
+                </div>
+
+                {/* State Multi-Select */}
+                {deliveryScope === "state" && (
+                  <div className="flex items-start justify-center col-span-2">
+                    <SelectBox
+                      className2="w-full"
+                      LabelName="Select States"
+                      Name="deliveryStates"
+                      multiple={true}
+                      Options={Object.keys(PinCodeData).map((state) => ({
+                        label: state,
+                        value: state,
+                      }))}
+                    />
+                  </div>
+                )}
+
+                {/* City Multi-Select */}
+                {deliveryScope === "city" && (
+                  <div className="flex items-start justify-center col-span-2">
+                    <SelectBox
+                      className2="w-full"
+                      LabelName="Select Cities"
+                      Name="deliveryCities"
+                      multiple={true}
+                      Options={Object.entries(PinCodeData).flatMap(
+                        ([state, cities]) =>
+                          Object.keys(cities).map((city) => ({
+                            label: `${city} (${state})`,
+                            value: city,
+                          }))
+                      )}
+                    />
+                  </div>
+                )}
               </div>
 
               <div className="button flex lg:flex-row flex-col w-full lg:w-fit px-2 justify-end gap-2">
@@ -808,6 +915,64 @@ const Products = ({ startLoading, stopLoading }) => {
                     className="max-h-20 min-h-20"
                   />
                 </div>
+                {/* Delivery Scope Selection */}
+                <div className="flex items-start justify-center">
+                  <SelectBox
+                    className2="w-full"
+                    LabelName="Delivery Scope"
+                    Name="deliveryScope"
+                    Value={editDeliveryScope}
+                    onChange={(e) => setEditDeliveryScope(e.target.value)}
+                    Options={[
+                      { label: "All India", value: "all" },
+                      { label: "State Selection", value: "state" },
+                      { label: "City Selection", value: "city" },
+                    ]}
+                  />
+                </div>
+
+                {/* State Multi-Select */}
+                {editDeliveryScope === "state" && (
+                  <div className="flex items-start justify-center col-span-2">
+                    <MultiSelect
+                      label="Select States"
+                      options={Object.keys(PinCodeData).map((state) => ({
+                        label: state,
+                        value: state,
+                      }))}
+                      selected={editProductData.deliveryStates || []}
+                      onChange={(values) =>
+                        setEditProductData((prev) => ({
+                          ...prev,
+                          deliveryStates: values,
+                        }))
+                      }
+                    />
+                  </div>
+                )}
+
+                {/* City Multi-Select */}
+                {editDeliveryScope === "city" && (
+                  <div className="flex items-start justify-center col-span-2">
+                    <MultiSelect
+                      label="Select Cities"
+                      options={Object.entries(PinCodeData).flatMap(
+                        ([state, cities]) =>
+                          Object.keys(cities).map((city) => ({
+                            label: `${city} (${state})`,
+                            value: city,
+                          }))
+                      )}
+                      selected={editProductData.deliveryCities || []}
+                      onChange={(values) =>
+                        setEditProductData((prev) => ({
+                          ...prev,
+                          deliveryCities: values,
+                        }))
+                      }
+                    />
+                  </div>
+                )}
               </div>
 
               <div className="button flex lg:flex-row flex-col w-full lg:w-fit px-2 justify-end gap-2">

@@ -8,6 +8,7 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { UploadImages } from "../utils/imageKit.io.js";
+import { User } from "../models/user.model.js";
 
 // Controller to register a new product
 const registerProduct = asyncHandler(async (req, res) => {
@@ -98,7 +99,11 @@ const registerProduct = asyncHandler(async (req, res) => {
     { description, category, subcategory }
   );
 
-  // console.log("UploadedImage", UploadedImage);
+  const { deliveryScope, deliveryStates, deliveryCities } = req.body;
+
+  if (!["all", "state", "city"].includes(deliveryScope)) {
+    throw new ApiError(400, "Invalid delivery scope");
+  }
 
   // Create a new product instance
   const newProduct = new Product({
@@ -125,6 +130,9 @@ const registerProduct = asyncHandler(async (req, res) => {
     tags: allTags,
     vendor: vendorId,
     brand,
+    deliveryScope,
+    deliveryStates: deliveryScope === "state" ? deliveryStates : [],
+    deliveryCities: deliveryScope === "city" ? deliveryCities : [],
   });
 
   // Save the product to the database
@@ -167,106 +175,148 @@ const getAllProductForAdmin = asyncHandler(async (req, res) => {
   res.status(response.statusCode).json(response);
 });
 
+// const getAllProducts = asyncHandler(async (req, res) => {
+//   try {
+//     const {
+//       category,
+//       subcategory,
+//       vendor,
+//       page = 1,
+//       limit = 10,
+//       userCity,
+//       userAddress,
+//     } = req.query;
+//     // const { userAddress } = req.params;
+
+//     // console.log({ query: req.query, params: req.params, body: req.body });
+
+//     // console.log("userCity", userCity);
+
+//     if (userCity) {
+//       const vendorsInCity = await VendorUser.find({
+//         "location.city": userCity,
+//       }).populate("products");
+//       if (vendorsInCity || vendorsInCity.length > 0) {
+//         const productsInCity = vendorsInCity.reduce((acc, vendor) => {
+//           if (vendor.products && vendor.products.length > 0) {
+//             acc.push(...vendor.products);
+//           }
+//           return acc;
+//         }, []);
+//         return res.status(200).json(
+//           new ApiResponse(
+//             200,
+//             {
+//               total: productsInCity.length,
+//               page: 1,
+//               limit: productsInCity.length,
+//               products: productsInCity,
+//             },
+//             `Products fetched successfully for ${userCity}`
+//           )
+//         );
+//       }
+//     }
+
+//     if (userAddress) {
+//       const aggregationPipeline = [
+//         // First, match products by category and subcategory (more efficient to do this first)
+//         {
+//           $match: {
+//             category: mongoose.Types.ObjectId(category),
+//             subcategory: mongoose.Types.ObjectId(subcategory),
+//           },
+//         },
+//         // Then join with the VendorUser collection to access location data
+//         {
+//           $lookup: {
+//             from: "VendorUser", // Make sure this matches your VendorUser collection name
+//             localField: "vendor",
+//             foreignField: "_id",
+//             as: "vendorData",
+//           },
+//         },
+//         // Unwind the vendorData array (since lookup returns an array)
+//         {
+//           $unwind: "$vendorData",
+//         },
+//         // Now filter by city
+//         {
+//           $match: {
+//             "vendorData.location.city": userAddress,
+//           },
+//         },
+//         // Optionally project only the fields you need
+//         {
+//           $project: {
+//             name: 1,
+//             description: 1,
+//             price: 1,
+//             stockQuantity: 1,
+//             images: 1,
+//             status: 1,
+//             // Include other fields you need
+//             "vendorData.location.city": 1,
+//             "vendorData.location.address": 1,
+//           },
+//         },
+//       ];
+
+//       const filteredProducts = await Product.aggregate(aggregationPipeline);
+//       return res.status(200).json({
+//         success: true,
+//         data: filteredProducts,
+//       });
+//     }
+
+//     const filter = {};
+//     if (category) filter.category = category;
+//     if (subcategory) filter.subcategory = subcategory;
+//     if (vendor) filter.vendor = vendor;
+
+//     const products = await Product.find(filter)
+//       .populate("category", "name")
+//       .populate("subcategory", "name")
+//       .populate("vendor", "name email")
+//       .populate("brand")
+//       .sort({ createdAt: -1 })
+//       .skip((page - 1) * limit)
+//       .limit(parseInt(limit));
+
+//     if (!products || products.length === 0) {
+//       throw new ApiError(404, "No products found");
+//     }
+
+//     const totalProducts = await Product.countDocuments(filter);
+
+//     const response = new ApiResponse(
+//       200,
+//       {
+//         total: totalProducts,
+//         page: parseInt(page),
+//         limit: parseInt(limit),
+//         products,
+//       },
+//       "Products fetched successfully"
+//     );
+
+//     res.status(response.statusCode).json(response);
+//   } catch (error) {
+//     throw new ApiError(500, error.message || "Internal Server Error");
+//   }
+// });
 const getAllProducts = asyncHandler(async (req, res) => {
   try {
-    const {
-      category,
-      subcategory,
-      vendor,
-      page = 1,
-      limit = 10,
-      userCity,
-      userAddress,
-    } = req.query;
-    // const { userAddress } = req.params;
-
-    // console.log({ query: req.query, params: req.params, body: req.body });
-
-    // console.log("userCity", userCity);
-
-    if (userCity) {
-      const vendorsInCity = await VendorUser.find({
-        "location.city": userCity,
-      }).populate("products");
-      if (vendorsInCity || vendorsInCity.length > 0) {
-        const productsInCity = vendorsInCity.reduce((acc, vendor) => {
-          if (vendor.products && vendor.products.length > 0) {
-            acc.push(...vendor.products);
-          }
-          return acc;
-        }, []);
-        return res.status(200).json(
-          new ApiResponse(
-            200,
-            {
-              total: productsInCity.length,
-              page: 1,
-              limit: productsInCity.length,
-              products: productsInCity,
-            },
-            `Products fetched successfully for ${userCity}`
-          )
-        );
-      }
-    }
-
-    if (userAddress) {
-      const aggregationPipeline = [
-        // First, match products by category and subcategory (more efficient to do this first)
-        {
-          $match: {
-            category: mongoose.Types.ObjectId(category),
-            subcategory: mongoose.Types.ObjectId(subcategory),
-          },
-        },
-        // Then join with the VendorUser collection to access location data
-        {
-          $lookup: {
-            from: "VendorUser", // Make sure this matches your VendorUser collection name
-            localField: "vendor",
-            foreignField: "_id",
-            as: "vendorData",
-          },
-        },
-        // Unwind the vendorData array (since lookup returns an array)
-        {
-          $unwind: "$vendorData",
-        },
-        // Now filter by city
-        {
-          $match: {
-            "vendorData.location.city": userAddress,
-          },
-        },
-        // Optionally project only the fields you need
-        {
-          $project: {
-            name: 1,
-            description: 1,
-            price: 1,
-            stockQuantity: 1,
-            images: 1,
-            status: 1,
-            // Include other fields you need
-            "vendorData.location.city": 1,
-            "vendorData.location.address": 1,
-          },
-        },
-      ];
-
-      const filteredProducts = await Product.aggregate(aggregationPipeline);
-      return res.status(200).json({
-        success: true,
-        data: filteredProducts,
-      });
-    }
+    const { category, subcategory, vendor, page = 1, limit = 10 } = req.query;
+    const userId = req.user?._id; // Assuming auth middleware attaches logged-in user
 
     const filter = {};
     if (category) filter.category = category;
     if (subcategory) filter.subcategory = subcategory;
     if (vendor) filter.vendor = vendor;
 
-    const products = await Product.find(filter)
+    // Fetch all products first
+    let products = await Product.find(filter)
       .populate("category", "name")
       .populate("subcategory", "name")
       .populate("vendor", "name email")
@@ -279,17 +329,84 @@ const getAllProducts = asyncHandler(async (req, res) => {
       throw new ApiError(404, "No products found");
     }
 
-    const totalProducts = await Product.countDocuments(filter);
+    // 👉 If user not present → return all products
+    if (!userId) {
+      const response = new ApiResponse(
+        200,
+        {
+          total: products.length,
+          page: parseInt(page),
+          limit: parseInt(limit),
+          products,
+        },
+        "Products fetched successfully (no user filtering)"
+      );
+      return res.status(response.statusCode).json(response);
+    }
+
+    // 👉 User present → apply postalCode filtering
+    const user = await User.findById(userId);
+    if (!user || !user.address || user.address.length === 0) {
+      const response = new ApiResponse(
+        200,
+        {
+          total: products.length,
+          page: parseInt(page),
+          limit: parseInt(limit),
+          products,
+        },
+        "Products fetched successfully (user has no valid address)"
+      );
+      return res.status(response.statusCode).json(response);
+    }
+
+    // Take first postalCode for now (can expand to all later)
+    const userPostalCode = user.address[0].postalCode;
+
+    if (userPostalCode) {
+      products = products.filter((product) => {
+        if (!product.deliveryScope) return false;
+
+        if (product.deliveryScope === "all") return true;
+
+        if (
+          product.deliveryScope === "state" &&
+          Array.isArray(product.deliveryStates)
+        ) {
+          return product.deliveryStates.some((state) =>
+            state.pincodes?.includes(userPostalCode)
+          );
+        }
+
+        if (
+          product.deliveryScope === "city" &&
+          Array.isArray(product.deliveryCities)
+        ) {
+          return product.deliveryCities.some((city) =>
+            city.pincodes?.includes(userPostalCode)
+          );
+        }
+
+        if (
+          product.deliveryScope === "pincode" &&
+          Array.isArray(product.deliveryPincodes)
+        ) {
+          return product.deliveryPincodes.includes(userPostalCode);
+        }
+
+        return false;
+      });
+    }
 
     const response = new ApiResponse(
       200,
       {
-        total: totalProducts,
+        total: products.length,
         page: parseInt(page),
         limit: parseInt(limit),
         products,
       },
-      "Products fetched successfully"
+      "Products fetched successfully with postalCode filtering"
     );
 
     res.status(response.statusCode).json(response);
@@ -303,6 +420,7 @@ const getProductsOfVendor = asyncHandler(async (req, res) => {
   const { vendorId } = req.params;
 
   if (!vendorId) throw new ApiError(400, "Vendor ID is required");
+  console.log("vendorId: ", vendorId);
 
   // Fetch the products of the given vendor ID
   const vendor = await VendorUser.findById(vendorId).populate({

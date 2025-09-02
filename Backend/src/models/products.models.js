@@ -98,6 +98,20 @@ const productSchema = new mongoose.Schema({
     ref: "Brand",
     required: true,
   },
+  deliveryScope: {
+    type: String,
+    enum: ["all", "state", "city"],
+    // required: true,
+  },
+  deliveryStates: {
+    type: [String], // e.g. ["BIHAR", "JHARKHAND"]
+    default: [],
+  },
+  deliveryCities: {
+    type: [String], // e.g. ["PATNA", "NALANDA"]
+    default: [],
+  },
+
   createdAt: {
     type: Date,
     default: Date.now,
