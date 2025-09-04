@@ -112,10 +112,10 @@ const Home = ({ startLoading, stopLoading }) => {
 
   // console.log(subcategories);
 
-  const suggestedItems = products && products.slice(0, 3);
-  const topSelection = products && products.slice(3, 6);
-  const youMayLike = products && products.slice(6, 9);
+  const suggestedItems = products && products.slice(0, 4);
   const recommendation = products && products.slice(6, 10);
+  const topSelection = products && products.slice(5, 8);
+  const youMayLike = products && products.slice(7, 11);
 
   arrayOfGridItems.push(
     { products: suggestedItems, title: "Suggested Products" },
@@ -123,7 +123,7 @@ const Home = ({ startLoading, stopLoading }) => {
     { products: youMayLike, title: "You May Like" },
     { products: topSelection, title: "Top Selection" }
   );
-  const FamousSubcategory = subcategories.slice(17);
+  const FamousSubcategory = [...subcategories].reverse();
   // console.log(FamousSubcategory);
 
   const BannerSlider = () => {
@@ -185,7 +185,7 @@ const Home = ({ startLoading, stopLoading }) => {
   // console.log(FamousSubcategory);
 
   return (
-    <div className="container mx-auto py-4">
+    <div className="mx-auto py-4 lg:px-10">
       {/* {user && productsAvailableForUser === false && (
       // {user && userCity && productsAvailableForUser === false && (
         <div className="w-full h-10 bg-red-500 text-white">
@@ -195,7 +195,7 @@ const Home = ({ startLoading, stopLoading }) => {
         </div>
       )} */}
 
-      <div className="flex justify-center items-center flex-row-reverse gap-10 w-full overflow-x-scroll p-5 no-scrollbar">
+      <div className="flex justify-start items-center gap-10 w-full overflow-x-scroll p-5 no-scrollbar ">
         {FamousSubcategory.map((subcategory) => (
           <Link
             to={`/all-products/${subcategory?.category._id}/${subcategory._id}/${subcategory?.category.title}/${subcategory.title}`}
@@ -228,7 +228,7 @@ const Home = ({ startLoading, stopLoading }) => {
         <div className="bg-red-500 text-white p-4 rounded">{error}</div>
       )} */}
 
-      <div className="lg:h-[35vw] h-fit w-full p-2 lg:p-5 my-10 lg:my-0 flex flex-col lg:flex-row gap-10 lg:overflow-x-auto flex-nowrap whitespace-nowrap  scroll-smooth no-scrollbar">
+      <div className="lg:h-[35vw] h-fit w-full p-2 lg:p-5  flex flex-col lg:flex-row lg:gap-10 gap-2 lg:overflow-x-auto flex-nowrap whitespace-nowrap  scroll-smooth justify-start items-center">
         {arrayOfGridItems.map((item, index) => (
           <div key={index} className="flex-none w-fit">
             <ThreeProductGrid products={item.products} heading={item.title} />
@@ -236,7 +236,10 @@ const Home = ({ startLoading, stopLoading }) => {
         ))}
       </div>
 
-      <div className="mx-10">
+      <div className="lg:mx-10 mx-2 my-10">
+        <h1 className="w-full text-center uppercase lg:text-2xl tracking-widest lg:mb-5 mb-2">
+          Shop by category
+        </h1>
         {categories.map((category, index) => {
           const scrollLeft = () => {
             if (scrollContainer.current) {
@@ -259,7 +262,7 @@ const Home = ({ startLoading, stopLoading }) => {
           return (
             <motion.section
               key={category._id} // Use unique id for key
-              className="mb-12"
+              className="lg:mb-10 mb-2"
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.2 }}
@@ -270,13 +273,13 @@ const Home = ({ startLoading, stopLoading }) => {
                 <div className="flex gap-2">
                   <button
                     onClick={scrollLeft}
-                    className="headerBg text-white px-3 py-1 rounded shadow hover:bg-purple-800"
+                    className="bg-[#fe4343af] text-white px-3 py-1 rounded-full shadow hover:bg-[#FE4343] hover:text-black/50 font-extrabold duration-300 ease-in-out"
                   >
                     &#8249;
                   </button>
                   <button
                     onClick={scrollRight}
-                    className="headerBg text-white px-3 py-1 rounded shadow hover:bg-purple-800"
+                    className="bg-[#fe4343af] text-white px-3 py-1 rounded-full shadow hover:bg-[#FE4343] hover:text-black/50 font-extrabold duration-300 ease-in-out"
                   >
                     &#8250;
                   </button>
@@ -286,7 +289,7 @@ const Home = ({ startLoading, stopLoading }) => {
               {/* Subcategories */}
               <div
                 ref={scrollContainer}
-                className="flex overflow-x-auto overflow-y-hidden scrollbar-hide gap-4 py-2 px-1 justify-start items-start "
+                className="flex overflow-x-auto overflow-y-hidden scrollbar-hide lg:gap-4 gap-2 py-2 px-1 justify-start items-start "
               >
                 {category.subcategories.length > 0 ? (
                   category.subcategories.map((item) => (
@@ -301,7 +304,7 @@ const Home = ({ startLoading, stopLoading }) => {
                         initial={{ opacity: 0, x: -100 }}
                         transition={{ duration: 0.5 }}
                       >
-                        <div className="object-fill h-24 bg-white rounded-md mb-2 flex justify-center items-center p-10 overflow-hidden">
+                        <div className="object-fill h-24 bg-white rounded-md mb-2 flex justify-center items-center overflow-hidden">
                           <img
                             src={item.image?.url}
                             alt={item.title}

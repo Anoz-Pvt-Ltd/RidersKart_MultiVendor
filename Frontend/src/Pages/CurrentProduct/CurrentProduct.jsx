@@ -153,6 +153,7 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
       alert(response.data.message);
       // console.log(products);
       dispatch(addCart(products));
+      console.log(products);
     } catch (err) {
       console.log(err);
       alert(

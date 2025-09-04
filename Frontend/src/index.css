@@ -26,22 +26,22 @@
 
 /* For all scrollbars */
 ::-webkit-scrollbar {
-  width: 8px; /* Vertical scrollbar width */
-  height: 8px; /* Horizontal scrollbar height */
+  width: 5px; /* Vertical scrollbar width */
+  height: 5px; /* Horizontal scrollbar height */
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #a855f7; /* Thumb color (purple in this case) */
-  border-radius: 10px; /* Rounded corners */
+  background: #fe4343ad; /* Thumb color (purple in this case) */
+  border-radius: 5px; /* Rounded corners */
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #9333ea; /* Darker thumb on hover */
+  background: #FE4343; /* Darker thumb on hover */
 }
 
 ::-webkit-scrollbar-track {
-  background: #f3f4f6; /* Track color (light gray in this case) */
-  border-radius: 10px; /* Rounded corners for track */
+  background: #faeaea; /* Track color (light gray in this case) */
+  border-radius: 5px; /* Rounded corners for track */
 }
 
 /* Hide the scrollbar completely (optional for specific containers) */

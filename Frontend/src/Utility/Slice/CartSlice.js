@@ -34,6 +34,26 @@ export const updateCartQuantity = createAsyncThunk(
   }
 );
 
+export const addProductToCart = createAsyncThunk(
+  "CartList/addProductToCart",
+  async (productId, { rejectWithValue }) => {
+    try {
+      const response = await FetchData(
+        `products/get-single-product/${productId}`,
+        "get"
+      );
+      console.log("Hello", response);
+      if (response.status === 200) {
+        return response.data.data; // product details
+      } else {
+        return rejectWithValue("Failed to fetch product");
+      }
+    } catch (error) {
+      return rejectWithValue(error.response?.data || "Error fetching product");
+    }
+  }
+);
+
 const CartList = createSlice({
   name: "cartList",
   initialState: {
@@ -63,7 +83,6 @@ const CartList = createSlice({
       });
     },
     addQuantity: (state, action) => {
-      
       const index = state.cart.findIndex((item) => {
         return item.product._id === action.payload;
       });
@@ -114,6 +133,18 @@ const CartList = createSlice({
       })
       .addCase(updateCartQuantity.rejected, (state, action) => {
         alert(action.payload || "Failed to update cart");
+      })
+      .addCase(addProductToCart.fulfilled, (state, action) => {
+        const product = action.payload;
+        const exists = state.cart.some(
+          (item) => item.product._id === product._id
+        );
+        if (!exists) {
+          state.cart.push({ product, quantity: 1 });
+        }
+      })
+      .addCase(addProductToCart.rejected, (state, action) => {
+        console.error("Failed to add product to cart:", action.payload);
       });
   },
 });

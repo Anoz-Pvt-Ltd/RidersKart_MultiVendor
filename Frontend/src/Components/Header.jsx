@@ -21,6 +21,7 @@ const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const user = useSelector((store) => store.UserInfo.user);
   const cart = useSelector((store) => store.CartList.cart);
+  console.log(cart)
   const cartCount = cart.length;
   const searchedValue = useParams().searchData;
   const [searchInput, setSearchInput] = useState(searchedValue || "");

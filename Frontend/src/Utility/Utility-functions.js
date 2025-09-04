@@ -7,6 +7,15 @@ export function truncateString(str, length) {
   return str;
 }
 
+export function truncateNumber(number, length) {
+  const str = number.toString();
+  if (str.length > length) {
+    return str.slice(0, length) + "...";
+  }
+  return str;
+}
+
+
 export const useDebounce = (callback, delay) => {
   const timerRef = useRef(null);
 
