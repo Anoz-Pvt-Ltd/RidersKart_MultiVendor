@@ -52,8 +52,7 @@ const ProductCard = ({
   };
 
   return (
-    <Link>
-      {/* <Link to={`/current-product/${productId}`} className={`w-fit ${className}`}> */}
+    <Link to={`/current-product/${productId}`} className={`w-fit ${className}`}>
       <div className="whiteSoftBG shadow-md hover:shadow-lg h-auto w-52 overflow-hidden rounded-lg hover:scale-105 duration-300 ease-in-out">
         <div className="  overflow-hidden object-center flex justify-center items-center">
           <img
