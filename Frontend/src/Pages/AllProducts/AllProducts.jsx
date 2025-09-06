@@ -1,5 +1,5 @@
 import { useParams } from "react-router";
-import ProductCard from "../../Components/ProductCard";
+import { ProductCardResponsive } from "../../Components/ProductCard";
 import { useEffect, useState } from "react";
 import { FetchData } from "../../Utility/FetchFromApi";
 import LoadingUI from "../../Components/Loading";
@@ -56,12 +56,12 @@ const AllProducts = ({ startLoading, stopLoading }) => {
   console.log(products);
 
   return (
-    <div className='flex flex-col flex-wrap justify-center gap-6 p-4'>
+    <div className="flex flex-col flex-wrap justify-center lg:gap-6 lg:p-4 p-2">
       <div>
-        <h1 className='text-3xl font-bold'>
+        <h1 className="text-xl font-bold">
           {category_title || "All Products"}{" "}
           {subcategory_title && (
-            <span className='text-xl font-medium ml-4'>
+            <span className="text-sm font-medium ml-4">
               {" "}
               - {subcategory_title}
             </span>
@@ -69,10 +69,10 @@ const AllProducts = ({ startLoading, stopLoading }) => {
         </h1>
       </div>
 
-      <div className='flex flex-wrap justify-start items-center gap-6 p-4'>
+      <div className="flex flex-wrap justify-start items-center lg:gap-6 lg:p-4 gap-1 p-1">
         {products.length > 0 ? (
           products.map((product, index) => (
-            <ProductCard
+            <ProductCardResponsive
               Image={product?.images[0]?.url}
               key={product._id}
               ProductName={product.name}
@@ -87,25 +87,25 @@ const AllProducts = ({ startLoading, stopLoading }) => {
             />
           ))
         ) : (
-          <p className='text-center text-gray-500'>No products found.</p>
+          <p className="text-center text-gray-500">No products found.</p>
         )}
       </div>
 
       {/* Pagination Controls */}
       {totalPages > 1 && (
-        <div className='flex justify-center items-center mt-4'>
+        <div className="flex justify-center items-center mt-4">
           <button
-            className='px-4 py-2 bg-gray-300 rounded-md mr-2 disabled:opacity-50'
+            className="px-4 py-2 bg-gray-300 rounded-md mr-2 disabled:opacity-50"
             onClick={() => setPage(page - 1)}
             disabled={page === 1}
           >
             Previous
           </button>
-          <span className='text-lg font-medium'>
+          <span className="text-lg font-medium">
             {page} / {totalPages}
           </span>
           <button
-            className='px-4 py-2 bg-gray-300 rounded-md ml-2 disabled:opacity-50'
+            className="px-4 py-2 bg-gray-300 rounded-md ml-2 disabled:opacity-50"
             onClick={() => setPage(page + 1)}
             disabled={page === totalPages}
           >

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { FetchData } from "../../Utility/FetchFromApi";
 import { useDispatch, useSelector } from "react-redux";
-import ProductCard from "../../Components/ProductCard";
+// import ProductCard from "../../Components/ProductCard";
 import Button from "../../Components/Button";
 import LoadingUI from "../../Components/Loading";
 import { MoveRight } from "lucide-react";

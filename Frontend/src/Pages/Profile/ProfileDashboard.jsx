@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { motion } from "framer-motion";
 import { FetchData } from "../../Utility/FetchFromApi";
-import ProductCard from "../../Components/ProductCard";
+import  { ProductCardResponsive } from "../../Components/ProductCard";
 import {
   Heart,
   ListOrdered,
@@ -41,7 +41,6 @@ const Dashboard = ({ startLoading, stopLoading }) => {
           `users/${user?.[0]?._id}/wishlist-products`,
           "get"
         );
-        console.log(response);
         if (response.data.success) {
           setWishlistProducts(response.data.data);
         } else {
@@ -147,9 +146,9 @@ const Dashboard = ({ startLoading, stopLoading }) => {
                 <span>{wishlistProducts?.length} items.</span>
               </h1>
               {console.log(wishlistProducts)}
-              <div className="flex justify-start items-start gap-5 flex-wrap p-5">
+              <div className="flex justify-start items-start gap-5 flex-wrap lg:p-5">
                 {wishlistProducts?.map((product, index) => (
-                  <ProductCard
+                  <ProductCardResponsive
                     Image={product?.images[0]?.url}
                     key={index}
                     ProductName={product?.name}

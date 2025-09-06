@@ -4,7 +4,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useEffect } from "react";
 import { useState } from "react";
 import Button from "../../Components/Button";
-import ProductCard from "../../Components/ProductCard";
 import { useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Heart } from "lucide-react";
@@ -13,6 +12,7 @@ import PopUp from "../../Components/PopUpWrapper";
 import { addCart } from "../../Utility/Slice/CartSlice";
 import { parseErrorMessage } from "../../Utility/ErrorMessageParser";
 import Policies from "./policies";
+import { Card } from "../../Components/ProductCard";
 
 const CurrentProduct = ({ startLoading, stopLoading }) => {
   const [isReadMoreDescription, setIsReadMoreDescription] = useState(false);
@@ -28,7 +28,6 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
   const isProductAvailableForUser = useSelector(
     (store) => store.UserInfo.isProductAvailableForUser
   );
-  console.log(isProductAvailableForUser);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -112,7 +111,7 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
           brandId: products.brand._id,
           productId,
         });
-        console.log(response.data.data);
+        // console.log(response.data.data);
         setProductPolicy(response.data.data);
       } catch (err) {
         console.error(err);
@@ -212,7 +211,7 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
 
   return (
     <div className="mt-2">
-      <div className="flex flex-col lg:flex-row justify-between items-start p-4">
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:p-4 ">
         <section
           ref={productRef}
           className="ImageSection w-full lg:w-[40vw] lg:h-[70vh]"
@@ -310,15 +309,15 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
               />
             </span>
           </h3>
-          <h3 className="text-2xl font-semibold mb-2">{products?.name}</h3>
+          <h3 className="text-xl font-semibold mb-2">{products?.name}</h3>
           {/* <p className="text-gray-600 mb-4">{products?.description}</p> */}
 
-          <div className="flex items-center mt-4 mb-4">
-            <span className="text-lg font-semibold mr-2">4.3</span>
+          <div className="flex items-center lg:my-4 my-2 lg:text-lg text-xs">
+            <span className=" font-semibold mr-2">4.3</span>
             <span className="text-gray-500">4,486 Ratings & 494 Reviews</span>
           </div>
           <div className="flex items-baseline mb-4">
-            <span className="text-3xl font-bold mr-4">
+            <span className="text-xl font-bold mr-4">
               ₹ {products?.price.sellingPrice}
             </span>
             <span className="text-gray-500 line-through mr-4">
@@ -350,7 +349,7 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
             </li>
           </ul> */}
 
-          <div className="mt-5">
+          <div className="lg:mt-5">
             <div>
               <h1 className="font-semibold">Product Description</h1>
               <span>
@@ -398,9 +397,7 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
       </div>
 
       <section>
-        <h1 className="text-2xl font-semibold mb-2 ml-10">
-          People Also visited
-        </h1>
+        <h1 className=" font-semibold mb-2 ml-10">People Also visited</h1>
       </section>
       <div className="relative">
         {/* Left Arrow Button */}
@@ -412,11 +409,11 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
         </button>
 
         <div
-          className="flex overflow-x-scroll no-scrollbar justify-start items-center gap-6 py-10 px-10"
+          className="flex overflow-x-scroll no-scrollbar justify-start items-center lg:gap-6 lg:py-10 lg:px-10"
           ref={sliderRef}
         >
           {AllProducts?.map((product, index) => (
-            <ProductCard
+            <Card
               Image={product?.images[0]?.url}
               key={product._id}
               ProductName={product.name}

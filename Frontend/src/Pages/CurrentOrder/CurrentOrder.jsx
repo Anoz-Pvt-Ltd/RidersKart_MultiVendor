@@ -14,10 +14,6 @@ const CurrentOrder = ({ startLoading, stopLoading }) => {
   const user = useSelector((store) => store.UserInfo.user);
   const Navigate = useNavigate();
 
-  // console.log(orderProducts);
-  console.log(order);
-  // console.log(shippingAddress);
-
   const tableHeaders = [
     "Product Name",
     "Shipping Details",
@@ -37,7 +33,6 @@ const CurrentOrder = ({ startLoading, stopLoading }) => {
             `orders/admin/current-order/${orderId}`,
             "get"
           );
-          // console.log(response);
           if (response.data.success) {
             setOrder(response.data.data.order);
             setOrderProducts(response.data.data.order.products);
@@ -65,21 +60,23 @@ const CurrentOrder = ({ startLoading, stopLoading }) => {
     images,
   }) => {
     return (
-      <div className="flex flex-col justify-center items-center bg-white shadow-md rounded-lg p-4 mb-5 mx-5">
-        <div className="flex justify-between items-center w-full">
-          <div className="px-5 py-2 flex flex-col justify-center items-start w-96 gap-5">
-            <h1 className="text-2xl">{productName}</h1>
+      <div className="flex flex-col justify-center lg:items-center items-start bg-white shadow-md rounded-lg p-4 lg:mb-5 mb-2 lg:mx-5 w-screen lg:w-fit">
+        <div className="flex flex-col-reverse justify-between items-center w-full">
+          <div className="px-5 py-2 flex flex-col justify-center items-start w-96 lg:gap-5 ">
+            <h1 className="lg:text-base text-sm">{productName}</h1>
             <h2 className="">Seller: {sellerName}</h2>
             <h3 className="font-medium gap-10 text-xl">
               <span>₹ {orderAmount}</span>{" "}
-              <span className="text-sm p-2 rounded-xl">{paymentMethod}</span>
+              <span className="lg:text-base text-sm p-2 rounded-xl">
+                {paymentMethod}
+              </span>
             </h3>
           </div>
-          <div className="w-48 h-48 shadow overflow-hidden flex justify-center items-center rounded-lg object-center">
+          <div className="lg:w-48 lg:h-48 w-24 h-24 shadow overflow-hidden flex justify-center items-center rounded-lg object-center">
             <img src={images} className="" />
           </div>
         </div>
-        <div className="flex justify-center items-center gap-10 py-5">
+        <div className="flex flex-col lg:flex-row lg:justify-center lg:items-center items-start lg:gap-10 gap-1 py-5">
           <div className="">
             <Button label={"Raise an issue for this order"} />
           </div>
@@ -102,9 +99,9 @@ const CurrentOrder = ({ startLoading, stopLoading }) => {
 
   return (
     <div>
-      <div className=" px-10 py-10 flex justify-center items-start">
-        <div>
-          <div className="bg-neutral-300 rounded-xl shadow-xl py-5 px-10 flex justify-start items-start flex-col mb-4 text-lg">
+      <div className=" lg:px-10 py-10 flex lg:flex-row flex-col-reverse justify-center items-start lg:text-base text-sm ">
+        <div className="flex flex-col w-screen lg:w-fit">
+          <div className="bg-neutral-300 rounded-xl shadow-xl py-5 lg:px-10 px-5 flex justify-start items-start flex-col mb-4">
             <h1 className="text-lg font-semibold">Order Details</h1>
             <h1 className="font-semibold">
               Id: <span className="font-normal">{order?._id}</span>
@@ -131,9 +128,9 @@ const CurrentOrder = ({ startLoading, stopLoading }) => {
               Amount: <span className="font-normal">₹{order?.totalAmount}</span>
             </h1>
           </div>
-          <div className="grid grid-cols-4 grid-rows-0 gap-4">
+          <div className="grid grid-cols-4 grid-rows-0 lg:gap-4 gap-1">
             {/* user: shipping details */}
-            <div className=" shadow rounded-xl py-5 px-10 flex justify-start items-start flex-col col-span-4 font-semibold bg-neutral-300 text-lg">
+            <div className=" shadow rounded-xl py-5 lg:px-10 px-5 flex justify-start items-start flex-col col-span-4 font-semibold bg-neutral-300 lg:text-base text-sm">
               Shipping Details
               <h1 className="flex flex-col">
                 <span>
@@ -157,11 +154,11 @@ const CurrentOrder = ({ startLoading, stopLoading }) => {
               </h1>
             </div>
             {/* user: name  */}
-            <div className=" shadow rounded-xl text-xl py-5 px-10 flex justify-start items-center col-span-4  col-start-1 row-start-2 font-semibold bg-neutral-300">
+            <div className=" shadow rounded-xl lg:text-base text-sm py-5 lg:px-10 px-5 flex justify-start items-center col-span-4  col-start-1 row-start-2 font-semibold bg-neutral-300">
               Name: <span className="font-normal ml-2">{user[0]?.name}</span>
             </div>
             {/* user: contact number */}
-            <div className="shadow rounded-xl text-lg py-5 px-10 flex justify-start items-center col-span-4 row-start-4 font-semibold bg-neutral-300">
+            <div className="shadow rounded-xl lg:text-base text-sm py-5 lg:px-10 px-5 flex justify-start items-center col-span-4 row-start-4 font-semibold bg-neutral-300">
               Phone number:{" "}
               <span className="font-normal ml-2">{user[0]?.phoneNumber}</span>
             </div>

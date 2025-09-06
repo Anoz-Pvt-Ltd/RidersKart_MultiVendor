@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { FetchData } from "../../Utility/FetchFromApi";
-import ProductCard from "../../Components/ProductCard";
 import Button from "../../Components/Button";
 import ProductCardMobile from "../../Components/ProductCardMobile";
 import LoadingUI from "../../Components/Loading";
@@ -46,7 +45,6 @@ const CartPage = ({ startLoading, stopLoading }) => {
 
   const HandleBuyNow = async () => {
     const products = productFormatter(cart);
-    console.log("products", products);
     try {
       startLoading();
 
@@ -57,13 +55,11 @@ const CartPage = ({ startLoading, stopLoading }) => {
         // shippingAddress: addresses[selectedAddress],
         totalAmount: (getTotalPayablePrice() * 1.1).toFixed(2),
       });
-      console.log(response);
       stopLoading();
       // alert(response.data.message);
       localStorage.setItem("orderId", response.data.data._id);
       return response.data.data._id;
     } catch (err) {
-      // console.log(err);
       alert(parseErrorMessage(err.response.data));
     } finally {
       stopLoading();
@@ -83,14 +79,12 @@ const CartPage = ({ startLoading, stopLoading }) => {
         status: "confirmed",
         address: addresses[selectedAddress],
       });
-      console.log(response);
       if (response.status === 200) {
         alert("Order confirmed successfully!");
         dispatch(resetCart());
         Navigate("/"); // Redirect to orders page after confirmation
       }
     } catch (error) {
-      console.error("Error confirming order:", error);
       alert("Failed to confirm order. Please try again.");
     } finally {
       stopLoading();
@@ -114,8 +108,6 @@ const CartPage = ({ startLoading, stopLoading }) => {
       },
     });
 
-    console.log(order);
-
     var options = {
       key: process.env.razorpay_key_id, // Enter the Key ID generated from the Dashboard
       order_id: order.data.data.id, // ✅ Correct key for order-based payments
@@ -123,8 +115,6 @@ const CartPage = ({ startLoading, stopLoading }) => {
       description: "Monthly Test Plan",
       image: "/Logo.png",
       handler: async function (response) {
-        console.log(response); // Check response
-
         const body = {
           ...response,
           amount: order.data.data.amount, // Pass correct amount
@@ -158,7 +148,6 @@ const CartPage = ({ startLoading, stopLoading }) => {
     e.preventDefault();
     if (!selectedAddress || !paymentMethod) {
       alert("Please select an address and payment method.");
-      console.log("Not selected address or payment method");
       return;
     }
 
@@ -180,7 +169,6 @@ const CartPage = ({ startLoading, stopLoading }) => {
             `users/${user?.[0]?._id}/addresses`,
             "get"
           );
-          console.log(response);
           setAddresses(response.data);
         } catch (err) {
           setError(err.response?.data?.message || "Failed to fetch addresses.");
@@ -213,18 +201,13 @@ const CartPage = ({ startLoading, stopLoading }) => {
     fetchProducts();
   }, []);
 
-  // console.log(cart?.[0]?.quantity);
-
   const removeFromCart = async (productId) => {
     try {
       startLoading();
-      console.log("productId", productId);
-      console.log("user", user[0]._id);
       const response = await FetchData(
         `users/${user[0]._id}/${productId}/cart/remove`,
         "delete"
       );
-      console.log(response);
 
       alert(response.data.message);
       dispatch(deleteFromCart(productId));
@@ -247,7 +230,6 @@ const CartPage = ({ startLoading, stopLoading }) => {
         "post",
         { quantity }
       );
-      console.log(response);
       alert("Quantity updated successfully");
     } catch (err) {
       console.log(err);
@@ -268,15 +250,9 @@ const CartPage = ({ startLoading, stopLoading }) => {
       return total + item.product.price.sellingPrice * item.quantity;
     }, 0);
   }
-
-  console.log(cart);
-  // console.log(cart[0]?._id);
-  // console.log(cart[0]?.product?.vendor);
   const HandleHome = () => {
     Navigate("/");
   };
-
-  // console.log("products", productFormatter(cart));
 
   return (
     <div className="container mx-auto p-4">

@@ -4,7 +4,6 @@ import { motion } from "framer-motion";
 import { FetchData } from "../../Utility/FetchFromApi";
 import Button from "../../Components/Button";
 import InputBox from "../../Components/InputBox";
-import ProductCard from "../../Components/ProductCard";
 import {
   Edit,
   Heart,

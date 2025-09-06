@@ -2,14 +2,14 @@ import React, { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { DemoImageBanner } from "../../Constants/DemoImages";
 import { FetchData } from "../../Utility/FetchFromApi";
-import ProductCard from "../../Components/ProductCard";
+import  { Card, ProductCardResponsive } from "../../Components/ProductCard";
 import { Link } from "react-router";
-import LoadingUI from "../../Components/Loading";
 import { ThreeProductGrid } from "../../Components/Product-Grid";
 import { truncateString } from "../../Utility/Utility-functions";
 import { useSelector } from "react-redux";
 import { toggleProductAvailability } from "../../Utility/Slice/UserInfoSlice";
 import { useDispatch } from "react-redux";
+import LoadingUI from "../../Components/Loading";
 
 const Home = ({ startLoading, stopLoading }) => {
   const scrollContainer = useRef(null);
@@ -24,15 +24,11 @@ const Home = ({ startLoading, stopLoading }) => {
   const [productsAvailableForUser, setProductsAvailableForUser] =
     useState(false);
 
-  // console.log(products);
-
   // useEffect(() => {
   //   if (user && user[0]?.address) {
   //     setUserCity(user[0]?.address[0]?.city);
   //   }
   // }, [user]);
-
-  // console.log(userCity);
 
   const arrayOfGridItems = [];
 
@@ -79,7 +75,7 @@ const Home = ({ startLoading, stopLoading }) => {
 
     fetchAllCategories();
     fetchProducts();
-  }, []);
+  }, [user]);
 
   // It will fetch products only for the specific user
   useEffect(() => {
@@ -109,8 +105,6 @@ const Home = ({ startLoading, stopLoading }) => {
     fetchProducts();
   }, [user]);
   // }, [user, userCity]);
-
-  // console.log(subcategories);
 
   const suggestedItems = products && products.slice(0, 4);
   const recommendation = products && products.slice(6, 10);
@@ -182,9 +176,9 @@ const Home = ({ startLoading, stopLoading }) => {
     );
   };
 
-  // console.log(FamousSubcategory);
-
-  return (
+  return categories.length === 0 ? (
+    startLoading()
+  ) : (
     <div className="mx-auto py-4 lg:px-10">
       {/* {user && productsAvailableForUser === false && (
       // {user && userCity && productsAvailableForUser === false && (
@@ -326,7 +320,7 @@ const Home = ({ startLoading, stopLoading }) => {
 
       <div className="flex gap-4 bg-transparent justify-start items-center overflow-x-auto p-5 max-w-full no-scrollbar">
         {products?.map((product) => (
-          <ProductCard
+          <Card
             Image={product?.images[0]?.url}
             key={product._id}
             ProductName={product.name}
