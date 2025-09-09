@@ -22,6 +22,7 @@ const Login = ({ startLoading, stopLoading }) => {
   const formRef = useRef(null);
   const [formData, setFormData] = useState({
     email: "",
+    phoneNumber: "",
     password: "",
   });
   const [error, setError] = useState("");
@@ -88,12 +89,22 @@ const Login = ({ startLoading, stopLoading }) => {
           >
             <InputBox
               onChange={handleChange}
-              LabelName={"Login"}
+              LabelName={"Email"}
               Placeholder={"Email Address"}
               Type={"email"}
               className={"w-full"}
               Name={"email"}
               Value={formData.email}
+            />
+            or
+            <InputBox
+              onChange={handleChange}
+              LabelName={"Contact Number"}
+              Placeholder={"Contact Number"}
+              Type={"text"}
+              className={"w-full"}
+              Name={"phoneNumber"}
+              Value={formData.phoneNumber}
             />
             <InputBox
               onChange={handleChange}

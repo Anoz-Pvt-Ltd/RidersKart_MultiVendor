@@ -66,7 +66,7 @@ const registerUser = asyncHandler(async (req, res, next) => {
 
   // send OTP to user through SMS
   const smsId = await sendOtpSMS(phoneNumber, otp, name);
-  if(!smsId) {
+  if (!smsId) {
     throw new ApiError(500, "Failed to send OTP via SMS");
   }
 
@@ -81,26 +81,82 @@ const registerUser = asyncHandler(async (req, res, next) => {
     );
 });
 
+// const loginUser = asyncHandler(async (req, res) => {
+//   const { email, password } = req.body;
+
+//   if (!email || !password)
+//     throw new ApiError(401, "email and password are required");
+
+//   const user = await User.findOne({ email });
+
+//   if (!user) throw new ApiError(404, "Provided email is not found");
+
+//   const isValid = await user.isPasswordCorrect(password);
+
+//   if (!isValid) throw new ApiError(401, "Entered Password is not correct");
+
+//   const { AccessToken, RefreshToken } = await generateAccessAndRefreshTokens(
+//     user?._id
+//   );
+
+//   // const mailSent = await SendMail();
+//   // console.log(mailSent);
+
+//   const options = {
+//     httpOnly: true,
+//     secure: true,
+//   };
+
+//   return res
+//     .status(201)
+//     .cookie("RefreshToken", RefreshToken, options)
+//     .cookie("AccessToken", AccessToken, options)
+//     .json(
+//       new ApiResponse(
+//         201,
+//         {
+//           user,
+//           tokens: {
+//             AccessToken,
+//             RefreshToken,
+//           },
+//         },
+//         "User Logged In successfully"
+//       )
+//     );
+// });
+
 const loginUser = asyncHandler(async (req, res) => {
-  const { email, password } = req.body;
+  const { email, phoneNumber, password } = req.body;
 
-  if (!email || !password)
-    throw new ApiError(401, "email and password are required");
+  if (!password) throw new ApiError(401, "Password is required");
 
-  const user = await User.findOne({ email });
+  if (!email && !phoneNumber) {
+    throw new ApiError(
+      401,
+      "Please provide either email or mobile phoneNumber"
+    );
+  }
 
-  if (!user) throw new ApiError(404, "Provided email is not found");
+  // find user by email or phoneNumber
+  let user;
+  if (email) {
+    user = await User.findOne({ email });
+    if (!user) throw new ApiError(404, "Provided email is not found");
+  } else if (phoneNumber) {
+    user = await User.findOne({ phoneNumber });
+    if (!user)
+      throw new ApiError(404, "Provided mobile phoneNumber is not found");
+  }
 
+  // validate password
   const isValid = await user.isPasswordCorrect(password);
+  if (!isValid) throw new ApiError(401, "Entered password is not correct");
 
-  if (!isValid) throw new ApiError(401, "Entered Password is not correct");
-
+  // generate tokens
   const { AccessToken, RefreshToken } = await generateAccessAndRefreshTokens(
     user?._id
   );
-
-  // const mailSent = await SendMail();
-  // console.log(mailSent);
 
   const options = {
     httpOnly: true,
@@ -121,7 +177,7 @@ const loginUser = asyncHandler(async (req, res) => {
             RefreshToken,
           },
         },
-        "User Logged In successfully"
+        "User logged in successfully"
       )
     );
 });
