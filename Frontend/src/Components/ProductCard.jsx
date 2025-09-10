@@ -9,6 +9,7 @@ import { truncateNumber, truncateString } from "../Utility/Utility-functions";
 import { useDispatch, useSelector } from "react-redux";
 import { current } from "@reduxjs/toolkit";
 import LoadingUI from "./Loading";
+import { alertError, alertSuccess } from "../Utility/Alert";
 
 const ProductCard = ({
   ProductName,
@@ -38,12 +39,12 @@ const ProductCard = ({
         `users/${user?._id}/${productId}/cart/add`,
         "post"
       );
-      alert(response.data.message);
+      alertSuccess(response.data.message);
       dispatch(addCart(currentProduct.data.data));
       // dispatch(addProductToCart(productId));
     } catch (err) {
       console.log(err);
-      alert(
+      alertError(
         err.response?.data?.message ||
           "Please Login first!, Failed to add product to cart."
       );
@@ -129,13 +130,13 @@ const Card = ({
         `users/${user?._id}/${productId}/cart/add`,
         "post"
       );
-      alert(response.data.message);
+      alertSuccess(response.data.message);
       dispatch(addCart(currentProduct.data.data));
       // dispatch(addProductToCart(productId));
     } catch (err) {
       Navigate("/login");
       console.log(err);
-      alert(
+      alertError(
         err.response?.data?.message ||
           "Please Login first!, Failed to add product to cart."
       );
@@ -218,12 +219,12 @@ const CheckOut = ({
         `users/${user?._id}/${productId}/cart/add`,
         "post"
       );
-      alert(response.data.message);
+      alertSuccess(response.data.message);
       dispatch(addCart(currentProduct.data.data));
       // dispatch(addProductToCart(productId));
     } catch (err) {
       console.log(err);
-      alert(
+      alertError(
         err.response?.data?.message ||
           "Please Login first!, Failed to add product to cart."
       );

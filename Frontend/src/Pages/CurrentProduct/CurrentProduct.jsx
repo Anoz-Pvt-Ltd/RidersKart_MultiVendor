@@ -13,9 +13,13 @@ import { addCart } from "../../Utility/Slice/CartSlice";
 import { parseErrorMessage } from "../../Utility/ErrorMessageParser";
 import Policies from "./policies";
 import { Card } from "../../Components/ProductCard";
-import { checkPincodeAvailability, FilterByPincode } from "../../Utility/FilterByPincode";
+import {
+  checkPincodeAvailability,
+  FilterByPincode,
+} from "../../Utility/FilterByPincode";
 import { PinCodeData } from "../../Constants/PinCodeData.js";
 import InputBox from "../../Components/InputBox.jsx";
+import { alertError, alertInfo, alertSuccess } from "../../Utility/Alert.js";
 
 const CurrentProduct = ({ startLoading, stopLoading }) => {
   const [isReadMoreDescription, setIsReadMoreDescription] = useState(false);
@@ -64,7 +68,7 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
   // 🔹 Manual check for guest users
   const handleCheck = () => {
     if (!pincode) {
-      alert("Please enter a pincode");
+      alertInfo("Please enter a pincode");
       return;
     }
 
@@ -81,7 +85,7 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
     }
 
     if (!pincodeExists) {
-      alert("Invalid pincode");
+      alertError("Invalid pincode");
       setAvailability(null);
       return;
     }
@@ -121,12 +125,12 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
         }
       } catch (err) {
         // console.log(err);
-        alert(parseErrorMessage(err.response.data));
+        alertError(parseErrorMessage(err.response.data));
       } finally {
         stopLoading();
       }
     } else {
-      alert("Please Login first!");
+      alertInfo("Please Login first!");
       navigate("/login");
     }
   };
@@ -209,7 +213,7 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
 
   const addProductToCart = async () => {
     if (user.length === 0) {
-      alert("Please Login first");
+      alertInfo("Please Login first");
       navigate("/login");
     } else {
       try {
@@ -220,13 +224,13 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
         );
         // console.log(response);
 
-        alert(response.data.message);
+        alertSuccess(response.data.message);
         // console.log(products);
         dispatch(addCart(products));
         console.log(products);
       } catch (err) {
         console.log(err);
-        alert(
+        alertError(
           err.response?.data?.message ||
             "Internal server error Please try after sometime !"
         );
@@ -238,7 +242,7 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
 
   const addProductToWishlist = async () => {
     if (user.length === 0) {
-      alert("Please Login first");
+      alertInfo("Please Login first");
     } else {
       try {
         startLoading();
@@ -247,7 +251,7 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
           "post"
         );
         // console.log(response);
-        alert(response.data.message);
+        alertSuccess(response.data.message);
       } catch (err) {
         // console.log(err);
         // alert(
@@ -255,10 +259,10 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
         //     "Please Login first! , Failed to add product to Wishlist."
         // );
         if (user.length > 0) {
-          alert(err.response?.data?.message || "Internal Server Error");
+          alertError(err.response?.data?.message || "Internal Server Error");
         }
         if (user.length === 0) {
-          alert(
+          alertError(
             err.response?.data?.message ||
               "Please Login first! , Failed to add product to Wishlist."
           );
@@ -366,8 +370,8 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
                     {availability ? (
                       <div className="flex flex-col justify-center items-center gap-3">
                         <div className="flex gap-10 lg:gap-52 justify-center items-center bg-green-500 text-white p-4 rounded-lg w-full">
-                          This product is not available for your location (
-                          {pincode})
+                          This product is available for your location ({pincode}
+                          )
                         </div>
                         <div className="flex w-full justify-evenly items-center ">
                           <Button

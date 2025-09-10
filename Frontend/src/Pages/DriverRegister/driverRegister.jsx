@@ -3,10 +3,10 @@ import Button from "../../Components/Button";
 import { FetchData } from "../../Utility/FetchFromApi";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-// import { alertError, alertSuccess } from "../../Utility/";
 // import { parseErrorMessage } from "../../../utility/ErrorMessageParser";
 import InputBox from "../../Components/InputBox";
 import SelectBox from "../../Components/SelectionBox";
+import { alertInfo, alertSuccess } from "../../Utility/Alert";
 
 export default function RegisterDriver() {
   // variables----------------------------------------------------------------
@@ -28,7 +28,7 @@ export default function RegisterDriver() {
     const phone = formData.get("phone");
     const phoneRegex = /^[6-9]\d{9}$/;
     if (!phoneRegex.test(phone)) {
-      alert("Please enter a valid phone number");
+      alertInfo("Please enter a valid phone number");
       return;
     }
 
@@ -36,7 +36,7 @@ export default function RegisterDriver() {
     const aadharNumber = formData.get("aadharNumber");
     const aadharRegex = /^\d{12}$/;
     if (!aadharRegex.test(aadharNumber)) {
-      alert("Please enter a valid aadhar number");
+      alertInfo("Please enter a valid aadhar number");
       return;
     }
 
@@ -44,7 +44,7 @@ export default function RegisterDriver() {
     const panNumber = formData.get("panNumber");
     const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
     if (!panRegex.test(panNumber)) {
-      alert("Please enter a valid Pan number");
+      alertInfo("Please enter a valid Pan number");
       return;
     }
 
@@ -52,7 +52,7 @@ export default function RegisterDriver() {
     const licenseNumber = formData.get("licenseNumber");
     const dlRegex = /^[A-Z]{2}\d{13}$/; // Adjust this regex as per the regional format
     if (!dlRegex.test(licenseNumber)) {
-      alert("Please enter a valid Driving License number");
+      alertInfo("Please enter a valid Driving License number");
       return;
     }
 

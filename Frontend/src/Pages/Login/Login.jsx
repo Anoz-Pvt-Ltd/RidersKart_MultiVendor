@@ -10,6 +10,7 @@ import { clearUser, addUser } from "../../Utility/Slice/UserInfoSlice";
 import LoadingUI from "../../Components/Loading";
 import { parseErrorMessage } from "../../Utility/ErrorMessageParser";
 import LoginImage from "../../assets/Login_Image.png";
+import { alertError, alertSuccess } from "../../Utility/Alert";
 
 const Login = ({ startLoading, stopLoading }) => {
   const Navigate = useNavigate();
@@ -55,7 +56,9 @@ const Login = ({ startLoading, stopLoading }) => {
         response.data.data.tokens.RefreshToken
       );
 
-      alert(response.data.message);
+      // alert(response.data.message);
+      console.log(response);
+      alertSuccess(response.data.message);
       Dispatch(clearUser());
       Dispatch(addUser(response.data.data.user));
       setSuccess("Login successful!");
@@ -63,7 +66,7 @@ const Login = ({ startLoading, stopLoading }) => {
     } catch (err) {
       console.log(err);
       // alert(parseErrorMessage(error.response.data.data.statusCode));
-      alert(parseErrorMessage(err.response.data));
+      alertError(parseErrorMessage(err.response.data));
     } finally {
       stopLoading(); // Stop loading once response is received
     }

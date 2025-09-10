@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { FetchData } from "../FetchFromApi";
+import { alertError } from "../Alert";
 
 // Define the fetchCart thunk
 export const fetchCart = createAsyncThunk(
@@ -132,7 +133,7 @@ const CartList = createSlice({
         }
       })
       .addCase(updateCartQuantity.rejected, (state, action) => {
-        alert(action.payload || "Failed to update cart");
+        alertError(action.payload || "Failed to update cart");
       })
       .addCase(addProductToCart.fulfilled, (state, action) => {
         const product = action.payload;

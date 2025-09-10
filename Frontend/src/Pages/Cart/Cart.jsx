@@ -15,6 +15,7 @@ import { useNavigate } from "react-router";
 import { parseErrorMessage } from "../../Utility/ErrorMessageParser";
 import { CheckOutCard } from "../../Components/ProductCard";
 import { Trash } from "lucide-react";
+import { alertError, alertInfo, alertSuccess } from "../../Utility/Alert";
 
 const CartPage = ({ startLoading, stopLoading }) => {
   const [error, setError] = useState("");
@@ -62,7 +63,7 @@ const CartPage = ({ startLoading, stopLoading }) => {
       localStorage.setItem("orderId", response.data.data._id);
       return response.data.data._id;
     } catch (err) {
-      alert(parseErrorMessage(err.response.data));
+      alertError(parseErrorMessage(err.response.data));
     } finally {
       stopLoading();
     }
@@ -71,7 +72,7 @@ const CartPage = ({ startLoading, stopLoading }) => {
   const OrderConfirmation = async (orderId) => {
     // const orderId = localStorage.getItem("orderId");
     if (!orderId) {
-      alert("Failed to find orderId. Please try again.");
+      alertError("Failed to find orderId. Please try again.");
       return;
     }
     try {
@@ -82,12 +83,12 @@ const CartPage = ({ startLoading, stopLoading }) => {
         address: addresses[selectedAddress],
       });
       if (response.status === 200) {
-        alert("Order confirmed successfully!");
+        alertSuccess("Order confirmed successfully!");
         dispatch(resetCart());
         Navigate("/"); // Redirect to orders page after confirmation
       }
     } catch (error) {
-      alert("Failed to confirm order. Please try again.");
+      alertError("Failed to confirm order. Please try again.");
     } finally {
       stopLoading();
     }
@@ -97,7 +98,7 @@ const CartPage = ({ startLoading, stopLoading }) => {
     const orderId = await HandleBuyNow();
 
     if (!orderId) {
-      alert("Failed to create order. Please try again.");
+      alertError("Failed to create order. Please try again.");
       return;
     }
 
@@ -131,9 +132,9 @@ const CartPage = ({ startLoading, stopLoading }) => {
         );
 
         if (isValidated.status === 450) {
-          alert("Payment Failed");
+          alertError("Payment Failed");
         } else if (isValidated.status === 201) {
-          alert("Payment Successful");
+          alertSuccess("Payment Successful");
 
           OrderConfirmation(orderId);
           setPaymentMethod("done");
@@ -149,13 +150,13 @@ const CartPage = ({ startLoading, stopLoading }) => {
   const HandleCashOnDelivery = async (e) => {
     e.preventDefault();
     if (!selectedAddress || !paymentMethod) {
-      alert("Please select an address and payment method.");
+      alertInfo("Please select an address and payment method.");
       return;
     }
 
     const orderId = await HandleBuyNow();
     if (!orderId) {
-      alert("Failed to create order. Please try again.");
+      alertError("Failed to create order. Please try again.");
       return;
     }
     OrderConfirmation(orderId);
@@ -211,9 +212,10 @@ const CartPage = ({ startLoading, stopLoading }) => {
         "delete"
       );
 
-      alert(response.data.message);
+      alertSuccess(response.data.message);
       dispatch(deleteFromCart(productId));
     } catch (err) {
+      alertError(err.response?.data?.message);
       console.log(err);
       // alert(
       //   err.response?.data?.message ||
@@ -232,8 +234,9 @@ const CartPage = ({ startLoading, stopLoading }) => {
         "post",
         { quantity }
       );
-      alert("Quantity updated successfully");
+      alertSuccess("Quantity updated successfully");
     } catch (err) {
+      alertError(err.response?.data?.message);
       console.log(err);
       // alert(
       //   err.response?.data?.message ||

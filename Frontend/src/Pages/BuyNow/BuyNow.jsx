@@ -8,6 +8,7 @@ import LoadingUI from "../../Components/Loading";
 import { MoveRight } from "lucide-react";
 import InputBox from "../../Components/InputBox";
 import { parseErrorMessage } from "../../Utility/ErrorMessageParser";
+import { alertError, alertInfo, alertSuccess } from "../../Utility/Alert";
 
 const BuyNow = ({ startLoading, stopLoading }) => {
   const { productId, orderId } = useParams();
@@ -76,7 +77,7 @@ const BuyNow = ({ startLoading, stopLoading }) => {
 
   const handleOrderConfirmation = async () => {
     if (!selectedAddress || !paymentMethod) {
-      alert("Please select address and payment method.");
+      alertInfo("Please select address and payment method.");
       return;
     }
     try {
@@ -88,12 +89,12 @@ const BuyNow = ({ startLoading, stopLoading }) => {
       });
       console.log(response);
       if (response.status === 200) {
-        alert("Order confirmed successfully!");
+        alertSuccess("Order confirmed successfully!");
         Navigate("/"); // Redirect to orders page after confirmation
       }
     } catch (error) {
       console.error("Error confirming order:", error);
-      alert("Failed to confirm order. Please try again.");
+      alertError("Failed to confirm order. Please try again.");
     } finally {
       stopLoading();
     }
@@ -134,9 +135,9 @@ const BuyNow = ({ startLoading, stopLoading }) => {
         );
 
         if (isValidated.status === 450) {
-          alert("Payment Failed");
+          alertError("Payment Failed");
         } else if (isValidated.status === 201) {
-          alert("Payment Successful");
+          alertSuccess("Payment Successful");
           handleOrderConfirmation();
           setPaymentMethod("done");
         }
@@ -188,7 +189,7 @@ const BuyNow = ({ startLoading, stopLoading }) => {
           response.data.data.tokens.RefreshToken
         );
 
-        alert(response.data.message);
+        alertSuccess(response.data.message);
         Dispatch(clearUser());
         Dispatch(addUser(response.data.data.user));
         setSuccess("Login successful!");
@@ -196,7 +197,7 @@ const BuyNow = ({ startLoading, stopLoading }) => {
       } catch (err) {
         console.log(err);
         // alert(parseErrorMessage(error.response.data.data.statusCode));
-        alert(parseErrorMessage(err.response.data));
+        alertError(parseErrorMessage(err.response.data));
       } finally {
         stopLoading(); // Stop loading once response is received
       }
@@ -292,7 +293,6 @@ const BuyNow = ({ startLoading, stopLoading }) => {
         <div className="buy-now-page flex flex-col lg:flex-row justify-center items-center gap-20 lg:mt-10 h-full">
           {product && (
             <div className="w-fit px-10 lg:py-10">
-              
               <div className="w-full rounded-lg px-4 py-6 shadow-lg shadow-neutral-300 grid grid-cols-1 gap-4 md:grid-cols-5 md:grid-rows-4 ">
                 {/* Image - full width on mobile, left column on desktop */}
                 <div className="w-full h-64 md:h-full md:col-span-2 md:row-span-4">

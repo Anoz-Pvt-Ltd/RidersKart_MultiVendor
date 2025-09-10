@@ -6,6 +6,8 @@ import { addUser, clearUser } from "../../Utility/Slice/UserInfoSlice";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import LoadingUI from "../../Components/Loading";
+import { alertError, alertSuccess } from "../../Utility/Alert";
+import { parseErrorMessage } from "../../Utility/ErrorMessageParser";
 
 const UserRegister = ({ startLoading, stopLoading }) => {
   const [formData, setFormData] = useState({
@@ -79,7 +81,7 @@ const UserRegister = ({ startLoading, stopLoading }) => {
       Dispatch(clearUser());
       Dispatch(addUser(response.data.data.user));
       navigate("/");
-      alert(response.data.message);
+      alertSuccess(response.data.message);
 
       if (response.status === 201) {
         setSuccess("User registered successfully!");
@@ -96,6 +98,8 @@ const UserRegister = ({ startLoading, stopLoading }) => {
         });
       }
     } catch (err) {
+      console.log(err);
+      alertError(parseErrorMessage(err.response?.data));
       setError(
         err.response?.data?.message || "An error occurred during registration."
       );

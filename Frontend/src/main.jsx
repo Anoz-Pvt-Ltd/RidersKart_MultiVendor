@@ -6,11 +6,13 @@ import { BrowserRouter as Router } from "react-router-dom";
 // import store from "./utils/Store.js";
 import store from "./Utility/Store.js";
 import { Provider } from "react-redux";
+import { ToastContainer } from "react-custom-alert";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <Provider store={store}>
       <Router>
+        <ToastContainer floatingTime={3000} />
         <App />
       </Router>
     </Provider>

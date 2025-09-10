@@ -5,6 +5,7 @@ import { ShoppingCart } from "lucide-react";
 import { addCart } from "../Utility/Slice/CartSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { FetchData } from "../Utility/FetchFromApi";
+import { alertError, alertSuccess } from "../Utility/Alert";
 
 export const ThreeProductGrid = ({ heading = "", products = [] }) => {
   if (!products.length || products.length > 4) return;
@@ -21,13 +22,13 @@ export const ThreeProductGrid = ({ heading = "", products = [] }) => {
         `users/${user?._id}/${productId}/cart/add`,
         "post"
       );
-      alert(response.data.message);
+      alertSuccess(response.data.message);
       dispatch(addCart(currentProduct.data.data));
       // dispatch(addProductToCart(productId));
     } catch (err) {
       console.log(err);
       Navigate("/login");
-      alert(
+      alertError(
         err.response?.data?.message ||
           "Please Login first!, Failed to add product to cart."
       );
