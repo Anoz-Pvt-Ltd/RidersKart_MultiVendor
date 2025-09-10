@@ -13,6 +13,9 @@ import { addCart } from "../../Utility/Slice/CartSlice";
 import { parseErrorMessage } from "../../Utility/ErrorMessageParser";
 import Policies from "./policies";
 import { Card } from "../../Components/ProductCard";
+import { checkPincodeAvailability, FilterByPincode } from "../../Utility/FilterByPincode";
+import { PinCodeData } from "../../Constants/PinCodeData.js";
+import InputBox from "../../Components/InputBox.jsx";
 
 const CurrentProduct = ({ startLoading, stopLoading }) => {
   const [isReadMoreDescription, setIsReadMoreDescription] = useState(false);
@@ -40,6 +43,57 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
   const [AllProducts, setAllProducts] = useState();
   const [specifications, setSpecifications] = useState("");
   const [productPolicy, setProductPolicy] = useState([]);
+
+  const userPostalCode = user[0]?.address?.[0]?.postalCode;
+
+  const [pincode, setPincode] = useState("");
+  const [availability, setAvailability] = useState(null);
+
+  // 🔹 Auto-check if user is logged in
+  useEffect(() => {
+    if (userPostalCode) {
+      const isAvailable = checkPincodeAvailability(
+        products,
+        userPostalCode,
+        PinCodeData
+      );
+      setAvailability(isAvailable);
+    }
+  }, [userPostalCode, products]);
+
+  // 🔹 Manual check for guest users
+  const handleCheck = () => {
+    if (!pincode) {
+      alert("Please enter a pincode");
+      return;
+    }
+
+    // ✅ Check if pincode exists in PinCodeData
+    let pincodeExists = false;
+    for (let state in PinCodeData) {
+      for (let city in PinCodeData[state]) {
+        if (PinCodeData[state][city].includes(pincode)) {
+          pincodeExists = true;
+          break;
+        }
+      }
+      if (pincodeExists) break;
+    }
+
+    if (!pincodeExists) {
+      alert("Invalid pincode");
+      setAvailability(null);
+      return;
+    }
+
+    // ✅ Now check availability for this product
+    const isAvailable = checkPincodeAvailability(
+      products, // pass a single product, not the array
+      pincode,
+      PinCodeData
+    );
+    setAvailability(isAvailable);
+  };
 
   const productRef = useRef(null);
   // console.log(user[0]?._id);
@@ -73,6 +127,7 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
       }
     } else {
       alert("Please Login first!");
+      navigate("/login");
     }
   };
 
@@ -130,7 +185,19 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
         startLoading();
         const response = await FetchData("products/get-all-products", "get");
         // console.log(response);
-        setAllProducts(response.data.data.products);
+        let allProducts = response.data.data.products;
+        // console.log(allProducts);
+
+        // filter products based on pincode
+        const filtered = FilterByPincode(
+          allProducts,
+          userPostalCode,
+          PinCodeData
+        );
+
+        setAllProducts(filtered);
+        // console.log("filtered", filtered);
+        // setProducts(response.data.data.products);
       } catch (err) {
         setError(err.response?.data?.message || "Failed to fetch products.");
       } finally {
@@ -141,55 +208,64 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
   }, []);
 
   const addProductToCart = async () => {
-    try {
-      startLoading();
-      const response = await FetchData(
-        `users/${user?.[0]?._id}/${products?._id}/cart/add`,
-        "post"
-      );
-      // console.log(response);
+    if (user.length === 0) {
+      alert("Please Login first");
+      navigate("/login");
+    } else {
+      try {
+        startLoading();
+        const response = await FetchData(
+          `users/${user?.[0]?._id}/${products?._id}/cart/add`,
+          "post"
+        );
+        // console.log(response);
 
-      alert(response.data.message);
-      // console.log(products);
-      dispatch(addCart(products));
-      console.log(products);
-    } catch (err) {
-      console.log(err);
-      alert(
-        err.response?.data?.message ||
-          "Please Login first!, Failed to add product to cart."
-      );
-    } finally {
-      stopLoading();
+        alert(response.data.message);
+        // console.log(products);
+        dispatch(addCart(products));
+        console.log(products);
+      } catch (err) {
+        console.log(err);
+        alert(
+          err.response?.data?.message ||
+            "Internal server error Please try after sometime !"
+        );
+      } finally {
+        stopLoading();
+      }
     }
   };
 
   const addProductToWishlist = async () => {
-    try {
-      startLoading();
-      const response = await FetchData(
-        `users/${user?.[0]?._id}/${products?._id}/wishlist/add`,
-        "post"
-      );
-      // console.log(response);
-      alert(response.data.message);
-    } catch (err) {
-      // console.log(err);
-      // alert(
-      //   err.response?.data?.message ||
-      //     "Please Login first! , Failed to add product to Wishlist."
-      // );
-      if (user.length > 0) {
-        alert(err.response?.data?.message || "Internal Server Error");
-      }
-      if (user.length === 0) {
-        alert(
-          err.response?.data?.message ||
-            "Please Login first! , Failed to add product to Wishlist."
+    if (user.length === 0) {
+      alert("Please Login first");
+    } else {
+      try {
+        startLoading();
+        const response = await FetchData(
+          `users/${user?.[0]?._id}/${products?._id}/wishlist/add`,
+          "post"
         );
+        // console.log(response);
+        alert(response.data.message);
+      } catch (err) {
+        // console.log(err);
+        // alert(
+        //   err.response?.data?.message ||
+        //     "Please Login first! , Failed to add product to Wishlist."
+        // );
+        if (user.length > 0) {
+          alert(err.response?.data?.message || "Internal Server Error");
+        }
+        if (user.length === 0) {
+          alert(
+            err.response?.data?.message ||
+              "Please Login first! , Failed to add product to Wishlist."
+          );
+        }
+      } finally {
+        stopLoading();
       }
-    } finally {
-      stopLoading();
     }
   };
 
@@ -210,12 +286,9 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
   };
 
   return (
-    <div className="mt-2">
+    <div className="mt-2 h-fit">
       <div className="flex flex-col lg:flex-row justify-between items-start lg:p-4 ">
-        <section
-          ref={productRef}
-          className="ImageSection w-full lg:w-[40vw] lg:h-[70vh]"
-        >
+        <section ref={productRef} className="ImageSection w-full lg:w-[40vw] ">
           <div className="flex flex-col-reverse lg:flex-row h-5/6 lg:mb-10 ">
             {/* Image Array */}
             <div className="lg:w-20 lg:h-full  ">
@@ -237,7 +310,7 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
               <img
                 src={products?.images[currentImg]?.url}
                 alt={products?.name}
-                className="h-full"
+                className="h-96 w-96 object-contain bg-neutral-200 rounded-xl"
                 onClick={() => setImgPopup(true)}
               />
               <div className="absolute top-0 right-0">
@@ -249,56 +322,78 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
               </div>
             </div>
           </div>
-          {isProductAvailableForUser === true ? (
-            <div className="flex gap-10 lg:gap-52 justify-center items-center lg:ml-20 ">
-              <Button
-                label={"Buy Now"}
-                className={
-                  "bg-[#ff741b]  hover:bg-[#ff924e] text-white w-36 h-12"
-                }
-                onClick={HandleBuyNow}
-              />
-              <Button
-                label={"Add to Cart"}
-                className={`bg-[#ff9f00] hover:bg-[#ffbb4e] text-white w-36 h-12`}
-                onClick={addProductToCart}
-              />
-            </div>
-          ) : (
-            <div className="flex gap-10 lg:gap-52 justify-center items-center lg:ml-20 bg-[#DF3F33] text-white p-4 rounded-lg">
-              This product is not available for your location
-            </div>
-          )}
 
-          {imgPopup && (
-            <PopUp onClose={() => setImgPopup(false)}>
-              <div>
-                <img
-                  src={products?.images[currentImg]?.url}
-                  alt=""
-                  className="h-[80vh]"
-                />
-              </div>
-            </PopUp>
-          )}
+          <div className="">
+            {userPostalCode ? (
+              <>
+                {/* Auto availability check for logged-in users */}
+                {availability ? (
+                  <div className="flex gap-10 lg:gap-52 justify-center items-center lg:ml-20 ">
+                    <Button
+                      label={"Buy Now"}
+                      className="bg-[#ff741b] hover:bg-[#ff924e] text-white w-36 h-12"
+                      onClick={HandleBuyNow}
+                    />
+                    <Button
+                      label={"Add to Cart"}
+                      className="bg-[#ff9f00] hover:bg-[#ffbb4e] text-white w-36 h-12"
+                      onClick={addProductToCart}
+                    />
+                  </div>
+                ) : (
+                  <div className="flex gap-10 lg:gap-52 justify-center items-center lg:ml-20 bg-[#DF3F33] text-white p-4 rounded-lg">
+                    This product is not available for your location (
+                    {userPostalCode})
+                  </div>
+                )}
+              </>
+            ) : (
+              <>
+                {/* Manual pincode check for guests */}
+                <div className="flex flex-col lg:flex-row justify-center items-center lg:gap-5">
+                  <InputBox
+                    LabelName="Enter Pincode to check product availability "
+                    Placeholder="Enter here"
+                    Type="text"
+                    Value={pincode}
+                    onChange={(e) => setPincode(e.target.value)}
+                  />
+                  <Button onClick={handleCheck} label={"Check"} />
+                </div>
 
-          {/* Buttons */}
-          {/* <div className="flex  justify-evenly items-center h-1/6  ">
-            <Button
-              label={"Buy Now"}
-              className={
-                "bg-[#ff741b]  hover:bg-[#ff924e] text-white w-36 h-12"
-              }
-              onClick={HandleBuyNow}
-            />
-            <Button
-              label={"Add to Cart"}
-              className={`bg-[#ff9f00] hover:bg-[#ffbb4e] text-white w-36 h-12`}
-              onClick={addProductToCart}
-            />
-          </div> */}
+                {availability !== null && (
+                  <>
+                    {availability ? (
+                      <div className="flex flex-col justify-center items-center gap-3">
+                        <div className="flex gap-10 lg:gap-52 justify-center items-center bg-green-500 text-white p-4 rounded-lg w-full">
+                          This product is not available for your location (
+                          {pincode})
+                        </div>
+                        <div className="flex w-full justify-evenly items-center ">
+                          <Button
+                            label={"Buy Now"}
+                            className="bg-[#ff741b] hover:bg-[#ff924e] text-white w-36 h-12"
+                            onClick={HandleBuyNow}
+                          />
+                          <Button
+                            label={"Add to Cart"}
+                            className="bg-[#ff9f00] hover:bg-[#ffbb4e] text-white w-36 h-12"
+                            onClick={addProductToCart}
+                          />
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex gap-10 lg:gap-52 justify-center items-center bg-[#DF3F33] text-white p-4 rounded-lg mt-4">
+                        This product is not available for this pincode
+                      </div>
+                    )}
+                  </>
+                )}
+              </>
+            )}
+          </div>
         </section>
-        <div className="flex-1 px-4 py-10">
+        <div className="flex flex-col lg:px-20 px-4 py-10 justify-start w-full">
           <h3 className="font-semibold mb-2 flex justify-start items-center gap-5">
             <span className="font-light">Brand: </span>
             {products?.brand?.title}
@@ -385,7 +480,6 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
               </span>
             </div>
             <div>
-              {/* <h1 className='font-semibold'>Product Policies</h1> */}
               <ul>
                 <Policies
                   categorizedPolicies={productPolicy.categorizedPolicies}
@@ -395,7 +489,6 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
           </div>
         </div>
       </div>
-
       <section>
         <h1 className=" font-semibold mb-2 ml-10">People Also visited</h1>
       </section>
@@ -437,6 +530,18 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
           →
         </button>
       </div>
+
+      {imgPopup && (
+        <PopUp onClose={() => setImgPopup(false)}>
+          <div>
+            <img
+              src={products?.images[currentImg]?.url}
+              alt=""
+              className="h-[80vh]"
+            />
+          </div>
+        </PopUp>
+      )}
     </div>
   );
 };

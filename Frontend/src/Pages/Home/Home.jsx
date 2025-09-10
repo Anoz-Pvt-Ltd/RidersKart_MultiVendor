@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { DemoImageBanner } from "../../Constants/DemoImages";
 import { FetchData } from "../../Utility/FetchFromApi";
-import  { Card, ProductCardResponsive } from "../../Components/ProductCard";
+import { Card, ProductCardResponsive } from "../../Components/ProductCard";
 import { Link } from "react-router";
 import { ThreeProductGrid } from "../../Components/Product-Grid";
 import { truncateString } from "../../Utility/Utility-functions";
@@ -10,6 +10,8 @@ import { useSelector } from "react-redux";
 import { toggleProductAvailability } from "../../Utility/Slice/UserInfoSlice";
 import { useDispatch } from "react-redux";
 import LoadingUI from "../../Components/Loading";
+import { FilterByPincode } from "../../Utility/FilterByPincode";
+import { PinCodeData } from "../../Constants/PinCodeData.js";
 
 const Home = ({ startLoading, stopLoading }) => {
   const scrollContainer = useRef(null);
@@ -19,11 +21,12 @@ const Home = ({ startLoading, stopLoading }) => {
   const [subcategories, setSubcategories] = useState([]);
   const { promotions, status } = useSelector((store) => store.PromotionList);
   const user = useSelector((store) => store.UserInfo.user);
+  const userPostalCode = user[0]?.address?.[0]?.postalCode;
   const dispatch = useDispatch();
   // const [userCity, setUserCity] = useState(null);
   const [productsAvailableForUser, setProductsAvailableForUser] =
     useState(false);
-
+  // console.log(user);
   // useEffect(() => {
   //   if (user && user[0]?.address) {
   //     setUserCity(user[0]?.address[0]?.city);
@@ -31,14 +34,37 @@ const Home = ({ startLoading, stopLoading }) => {
   // }, [user]);
 
   const arrayOfGridItems = [];
+  // console.log(products);
 
   useEffect(() => {
+    // const fetchProducts = async () => {
+    //   try {
+    //     startLoading();
+    //     const response = await FetchData("products/get-all-products", "get");
+    //     console.log(response);
+    //     setProducts(response.data.data.products);
+    //   } catch (err) {
+    //     setError(err.response?.data?.message || "Failed to fetch products.");
+    //   } finally {
+    //     stopLoading();
+    //   }
+    // };
     const fetchProducts = async () => {
       try {
         startLoading();
         const response = await FetchData("products/get-all-products", "get");
-        // console.log(response.data.data);
-        setProducts(response.data.data.products);
+        let allProducts = response.data.data.products;
+        // console.log(allProducts)
+
+        // filter products based on pincode
+        const filtered = FilterByPincode(
+          allProducts,
+          userPostalCode,
+          PinCodeData
+        );
+
+        setProducts(filtered);
+        // setProducts(response.data.data.products);
       } catch (err) {
         setError(err.response?.data?.message || "Failed to fetch products.");
       } finally {
@@ -78,32 +104,32 @@ const Home = ({ startLoading, stopLoading }) => {
   }, [user]);
 
   // It will fetch products only for the specific user
-  useEffect(() => {
-    // if (!userCity) return;
+  // useEffect(() => {
+  //   // if (!userCity) return;
 
-    const fetchProducts = async () => {
-      try {
-        startLoading();
-        const response = await FetchData("products/get-all-products", "get", {
-          userCity,
-        });
-        // console.log(response.data.data);
-        if (response.data.data.total !== 0) {
-          setProducts(response.data.data.products);
-          setProductsAvailableForUser(true);
-          dispatch(toggleProductAvailability(true));
-        } else {
-          setProductsAvailableForUser(false);
-          dispatch(toggleProductAvailability(false));
-        }
-      } catch (err) {
-        setError(err.response?.data?.message || "Failed to fetch products.");
-      } finally {
-        stopLoading();
-      }
-    };
-    fetchProducts();
-  }, [user]);
+  //   const fetchProducts = async () => {
+  //     try {
+  //       startLoading();
+  //       const response = await FetchData("products/get-all-products", "get", {
+  //         userCity,
+  //       });
+  //       // console.log(response.data.data);
+  //       if (response.data.data.total !== 0) {
+  //         setProducts(response.data.data.products);
+  //         setProductsAvailableForUser(true);
+  //         dispatch(toggleProductAvailability(true));
+  //       } else {
+  //         setProductsAvailableForUser(false);
+  //         dispatch(toggleProductAvailability(false));
+  //       }
+  //     } catch (err) {
+  //       setError(err.response?.data?.message || "Failed to fetch products.");
+  //     } finally {
+  //       stopLoading();
+  //     }
+  //   };
+  //   fetchProducts();
+  // }, [user]);
   // }, [user, userCity]);
 
   const suggestedItems = products && products.slice(0, 4);

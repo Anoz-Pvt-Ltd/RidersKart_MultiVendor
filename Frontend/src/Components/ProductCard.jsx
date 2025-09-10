@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router";
 import Button from "./Button";
 import { FetchData } from "../Utility/FetchFromApi";
 import { addCart } from "../Utility/Slice/CartSlice";
@@ -116,9 +117,10 @@ const Card = ({
 }) => {
   const dispatch = useDispatch();
   const user = useSelector((store) => store.UserInfo.user[0]);
+  const Navigate = useNavigate();
   const addProductToCart = async () => {
     try {
-      startLoading();
+      // startLoading();
       const currentProduct = await FetchData(
         `products/get-single-product/${productId}`,
         "get"
@@ -131,13 +133,14 @@ const Card = ({
       dispatch(addCart(currentProduct.data.data));
       // dispatch(addProductToCart(productId));
     } catch (err) {
+      Navigate("/login");
       console.log(err);
       alert(
         err.response?.data?.message ||
           "Please Login first!, Failed to add product to cart."
       );
     } finally {
-      stopLoading();
+      // stopLoading();
     }
   };
 
