@@ -35,7 +35,7 @@ export const ThreeProductGrid = ({ heading = "", products = [] }) => {
   };
 
   return (
-    <div className="product-grid lg:h-[30vw] lg:w-[30vw] w-full flex flex-col justify-evenly rounded-xl drop-shadow-2xl ">
+    <div className="product-grid lg:h-[30vw] lg:w-[30vw] w-full flex flex-col justify-evenly rounded-xl drop-shadow-2xl bg-neutral-300 ">
       <h2 className="uppercase tracking-widest text-center font-semibold text-gray-800 p-2">
         {heading}
       </h2>
@@ -50,7 +50,7 @@ export const ThreeProductGrid = ({ heading = "", products = [] }) => {
               products.length === 3 && index === 2
                 ? "col-start-2 row-start-2"
                 : ""
-            }  flex flex-col justify-center overflow-hidden shadow hover:shadow-xl duration-300 ease-in-out m-1 p-1 rounded-xl`}
+            }  flex flex-col justify-center overflow-hidden hover:shadow-xl duration-300 ease-in-out m-1 p-1 rounded-xl`}
           >
             <div
               className={`w-full ${

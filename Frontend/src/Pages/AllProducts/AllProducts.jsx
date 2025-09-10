@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { FetchData } from "../../Utility/FetchFromApi";
 import LoadingUI from "../../Components/Loading";
 import { useSelector } from "react-redux";
+import { FilterByPincode } from "../../Utility/FilterByPincode";
+import { PinCodeData } from "../../Constants/PinCodeData";
 
 const AllProducts = ({ startLoading, stopLoading }) => {
   const [products, setProducts] = useState([]);
@@ -11,8 +13,10 @@ const AllProducts = ({ startLoading, stopLoading }) => {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  console.log(products.length);
 
   const user = useSelector((store) => store.UserInfo.user);
+  const userPostalCode = user[0]?.address?.[0]?.postalCode;
 
   const { category, subcategory, category_title, subcategory_title } =
     useParams();
@@ -37,7 +41,15 @@ const AllProducts = ({ startLoading, stopLoading }) => {
       // console.log(response);
 
       if (response.data.success) {
-        setProducts(response.data.data.products);
+        let allProducts = response.data.data.products;
+        const filtered = FilterByPincode(
+          allProducts,
+          userPostalCode,
+          PinCodeData
+        );
+
+        setProducts(filtered);
+        // setProducts(response.data.data.products);
         setTotalPages(Math.ceil(response.data.data.total / 10));
       } else {
         setError("Failed to load products.");
@@ -52,8 +64,7 @@ const AllProducts = ({ startLoading, stopLoading }) => {
 
   useEffect(() => {
     fetchProducts(page);
-  }, [category, subcategory, page]);
-  console.log(products);
+  }, [category, subcategory, page, user]);
 
   return (
     <div className="flex flex-col flex-wrap justify-center lg:gap-6 lg:p-4 p-2">

@@ -189,10 +189,93 @@ const Card = ({
   );
 };
 
+const CheckOut = ({
+  ProductName,
+  CurrentPrice,
+  Mrp,
+  Rating,
+  Offer,
+  Description,
+  Image,
+  productId,
+  className,
+  Discount,
+  Stock,
+  startLoading,
+  stopLoading,
+  CartFunctionalities,
+}) => {
+  const dispatch = useDispatch();
+  const user = useSelector((store) => store.UserInfo.user[0]);
+  const addProductToCart = async () => {
+    try {
+      startLoading();
+      const currentProduct = await FetchData(
+        `products/get-single-product/${productId}`,
+        "get"
+      );
+      const response = await FetchData(
+        `users/${user?._id}/${productId}/cart/add`,
+        "post"
+      );
+      alert(response.data.message);
+      dispatch(addCart(currentProduct.data.data));
+      // dispatch(addProductToCart(productId));
+    } catch (err) {
+      console.log(err);
+      alert(
+        err.response?.data?.message ||
+          "Please Login first!, Failed to add product to cart."
+      );
+    } finally {
+      stopLoading();
+    }
+  };
+
+  return (
+    <div
+      to={`/current-product/${productId}`}
+      className={`w-full  ${className}`}
+    >
+      <div className="whiteSoftBG shadow-md hover:shadow-lg h-full w-full overflow-hidden rounded-lg duration-300 ease-in-out flex justify-evenly items-center flex-col lg:flex-row">
+        <div className="overflow-hidden  object-center flex justify-center items-center">
+          <img
+            src={Image}
+            alt="No Image found"
+            className="lg:w-64 lg:h-52 w-24 h-24 object-contain"
+          />
+        </div>
+        <div className="px-2 flex flex-col">
+          <Link
+            to={`/current-product/${productId}`}
+            className=" font-semibold truncate hover:text-blue-500 hover:underline duration-200 ease-in-out"
+          >
+            Product Name: {truncateString(ProductName, 20)}
+          </Link>
+          <p>Description: {truncateString(Description, 30)}</p>
+          <div className="flex flex-col w-full justify-center items-start ">
+            <h1 className="">Current price: ₹{CurrentPrice}</h1>
+            <h1 className=" line-through text-gray-500 text-xs">
+              {" "}
+              MRP:
+              {truncateNumber(Mrp, 3)}
+            </h1>
+            <h1 className=" bg-green-500 p-1 rounded text-xs truncate">
+              Discount: {Discount}% off
+            </h1>
+          </div>
+        </div>
+        <div className="h-full text-xs">{CartFunctionalities}</div>
+      </div>
+    </div>
+  );
+};
+
 // export default Card;
 // export default LoadingUI(Card, ProductCard);
 export const ProductCardResponsive = LoadingUI(ProductCard);
 export const ProductCardSuggestion = LoadingUI(Card);
+export const CheckOutCard = LoadingUI(CheckOut);
 
 // Optionally, you can also export the raw components if needed:
 export { ProductCard, Card };

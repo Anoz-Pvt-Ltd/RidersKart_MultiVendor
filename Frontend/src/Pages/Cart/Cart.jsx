@@ -13,6 +13,8 @@ import {
 import { useDebounce } from "../../Utility/Utility-functions";
 import { useNavigate } from "react-router";
 import { parseErrorMessage } from "../../Utility/ErrorMessageParser";
+import { CheckOutCard } from "../../Components/ProductCard";
+import { Trash } from "lucide-react";
 
 const CartPage = ({ startLoading, stopLoading }) => {
   const [error, setError] = useState("");
@@ -182,24 +184,24 @@ const CartPage = ({ startLoading, stopLoading }) => {
     fetchUserAddresses();
   }, [user]);
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        startLoading();
-        const response = await FetchData("products/get-all-products", "get");
-        if (response.data.success) {
-          setProducts(response.data.data.products);
-        } else {
-          setError("Failed to load products.");
-        }
-      } catch (err) {
-        setError(err.response?.data?.message || "Failed to fetch products.");
-      } finally {
-        stopLoading();
-      }
-    };
-    fetchProducts();
-  }, []);
+  // useEffect(() => {
+  //   const fetchProducts = async () => {
+  //     try {
+  //       startLoading();
+  //       const response = await FetchData("products/get-all-products", "get");
+  //       if (response.data.success) {
+  //         setProducts(response.data.data.products);
+  //       } else {
+  //         setError("Failed to load products.");
+  //       }
+  //     } catch (err) {
+  //       setError(err.response?.data?.message || "Failed to fetch products.");
+  //     } finally {
+  //       stopLoading();
+  //     }
+  //   };
+  //   fetchProducts();
+  // }, []);
 
   const removeFromCart = async (productId) => {
     try {
@@ -260,65 +262,36 @@ const CartPage = ({ startLoading, stopLoading }) => {
 
       {cart.length > 0 ? (
         <div className="flex flex-col w-full gap-4 justify-between items-center">
-          <div className="flex flex-col lg:flex-row w-full justify-around items-start ">
-            <div className="lg:col-span-2 lg:w-3/4 w-full">
-              <div className="bg-white shadow-md rounded-md p-4 h-[30rem] overflow-y-scroll ">
+          <div className="flex flex-col lg:flex-row w-full justify-center items-center ">
+            <div className="lg:col-span-2 lg:w-3/4 w-full ">
+              <div className="bg-neutral-300 no-scrollbar shadow-md rounded-md lg:p-4 p-1 lg:h-[30rem] overflow-y-scroll ">
                 {cart?.map((item) =>
                   item?.product === null ? (
                     <div key={item?._id}></div>
                   ) : (
-                    <div>
-                      <div
+                    <div className="w-full flex justify-center items-center lg:my-4 my-1">
+                      <CheckOutCard
+                        Image={item?.product?.images[0].url}
                         key={item?._id}
-                        className="flex flex-col gap-5 md:flex-row items-center justify-between border-b pb-4 mb-4"
-                      >
-                        <div className="grid grid-cols-5 grid-rows-5 gap-4 w-full rounded">
-                          <div className="col-span-2 row-span-4 ">
-                            <div className="flex justify-center items-center w-full h-full rounded">
-                              <img
-                                src={item?.product?.images[0].url}
-                                alt={item?.product?.name}
-                                className="w-40 object-cover rounded shadow-lg shadow-neutral-600 "
-                              />
-                            </div>
-                          </div>
-                          <div className="col-span-5 col-start-1 row-start-5 w-full">
-                            <div className="flex justify-evenly items-center gap-5">
-                              <span className="text-sm line-through">
-                                MRP: ₹ {item?.product?.price.MRP}
-                              </span>
-                              <span className="font-semibold">
-                                Current price: ₹
-                                {item?.product?.price.sellingPrice}
-                              </span>
-                              <span className="text-green-500 font-semibold">
-                                {item?.product?.price.discount}%off
-                              </span>
-                            </div>
-                          </div>
-                          <div className="col-span-3 col-start-3 row-start-1 w-full border rounded-xl shadow-xl shadow-neutral-300">
-                            <h2 className="font-medium text-2xl px-5 w-full h-full flex items-center">
-                              {item?.product?.name}
-                            </h2>
-                          </div>
-                          <div className="col-span-3 col-start-3 row-start-2  w-full">
-                            <h2 className="text-sm w-full h-full flex items-center truncate">
-                              {/* Seller name: {item?.product?.name} */}
-                              Description: {item?.product?.description}
-                            </h2>
-                          </div>
-                          <div className="col-span-2 col-start-4 row-start-4  w-full">
-                            <div className="w-full h-full flex items-center justify-center ">
-                              <Button
-                                onClick={() =>
-                                  removeFromCart(item?.product?._id)
-                                }
-                                label="Remove"
-                                className=" hover:bg-orange-500  w-full"
-                              />
-                            </div>
-                          </div>
-                          <div className="col-start-3 row-start-4 w-full">
+                        ProductName={item?.product.name}
+                        CurrentPrice={item?.product.price.sellingPrice}
+                        Mrp={item?.product.price.MRP}
+                        Rating={item?.product.Rating}
+                        Offer={item?.product.off}
+                        Description={item?.product.description}
+                        productId={item?.product._id}
+                        Discount={item?.product.price.discount}
+                        Stock={item?.product.stockQuantity}
+                        CartFunctionalities={
+                          <div className="w-full h-full flex lg:flex-col flex-row items-center justify-evenly lg:px-5 lg:gap-2">
+                            <span className="w-full">
+                              Quantity: {item?.quantity}
+                            </span>
+                            <span className="w-full">
+                              Total: ₹
+                              {item?.product?.price.sellingPrice *
+                                item?.quantity}
+                            </span>
                             <div className="flex items-center justify-center gap-2 w-full h-full">
                               <button
                                 onClick={() => {
@@ -348,50 +321,62 @@ const CartPage = ({ startLoading, stopLoading }) => {
                                 +
                               </button>
                             </div>
+                            <Button
+                              onClick={() => removeFromCart(item?.product?._id)}
+                              label={
+                                <div className="flex justify-center items-center ">
+                                  <h1 className="text-xs flex justify-center items-center gap-1">
+                                    <Trash className="h-3 w-3" />
+                                    <span className="hidden lg:flex">
+                                      Remove
+                                    </span>
+                                  </h1>
+                                </div>
+                              }
+                              className=" hover:bg-orange-500  lg:w-full"
+                            />
                           </div>
-                          <div className="col-span-3 col-start-3 row-start-3  w-full ">
-                            <div className="flex justify-evenly items-center gap-5 w-full h-full text-xl">
-                              <span>Total Quantity: {item?.quantity}</span>
-                              <span>
-                                Total value: ₹
-                                {item?.product?.price.sellingPrice *
-                                  item?.quantity}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
+                        }
+                      />
                     </div>
                   )
                 )}
-                <Button label={"Shop more"} onClick={HandleHome} />
+              </div>
+              <div className="flex justify-center items-center w-full ">
+                <Button
+                  label={"Shop more"}
+                  onClick={HandleHome}
+                  className={`text-xs lg:text-base lg:w-fit w-full my-4`}
+                />
               </div>
             </div>
 
             {/* Order summery */}
-            <div className="lg:w-1/3 w-full  flex flex-col justify-center items-center lg:p-10 lg:pt-0 gap-5">
-              <div className="bg-white shadow-md rounded-md p-4 w-full">
+            <div className="lg:w-1/3 w-full flex flex-col justify-center items-center lg:p-10 lg:pt-0 gap-5">
+              {/* order summary  */}
+              <div className="bg-white shadow-md rounded-md p-4 w-full text-sm lg:text-base">
                 <h2 className="text-xl font-bold mb-4">Order Summary</h2>
-                <div className="flex justify-between mb-2">
+                <div className="flex justify-between">
                   <p>Subtotal</p>
                   <p>₹ {getTotalPayablePrice()}</p>
                 </div>
-                <div className="flex justify-between mb-2">
+                <div className="flex justify-between">
                   <p>Tax</p>
                   <p>₹ {(getTotalPayablePrice() * 0.1).toFixed(2)}</p>
                 </div>
-                <div className="flex justify-between font-bold mb-4">
+                <div className="flex justify-between font-bold">
                   <p>Total</p>
                   <p>₹ {(getTotalPayablePrice() * 1.1).toFixed(2)}</p>
                 </div>
               </div>
+              {/* address area  */}
               <div className="addresses w-full">
                 <h2 className="mb-5 font-semibold">Select Shipping Address</h2>
                 {addresses?.length > 0 ? (
                   <select
                     value={selectedAddress}
                     onChange={handleAddressChange}
-                    className="bg-white border border-neutral-400 p-5 rounded-xl outline-none w-full"
+                    className="bg-white border border-neutral-400 p-2 rounded-xl outline-none w-full"
                   >
                     <option value="" selected disabled>
                       Select an address
@@ -410,12 +395,13 @@ const CartPage = ({ startLoading, stopLoading }) => {
                   <p>No addresses available. Please add one in your profile.</p>
                 )}
               </div>
+              {/* payment method  */}
               <div className=" w-full">
                 <h2 className="mb-5 font-semibold">Select Payment Method</h2>
                 <select
                   value={paymentMethod}
                   onChange={handlePaymentChange}
-                  className="bg-white border border-neutral-400 p-5 rounded-xl outline-none w-full"
+                  className="bg-white border border-neutral-400 p-2 rounded-xl outline-none w-full"
                 >
                   <option value="" disabled>
                     Select a payment method
@@ -425,14 +411,14 @@ const CartPage = ({ startLoading, stopLoading }) => {
                 </select>
                 {paymentMethod === "online" && (
                   <Button
-                    className={`mt-5 hover:bg-green-500 hover:text-black`}
+                    className={` hover:bg-green-500 hover:text-black mt-5 w-full`}
                     onClick={OnlinePayment}
                     label={"Proceed for payment"}
                   />
                 )}
                 {paymentMethod != "online" && (
                   <Button
-                    className={` hover:bg-green-500 hover:text-black mt-10`}
+                    className={` hover:bg-green-500 hover:text-black mt-5 w-full`}
                     onClick={HandleCashOnDelivery}
                     label={"Place order"}
                   />
