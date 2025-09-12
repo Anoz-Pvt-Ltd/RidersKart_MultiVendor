@@ -296,7 +296,7 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
           <div className="flex flex-col-reverse lg:flex-row h-5/6 lg:mb-10 ">
             {/* Image Array */}
             <div className="lg:w-20 lg:h-full  ">
-              <div className="overflow-x-auto flex flex-col justify-center items-center mt-2  gap-2 bg-neutral-400 rounded-xl m-4 lg:m-0">
+              <div className="overflow-x-auto flex lg:flex-col flex-row justify-start items-center mt-2  gap-2 bg-neutral-400 rounded-xl m-4 lg:m-0">
                 {products?.images.map((image, index) => (
                   <img
                     key={index}
@@ -537,11 +537,11 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
 
       {imgPopup && (
         <PopUp onClose={() => setImgPopup(false)}>
-          <div>
+          <div className="flex justify-center items-center w-full h-full">
             <img
               src={products?.images[currentImg]?.url}
               alt=""
-              className="h-[80vh]"
+              className="h-[70vh] object-contain"
             />
           </div>
         </PopUp>

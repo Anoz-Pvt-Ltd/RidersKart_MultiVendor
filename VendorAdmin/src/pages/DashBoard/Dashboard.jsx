@@ -40,6 +40,58 @@ const Dashboard = ({ startLoading, stopLoading }) => {
     setSortedOrders(todaysOrders);
   }, [allOrders]);
 
+  const fetchProducts = async () => {
+    if (user?.length > 0) {
+      try {
+        startLoading();
+        const response = await FetchData(
+          `products/get-all-product-of-vendor/${user?.[0]?._id}`,
+          "get"
+        );
+        console.log(response);
+
+        const fetchedProducts = response.data.data || [];
+        setProducts(fetchedProducts);
+        // console.log(fetchedProducts);
+
+        // Aggregate stockQuantity by category
+        const categoryData = {};
+        fetchedProducts.forEach((product) => {
+          const { category, stockQuantity } = product;
+          if (category) {
+            categoryData[category?.title] =
+              (categoryData[category?.title] || 0) + stockQuantity;
+          }
+        });
+        // console.log(categoryData);
+
+        // Prepare pieData
+        const labels = Object.keys(categoryData);
+        const data = Object.values(categoryData);
+
+        setPieData((prevPieData) => ({
+          ...prevPieData,
+          labels,
+          datasets: [
+            {
+              ...prevPieData.datasets[0],
+              data,
+            },
+          ],
+        }));
+      } catch (err) {
+        console.error(err);
+        setError(err.response?.data?.message || "Failed to fetch products.");
+      } finally {
+        stopLoading();
+      }
+    }
+  };
+
+  useEffect(() => {
+    fetchProducts();
+  }, [user]);
+
   // const handleDateChange = (e) => {
   //   setSelectedDate(e.target.value);
   // };
@@ -141,7 +193,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
       try {
         startLoading();
         const response = await FetchData(
-          `vendors/vendor-profile/${user?.[0]?._id}`,
+          `vendor/vendor-profile/${user?.[0]?._id}`,
           "get"
         );
         // console.log(response);
@@ -184,57 +236,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
       },
     ],
   });
-  // console.log(pieData);
-
-  const fetchProducts = async () => {
-    try {
-      startLoading();
-      const response = await FetchData(
-        `products/get-all-product-of-vendor/${user?.[0]?._id}`,
-        "get"
-      );
-      // console.log(response);
-
-      const fetchedProducts = response.data.data || [];
-      setProducts(fetchedProducts);
-      // console.log(fetchedProducts);
-
-      // Aggregate stockQuantity by category
-      const categoryData = {};
-      fetchedProducts.forEach((product) => {
-        const { category, stockQuantity } = product;
-        if (category) {
-          categoryData[category?.title] =
-            (categoryData[category?.title] || 0) + stockQuantity;
-        }
-      });
-      // console.log(categoryData);
-
-      // Prepare pieData
-      const labels = Object.keys(categoryData);
-      const data = Object.values(categoryData);
-
-      setPieData((prevPieData) => ({
-        ...prevPieData,
-        labels,
-        datasets: [
-          {
-            ...prevPieData.datasets[0],
-            data,
-          },
-        ],
-      }));
-    } catch (err) {
-      console.error(err);
-      setError(err.response?.data?.message || "Failed to fetch products.");
-    } finally {
-      stopLoading();
-    }
-  };
-
-  useEffect(() => {
-    if (user?.[0]?._id) fetchProducts();
-  }, [user]);
+  // console.log(user);
 
   const renderContent = () => {
     switch (selectedMenu) {

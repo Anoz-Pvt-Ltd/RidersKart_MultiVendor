@@ -54,7 +54,6 @@ const Home = ({ startLoading, stopLoading }) => {
         startLoading();
         const response = await FetchData("products/get-all-products", "get");
         let allProducts = response.data.data.products;
-        // console.log(allProducts)
 
         // filter products based on pincode
         const filtered = FilterByPincode(

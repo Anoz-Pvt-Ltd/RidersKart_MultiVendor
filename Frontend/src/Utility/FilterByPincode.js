@@ -4,12 +4,12 @@ export const FilterByPincode = (allProducts, userPostalCode, PinCodeData) => {
   if (!userPostalCode) return allProducts; // if no pincode, show all
 
   return allProducts.filter((product) => {
-    const deliveryScope = product?.deliveryScope || "All India"; // fallback
+    const deliveryScope = product?.deliveryScope || "all"; // fallback
     const deliveryStates = product?.deliveryStates || [];
     const deliveryCities = product?.deliveryCities || [];
 
     // ✅ Case 1: All India OR missing delivery info (old allProducts)
-    if (deliveryScope === "All India" || !product.deliveryScope) {
+    if (deliveryScope === "all" || !product.deliveryScope) {
       return true;
     }
 
@@ -48,12 +48,12 @@ export const FilterByPincode = (allProducts, userPostalCode, PinCodeData) => {
 };
 
 export const checkPincodeAvailability = (product, pincode, pincodeData) => {
-  const deliveryScope = product?.deliveryScope || "All India";
+  const deliveryScope = product?.deliveryScope || "all";
   const deliveryStates = product?.deliveryStates || [];
   const deliveryCities = product?.deliveryCities || [];
 
-  // ✅ Case 1: All India OR old products (no scope)
-  if (deliveryScope === "All India" || !product.deliveryScope) {
+  // ✅ Case 1: all india OR old products (no scope)
+  if (deliveryScope === "all" || !product.deliveryScope) {
     return true;
   }
 

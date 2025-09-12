@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import PopUp from "../../components/PopUpWrapper";
 import { PinCodeData } from "../../constants/PinCOdeData";
-// import { categories } from "../../constants/AllProducts.Vendor";
+import { parseErrorMessage } from "../../utils/ErrorMessageParser";
 import { Check } from "lucide-react";
 
 const MultiSelect = ({ label, options, selected, onChange }) => {
@@ -175,7 +175,7 @@ const Products = ({ startLoading, stopLoading }) => {
         "get"
       );
       console.log(response);
-      if (response.data.success) setProducts(response.data.data);
+      setProducts(response.data.data);
     } catch (err) {
       setError(err.response?.data?.message || "Failed to fetch products.");
     } finally {
@@ -184,7 +184,7 @@ const Products = ({ startLoading, stopLoading }) => {
   };
   useEffect(() => {
     fetchProducts();
-  }, []);
+  }, [user]);
 
   const handleAddProduct = async (e) => {
     e.preventDefault();
@@ -215,11 +215,7 @@ const Products = ({ startLoading, stopLoading }) => {
       setIsModalOpen(false);
     } catch (err) {
       console.log(err);
-      alert(
-        parseErrorMessage(
-          err.response?.data || "An error occurred while adding the product."
-        )
-      );
+      alert(parseErrorMessage(err.response.data));
     } finally {
       stopLoading();
     }
@@ -511,7 +507,7 @@ const Products = ({ startLoading, stopLoading }) => {
       />
 
       {isModalOpen && (
-        <div className="fixed inset-0 flex items-start lg:items-start justify-center  backdrop-blur-xl p-4 h-screen w-screen overflow-auto top-0 left-0  z-50">
+        <div className="fixed inset-0 flex items-start lg:items-start justify-center  backdrop-blur-xl p-4 h-screen w-screen overflow-auto top-0 left-0  z-40">
           <div className="bg-white flex flex-col rounded-lg shadow-lg w-fit lg:px-20 lg:py-10 py-4">
             <h2 className="text-lg font-semibold text-gray-800 lg:mb-4 w-full text-center">
               Add New Product
@@ -747,7 +743,7 @@ const Products = ({ startLoading, stopLoading }) => {
 
       {/* Edit Product Modal */}
       {editModalOpen && editProductData && (
-        <div className="fixed inset-0 flex items-start lg:items-center justify-center  backdrop-blur-xl p-4 h-screen w-screen overflow-auto top-0 left-0  z-50">
+        <div className="fixed inset-0 flex items-start lg:items-center justify-center  backdrop-blur-xl p-4 h-screen w-screen overflow-auto top-0 left-0  z-40">
           <div className="bg-white flex flex-col rounded-lg shadow-lg w-full  lg:px-20 lg:py-10 py-5">
             <h2 className="text-lg font-semibold text-gray-800 lg:mb-4 w-full text-center">
               Edit Product

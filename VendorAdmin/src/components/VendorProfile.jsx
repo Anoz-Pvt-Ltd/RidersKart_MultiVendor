@@ -4,30 +4,36 @@ import { useSelector } from "react-redux";
 import Button from "./Button";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import LoadingUI from "./Loading";
 
-const VendorProfile = () => {
+const VendorProfile = ({ startLoading, stopLoading }) => {
   const [vendor, setVendor] = useState(null);
   const [error, setError] = useState(null);
   const user = useSelector((store) => store.UserInfo.user);
   const [VendorProduct, setVendorProducts] = useState(null);
+  console.log(user);
 
   useEffect(() => {
     const fetchVendor = async () => {
-      if (user.length > 0) {
+      if (user?.length > 0) {
         try {
+          startLoading();
           const response = await FetchData(
             `vendor/vendor-profile/${user?.[0]?._id}`,
             "get"
           );
+          console.log(response);
           setVendor(response.data.data);
         } catch (err) {
           setError("Failed to load vendor profile.");
+        } finally {
+          stopLoading();
         }
       }
     };
 
     fetchVendor();
-  }, [user]);
+  }, [vendor]);
 
   const fetchProducts = async () => {
     if (user.length > 0) {
@@ -202,4 +208,4 @@ const VendorProfile = () => {
   );
 };
 
-export default VendorProfile;
+export default LoadingUI(VendorProfile);
