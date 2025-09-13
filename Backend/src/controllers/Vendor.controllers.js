@@ -5,6 +5,7 @@ import { VendorUser } from "../models/vendorUser.models.js";
 import { Product } from "../models/products.models.js";
 import jwt from "jsonwebtoken";
 import { UploadImages } from "../utils/imageKit.io.js";
+import { sendOtpSMS } from "../utils/send-sms.js";
 
 const registerVendor = asyncHandler(async (req, res, next) => {
   const {
@@ -15,7 +16,7 @@ const registerVendor = asyncHandler(async (req, res, next) => {
     city,
     state,
     country,
-    postalCode, // Default to an empty object to avoid destructuring issues
+    postalCode,
     gstNumber,
     businessName,
     accountHolderName,
@@ -133,7 +134,7 @@ const registerVendor = asyncHandler(async (req, res, next) => {
   // Return success response
   const response = new ApiResponse(201, {
     vendor: {
-      id: newVendor._id,
+      _id: newVendor._id,
       name: newVendor.name,
       email: newVendor.email,
       contactNumber: newVendor.contactNumber,
@@ -180,13 +181,15 @@ const loginVendor = asyncHandler(async (req, res, next) => {
   // Return success response
   const response = new ApiResponse(200, {
     vendor: {
-      id: vendor._id,
+      _id: vendor._id,
       name: vendor.name,
       email: vendor.email,
       contactNumber: vendor.contactNumber,
       location: vendor.location,
       status: vendor.status,
       createdAt: vendor.createdAt,
+      bankDetails: vendor.bankDetails,
+      businessDetails: vendor.businessDetails,
     },
     tokens: {
       accessToken,
@@ -414,6 +417,76 @@ const acceptVendor = asyncHandler(async (req, res) => {
   res.status(200).json(new ApiResponse(200, vendor, "Vendor accepted!"));
 });
 
+const generateOTP = asyncHandler(async (req, res) => {
+  const { email, contactNumber } = req.body;
+  console.log(email, contactNumber);
+  if (!email || !contactNumber)
+    throw new ApiError(400, "Email or Contact Number is missing");
+
+  const vendor = await VendorUser.findOne({ email, contactNumber });
+
+  if (!vendor)
+    throw new ApiError(
+      404,
+      "Vendor not found with this email or contact number"
+    );
+
+  // Generate OTP
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  console.log(otp);
+  vendor.otp = otp;
+  vendor.otpExpiry = Date.now() + 1 * 60 * 1000; // OTP valid for 1 minutes
+  await vendor.save();
+
+  const smsId = await sendOtpSMS(contactNumber, otp, vendor.name);
+  if (!smsId) {
+    throw new ApiError(500, "Failed to send OTP via SMS");
+  }
+
+  res.status(200).json(new ApiResponse(200, otp, "OTP generated!"));
+});
+
+const resetPasswordWithOTP = asyncHandler(async (req, res) => {
+  const { email, contactNumber, otp, newPassword, confirmNewPassword } =
+    req.body;
+
+  console.log(email, contactNumber, otp, newPassword, confirmNewPassword);
+
+  if (!email) throw new ApiError(400, "Invalid email");
+  if (!contactNumber) throw new ApiError(400, "Invalid contactNumber");
+  if (!newPassword)
+    throw new ApiError(400, "New password not found, Please try again !");
+  if (!confirmNewPassword)
+    throw new ApiError(400, "New confirmed not found, Please try again !");
+
+  const vendor = await VendorUser.findOne({ email, contactNumber });
+  if (!vendor) throw new ApiError(404, "Vendor not found");
+
+  if (vendor.otp !== otp) {
+    throw new ApiError(
+      404,
+      "Invalid OTP Please Try again !"
+    );
+  }
+  if (vendor.otpExpiry < Date.now()) {
+    throw new ApiError(404, "OTP has expired");
+  }
+  vendor.password = confirmNewPassword;
+  vendor.otp = "";
+
+  await vendor.save({ validateBeforeSave: false });
+
+  res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        vendor,
+        "Your password is changed successfully, Please Login now... "
+      )
+    );
+});
+
 export {
   registerVendor,
   loginVendor,
@@ -429,4 +502,6 @@ export {
   VendorBan,
   acceptVendor,
   rejectVendor,
+  generateOTP,
+  resetPasswordWithOTP,
 };

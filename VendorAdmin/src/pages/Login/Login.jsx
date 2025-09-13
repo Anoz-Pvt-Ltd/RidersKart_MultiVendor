@@ -7,7 +7,12 @@ import { useNavigate } from "react-router-dom";
 import LoadingUI from "../../components/Loading";
 import Button from "../../components/Button";
 
-const LoginForm = ({ startLoading, stopLoading, openRegister }) => {
+const LoginForm = ({
+  startLoading,
+  stopLoading,
+  openRegister,
+  openForgetPassword,
+}) => {
   const Dispatch = useDispatch();
   const Navigate = useNavigate();
   const [credentials, setCredentials] = useState({
@@ -95,12 +100,12 @@ const LoginForm = ({ startLoading, stopLoading, openRegister }) => {
       </form>
       <div className="lg:block hidden">
         <p className="text-sm text-gray-500">
-          Don't have an account?{" "}
+          Forget Password ?{" "}
           <span
             className="font-bold underline text-blue-500 cursor-pointer"
-            onClick={openRegister}
+            onClick={openForgetPassword}
           >
-            Sign Up
+            Reset Here
           </span>
         </p>
       </div>

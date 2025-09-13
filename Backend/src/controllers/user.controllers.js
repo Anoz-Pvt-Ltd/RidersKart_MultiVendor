@@ -694,6 +694,72 @@ const UserBan = asyncHandler(async (req, res) => {
   res.status(200).json(new ApiResponse(200, user, "User status updated"));
 });
 
+const generateOTP = asyncHandler(async (req, res) => {
+  const { email, phoneNumber } = req.body;
+  console.log(email, phoneNumber);
+  if (!email || !phoneNumber)
+    throw new ApiError(400, "Email or Contact Number is missing");
+
+  const user = await User.findOne({ email, phoneNumber });
+
+  if (!user)
+    throw new ApiError(404, "User not found with this email or contact number");
+
+  // Generate OTP
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  console.log(otp);
+  user.otp = otp;
+  user.otpExpiry = Date.now() + 1 * 60 * 1000; // OTP valid for 1 minutes
+  await user.save();
+
+  const smsId = await sendOtpSMS(phoneNumber, otp, user.name);
+  if (!smsId) {
+    throw new ApiError(500, "Failed to send OTP via SMS");
+  }
+
+  res.status(200).json(new ApiResponse(200, otp, "OTP generated!"));
+});
+
+const resetPasswordWithOTP = asyncHandler(async (req, res) => {
+  const { email, phoneNumber, otp, newPassword, confirmNewPassword } = req.body;
+
+  if (!otp || !email || !phoneNumber || !newPassword || !confirmNewPassword) {
+    throw new ApiError(400, "All fields are required");
+  }
+  console.log(email, phoneNumber, otp, newPassword, confirmNewPassword);
+
+  if (!email) throw new ApiError(400, "Invalid email");
+  if (!phoneNumber) throw new ApiError(400, "Invalid Phone number");
+  if (!newPassword)
+    throw new ApiError(400, "New password not found, Please try again !");
+  if (!confirmNewPassword)
+    throw new ApiError(400, "New confirmed not found, Please try again !");
+
+  const user = await User.findOne({ email, phoneNumber });
+  if (!user) throw new ApiError(404, "User not found");
+
+  if (user.otp !== otp) {
+    throw new ApiError(404, "Invalid OTP Please Try again !");
+  }
+  if (user.otpExpiry < Date.now()) {
+    throw new ApiError(404, "OTP has expired");
+  }
+  user.password = confirmNewPassword;
+  user.otp = "";
+
+  await user.save({ validateBeforeSave: false });
+
+  res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        user,
+        "Your password is changed successfully, Please Login now... "
+      )
+    );
+});
+
 export {
   registerUser,
   loginUser,
@@ -716,4 +782,6 @@ export {
   getAllUsers,
   getCurrentUser,
   UserBan,
+  generateOTP,
+  resetPasswordWithOTP,
 };

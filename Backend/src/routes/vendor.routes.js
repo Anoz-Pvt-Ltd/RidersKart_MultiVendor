@@ -14,6 +14,8 @@ import {
   rejectVendor,
   acceptVendor,
   VendorBan,
+  generateOTP,
+  resetPasswordWithOTP,
 } from "../controllers/Vendor.controllers.js";
 import {
   VerifyVendorUser,
@@ -40,6 +42,9 @@ router.route("/delete-vendor/:vendorId").post(deleteVendor);
 router
   .route("/get-vendor-by-product-id/:productId")
   .get(getVendorDetailsByProductId);
+
+router.route("/forget-password/generate-otp").post(generateOTP);
+router.route("/forget-password/reset-password").post(resetPasswordWithOTP);
 
 //admin routes
 router.route("/admin/get-all-vendor").get(VerifyAdminUser, getAllVendors);

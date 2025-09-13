@@ -11,6 +11,7 @@ import LoadingUI from "../../Components/Loading";
 import { parseErrorMessage } from "../../Utility/ErrorMessageParser";
 import LoginImage from "../../assets/Login_Image.png";
 import { alertError, alertSuccess } from "../../Utility/Alert";
+import ForgetPassword from "../ForgetPassword/ForgetPassword";
 
 const Login = ({ startLoading, stopLoading }) => {
   const Navigate = useNavigate();
@@ -28,6 +29,7 @@ const Login = ({ startLoading, stopLoading }) => {
   });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [openModel, setIsOpenModel] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -130,7 +132,14 @@ const Login = ({ startLoading, stopLoading }) => {
               onClick={handleSubmit}
             />
           </form>
-          <div className="w-full h-full justify-center items-center flex flex-col mt-20 lg:mt-0">
+          <div className="flex lg:flex-row flex-col lg:gap-5 justify-center items-center w-full lg:pt-5 pt-2">
+            <h1>Forget password ? reset here</h1>
+            <Button
+              label={"Reset Password"}
+              onClick={() => setIsOpenModel(true)}
+            />
+          </div>
+          <div className="w-full h-full justify-center items-center flex flex-col mt-10 lg:mt-0">
             <Button
               label={"Register Here"}
               onClick={NavigateRegister}
@@ -143,6 +152,11 @@ const Login = ({ startLoading, stopLoading }) => {
           </div>
         </div>
       </section>
+      {openModel && (
+        <div className="fixed top-0 left-0 flex justify-center items-center h-screen w-full bg-neutral-200">
+          <ForgetPassword />
+        </div>
+      )}
     </div>
   );
 };

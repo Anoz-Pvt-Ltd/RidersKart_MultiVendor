@@ -10,6 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { addUser, clearUser } from "./utils/Slice/UserInfoSlice";
 import { FetchData } from "./utils/FetchFromApi";
 import { parseErrorMessage } from "./utils/ErrorMessageParser";
+import ForgetPassword from "./pages/ForgetPassword/ForgetPassword";
 
 function App() {
   const dispatch = useDispatch();
@@ -37,8 +38,8 @@ function App() {
         dispatch(addUser(User.data.data.user));
         return User;
       } catch (error) {
-        console.log(error);
-        alert(parseErrorMessage(error));
+        // console.log(error);
+        // alert(parseErrorMessage(error.response.data));
       }
     }
 
@@ -49,6 +50,7 @@ function App() {
     <div className="text-black whiteSoftBG">
       <Routes>
         <Route path="/" element={<Hero />} />
+        {/* <Route path="/" element={<ForgetPassword />} /> */}
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/login" element={<Hero />} />
         <Route path="/register" element={<Hero />} />

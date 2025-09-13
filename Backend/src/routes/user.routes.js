@@ -21,6 +21,8 @@ import {
   UserBan,
   removeProductFromWishlist,
   EditProductQuantity,
+  generateOTP,
+  resetPasswordWithOTP,
   //   getUserProfile,
 } from "../controllers/user.controllers.js";
 
@@ -48,6 +50,10 @@ router
   .post(VerifyUser, removeProductFromWishlist);
 router.route("/:userId/cart-products").get(VerifyUser, getCartProducts);
 router.route("/:userId/wishlist-products").get(VerifyUser, getWishlistProducts);
+
+// forget password
+router.route("/forget-password/generate-otp").post(generateOTP);
+router.route("/forget-password/reset-password").post(resetPasswordWithOTP);
 
 //modification routes
 router.route("/:userId/addresses").post(VerifyUser, addAddress);

@@ -3,9 +3,11 @@ import Login from "../Login/Login";
 import VendorRegistrationForm from "../Registration/Registration";
 import background from "../../assets/HomeBackground.jpg";
 import Button from "../../components/Button";
+import ForgetPassword from "../ForgetPassword/ForgetPassword";
 
 const Hero = () => {
   const [showPopup, setShowPopup] = useState(false);
+  const [openModel, setIsOpenModel] = useState(false);
   return (
     <div className="">
       <div className="absolute h-screen w-screen object-fill overflow-hidden hidden lg:block">
@@ -20,7 +22,7 @@ const Hero = () => {
       <section className="flex lg:flex-row flex-col ">
         {/* Login Component */}
         <div className="login lg:w-1/2 lg:h-screen flex lg:justify-center lg:items-center items-start justify-start relative">
-          <Login openRegister={() => setShowPopup(true)} />
+          <Login openForgetPassword={() => setIsOpenModel(true)} />
         </div>
         {/* register Component */}
         <div className="register lg:w-1/2 w-full lg:h-screen flex lg:justify-center lg:items-center items-start justify-start relative">
@@ -91,6 +93,11 @@ const Hero = () => {
                 }}
               />
             </div>
+          </div>
+        )}
+        {openModel && (
+          <div className="absolute top-0 left-0 h-screen w-full flex justify-center items-center bg-neutral-200">
+            <ForgetPassword />
           </div>
         )}
       </section>
