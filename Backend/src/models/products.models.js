@@ -1,5 +1,5 @@
 import mongoose, { Schema } from "mongoose";
-
+// import { User } from "./user.model";
 const productSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -111,6 +111,29 @@ const productSchema = new mongoose.Schema({
     type: [String], // e.g. ["PATNA", "NALANDA"]
     default: [],
   },
+  ratings: [
+    {
+      user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true,
+      },
+      rating: {
+        type: Number,
+        required: true,
+        min: 1,
+        max: 5,
+      },
+      comment: {
+        type: String,
+        trim: true,
+      },
+      createdAt: {
+        type: Date,
+        default: Date.now,
+      },
+    },
+  ],
 
   createdAt: {
     type: Date,

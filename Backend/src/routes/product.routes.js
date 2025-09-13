@@ -13,6 +13,8 @@ import {
   AddProductImages,
   searchProducts,
   deleteProductsByVendor,
+  productRating,
+  checkUserProductRating,
 } from "../controllers/product.controllers.js";
 import {
   VerifyAdminUser,
@@ -52,6 +54,10 @@ router
 router
   .route("/delete-products/:productId")
   .delete(VerifyVendorUser, deleteProduct);
+router.route("/rating/:productId/:userId").post(VerifyUser, productRating);
+router
+  .route("/rated-products/:productId/:userId")
+  .get(VerifyUser, checkUserProductRating);
 
 //routes for admin
 router.route("/admin/get-all-products").get(VerifyAdminUser, getAllProducts);

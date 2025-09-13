@@ -1012,6 +1012,76 @@ const deleteProductsByVendor = asyncHandler(async (req, res, next) => {
     );
 });
 
+const productRating = asyncHandler(async (req, res) => {
+  const { productId, userId } = req.params;
+  const { rating, comment } = req.body;
+
+  if (!productId) throw new ApiError(400, "Product ID not found!");
+  if (!userId) throw new ApiError(400, "User not found");
+
+  // find product
+  const product = await Product.findById(productId);
+  if (!product) throw new ApiError(404, "Product not found");
+
+  // check if user has already rated
+  const existingRating = product.ratings.find(
+    (r) => r.user.toString() === userId
+  );
+
+  if (existingRating) {
+    // update old rating
+    existingRating.rating = rating;
+    existingRating.comment = comment;
+  } else {
+    // push new rating
+    product.ratings.push({ user: userId, rating, comment });
+  }
+
+  await product.save();
+
+  res
+    .status(200)
+    .json(
+      new ApiResponse(200, product.ratings, "Rating submitted successfully")
+    );
+});
+
+const checkUserProductRating = asyncHandler(async (req, res) => {
+  const { productId, userId } = req.params;
+
+  if (!productId) throw new ApiError(400, "Product ID not provided");
+  if (!userId) throw new ApiError(400, "User ID not provided");
+
+  // find product with ratings
+  const product = await Product.findById(productId).populate(
+    "ratings.user",
+    "name email"
+  );
+
+  if (!product) throw new ApiError(404, "Product not found");
+
+  // check if user has rated
+  const userRating = product.ratings.find((r) => r.user.toString() === userId);
+
+  if (!userRating) {
+    return res.status(200).json({
+      success: true,
+      hasRated: false,
+      message: "User has not rated this product yet",
+    });
+  }
+
+  return res.status(200).json({
+    success: true,
+    hasRated: true,
+    rating: {
+      rating: userRating.rating,
+      comment: userRating.comment,
+      createdAt: userRating.createdAt,
+    },
+  });
+});
+
 export {
   registerProduct,
   getAllProductForAdmin,
@@ -1026,4 +1096,6 @@ export {
   removeStockQuantity,
   searchProducts,
   deleteProductsByVendor,
+  productRating,
+  checkUserProductRating,
 };
