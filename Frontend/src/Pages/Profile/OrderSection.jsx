@@ -18,7 +18,6 @@ const OrderSection = ({ startLoading, stopLoading }) => {
             `orders/all-products-of/${user?.[0]?._id}`,
             "get"
           );
-          console.log(response);
           if (response.data.success) {
             setAllOrders(response.data.orders);
           } else {

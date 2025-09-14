@@ -23,6 +23,7 @@ import {
   EditProductQuantity,
   generateOTP,
   resetPasswordWithOTP,
+  getBulkUsers,
   //   getUserProfile,
 } from "../controllers/user.controllers.js";
 
@@ -62,6 +63,7 @@ router.route("/:userId/addresses/:addressId").post(VerifyUser, editAddress);
 router.route("/:userId/addresses/:addressId").delete(VerifyUser, deleteAddress);
 router.route("/edit-user-profile/:userId").post(VerifyUser, editUserDetails);
 // router.route("/user-profile/:userId").get(getUserProfile);
+router.route("/get-bulk-name-rating").post(getBulkUsers);
 
 //routes for admin usage
 router.route("/admin/get-all-users").get(getAllUsers);

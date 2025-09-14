@@ -35,6 +35,28 @@ const registerUser = asyncHandler(async (req, res, next) => {
     throw new ApiError(400, "All fields are required");
   }
 
+  // Phone validation (10 digits only)
+  if (!/^\d{10}$/.test(phoneNumber)) {
+    throw new ApiError(400, "Invalid contact number. Must be 10 digits.");
+  }
+
+  // Email validation (basic RFC 5322 compliant pattern)
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    throw new ApiError(400, "Invalid email address format.");
+  }
+  // Password validation
+  // Must be at least 8 characters, contain 1 uppercase, 1 lowercase, 1 digit, and 1 special character
+  if (
+    !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(
+      password
+    )
+  ) {
+    throw new ApiError(
+      400,
+      "Invalid password. Must be at least 8 characters long and include uppercase, lowercase, number, and special character."
+    );
+  }
+
   const existingUser = await User.findOne({ email });
   if (existingUser) {
     throw new ApiError(400, "Email is already in use");
@@ -760,6 +782,22 @@ const resetPasswordWithOTP = asyncHandler(async (req, res) => {
     );
 });
 
+const getBulkUsers = asyncHandler(async (req, res) => {
+  const { ids } = req.body;
+
+  if (!ids || !Array.isArray(ids) || ids.length === 0) {
+    throw new ApiError(400, "User IDs are required");
+  }
+
+  const users = await User.find({ _id: { $in: ids } }).select("name email");
+
+  if (!users || users.length === 0) {
+    throw new ApiError(404, "No users found");
+  }
+
+  return res.json(new ApiResponse(200, users, "Users fetched successfully"));
+});
+
 export {
   registerUser,
   loginUser,
@@ -784,4 +822,5 @@ export {
   UserBan,
   generateOTP,
   resetPasswordWithOTP,
+  getBulkUsers,
 };

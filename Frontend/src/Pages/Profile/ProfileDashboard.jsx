@@ -2,13 +2,8 @@ import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { motion } from "framer-motion";
 import { FetchData } from "../../Utility/FetchFromApi";
-import  { ProductCardResponsive } from "../../Components/ProductCard";
-import {
-  Heart,
-  ListOrdered,
-  Newspaper,
-  User,
-} from "lucide-react";
+import { ProductCardResponsive } from "../../Components/ProductCard";
+import { Heart, ListOrdered, Newspaper, User } from "lucide-react";
 import Lottie from "lottie-react";
 import Loading from "../../assets/Loading/Loading.json";
 import { useNavigate } from "react-router";
@@ -19,7 +14,13 @@ import OrderSection from "./OrderSection";
 const Dashboard = ({ startLoading, stopLoading }) => {
   const user = useSelector((store) => store.UserInfo.user);
   const [error, setError] = useState(null);
-  const [activeSection, setActiveSection] = useState("profile");
+  const [activeSection, setActiveSection] = useState(
+    localStorage.getItem("activeSection") || "profile"
+  );
+
+  useEffect(() => {
+    localStorage.setItem("activeSection", activeSection);
+  }, [activeSection]);
   const [wishlistProducts, setWishlistProducts] = useState();
   const [allOrders, setAllOrders] = useState([]);
 
@@ -145,7 +146,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
                 Your wishlist is here with {""}
                 <span>{wishlistProducts?.length} items.</span>
               </h1>
-              {console.log(wishlistProducts)}
+
               <div className="flex justify-start items-start gap-5 flex-wrap lg:p-5">
                 {wishlistProducts?.map((product, index) => (
                   <ProductCardResponsive

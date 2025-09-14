@@ -1034,7 +1034,7 @@ const productRating = asyncHandler(async (req, res) => {
     existingRating.comment = comment;
   } else {
     // push new rating
-    product.ratings.push({ user: userId, rating, comment });
+    product.ratings.push({ user: userId, rating, comment, product: productId });
   }
 
   await product.save();

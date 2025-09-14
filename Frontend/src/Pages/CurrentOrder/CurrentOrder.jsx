@@ -4,50 +4,43 @@ import { useNavigate, useParams } from "react-router";
 import { useSelector } from "react-redux";
 import { FetchData } from "../../Utility/FetchFromApi";
 import Button from "../../Components/Button";
+import { ArrowDownToLine } from "lucide-react";
+import { alertError, alertSuccess } from "../../Utility/Alert";
+import { parseErrorMessage } from "../../Utility/ErrorMessageParser";
 
 const CurrentOrder = ({ startLoading, stopLoading }) => {
   const { orderId } = useParams();
   const [order, setOrder] = useState([]);
-  const [orderProducts, setOrderProducts] = useState();
+  const [orderProducts, setOrderProducts] = useState([]);
   const [error, setError] = useState(null);
   const [shippingAddress, setShippingAddress] = useState([]);
   const user = useSelector((store) => store.UserInfo.user);
   const Navigate = useNavigate();
 
-  const tableHeaders = [
-    "Product Name",
-    "Shipping Details",
-    "Phone Number",
-    "Price Details",
-    "Order Date",
-    "Delivery Date",
-    "Rating",
-  ];
-
-  useEffect(() => {
-    const fetchOrder = async () => {
-      if (user?.length > 0) {
-        try {
-          startLoading();
-          const response = await FetchData(
-            `orders/admin/current-order/${orderId}`,
-            "get"
-          );
-          if (response.data.success) {
-            setOrder(response.data.data.order);
-            setOrderProducts(response.data.data.order.products);
-            setShippingAddress(response.data.data.order.shippingAddress);
-          } else {
-            setError("Failed to load orders.");
-          }
-        } catch (err) {
-          setError(err.response?.data?.message || "Failed to fetch orders.");
-        } finally {
-          stopLoading();
+  const fetchOrder = async () => {
+    if (user?.length > 0) {
+      try {
+        startLoading();
+        const response = await FetchData(
+          `orders/admin/current-order/${orderId}`,
+          "get"
+        );
+        // console.log(response);
+        if (response.data.success) {
+          setOrder(response.data.data.order);
+          setOrderProducts(response.data.data.order.products);
+          setShippingAddress(response.data.data.order.shippingAddress);
+        } else {
+          setError("Failed to load orders.");
         }
+      } catch (err) {
+        setError(err.response?.data?.message || "Failed to fetch orders.");
+      } finally {
+        stopLoading();
       }
-    };
-
+    }
+  };
+  useEffect(() => {
     fetchOrder();
   }, [user]);
 
@@ -58,14 +51,74 @@ const CurrentOrder = ({ startLoading, stopLoading }) => {
     orderAmount,
     paymentMethod,
     images,
+    ratings = [],
+    userId,
   }) => {
+    const [rating, setRating] = useState(0);
+    const [comment, setComment] = useState("");
+    const userRating = ratings.find((r) => r.user === userId);
+
+    const handleSubmitReview = async () => {
+      try {
+        console.log(productId);
+        console.log(user[0]?._id);
+        startLoading();
+        const response = await FetchData(
+          `products/rating/${productId}/${user[0]?._id}`,
+          "post",
+          { rating, comment }
+        );
+        console.log(response);
+        fetchOrder();
+        alertSuccess(response.data.message);
+      } catch (err) {
+        console.error(err);
+        alertError(parseErrorMessage(err.response?.data));
+      } finally {
+        stopLoading();
+      }
+    };
+
+    // ⭐ Read only stars (for already rated)
+    const ReadOnlyStars = ({ rating }) => (
+      <div className="flex items-center gap-1">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <span
+            key={star}
+            className={`text-2xl ${
+              star <= rating ? "text-yellow-500" : "text-gray-400"
+            }`}
+          >
+            ★
+          </span>
+        ))}
+      </div>
+    );
+
+    // ⭐ Interactive stars (for new rating)
+    const InteractiveStars = ({ rating, onRate }) => (
+      <div className="flex items-center gap-1 cursor-pointer">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <span
+            key={star}
+            onClick={() => onRate(star)} // ✅ allow clicking
+            className={`text-2xl ${
+              star <= rating ? "text-yellow-500" : "text-gray-400"
+            }`}
+          >
+            ★
+          </span>
+        ))}
+      </div>
+    );
+
     return (
-      <div className="flex flex-col justify-center lg:items-center items-start bg-white shadow-md rounded-lg p-4 lg:mb-5 mb-2 lg:mx-5 w-screen lg:w-fit">
-        <div className="flex flex-col-reverse justify-between items-center w-full">
-          <div className="px-5 py-2 flex flex-col justify-center items-start w-96 lg:gap-5 ">
+      <div className="flex lg:flex-row flex-col justify-center lg:items-center items-start bg-white shadow-md rounded-lg p-4 lg:mb-5 mb-2 lg:mx-5 w-screen lg:w-full gap-20">
+        <div className="flex flex-col-reverse justify-between items-center">
+          <div className="py-2 flex flex-col justify-center items-start lg:gap-5 ">
             <h1 className="lg:text-base text-sm">{productName}</h1>
             <h2 className="">Seller: {sellerName}</h2>
-            <h3 className="font-medium gap-10 text-xl">
+            <h3 className="font-medium text-xl">
               <span>₹ {orderAmount}</span>{" "}
               <span className="lg:text-base text-sm p-2 rounded-xl">
                 {paymentMethod}
@@ -76,22 +129,60 @@ const CurrentOrder = ({ startLoading, stopLoading }) => {
             <img src={images} className="" />
           </div>
         </div>
-        <div className="flex flex-col lg:flex-row lg:justify-center lg:items-center items-start lg:gap-10 gap-1 py-5">
-          <div className="">
-            <Button label={"Raise an issue for this order"} />
+        <div className="w-full flex flex-col justify-center items-center gap-3">
+          <div className="flex justify-between items-center w-full">
+            <div className="">
+              <Button label={"Raise issue"} />
+            </div>
+            <div className="">
+              <Button
+                label={
+                  <h1 className="flex justify-center items-center text-base">
+                    <ArrowDownToLine className="h-4 w-4" /> Invoice
+                  </h1>
+                }
+              />
+            </div>
+            <div className="">
+              <Button
+                label={"Reorder"}
+                onClick={() => {
+                  Navigate(`/current-product/${productId}`);
+                }}
+              />
+            </div>
           </div>
-          <div className="">
-            <Button label={"Download Invoice"} />
+          <div className="w-full mt-3">
+            {userRating ? (
+              <div className="p-3 border rounded-lg bg-gray-50">
+                <h3 className="font-semibold mb-2 text-green-700">
+                  ✅ You already rated this product
+                </h3>
+                <ReadOnlyStars rating={userRating.rating} />
+                {userRating.comment && (
+                  <p className="mt-2 text-gray-700 italic">
+                    "{userRating.comment}"
+                  </p>
+                )}
+              </div>
+            ) : (
+              <>
+                <h3 className="font-semibold mb-2">Rate this product</h3>
+                <InteractiveStars rating={rating} onRate={setRating} />
+                <textarea
+                  className="w-full border rounded-lg p-2 mt-2"
+                  placeholder="Write your review..."
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                />
+                <Button
+                  label="Submit Review"
+                  className="mt-3"
+                  onClick={handleSubmitReview}
+                />
+              </>
+            )}
           </div>
-          <div className="">
-            <Button
-              label={"Reorder"}
-              onClick={() => {
-                Navigate(`/current-product/${productId}`);
-              }}
-            />
-          </div>
-          <div className="">★★★★★</div>
         </div>
       </div>
     );
@@ -176,6 +267,8 @@ const CurrentOrder = ({ startLoading, stopLoading }) => {
               orderAmount={product?.price?.MRP}
               paymentMethod={order?.paymentMethod}
               images={product?.product?.images[0]?.url}
+              ratings={product?.product?.ratings} // ✅ pass ratings here
+              userId={user[0]?._id} // ✅ pass current user id
             />
           ))}
         </div>

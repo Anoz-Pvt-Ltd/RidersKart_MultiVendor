@@ -6,7 +6,7 @@ import { useState } from "react";
 import Button from "../../Components/Button";
 import { useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Heart } from "lucide-react";
+import { Heart, User } from "lucide-react";
 import LoadingUI from "../../Components/Loading";
 import PopUp from "../../Components/PopUpWrapper";
 import { addCart } from "../../Utility/Slice/CartSlice";
@@ -20,6 +20,7 @@ import {
 import { PinCodeData } from "../../Constants/PinCodeData.js";
 import InputBox from "../../Components/InputBox.jsx";
 import { alertError, alertInfo, alertSuccess } from "../../Utility/Alert.js";
+import { truncateString } from "../../Utility/Utility-functions.js";
 
 const CurrentProduct = ({ startLoading, stopLoading }) => {
   const [isReadMoreDescription, setIsReadMoreDescription] = useState(false);
@@ -44,14 +45,47 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
   const [imgPopup, setImgPopup] = useState(false);
   const [currentImg, setCurrentImg] = useState(0);
   const [products, setProducts] = useState(null);
+  const [ratings, setRatings] = useState([]);
   const [AllProducts, setAllProducts] = useState();
   const [specifications, setSpecifications] = useState("");
   const [productPolicy, setProductPolicy] = useState([]);
-
   const userPostalCode = user[0]?.address?.[0]?.postalCode;
-
   const [pincode, setPincode] = useState("");
   const [availability, setAvailability] = useState(null);
+  const [users, setUsers] = useState({});
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        // get unique ids
+        const userIds = [...new Set(ratings.map((r) => r.user))];
+
+        if (userIds.length > 0) {
+          // API: /users/bulk (you should build this endpoint in backend)
+          const response = await FetchData(
+            "users/get-bulk-name-rating",
+            "post",
+            {
+              ids: userIds,
+            }
+          );
+          // console.log(response);
+
+          // create map { userId: userObj }
+          const userMap = {};
+          response.data.data.forEach((u) => {
+            userMap[u._id] = u;
+          });
+
+          setUsers(userMap);
+        }
+      } catch (err) {
+        // console.error("Error fetching users:", err);
+      }
+    };
+
+    if (ratings?.length > 0) fetchUsers();
+  }, [ratings]);
 
   // 🔹 Auto-check if user is logged in
   useEffect(() => {
@@ -145,6 +179,7 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
       );
       // console.log(Product);
       setProducts(Product?.data?.data);
+      setRatings(Product?.data?.data?.ratings);
       setSpecifications(Product?.data?.data?.specifications);
       stopLoading();
       return Product;
@@ -173,7 +208,7 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
         // console.log(response.data.data);
         setProductPolicy(response.data.data);
       } catch (err) {
-        console.error(err);
+        // console.error(err);
       } finally {
         stopLoading();
       }
@@ -227,9 +262,9 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
         alertSuccess(response.data.message);
         // console.log(products);
         dispatch(addCart(products));
-        console.log(products);
+        // console.log(products);
       } catch (err) {
-        console.log(err);
+        // console.log(err);
         alertError(
           err.response?.data?.message ||
             "Internal server error Please try after sometime !"
@@ -287,6 +322,125 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
     if (sliderRef.current) {
       sliderRef.current.scrollBy({ left: 300, behavior: "smooth" });
     }
+  };
+
+  const ReadOnlyStars = ({ rating }) => (
+    <div className="flex items-center gap-1">
+      {[1, 2, 3, 4, 5].map((star) => (
+        <span
+          key={star}
+          className={`text-2xl ${
+            star <= rating ? "text-[#FE4343]" : "text-[#FE4343]"
+          }`}
+        >
+          ★
+        </span>
+      ))}
+    </div>
+  );
+
+  const RatingUI = ({ reviews }) => {
+    // reviews example: [{ rating: 5 }, { rating: 4 }, { rating: 5 }, ...]
+
+    if (!reviews || reviews.length === 0) {
+      return (
+        <div className="max-w-md w-full bg-white p-4 rounded-lg shadow text-center">
+          <h2 className="text-xl font-bold mb-2">Customer reviews</h2>
+          <p className="text-gray-600">No reviews yet.</p>
+        </div>
+      );
+    }
+
+    const totalRatings = reviews.length;
+
+    // Calculate average
+    const average =
+      reviews.reduce((acc, r) => acc + (r.rating || 0), 0) / totalRatings;
+
+    // Calculate breakdown percentages
+    const breakdown = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
+    reviews.forEach((r) => {
+      if (r.rating >= 1 && r.rating <= 5) {
+        breakdown[r.rating]++;
+      }
+    });
+
+    const breakdownPercent = {};
+    for (let star = 1; star <= 5; star++) {
+      breakdownPercent[star] = ((breakdown[star] / totalRatings) * 100).toFixed(
+        0
+      );
+    }
+
+    return (
+      <div className="max-w-md w-full bg-white p-4 rounded-lg shadow">
+        {/* Heading */}
+        <h2 className="text-xl font-bold mb-2">Customer reviews</h2>
+
+        {/* Average rating */}
+        <div className="flex items-center gap-2 mb-1">
+          <div className="flex text-[#FE4343] text-2xl">
+            {[1, 2, 3, 4, 5].map((star) => (
+              <span
+                key={star}
+                className={star <= Math.round(average) ? "" : "text-gray-300"}
+              >
+                ★
+              </span>
+            ))}
+          </div>
+          <span className="text-lg font-semibold">
+            {average.toFixed(1)} out of 5
+          </span>
+        </div>
+
+        <p className="text-sm text-gray-600 mb-4">
+          {totalRatings} global ratings
+        </p>
+
+        {/* Breakdown */}
+        <div className="flex flex-col gap-1">
+          {[5, 4, 3, 2, 1].map((star) => (
+            <div key={star} className="flex items-center gap-2 text-sm">
+              <span className="text-blue-600 cursor-pointer hover:underline w-10">
+                {star} star
+              </span>
+              <div className="flex-1 bg-gray-200 rounded-full h-4 overflow-hidden">
+                <div
+                  className="bg-[#FE4343] h-4"
+                  style={{ width: `${breakdownPercent[star]}%` }}
+                ></div>
+              </div>
+              <span className="w-10 text-blue-600">
+                {breakdownPercent[star]}%
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
+  const RatingProduct = ({ reviews }) => {
+    if (!reviews || reviews.length === 0) {
+      return (
+        <div className="max-w-md w-full bg-white p-4 rounded-lg shadow text-center">
+          <h2 className="text-xl font-bold mb-2">Customer reviews</h2>
+          <p className="text-gray-600">No reviews yet.</p>
+        </div>
+      );
+    }
+
+    const totalRatings = reviews.length;
+
+    // Calculate average
+    const average =
+      reviews.reduce((acc, r) => acc + (r.rating || 0), 0) / totalRatings;
+    return (
+      <h1>
+        <span className="text-lg font-semibold">{average.toFixed(1)}</span>
+      </h1>
+    );
   };
 
   return (
@@ -412,8 +566,13 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
           {/* <p className="text-gray-600 mb-4">{products?.description}</p> */}
 
           <div className="flex items-center lg:my-4 my-2 lg:text-lg text-xs">
-            <span className=" font-semibold mr-2">4.3</span>
-            <span className="text-gray-500">4,486 Ratings & 494 Reviews</span>
+            <span className=" font-semibold mr-2 flex justify-center items-center bg-green-400 px-2 rounded-xl">
+              ⭐️{<RatingProduct reviews={ratings} />}
+            </span>
+            {/* {console.log(ratings)} */}
+            <span className="text-gray-500">
+              {ratings?.length || 0} Ratings
+            </span>
           </div>
           <div className="flex items-baseline mb-4">
             <span className="text-xl font-bold mr-4">
@@ -493,6 +652,32 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
           </div>
         </div>
       </div>
+      <section className="flex flex-col lg:flex-row justify-between items-center lg:px-20 gap-4 mb-10">
+        <div className=" lg:w-1/4 w-full">
+          <h1 className=" font-semibold mb-2 ml-10">Product Reviews</h1>
+          <RatingUI reviews={ratings} />
+        </div>
+        <div className=" lg:w-3/4 lg:pl-20 w-full ">
+          {ratings?.map((rating) => (
+            <div className="flex flex-col w-full shadow px-10 m-2 rounded-xl ">
+              <h1 className="flex justify-start items-center gap-2">
+                <span>
+                  <User className="h-4 w-4" />
+                </span>
+                {users[rating.user]?.name || "Profile deleted by user"}
+              </h1>
+              <div className="flex flex-col justify-center items-start">
+                <ReadOnlyStars rating={rating.rating} />
+                <h1>Review: {truncateString(rating.comment, 30)}</h1>
+              </div>
+              <p>
+                Reviewed on: {new Date(rating.createdAt).toLocaleDateString()}
+              </p>
+              <p>✅ Verified Purchase</p>
+            </div>
+          ))}
+        </div>
+      </section>
       <section>
         <h1 className=" font-semibold mb-2 ml-10">People Also visited</h1>
       </section>
@@ -506,7 +691,7 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
         </button>
 
         <div
-          className="flex overflow-x-scroll no-scrollbar justify-start items-center lg:gap-6 lg:py-10 lg:px-10"
+          className="flex overflow-x-scroll no-scrollbar justify-start items-center gap-6 lg:py-10 lg:px-10"
           ref={sliderRef}
         >
           {AllProducts?.map((product, index) => (
