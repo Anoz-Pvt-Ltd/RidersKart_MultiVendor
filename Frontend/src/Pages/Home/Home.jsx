@@ -214,24 +214,37 @@ const Home = ({ startLoading, stopLoading }) => {
         </div>
       )} */}
 
-      <div className="flex justify-start items-center gap-10 w-full overflow-x-scroll p-5 no-scrollbar ">
+      <div className="flex justify-start items-center gap-1 w-full overflow-x-scroll p-5 no-scrollbar">
         {FamousSubcategory.map((subcategory) => (
-          <Link
-            to={`/all-products/${subcategory?.category._id}/${subcategory._id}/${subcategory?.category.title}/${subcategory.title}`}
+          <motion.div
             key={subcategory._id}
-            className="w-24 flex flex-col justify-center items-center  "
+            whileHover={{ scale: 1, y: 10 }}
+            transition={{ type: "spring", stiffness: 300, damping: 20 }}
           >
-            <div className="w-16 h-16 overflow-hidden rounded-full drop-shadow-xl border-4 border-gray-100">
-              <img
-                src={subcategory.image.url}
-                alt={subcategory.title}
-                className="w-full h-full "
-              />
-            </div>
-            <span className="text-sm truncate">
-              {truncateString(subcategory.title, 10)}
-            </span>
-          </Link>
+            <Link
+              to={`/all-products/${subcategory?.category._id}/${subcategory._id}/${subcategory?.category.title}/${subcategory.title}`}
+              className="w-24 flex flex-col justify-center items-center"
+            >
+              <motion.div
+                className="w-16 h-16 overflow-hidden rounded-full drop-shadow-xl border-4 border-gray-100"
+                whileHover={{ scale: 1.2 }}
+                transition={{ type: "spring", stiffness: 300, damping: 15 }}
+              >
+                <img
+                  src={subcategory.image.url}
+                  alt={subcategory.title}
+                  className="w-full h-full"
+                />
+              </motion.div>
+              <motion.span
+                className="text-sm truncate mt-2"
+                whileHover={{ scale: 1.1 }}
+                transition={{ type: "spring", stiffness: 300, damping: 20 }}
+              >
+                {truncateString(subcategory.title, 10)}
+              </motion.span>
+            </Link>
+          </motion.div>
         ))}
       </div>
 
