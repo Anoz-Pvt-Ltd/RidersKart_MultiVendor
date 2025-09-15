@@ -43,7 +43,7 @@ export const addProductToCart = createAsyncThunk(
         `products/get-single-product/${productId}`,
         "get"
       );
-      console.log("Hello", response);
+      // console.log("Hello", response);
       if (response.status === 200) {
         return response.data.data; // product details
       } else {

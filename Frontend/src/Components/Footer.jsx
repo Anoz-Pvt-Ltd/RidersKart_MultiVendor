@@ -17,7 +17,7 @@ const Footer = () => {
     <div className="bg-black text-white  select-none z-50">
       <section className="Upper-part pt-10 flex justify-around phone:gap-10 flex-col lg:flex-row px-5 z-50">
         <div className="Logo-and-slogan border-b mb-5 h-fit">
-          <h1 className="text-[2rem] font-serif">
+          <h1 className="text-[2rem] tracking-widest font-serif">
             Rider's Kart
           </h1>
           <h3 className="lg:text-lg text-gray-300">Purchase anything,</h3>
@@ -28,22 +28,13 @@ const Footer = () => {
           <h1 className="text-xl underline-offset-4 underline">Quick Links </h1>
           <ul>
             <li className="small-footer-text">
-              <Link to={"#services"} onClick={handleNavigate}>
-                {" "}
+              <Link>
+                {/* <Link to={"#services"} onClick={handleNavigate}> */}{" "}
                 Services
               </Link>
             </li>
-
-            {/* <li className="small-footer-text">
-              <h1> API Integrations</h1>
-              <Link to={`/api-requests/${user?.[0]?._id}`}>
-                {" "}
-                API Integrations
-              </Link>
-            </li> */}
             <li className="small-footer-text">
               <Link to={`https://postman.riderskart.in/`} target="_blank">
-                {" "}
                 Rider's Kart Postman
               </Link>
             </li>
@@ -60,96 +51,20 @@ const Footer = () => {
             </li>
 
             <li className="small-footer-text">
-              <Link>Driver Partner Terms & Conditions</Link>
+              <a href="/terms-and-conditions">Terms & Conditions: User</a>
             </li>
             <li className="small-footer-text">
-              <Link to={"/refund-process"}>Refund Process</Link>
+              <a href="/refund-process">Refund Process</a>
             </li>
             <li className="small-footer-text">
-              <Link to={`/vendor-policy`}>T & C Vendor</Link>
+              <a href="/vendor-policy">T & C Vendor</a>
             </li>
             <li className="small-footer-text">
-              <Link to={"/delivery-instructions"}>Delivery Instruction</Link>
+              <a href="/delivery-instructions">Delivery Instruction</a>
             </li>
           </ul>
         </div>
-        {/* <div className="Company">
-          <h1 className="text-xl">Company</h1>
-          <ul>
-            <li className="small-footer-text">
-              <Link>About Us</Link>
-            </li>
-            <li className="small-footer-text">
-              <Link>Careers</Link>
-            </li>
-          </ul>
-        </div> */}
       </section>
-      {/* <section className="Lower-part p-5 ">
-        <h1 className="mb-0">We are here</h1>
-        <ul className="flex flex-wrap justify-start items-center  lg:gap-2 gap-1">
-          <li className="small-footer-text hover:underline ">
-            <Link>Delhi NCR</Link>
-          </li>
-          <li className="small-footer-text hover:underline">
-            <Link>Chandigarh</Link>
-          </li>
-          <li className="small-footer-text hover:underline">
-            <Link>Ahmedabad</Link>
-          </li>
-          <li className="small-footer-text hover:underline">
-            <Link>Coimbatore</Link>
-          </li>
-          <li className="small-footer-text hover:underline">
-            <Link>Hyderabad</Link>
-          </li>
-          <li className="small-footer-text hover:underline">
-            <Link>Jaipur</Link>
-          </li>
-          <li className="small-footer-text hover:underline">
-            <Link>Surat</Link>
-          </li>
-          <li className="small-footer-text hover:underline">
-            <Link>Ludhiana</Link>
-          </li>
-          <li className="small-footer-text hover:underline">
-            <Link>Bangalore</Link>
-          </li>
-          <li className="small-footer-text hover:underline">
-            <Link>Chennai</Link>
-          </li>
-          <li className="small-footer-text hover:underline">
-            <Link>Nagpur</Link>
-          </li>
-          <li className="small-footer-text hover:underline">
-            <Link>Kochi</Link>
-          </li>
-          <li className="small-footer-text hover:underline">
-            <Link>Mumbai</Link>
-          </li>
-          <li className="small-footer-text hover:underline">
-            <Link>Kolkata</Link>
-          </li>
-          <li className="small-footer-text hover:underline">
-            <Link>Lucknow</Link>
-          </li>
-          <li className="small-footer-text hover:underline">
-            <Link>Nashik</Link>
-          </li>
-          <li className="small-footer-text hover:underline">
-            <Link>Vadodara</Link>
-          </li>
-          <li className="small-footer-text hover:underline">
-            <Link>Indore</Link>
-          </li>
-          <li className="small-footer-text hover:underline">
-            <Link>Pune</Link>
-          </li>
-          <li className="small-footer-text hover:underline">
-            <Link>Kanpur</Link>
-          </li>
-        </ul>
-      </section> */}
 
       <section className="Social flex flex-col justify-center items-center">
         <div className="flex gap-5 p-5 justify-center items-center">
@@ -176,7 +91,7 @@ const Footer = () => {
           </Link>
         </div>
         <div>
-          <h1 className="tesm">
+          <h1 className="text-sm">
             Copyright and policies reserved by Anonz Future OPC Pvt. Ltd.
           </h1>
         </div>
