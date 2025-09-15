@@ -1,19 +1,15 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
 import { motion } from "framer-motion";
-import { FetchData } from "../../Utility/FetchFromApi";
-import { ProductCardResponsive } from "../../Components/ProductCard";
 import { Heart, ListOrdered, Newspaper, User } from "lucide-react";
-import Lottie from "lottie-react";
-import Loading from "../../assets/Loading/Loading.json";
 import { useNavigate } from "react-router";
 import LoadingUI from "../../Components/Loading";
 import ProfileSection from "./ProfileSection";
 import OrderSection from "./OrderSection";
+import WishListSection from "./WishListSection";
 
 const Dashboard = ({ startLoading, stopLoading }) => {
-  const user = useSelector((store) => store.UserInfo.user);
-  const [error, setError] = useState(null);
+  // const user = useSelector((store) => store.UserInfo.user);
+  // const [error, setError] = useState(null);
   const [activeSection, setActiveSection] = useState(
     localStorage.getItem("activeSection") || "profile"
   );
@@ -21,8 +17,8 @@ const Dashboard = ({ startLoading, stopLoading }) => {
   useEffect(() => {
     localStorage.setItem("activeSection", activeSection);
   }, [activeSection]);
-  const [wishlistProducts, setWishlistProducts] = useState();
-  const [allOrders, setAllOrders] = useState([]);
+  // const [wishlistProducts, setWishlistProducts] = useState();
+  // const [allOrders, setAllOrders] = useState([]);
 
   const sectionVariants = {
     hidden: { opacity: 0, x: -50 },
@@ -34,31 +30,31 @@ const Dashboard = ({ startLoading, stopLoading }) => {
     visible: { opacity: 1, x: 0, transition: { duration: 0.8 } },
   };
 
-  const fetchWishlistProducts = async () => {
-    if (user?.length > 0) {
-      try {
-        startLoading();
-        const response = await FetchData(
-          `users/${user?.[0]?._id}/wishlist-products`,
-          "get"
-        );
-        if (response.data.success) {
-          setWishlistProducts(response.data.data);
-        } else {
-          setError("Failed to load Wishlist products.");
-        }
-      } catch (err) {
-        setError(
-          err.response?.data?.message || "Failed to fetch Wishlist products."
-        );
-      } finally {
-        stopLoading();
-      }
-    }
-  };
-  useEffect(() => {
-    fetchWishlistProducts();
-  }, [user]);
+  // const fetchWishlistProducts = async () => {
+  //   if (user?.length > 0) {
+  //     try {
+  //       startLoading();
+  //       const response = await FetchData(
+  //         `users/${user?.[0]?._id}/wishlist-products`,
+  //         "get"
+  //       );
+  //       if (response.data.success) {
+  //         setWishlistProducts(response.data.data);
+  //       } else {
+  //         setError("Failed to load Wishlist products.");
+  //       }
+  //     } catch (err) {
+  //       setError(
+  //         err.response?.data?.message || "Failed to fetch Wishlist products."
+  //       );
+  //     } finally {
+  //       stopLoading();
+  //     }
+  //   }
+  // };
+  // useEffect(() => {
+  //   fetchWishlistProducts();
+  // }, [user]);
 
   const navigate = useNavigate();
 
@@ -66,14 +62,10 @@ const Dashboard = ({ startLoading, stopLoading }) => {
     navigate("/");
   };
 
-  return !user ? (
-    <div className="w-screen  flex justify-center items-center">
-      <Lottie width={50} height={50} animationData={Loading} />
-    </div>
-  ) : (
+  return (
     <div className="flex flex-col lg:flex-row min-h-screen">
       <motion.aside
-        className="lg:w-64 text-black p-4 shadow-lg"
+        className="lg:w-64 text-black p-4 sticky top-0 left-0 z-40 lg:bg-black/10 bg-[#E8E8F5]"
         initial="hidden"
         animate="visible"
         variants={sidebarVariants}
@@ -102,16 +94,6 @@ const Dashboard = ({ startLoading, stopLoading }) => {
             </li>
             <li
               className={`lg:p-4 rounded-md lg:mb-2 cursor-pointer transition-all duration-300 p-2 flex flex-col justify-center items-center lg:justify-start lg:items-start lg:w-full ${
-                activeSection === "coupons"
-                  ? "bg-[#DF3F33] text-white"
-                  : "bg-gray-300 text-black"
-              }`}
-              onClick={() => setActiveSection("coupons")}
-            >
-              {<Newspaper />} Coupons
-            </li>
-            <li
-              className={`lg:p-4 rounded-md cursor-pointer transition-all duration-300 p-2 flex flex-col justify-center items-center lg:justify-start lg:items-start lg:w-full ${
                 activeSection === "wishlist"
                   ? "bg-[#DF3F33] text-white"
                   : "bg-gray-300 text-black"
@@ -119,6 +101,16 @@ const Dashboard = ({ startLoading, stopLoading }) => {
               onClick={() => setActiveSection("wishlist")}
             >
               {<Heart />}Wishlist
+            </li>
+            <li
+              className={`lg:p-4 rounded-md  cursor-pointer transition-all duration-300 p-2 flex flex-col justify-center items-center lg:justify-start lg:items-start lg:w-full ${
+                activeSection === "coupons"
+                  ? "bg-[#DF3F33] text-white"
+                  : "bg-gray-300 text-black"
+              }`}
+              onClick={() => setActiveSection("coupons")}
+            >
+              {<Newspaper />} Coupons
             </li>
           </ul>
         </nav>
@@ -135,50 +127,11 @@ const Dashboard = ({ startLoading, stopLoading }) => {
           {activeSection === "coupons" && (
             <section>
               <h2 className="text-2xl font-bold mb-4">Available Coupons</h2>
+              <h2 className="mb-4">Currently no coupons are available</h2>
               {/* Coupons content */}
             </section>
           )}
-          {activeSection === "wishlist" && (
-            <section>
-              <h2 className="text-2xl font-bold mb-4">Wishlist</h2>
-              {/* Wishlist content */}
-              <h1>
-                Your wishlist is here with {""}
-                <span>{wishlistProducts?.length} items.</span>
-              </h1>
-
-              <div className="flex justify-start items-start gap-5 flex-wrap lg:p-5">
-                {wishlistProducts?.map((product, index) => (
-                  <ProductCardResponsive
-                    Image={product?.images[0]?.url}
-                    key={index}
-                    ProductName={product?.name}
-                    CurrentPrice={product?.price?.sellingPrice}
-                    Mrp={product?.price?.MRP}
-                    // Rating={product?.products?.[0]?.product?.Rating}
-                    Discount={product?.price?.discount}
-                    Description={product?.description}
-                    productId={product?._id}
-                  />
-                ))}
-              </div>
-              {/* <div className="flex justify-start items-start gap-5 flex-wrap lg:hidden">
-                {wishlistProducts?.map((product, index) => (
-                  <ProductCardMobile
-                    Image={product?.images[0]?.url}
-                    key={product._id}
-                    ProductName={product.name}
-                    CurrentPrice={product.price}
-                    Mrp={product.price}
-                    Rating={product.rating || "No rating"}
-                    Offer="No offer"
-                    Category={product.category.main}
-                    StockQuantity={product.stockQuantity}
-                  />
-                ))}
-              </div> */}
-            </section>
-          )}
+          {activeSection === "wishlist" && <WishListSection />}
         </motion.div>
       </main>
     </div>

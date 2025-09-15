@@ -6,6 +6,7 @@ import { addCart } from "../Utility/Slice/CartSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { FetchData } from "../Utility/FetchFromApi";
 import { alertError, alertSuccess } from "../Utility/Alert";
+import { motion } from "framer-motion";
 
 export const ThreeProductGrid = ({ heading = "", products = [] }) => {
   if (!products.length || products.length > 4) return;
@@ -37,9 +38,14 @@ export const ThreeProductGrid = ({ heading = "", products = [] }) => {
 
   return (
     <div className="product-grid lg:h-[30vw] lg:w-[30vw] w-full flex flex-col justify-evenly rounded-xl drop-shadow-2xl bg-neutral-300 ">
-      <h2 className="uppercase tracking-widest text-center font-semibold text-gray-800 p-2">
+      <motion.h2
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5, delay: 0.5 }}
+        className="uppercase tracking-widest text-center font-semibold text-gray-800 p-2"
+      >
         {heading}
-      </h2>
+      </motion.h2>
       <div className="grid grid-cols-2 grid-rows-2 h-5/6 ">
         {products.map((product, index) => (
           <Link
@@ -56,7 +62,7 @@ export const ThreeProductGrid = ({ heading = "", products = [] }) => {
             <div
               className={`w-full ${
                 products.length === 3 && index === 0 ? "h-fit" : "h-4/5 "
-              }  flex justify-between items-start p-1 overflow-hidden rounded-lg `}
+              }  flex justify-between items-start p-1 overflow-hidden rounded-lg`}
             >
               <img
                 src={product.images[0].url}
@@ -65,7 +71,7 @@ export const ThreeProductGrid = ({ heading = "", products = [] }) => {
                   products.length === 3 && index === 0 ? "w-full" : "h-full "
                 } ${
                   products.length === 3 && index > 0 ? "h-full" : " "
-                } rounded-lg h-20 w-20 lg:h-32 lg:w-32 object-contain`}
+                } rounded-lg h-20 w-20 lg:h-20 lg:w-20 lg:object-center object-contain`}
               />
               <button
                 onClick={() => addProductToCart({ productId: product._id })}

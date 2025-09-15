@@ -25,13 +25,19 @@ import { clearUser } from "../../Utility/Slice/UserInfoSlice";
 import ProductCardMobile from "../../Components/ProductCardMobile";
 import LoadingUI from "../../Components/Loading";
 import { alertError, alertInfo, alertSuccess } from "../../Utility/Alert";
+import UserTC from "./UserProfile_T_C";
+import OrderSection from "./OrderSection";
+import UserFAQ from "./UserProfile_FAQ";
+import { truncateString } from "../../Utility/Utility-functions";
+
 const ProfileSection = ({ startLoading, stopLoading }) => {
   const ProfileEditFromRef = useRef(null);
   const EditAddressFromRef = useRef(null);
   const [error, setError] = useState("");
   const Dispatch = useDispatch();
-
   const user = useSelector((store) => store.UserInfo.user);
+  // const [allOrders, setAllOrders] = useState([]);
+  // console.log(allOrders);
   const [showModal, setShowModal] = useState(false);
   const [showModal2, setShowModal2] = useState(false);
   const [showModal3, setShowModal3] = useState(false);
@@ -222,35 +228,39 @@ const ProfileSection = ({ startLoading, stopLoading }) => {
       stopLoading();
     }
   };
-  // console.log(user?.[0]?.address);
+
+  // useEffect(() => {
+  //   const fetchAllOrders = async () => {
+  //     if (user?.length > 0) {
+  //       try {
+  //         startLoading();
+  //         const response = await FetchData(
+  //           `orders/all-products-of/${user?.[0]?._id}`,
+  //           "get"
+  //         );
+  //         if (response.data.success) {
+  //           setAllOrders(response.data.orders);
+  //         } else {
+  //           setError("Failed to load orders.");
+  //         }
+  //       } catch (err) {
+  //         setError(err.response?.data?.message || "Failed to fetch orders.");
+  //       } finally {
+  //         stopLoading();
+  //       }
+  //     }
+  //   };
+  //   fetchAllOrders();
+  // }, [user]);
 
   return (
     <section className="flex justify-center items-center flex-col">
-      <div className="flex lg:flex-row flex-col w-full justify-evenly items-center lg:shadow py-2 rounded-xl">
-        {/* Profile_area */}
-        <div className="name flex flex-col gap-2">
-          <h2 className="text-2xl font-bold lg:flex justify-center items-center hidden">
-            <span>
-              <UserCheck className="mr-5" />
-            </span>
-            Your Profile
-          </h2>
-          <p>
-            Name: <span className="lg:text-2xl">{user?.[0]?.name}</span>
-          </p>
-          <p>
-            Email: <span className="lg:text-2xl">{user?.[0]?.email}</span>
-          </p>
-          <p>
-            Number:{" "}
-            <span className="lg:text-2xl">{user?.[0]?.phoneNumber}</span>
-          </p>
-        </div>
+      <div className="flex flex-col-reverse lg:flex-col w-full justify-evenly items-start lg:shadow py-2 rounded-xl lg:px-20 gap-5">
         {/* all_FourButtons */}
-        <div className="all_FourButtons flex flex-col gap-5 justify-center items-center mt-10 lg:mt-0">
-          <div className="button flex flex-col justify-evenly items-center gap-5 w-full">
+        <div className="all_FourButtons flex lg:gap-5 justify-center items-center w-full">
+          <div className="button flex justify-start items-center lg:gap-3 gap-1 w-full flex-col lg:flex-row ">
             <Button
-              className={`hover:bg-green-500 hover:text-black w-full`}
+              className={`lg:w-fit w-full`}
               onClick={navigateHome}
               // label={<ShoppingBag/>"Continue Shopping"}
               label={
@@ -263,7 +273,7 @@ const ProfileSection = ({ startLoading, stopLoading }) => {
               }
             />
             <Button
-              className={` hover:bg-orange-500  hover:text-black w-full`}
+              className={`lg:w-fit w-full`}
               onClick={() => {
                 Dispatch(clearUser());
                 localStorage.removeItem("AccessToken");
@@ -281,101 +291,139 @@ const ProfileSection = ({ startLoading, stopLoading }) => {
                 </h1>
               }
             />
-            {/* <Button label={"Add Address"} /> */}
-          </div>
-          <div className="button flex flex-col justify-evenly items-center gap-5 w-full">
             <Button
-              className={`hover:bg-green-500 hover:text-black w-full`}
-              onClick={openModal}
-              label={
-                <h1 className="flex justify-start gap-2">
-                  <span>
-                    <Plus />
-                  </span>
-                  Add Address{" "}
-                </h1>
-              }
-            />
-            <Button
-              className={`hover:bg-green-500 hover:text-black w-full`}
+              className={`lg:w-fit w-full`}
               onClick={openModal2}
               label={
                 <h1 className="flex justify-start gap-2 w-full">
                   <span>
                     <Edit />
                   </span>
-                  Edit Profile{" "}
+                  Profile{" "}
                 </h1>
               }
             />
             {/* <Button label={"Add Address"} /> */}
+            <Button
+              className={`lg:w-fit w-full lg:hidden flex `}
+              onClick={openModal}
+              label={
+                <h1 className="flex justify-start gap-2">
+                  <span>
+                    <Plus />
+                  </span>
+                  Address{" "}
+                </h1>
+              }
+            />
+          </div>
+        </div>
+        <div className="flex flex-col justify-evenly items-start w-full">
+          {/* Profile_area */}
+          <div className="bg-neutral-50 p-6 rounded-2xl shadow-md mb-8 lg:w-3/4 w-full">
+            <h2 className="text-xl font-semibold text-gray-700 mb-4">
+              Personal Details
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:gap-4 text-gray-600">
+              <div>
+                <strong>Name:</strong> {user?.[0]?.name}
+              </div>
+              <div>
+                <strong>Email:</strong> {user?.[0]?.email}
+              </div>
+              <div>
+                <strong>Password:</strong> {user?.[0]?.phoneNumber}
+              </div>
+              <div>
+                <strong>Contact Number:</strong> {user?.[0]?.phoneNumber}
+              </div>
+            </div>
+          </div>
+          {/* address area */}
+          <div className="address flex flex-wrap flex-col w-full">
+            <p className=" font-bold lg:hidden block">Address:</p>
+            <p className=" font-bold  hidden lg:block">Available address:</p>
+            {/* address list  */}
+            <div className="flex lg:flex-row flex-col flex-wrap justify-start items-center text-xs">
+              {user?.[0]?.address?.map((address, index) => (
+                <div
+                  key={address._id}
+                  className="gap-5 flex justify-center items-center flex-row flex-wrap "
+                >
+                  <span className="shadow m-1 py-3 px-2 rounded-xl bg-neutral-50 ">
+                    <li className=" font-semibold list-none">
+                      Street:{" "}
+                      <span className="font-normal text-xs ">
+                        {truncateString(address.street, 10)}
+                      </span>
+                    </li>
+                    <li className=" font-semibold list-none">
+                      City:{" "}
+                      <span className="font-normal text-xs ">
+                        {address.city}
+                      </span>
+                    </li>
+                    <li className=" font-semibold list-none">
+                      Country:{" "}
+                      <span className="font-normal text-xs ">
+                        {address.country}
+                      </span>
+                    </li>
+                    <li className=" font-semibold list-none">
+                      Postal Code:{" "}
+                      <span className="font-normal text-xs ">
+                        {address.postalCode}
+                      </span>
+                    </li>
+                    <li className=" font-semibold list-none">
+                      State:{" "}
+                      <span className="font-normal text-xs ">
+                        {address.state}
+                      </span>
+                    </li>
+                    <div className="flex justify-evenly items-center gap-5 pt-2">
+                      <button
+                        className="flex justify-center items-center gap-2 hover:text-green-500"
+                        onClick={() => {
+                          setEditAddress(address); // Set the address to edit
+                          setEditAddressId(address._id); // (optional) if you need the id
+                          openModal3();
+                        }}
+                      >
+                        <PencilLine className="h-4 w-4" />{" "}
+                        <span className="lg:hidden">Edit</span>
+                      </button>
+                      <button
+                        className="flex justify-center items-center gap-2 hover:text-red-500 "
+                        onClick={() => DeleteAddress(address?._id)}
+                      >
+                        <Trash className="h-4 w-4" />
+                        <span className="lg:hidden">Delete</span>
+                      </button>
+                    </div>
+                  </span>
+                </div>
+              ))}
+              <button
+                onClick={openModal}
+                className="hidden border border-dashed h-full lg:flex justify-center items-center px-10 py-10 border-black rounded-xl"
+              >
+                <h1 className="flex flex-col justify-center items-center ">
+                  <Plus />
+                  Address
+                </h1>
+              </button>
+            </div>
+            {/* <AddressList/> */}
           </div>
         </div>
       </div>
-      {/* address area */}
-      <div className="address flex flex-wrap flex-col">
-        <p className=" font-bold text-xl lg:hidden block">Address:</p>
-        <p className=" font-bold text-xl hidden lg:block">Available address:</p>
-        {/* address list  */}
-        <div className="flex lg:flex-row flex-col flex-wrap justify-start items-center">
-          {user?.[0]?.address?.map((address, index) => (
-            <div
-              key={address._id}
-              className="gap-5 flex justify-center items-center flex-row flex-wrap"
-            >
-              <span className="shadow m-2 p-4 rounded-xl">
-                <li className="ml-4 font-semibold list-none">
-                  Street:{" "}
-                  <span className="font-normal text-lg ">{address.street}</span>
-                </li>
-                <li className="ml-4 font-semibold list-none">
-                  City:{" "}
-                  <span className="font-normal text-lg ">{address.city}</span>
-                </li>
-                <li className="ml-4 font-semibold list-none">
-                  Country:{" "}
-                  <span className="font-normal text-lg ">
-                    {address.country}
-                  </span>
-                </li>
-                <li className="ml-4 font-semibold list-none">
-                  Postal Code:{" "}
-                  <span className="font-normal text-lg ">
-                    {address.postalCode}
-                  </span>
-                </li>
-                <li className="ml-4 font-semibold list-none">
-                  State:{" "}
-                  <span className="font-normal text-lg ">{address.state}</span>
-                </li>
-                <div className="flex justify-center items-center gap-5 pt-5">
-                  <button
-                    className="flex justify-center items-center gap-2 hover:text-green-500"
-                    onClick={() => {
-                      setEditAddress(address); // Set the address to edit
-                      setEditAddressId(address._id); // (optional) if you need the id
-                      openModal3();
-                    }}
-                  >
-                    <PencilLine /> <span className="lg:hidden">Edit</span>
-                  </button>
-                  <button
-                    className="flex justify-center items-center gap-2 hover:text-red-500 "
-                    onClick={() => DeleteAddress(address?._id)}
-                  >
-                    <Trash />
-                    <span className="lg:hidden">Delete</span>
-                  </button>
-                </div>
-              </span>
-            </div>
-          ))}
-        </div>
-        {/* <AddressList/> */}
-      </div>
+      <UserFAQ />
+      <UserTC />
+
       {/* Add address modal */}
       {showModal && (
-        <div className="modal backdrop-blur-lg bg-black/70 fixed top-0 left-0 w-full h-full flex justify-center items-center">
+        <div className="modal backdrop-blur-lg bg-black/70 fixed top-0 left-0 w-full h-full flex justify-center items-center z-50">
           <div className="modal-content flex  justify-center px-20 items-center gap-20 bg-white p-4 rounded-xl">
             <form>
               <InputBox
@@ -435,10 +483,10 @@ const ProfileSection = ({ startLoading, stopLoading }) => {
       )}
       {/* Edit profile modal */}
       {showModal2 && (
-        <div className=" fixed top-0 left-0 w-full h-full flex flex-col justify-center items-center backdrop-blur-lg">
+        <div className=" fixed top-0 left-0 w-full h-full flex flex-col justify-center items-center backdrop-blur-lg z-50">
           <h1 className="mb-5 text-center">
-            Hello <span className="text-2xl font-bold ">{user?.[0]?.name}</span>{" "}
-            you can edit your account details here
+            Hello <span className=" font-bold ">{user?.[0]?.name}</span> you can
+            edit your account details here
           </h1>
 
           <div className="flex justify-center items-center gap-10 lg:w-1/2 w-full  rounded-xl shadow lg:py-10 whiteSoftBG">
@@ -485,29 +533,25 @@ const ProfileSection = ({ startLoading, stopLoading }) => {
                     type="button"
                     onClick={closeModal2}
                     label="Cancel"
-                    className="mt-4 hover:bg-orange-500 lg:hidden block"
+                    className="mt-4"
                   />
-                  <Button
-                    className={`mt-4 hover:bg-green-500 hover:text-black`}
-                    type="submit"
-                    label="Update Profile"
-                  />
+                  <Button className={`mt-4 `} type="submit" label="Submit" />
                 </div>
               </form>
             </div>
-            <div className="flex flex-col gap-5">
+            {/* <div className="flex flex-col gap-5">
               <Button
                 type="button"
                 onClick={closeModal2}
                 label="Cancel"
                 className="mt-4 hover:bg-orange-500 hidden lg:block"
               />
-            </div>
+            </div> */}
           </div>
         </div>
       )}
       {showModal3 && (
-        <div className=" fixed top-0 left-0 w-full h-full flex flex-col justify-center items-center backdrop-blur-lg">
+        <div className=" fixed top-0 left-0 w-full h-full flex flex-col justify-center items-center backdrop-blur-lg z-50">
           <h1 className="mb-5 text-center">
             Hello <span className="text-2xl font-bold ">{user?.[0]?.name}</span>{" "}
             you can edit your address here

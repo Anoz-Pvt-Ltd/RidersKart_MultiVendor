@@ -16,15 +16,15 @@ const Footer = () => {
   return (
     <div className="bg-black text-white  select-none z-50">
       <section className="Upper-part pt-10 flex justify-around phone:gap-10 flex-col lg:flex-row px-5 z-50">
-        <div className="Logo-and-slogan border-b mb-5">
-          <h1 className="text-[2rem] font-serif underline-offset-4 underline">
+        <div className="Logo-and-slogan border-b mb-5 h-fit">
+          <h1 className="text-[2rem] font-serif">
             Rider's Kart
           </h1>
           <h3 className="lg:text-lg text-gray-300">Purchase anything,</h3>
           <h3 className="lg:text-lg text-gray-300">Anywhere,</h3>
           <h3 className="lg:text-lg text-gray-300">Anytime</h3>
         </div>
-        <div className="Quick link   border-b mb-5">
+        <div className="Quick link   border-b mb-5 h-fit">
           <h1 className="text-xl underline-offset-4 underline">Quick Links </h1>
           <ul>
             <li className="small-footer-text">
@@ -34,17 +34,17 @@ const Footer = () => {
               </Link>
             </li>
 
-            <li className="small-footer-text">
+            {/* <li className="small-footer-text">
               <h1> API Integrations</h1>
-              {/* <Link to={`/api-requests/${user?.[0]?._id}`}>
+              <Link to={`/api-requests/${user?.[0]?._id}`}>
                 {" "}
                 API Integrations
-              </Link> */}
-            </li>
+              </Link>
+            </li> */}
             <li className="small-footer-text">
-              <Link to={`https://riderskart.in/`} target="_blank">
+              <Link to={`https://postman.riderskart.in/`} target="_blank">
                 {" "}
-                Rider's Kart
+                Rider's Kart Postman
               </Link>
             </li>
           </ul>
@@ -61,6 +61,15 @@ const Footer = () => {
 
             <li className="small-footer-text">
               <Link>Driver Partner Terms & Conditions</Link>
+            </li>
+            <li className="small-footer-text">
+              <Link to={"/refund-process"}>Refund Process</Link>
+            </li>
+            <li className="small-footer-text">
+              <Link to={`/vendor-policy`}>T & C Vendor</Link>
+            </li>
+            <li className="small-footer-text">
+              <Link to={"/delivery-instructions"}>Delivery Instruction</Link>
             </li>
           </ul>
         </div>
@@ -142,25 +151,35 @@ const Footer = () => {
         </ul>
       </section> */}
 
-      <section className="Social flex gap-5 p-5 justify-center items-center">
-        <Link
-          className="Instagram hover:scale-110 transition "
-          title="Instagram"
-        >
-          <Instagram />
-        </Link>
-        <Link className="Fb hover:scale-110 transition " title="Facebook">
-          <Facebook />
-        </Link>
-        <Link className="linkedIn hover:scale-110 transition " title="Linkedin">
-          <Linkedin />
-        </Link>
-        <Link className="Youtube hover:scale-110 transition " title="Youtube">
-          <Youtube />
-        </Link>
-        <Link className="Twitter hover:scale-110 transition " title="Twitter">
-          <Twitter />
-        </Link>
+      <section className="Social flex flex-col justify-center items-center">
+        <div className="flex gap-5 p-5 justify-center items-center">
+          <Link
+            className="Instagram hover:scale-110 transition "
+            title="Instagram"
+          >
+            <Instagram />
+          </Link>
+          <Link className="Fb hover:scale-110 transition " title="Facebook">
+            <Facebook />
+          </Link>
+          <Link
+            className="linkedIn hover:scale-110 transition "
+            title="Linkedin"
+          >
+            <Linkedin />
+          </Link>
+          <Link className="Youtube hover:scale-110 transition " title="Youtube">
+            <Youtube />
+          </Link>
+          <Link className="Twitter hover:scale-110 transition " title="Twitter">
+            <Twitter />
+          </Link>
+        </div>
+        <div>
+          <h1 className="tesm">
+            Copyright and policies reserved by Anonz Future OPC Pvt. Ltd.
+          </h1>
+        </div>
       </section>
     </div>
   );
