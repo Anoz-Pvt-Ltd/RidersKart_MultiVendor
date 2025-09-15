@@ -423,12 +423,7 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
 
   const RatingProduct = ({ reviews }) => {
     if (!reviews || reviews.length === 0) {
-      return (
-        <div className="max-w-md w-full bg-white p-4 rounded-lg shadow text-center">
-          <h2 className="text-xl font-bold mb-2">Customer reviews</h2>
-          <p className="text-gray-600">No reviews yet.</p>
-        </div>
-      );
+      return <p className="text-gray-600">No reviews yet.</p>;
     }
 
     const totalRatings = reviews.length;
@@ -438,7 +433,7 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
       reviews.reduce((acc, r) => acc + (r.rating || 0), 0) / totalRatings;
     return (
       <h1>
-        <span className="text-lg font-semibold">{average.toFixed(1)}</span>
+        <span className="text-lg font-semibold">⭐️{average.toFixed(1)}</span>
       </h1>
     );
   };
@@ -567,7 +562,7 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
 
           <div className="flex items-center lg:my-4 my-2 lg:text-lg text-xs">
             <span className=" font-semibold mr-2 flex justify-center items-center bg-green-400 px-2 rounded-xl">
-              ⭐️{<RatingProduct reviews={ratings} />}
+              {<RatingProduct reviews={ratings} />}
             </span>
             {/* {console.log(ratings)} */}
             <span className="text-gray-500">

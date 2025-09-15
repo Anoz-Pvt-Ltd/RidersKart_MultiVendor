@@ -28,7 +28,11 @@ export const ThreeProductGrid = ({ heading = "", products = [] }) => {
       // dispatch(addProductToCart(productId));
     } catch (err) {
       console.log(err);
-      Navigate("/login");
+      if (user.length > 0) {
+        window.location.reload();
+      } else {
+        Navigate("/login");
+      }
       alertError(
         err.response?.data?.message ||
           "Please Login first!, Failed to add product to cart."

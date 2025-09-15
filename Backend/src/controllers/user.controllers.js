@@ -372,7 +372,7 @@ const addProductToCart = asyncHandler(async (req, res) => {
     // Check if the product is already in the user's cart
     if (
       user.CartProducts.some(
-        (item) => item.product._id.toString() === productId
+        (item) => item.product?._id.toString() === productId
       )
     ) {
       return res.status(400).json({ message: "Product already in cart" });
