@@ -91,7 +91,8 @@ const Footer = () => {
           </Link>
         </div>
         <div>
-          <h1 className="text-sm">
+          <h1 className="text-sm flex flex-col justify-center items-center py-2">
+            <span>Rider's Kart A Unit of Anonz Future OPC Pvt. Ltd. </span>
             Copyright and policies reserved by Anonz Future OPC Pvt. Ltd.
           </h1>
         </div>

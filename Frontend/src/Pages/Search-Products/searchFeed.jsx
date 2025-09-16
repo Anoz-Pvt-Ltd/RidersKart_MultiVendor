@@ -6,9 +6,6 @@ import { FetchData } from "../../Utility/FetchFromApi";
 
 export default function SearchPage() {
   const searchInput = useParams().searchData;
-
-  console.log("searchInput", searchInput);
-
   const [searchedResponse, setSearchedResponse] = useState(null);
 
   useEffect(() => {

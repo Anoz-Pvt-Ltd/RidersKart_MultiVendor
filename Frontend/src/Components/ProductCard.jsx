@@ -266,7 +266,9 @@ const CheckOut = ({
             </h1>
           </div>
         </div>
-        <div className="h-full text-xs">{CartFunctionalities}</div>
+        <div className="h-full text-xs lg:w-fit w-full px-1 lg:px-0">
+          {CartFunctionalities}
+        </div>
       </div>
     </div>
   );

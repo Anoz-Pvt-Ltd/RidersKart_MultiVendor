@@ -16,6 +16,7 @@ import { parseErrorMessage } from "../../Utility/ErrorMessageParser";
 import { CheckOutCard } from "../../Components/ProductCard";
 import { Trash } from "lucide-react";
 import { alertError, alertInfo, alertSuccess } from "../../Utility/Alert";
+import { AnimatePresence, motion } from "framer-motion";
 
 const CartPage = ({ startLoading, stopLoading }) => {
   const [error, setError] = useState("");
@@ -267,7 +268,15 @@ const CartPage = ({ startLoading, stopLoading }) => {
         <div className="flex flex-col w-full gap-4 justify-between items-center">
           <div className="flex flex-col lg:flex-row w-full justify-center items-center ">
             <div className="lg:col-span-2 lg:w-3/4 w-full ">
-              <div className="bg-neutral-300 no-scrollbar shadow-md rounded-md lg:p-4 p-1 lg:h-[30rem] overflow-y-scroll ">
+              <motion.div
+                initial={{ x: 100, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{
+                  ease: "easeInOut",
+                  duration: 0.3,
+                }}
+                className="bg-neutral-300 no-scrollbar shadow-md rounded-md lg:p-4 p-1 lg:h-[30rem] overflow-y-scroll "
+              >
                 {cart?.map((item) =>
                   item?.product === null ? (
                     <div key={item?._id}></div>
@@ -344,7 +353,7 @@ const CartPage = ({ startLoading, stopLoading }) => {
                     </div>
                   )
                 )}
-              </div>
+              </motion.div>
               <div className="flex justify-center items-center w-full ">
                 <Button
                   label={"Shop more"}
@@ -357,7 +366,15 @@ const CartPage = ({ startLoading, stopLoading }) => {
             {/* Order summery */}
             <div className="lg:w-1/3 w-full flex flex-col justify-center items-center lg:p-10 lg:pt-0 gap-5">
               {/* order summary  */}
-              <div className="bg-white shadow-md rounded-md p-4 w-full text-sm lg:text-base">
+              <motion.div
+                initial={{ x: -100, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{
+                  ease: "easeInOut",
+                  duration: 0.3,
+                }}
+                className="bg-white shadow-md rounded-md p-4 w-full text-sm lg:text-base"
+              >
                 <h2 className="text-xl font-bold mb-4">Order Summary</h2>
                 <div className="flex justify-between">
                   <p>Subtotal</p>
@@ -371,9 +388,18 @@ const CartPage = ({ startLoading, stopLoading }) => {
                   <p>Total</p>
                   <p>₹ {(getTotalPayablePrice() * 1.1).toFixed(2)}</p>
                 </div>
-              </div>
+              </motion.div>
               {/* address area  */}
-              <div className="addresses w-full">
+              <motion.div
+                initial={{ x: -100, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{
+                  ease: "easeInOut",
+                  duration: 0.3,
+                  delay: 0.2,
+                }}
+                className="addresses w-full"
+              >
                 <h2 className="mb-5 font-semibold">Select Shipping Address</h2>
                 {addresses?.length > 0 ? (
                   <select
@@ -397,9 +423,18 @@ const CartPage = ({ startLoading, stopLoading }) => {
                 ) : (
                   <p>No addresses available. Please add one in your profile.</p>
                 )}
-              </div>
+              </motion.div>
               {/* payment method  */}
-              <div className=" w-full">
+              <motion.div
+                initial={{ x: -100, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{
+                  ease: "easeInOut",
+                  duration: 0.3,
+                  delay: 0.4,
+                }}
+                className=" w-full"
+              >
                 <h2 className="mb-5 font-semibold">Select Payment Method</h2>
                 <select
                   value={paymentMethod}
@@ -426,7 +461,7 @@ const CartPage = ({ startLoading, stopLoading }) => {
                     label={"Place order"}
                   />
                 )}
-              </div>
+              </motion.div>
             </div>
           </div>
         </div>

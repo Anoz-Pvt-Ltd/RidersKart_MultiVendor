@@ -1,26 +1,36 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { FetchData } from "../../Utility/FetchFromApi";
 import { useDispatch, useSelector } from "react-redux";
-// import ProductCard from "../../Components/ProductCard";
+import { AnimatePresence, motion } from "framer-motion";
 import Button from "../../Components/Button";
 import LoadingUI from "../../Components/Loading";
-import { MoveRight } from "lucide-react";
+import { ChevronDown, MoveRight } from "lucide-react";
 import InputBox from "../../Components/InputBox";
 import { parseErrorMessage } from "../../Utility/ErrorMessageParser";
 import { alertError, alertInfo, alertSuccess } from "../../Utility/Alert";
+import {
+  truncateNumber,
+  truncateString,
+} from "../../Utility/Utility-functions";
+import { Card } from "../../Components/ProductCard";
+import { PinCodeData } from "../../Constants/PinCodeData";
+import { all } from "axios";
+import { FilterByPincode } from "../../Utility/FilterByPincode";
 
 const BuyNow = ({ startLoading, stopLoading }) => {
   const { productId, orderId } = useParams();
   const [product, setProduct] = useState(null);
+  const [products, setProducts] = useState([]);
   const [addresses, setAddresses] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState(null);
   const [error, setError] = useState("");
   const user = useSelector((store) => store.UserInfo.user);
-
+  const userPostalCode = user[0]?.address?.[0]?.postalCode;
   const Navigate = useNavigate();
   const Dispatch = useDispatch();
+  console.log(products);
 
   useEffect(() => {
     const fetchProductDetails = async () => {
@@ -62,9 +72,30 @@ const BuyNow = ({ startLoading, stopLoading }) => {
         }
       }
     };
+    const fetchProducts = async () => {
+      try {
+        startLoading();
+        const response = await FetchData("products/get-all-products", "get");
+        let allProducts = response.data.data.products;
+
+        // filter products based on pincode
+        const filtered = FilterByPincode(
+          allProducts,
+          userPostalCode,
+          PinCodeData
+        );
+        setProducts(filtered);
+        // setProducts(response.data.data.products);
+      } catch (err) {
+        setError(err.response?.data?.message || "Failed to fetch products.");
+      } finally {
+        stopLoading();
+      }
+    };
 
     fetchProductDetails();
     fetchUserAddresses();
+    fetchProducts();
   }, [productId, user]);
 
   const handleAddressChange = (e) => {
@@ -290,45 +321,37 @@ const BuyNow = ({ startLoading, stopLoading }) => {
           <Login />
         </div>
       ) : (
-        <div className="buy-now-page flex flex-col lg:flex-row justify-center items-center gap-20 lg:mt-10 h-full">
+        <div className="buy-now-page flex flex-col lg:flex-row justify-center items-center lg:py-10 h-full gap-20">
           {product && (
-            <div className="w-fit px-10 lg:py-10">
-              <div className="w-full rounded-lg px-4 py-6 shadow-lg shadow-neutral-300 grid grid-cols-1 gap-4 md:grid-cols-5 md:grid-rows-4 ">
-                {/* Image - full width on mobile, left column on desktop */}
-                <div className="w-full h-64 md:h-full md:col-span-2 md:row-span-4">
-                  <div className="flex justify-center items-center w-full h-full rounded">
-                    <img
-                      src={product?.images[0].url}
-                      alt={product?.name}
-                      className="object-cover w-full h-full rounded shadow-lg shadow-neutral-600"
-                    />
-                  </div>
+            <div>
+              <div className="whiteSoftBG shadow-md hover:shadow-lg h-full w-fit overflow-hidden rounded-lg duration-300 ease-in-out flex justify-evenly items-center flex-col lg:flex-row">
+                <div className="overflow-hidden  object-center flex justify-center items-center">
+                  <img
+                    src={product?.images[0].url}
+                    alt="No Image found"
+                    className="lg:w-64 lg:h-52 w-24 h-24 object-contain"
+                  />
                 </div>
-
-                {/* Product Name */}
-                <div className="w-full border rounded-xl shadow-xl shadow-neutral-300 px-5 py-3 md:col-span-3 md:col-start-3 md:row-start-1 flex items-center">
-                  <h2 className="font-medium text-2xl">{product?.name}</h2>
-                </div>
-
-                {/* Description */}
-                <div className="w-full px-2 md:px-0 md:col-span-3 md:col-start-3 md:row-start-2 flex items-center">
-                  <h2 className="text-sm truncate">
-                    Description: {product?.description}
-                  </h2>
-                </div>
-
-                {/* Pricing Info */}
-                <div className="w-full px-2 md:px-0 md:col-span-3 md:col-start-3 md:row-start-3">
-                  <div className="flex flex-col md:flex-row justify-start md:justify-evenly items-start md:items-center gap-2 md:gap-5">
-                    <span className="text-sm line-through">
-                      MRP: ₹{product?.price.MRP}
-                    </span>
-                    <span className="font-semibold">
+                <div className="px-2 flex flex-col">
+                  <Link
+                    to={`/current-product/${product?._id}`}
+                    className=" font-semibold truncate hover:text-blue-500 hover:underline duration-200 ease-in-out"
+                  >
+                    Product Name: {truncateString(product?.name, 20)}
+                  </Link>
+                  <p>Description: {truncateString(product?.description, 30)}</p>
+                  <div className="flex flex-col w-full justify-center items-start ">
+                    <h1 className="">
                       Current price: ₹{product?.price.sellingPrice}
-                    </span>
-                    <span className="text-green-500 font-semibold">
-                      {product?.price.discount}% off
-                    </span>
+                    </h1>
+                    <h1 className=" line-through text-gray-500 text-xs">
+                      {" "}
+                      MRP:
+                      {truncateNumber(product?.price.MRP, 3)}
+                    </h1>
+                    <h1 className=" bg-green-500 p-1 rounded text-xs truncate">
+                      Discount: {product?.price.discount}% off
+                    </h1>
                   </div>
                 </div>
               </div>
@@ -336,18 +359,23 @@ const BuyNow = ({ startLoading, stopLoading }) => {
           )}
 
           <div className="address-selection flex flex-col gap-5 justify-evenly items-center">
-            {/* <div>
-              <h1 className="font-semibold text-2xl">
-                Hello, {user?.[0]?.name}
-              </h1>
-            </div> */}
-            <div className="w-4/5 ">
+            {/* address area  */}
+            <motion.div
+              initial={{ x: -100, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{
+                ease: "easeInOut",
+                duration: 0.3,
+                delay: 0.2,
+              }}
+              className="addresses w-full"
+            >
               <h2 className="mb-5 font-semibold">Select Shipping Address</h2>
               {addresses?.length > 0 ? (
                 <select
                   value={selectedAddress}
                   onChange={handleAddressChange}
-                  className="bg-white p-5 rounded-xl outline-none w-full shadow-xl border"
+                  className="bg-white border border-neutral-400 p-2 rounded-xl outline-none w-full"
                 >
                   <option value="" selected disabled>
                     Select an address
@@ -365,13 +393,23 @@ const BuyNow = ({ startLoading, stopLoading }) => {
               ) : (
                 <p>No addresses available. Please add one in your profile.</p>
               )}
-            </div>
-            <div className="w-4/5">
+            </motion.div>
+            {/* payment method  */}
+            <motion.div
+              initial={{ x: -100, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{
+                ease: "easeInOut",
+                duration: 0.3,
+                delay: 0.4,
+              }}
+              className=" w-full"
+            >
               <h2 className="mb-5 font-semibold">Select Payment Method</h2>
               <select
                 value={paymentMethod}
                 onChange={handlePaymentChange}
-                className="bg-white p-5 rounded-xl outline-none w-full shadow-xl border"
+                className="bg-white border border-neutral-400 p-2 rounded-xl outline-none w-full"
               >
                 <option value="" disabled selected>
                   Select a payment method
@@ -379,25 +417,46 @@ const BuyNow = ({ startLoading, stopLoading }) => {
                 <option value="online">Online</option>
                 <option value="cash">Cash on delivery</option>
               </select>
-            </div>
-            {paymentMethod === "online" && (
-              <Button
-                className={`mt-5 hover:bg-green-500 hover:text-black w-3/4`}
-                onClick={Payment}
-                label={"Proceed for payment"}
-              />
-            )}
-            {paymentMethod === "cash" && (
-              <Button
-                className={`w-3/4 hover:bg-green-500 hover:text-black`}
-                onClick={handleOrderConfirmation}
-                // Disabled={!selectedAddress || !paymentMethod}
-                label={"Place order"}
-              />
-            )}
+              {paymentMethod === "online" && (
+                <Button
+                  className={` hover:bg-green-500 hover:text-black mt-5 w-full`}
+                  onClick={Payment}
+                  label={"Proceed for payment"}
+                />
+              )}
+              {paymentMethod === "cash" && (
+                <Button
+                  className={` hover:bg-green-500 hover:text-black mt-5 w-full`}
+                  onClick={handleOrderConfirmation}
+                  label={"Place order"}
+                />
+              )}
+            </motion.div>
           </div>
         </div>
       )}
+      <div className="pb-20">
+        <h1 className="px-10 bg-neutral-200 text-center py-4 flex justify-center items-center gap-5">
+          People also bought <ChevronDown className="h-4 w-4" />
+        </h1>
+        <div className="flex gap-4 bg-transparent justify-start items-center overflow-x-auto p-5 max-w-full">
+          {products?.map((product) => (
+            <Card
+              Image={product?.images[0]?.url}
+              key={product._id}
+              ProductName={product.name}
+              CurrentPrice={product.price.sellingPrice}
+              Mrp={product.price.MRP}
+              Rating={product.Rating}
+              Offer={product.off}
+              Description={product.description}
+              productId={product._id}
+              Discount={product.price.discount}
+              Stock={product.stockQuantity}
+            />
+          ))}
+        </div>
+      </div>
     </div>
   );
 };

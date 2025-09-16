@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { FetchData } from "../../Utility/FetchFromApi";
 import Button from "../../Components/Button";
 import InputBox from "../../Components/InputBox";
@@ -325,6 +325,7 @@ const ProfileSection = ({ startLoading, stopLoading }) => {
               Personal Details
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:gap-4 text-gray-600">
+              {console.log(user)}
               <div>
                 <strong>Name:</strong> {user?.[0]?.name}
               </div>
@@ -348,9 +349,9 @@ const ProfileSection = ({ startLoading, stopLoading }) => {
               {user?.[0]?.address?.map((address, index) => (
                 <div
                   key={address._id}
-                  className="gap-5 flex justify-center items-center flex-row flex-wrap "
+                  className="gap-5 flex justify-center items-center flex-row flex-wrap w-full lg:w-fit"
                 >
-                  <span className="shadow m-1 py-3 px-2 rounded-xl bg-neutral-50 ">
+                  <span className="shadow m-1 py-3 px-2 rounded-xl bg-neutral-200 w-full lg:w-fit">
                     <li className=" font-semibold list-none">
                       Street:{" "}
                       <span className="font-normal text-xs ">
@@ -422,124 +423,139 @@ const ProfileSection = ({ startLoading, stopLoading }) => {
       <UserTC />
 
       {/* Add address modal */}
-      {showModal && (
-        <div className="modal backdrop-blur-lg bg-black/70 fixed top-0 left-0 w-full h-full flex justify-center items-center z-50">
-          <div className="modal-content flex  justify-center px-20 items-center gap-20 bg-white p-4 rounded-xl">
-            <form>
-              <InputBox
-                LabelName="Street"
-                Placeholder="Enter street address"
-                Name="street"
-                Value={newAddress.street}
-                onChange={handleAddressInputChange}
-              />
-              <InputBox
-                LabelName="City"
-                Placeholder="Enter city"
-                Name="city"
-                Value={newAddress.city}
-                onChange={handleAddressInputChange}
-              />
-              <InputBox
-                LabelName="State"
-                Placeholder="Enter state"
-                Name="state"
-                Value={newAddress.state}
-                onChange={handleAddressInputChange}
-              />
-              <InputBox
-                LabelName="Country"
-                Placeholder="Enter country"
-                Name="country"
-                Value={newAddress.country}
-                onChange={handleAddressInputChange}
-              />
-              <InputBox
-                LabelName="Postal Code"
-                Placeholder="Enter postal code"
-                Name="postalCode"
-                Value={newAddress.postalCode}
-                onChange={handleAddressInputChange}
-              />
+      <AnimatePresence>
+        {showModal && (
+          <motion.div
+            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, y: -100 }}
+            exit={{ opacity: 0, y: 100 }}
+            transition={{ type: "spring", duration: 0.3, ease: "easeInOut" }}
+            className="modal backdrop-blur-lg bg-black/70 fixed top-0 left-0 w-full h-full flex justify-center items-center z-50"
+          >
+            <div className="modal-content flex  justify-center px-20 items-center gap-20 bg-white p-4 rounded-xl">
+              <form>
+                <InputBox
+                  LabelName="Street"
+                  Placeholder="Enter street address"
+                  Name="street"
+                  Value={newAddress.street}
+                  onChange={handleAddressInputChange}
+                />
+                <InputBox
+                  LabelName="City"
+                  Placeholder="Enter city"
+                  Name="city"
+                  Value={newAddress.city}
+                  onChange={handleAddressInputChange}
+                />
+                <InputBox
+                  LabelName="State"
+                  Placeholder="Enter state"
+                  Name="state"
+                  Value={newAddress.state}
+                  onChange={handleAddressInputChange}
+                />
+                <InputBox
+                  LabelName="Country"
+                  Placeholder="Enter country"
+                  Name="country"
+                  Value={newAddress.country}
+                  onChange={handleAddressInputChange}
+                />
+                <InputBox
+                  LabelName="Postal Code"
+                  Placeholder="Enter postal code"
+                  Name="postalCode"
+                  Value={newAddress.postalCode}
+                  onChange={handleAddressInputChange}
+                />
 
-              <div className="flex justify-center items-center gap-5">
-                <Button
-                  className={`mt-4  hover:bg-green-500 hover:text-black`}
-                  type="button"
-                  onClick={addAddress}
-                  label="Add Address"
-                />
-                <Button
-                  className={`mt-4  hover:bg-green-500 hover:text-black`}
-                  type="button"
-                  onClick={closeModal}
-                  label="Cancel"
-                />
-              </div>
-            </form>
-            {error && <p className="text-red-500">{error}</p>}
-          </div>
-        </div>
-      )}
-      {/* Edit profile modal */}
-      {showModal2 && (
-        <div className=" fixed top-0 left-0 w-full h-full flex flex-col justify-center items-center backdrop-blur-lg z-50">
-          <h1 className="mb-5 text-center">
-            Hello <span className=" font-bold ">{user?.[0]?.name}</span> you can
-            edit your account details here
-          </h1>
-
-          <div className="flex justify-center items-center gap-10 lg:w-1/2 w-full  rounded-xl shadow lg:py-10 whiteSoftBG">
-            <div className="lg:w-1/2 w-full">
-              <form
-                ref={ProfileEditFromRef}
-                onSubmit={handleEditProfileSubmit}
-                className="w-full flex flex-col justify-center items-center px-5 py-2"
-              >
-                <InputBox
-                  LabelName="Name"
-                  Placeholder={user?.[0]?.name}
-                  Name="name"
-                  Value={editProfile.name}
-                  Type="name"
-                  onChange={handleAddressInputChange2}
-                />
-                <InputBox
-                  LabelName="Email Address"
-                  Placeholder={user?.[0]?.email}
-                  Name="email"
-                  Value={editProfile.email}
-                  Type="email"
-                  onChange={handleAddressInputChange2}
-                />
-                <InputBox
-                  LabelName="Contact Number"
-                  Placeholder={user?.[0]?.phoneNumber}
-                  Name="phoneNumber"
-                  Type="number"
-                  Value={editProfile.phoneNumber}
-                  onChange={handleAddressInputChange2}
-                />
-                <InputBox
-                  LabelName="Password"
-                  Placeholder="Password"
-                  Name="password"
-                  Value={editProfile.password}
-                  Type="password"
-                  onChange={handleAddressInputChange2}
-                />
                 <div className="flex justify-center items-center gap-5">
                   <Button
+                    className={`mt-4  hover:bg-green-500 hover:text-black`}
                     type="button"
-                    onClick={closeModal2}
-                    label="Cancel"
-                    className="mt-4"
+                    onClick={addAddress}
+                    label="Add Address"
                   />
-                  <Button className={`mt-4 `} type="submit" label="Submit" />
+                  <Button
+                    className={`mt-4  hover:bg-green-500 hover:text-black`}
+                    type="button"
+                    onClick={closeModal}
+                    label="Cancel"
+                  />
                 </div>
               </form>
+              {error && <p className="text-red-500">{error}</p>}
             </div>
-            {/* <div className="flex flex-col gap-5">
+          </motion.div>
+        )}
+      </AnimatePresence>
+      {/* Edit profile modal */}
+      <AnimatePresence>
+        {showModal2 && (
+          <motion.div
+            whileInView={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, x: -100 }}
+            exit={{ opacity: 0, x: 100 }}
+            transition={{ type: "spring", duration: 0.4, ease: "easeInOut" }}
+            className=" fixed top-0 left-0 w-full h-full flex flex-col justify-center items-center backdrop-blur-lg z-50 bg-black/70"
+          >
+            <h1 className="mb-5 text-center text-white">
+              Hello <span className=" font-bold ">{user?.[0]?.name}</span> you
+              can edit your account details here
+            </h1>
+
+            <div className="flex justify-center items-center gap-10 lg:w-1/2 w-full  rounded-xl shadow lg:py-10 whiteSoftBG">
+              <div className="lg:w-1/2 w-full">
+                <form
+                  ref={ProfileEditFromRef}
+                  onSubmit={handleEditProfileSubmit}
+                  className="w-full flex flex-col justify-center items-center px-5 py-2"
+                >
+                  <InputBox
+                    LabelName="Name"
+                    Placeholder={user?.[0]?.name}
+                    Name="name"
+                    Value={editProfile.name}
+                    Type="name"
+                    onChange={handleAddressInputChange2}
+                  />
+                  <InputBox
+                    LabelName="Email Address"
+                    Placeholder={user?.[0]?.email}
+                    Name="email"
+                    Value={editProfile.email}
+                    Type="email"
+                    onChange={handleAddressInputChange2}
+                  />
+                  <InputBox
+                    LabelName="Contact Number"
+                    Placeholder={user?.[0]?.phoneNumber}
+                    Name="phoneNumber"
+                    Type="number"
+                    Value={editProfile.phoneNumber}
+                    onChange={handleAddressInputChange2}
+                  />
+                  <InputBox
+                    LabelName="Password"
+                    Placeholder="Password"
+                    Name="password"
+                    Value={editProfile.password}
+                    Type="password"
+                    onChange={handleAddressInputChange2}
+                  />
+                  <div className="flex justify-center items-center gap-5">
+                    <Button
+                      type="button"
+                      onClick={closeModal2}
+                      label="Cancel"
+                      className="mt-4"
+                    />
+                    <Button className={`mt-4 `} type="submit" label="Submit" />
+                  </div>
+                </form>
+              </div>
+              {/* <div className="flex flex-col gap-5">
               <Button
                 type="button"
                 onClick={closeModal2}
@@ -547,98 +563,111 @@ const ProfileSection = ({ startLoading, stopLoading }) => {
                 className="mt-4 hover:bg-orange-500 hidden lg:block"
               />
             </div> */}
-          </div>
-        </div>
-      )}
-      {showModal3 && (
-        <div className=" fixed top-0 left-0 w-full h-full flex flex-col justify-center items-center backdrop-blur-lg z-50">
-          <h1 className="mb-5 text-center">
-            Hello <span className="text-2xl font-bold ">{user?.[0]?.name}</span>{" "}
-            you can edit your address here
-          </h1>
-
-          <div className="flex justify-center items-center gap-10 lg:w-1/2 w-full  rounded-xl shadow lg:py-10 whiteSoftBG">
-            <div className="lg:w-1/2 w-full">
-              <form
-                ref={EditAddressFromRef}
-                onSubmit={handleEditAddress}
-                className="w-full flex flex-col justify-center items-center px-5 py-2"
-              >
-                <InputBox
-                  LabelName="Street"
-                  Placeholder={editAddress.street}
-                  Name="street"
-                  Value={editAddress.street}
-                  onChange={(e) =>
-                    setEditAddress({ ...editAddress, street: e.target.value })
-                  }
-                />
-                <InputBox
-                  LabelName="City"
-                  Placeholder={editAddress.city}
-                  Name="city"
-                  Value={editAddress.city}
-                  onChange={(e) =>
-                    setEditAddress({ ...editAddress, city: e.target.value })
-                  }
-                />
-                <InputBox
-                  LabelName="State"
-                  Placeholder={editAddress.state}
-                  Name="state"
-                  Value={editAddress.state}
-                  onChange={(e) =>
-                    setEditAddress({ ...editAddress, state: e.target.value })
-                  }
-                />
-                <InputBox
-                  LabelName="Postal Code"
-                  Placeholder={editAddress.postalCode}
-                  Name="postalCode"
-                  Value={editAddress.postalCode}
-                  onChange={(e) =>
-                    setEditAddress({
-                      ...editAddress,
-                      postalCode: e.target.value,
-                    })
-                  }
-                />
-                <InputBox
-                  LabelName="Country"
-                  Placeholder={editAddress.country}
-                  Name="country"
-                  Value={editAddress.country}
-                  onChange={(e) =>
-                    setEditAddress({ ...editAddress, country: e.target.value })
-                  }
-                />
-
-                <div className="flex justify-center items-center gap-5">
-                  <Button
-                    type="button"
-                    onClick={closeModal3}
-                    label="Cancel"
-                    className="mt-4 hover:bg-orange-500 lg:hidden block"
-                  />
-                  <Button
-                    className={`mt-4 hover:bg-green-500 hover:text-black`}
-                    type="submit"
-                    label="Update Profile"
-                  />
-                </div>
-              </form>
             </div>
-            <div className="flex flex-col gap-5">
-              <Button
-                type="button"
-                onClick={closeModal3}
-                label="Cancel"
-                className="mt-4 hover:bg-orange-500 hidden lg:block"
-              />
+          </motion.div>
+        )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {showModal3 && (
+          <motion.div
+            whileInView={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, x: -100 }}
+            exit={{ opacity: 0, x: 100 }}
+            transition={{ type: "spring", duration: 0.4, ease: "easeInOut" }}
+            className=" fixed top-0 left-0 w-full h-full flex flex-col justify-center items-center backdrop-blur-lg z-50 bg-black/70"
+          >
+            <h1 className="mb-5 text-center text-white">
+              Hello{" "}
+              <span className="text-2xl font-bold ">{user?.[0]?.name}</span> you
+              can edit your address here
+            </h1>
+
+            <div className="flex justify-center items-center gap-10 lg:w-1/2 w-full  rounded-xl shadow lg:py-10 whiteSoftBG">
+              <div className="lg:w-1/2 w-full">
+                <form
+                  ref={EditAddressFromRef}
+                  onSubmit={handleEditAddress}
+                  className="w-full flex flex-col justify-center items-center px-5 py-2"
+                >
+                  <InputBox
+                    LabelName="Street"
+                    Placeholder={editAddress.street}
+                    Name="street"
+                    Value={editAddress.street}
+                    onChange={(e) =>
+                      setEditAddress({ ...editAddress, street: e.target.value })
+                    }
+                  />
+                  <InputBox
+                    LabelName="City"
+                    Placeholder={editAddress.city}
+                    Name="city"
+                    Value={editAddress.city}
+                    onChange={(e) =>
+                      setEditAddress({ ...editAddress, city: e.target.value })
+                    }
+                  />
+                  <InputBox
+                    LabelName="State"
+                    Placeholder={editAddress.state}
+                    Name="state"
+                    Value={editAddress.state}
+                    onChange={(e) =>
+                      setEditAddress({ ...editAddress, state: e.target.value })
+                    }
+                  />
+                  <InputBox
+                    LabelName="Postal Code"
+                    Placeholder={editAddress.postalCode}
+                    Name="postalCode"
+                    Value={editAddress.postalCode}
+                    onChange={(e) =>
+                      setEditAddress({
+                        ...editAddress,
+                        postalCode: e.target.value,
+                      })
+                    }
+                  />
+                  <InputBox
+                    LabelName="Country"
+                    Placeholder={editAddress.country}
+                    Name="country"
+                    Value={editAddress.country}
+                    onChange={(e) =>
+                      setEditAddress({
+                        ...editAddress,
+                        country: e.target.value,
+                      })
+                    }
+                  />
+
+                  <div className="flex justify-center items-center gap-5">
+                    <Button
+                      type="button"
+                      onClick={closeModal3}
+                      label="Cancel"
+                      className="mt-4"
+                    />
+                    <Button
+                      className={`mt-4 hover:bg-green-500 hover:text-black`}
+                      type="submit"
+                      label="Update Profile"
+                    />
+                  </div>
+                </form>
+              </div>
+              {/* <div className="flex flex-col gap-5">
+                <Button
+                  type="button"
+                  onClick={closeModal3}
+                  label="Cancel"
+                  className="mt-4 hover:bg-orange-500 hidden lg:block"
+                />
+              </div> */}
             </div>
-          </div>
-        </div>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 };
