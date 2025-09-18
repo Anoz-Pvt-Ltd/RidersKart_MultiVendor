@@ -137,6 +137,11 @@ const productSchema = new mongoose.Schema({
       },
     },
   ],
+  status: {
+    type: String,
+    enum: ["active", "inactive", "suspended"],
+    default: "inactive",
+  },
 
   createdAt: {
     type: Date,
