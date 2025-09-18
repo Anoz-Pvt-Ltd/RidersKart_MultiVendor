@@ -99,7 +99,13 @@ const Products = ({ startLoading, stopLoading }) => {
   const [deliveryScope, setDeliveryScope] = useState("all");
   const [editDeliveryScope, setEditDeliveryScope] = useState("all");
 
-  console.log(products);
+  useEffect(() => {
+    if (!isModalOpen && formRef.current) {
+      formRef.current.reset();
+      setProductName("");
+      setImagePreview(null);
+    }
+  }, [isModalOpen]);
 
   const filteredProducts = products.filter((product) =>
     product?.name?.toLowerCase().includes(searchQuery.toLowerCase())
@@ -212,6 +218,9 @@ const Products = ({ startLoading, stopLoading }) => {
       setProducts((prev) => [...prev, response.data.data.product]);
       alert("Product added successfully!");
       // window.location.reload();
+      setProductName("");
+      setImagePreview(null);
+      formRef.current.reset();
       setIsModalOpen(false);
     } catch (err) {
       console.log(err);
@@ -731,7 +740,7 @@ const Products = ({ startLoading, stopLoading }) => {
                 <Button label="Add Product" Type="submit" />
                 <Button
                   label="Cancel"
-                  Type="button"
+                  Type={"reset"}
                   className="bg-gray-300"
                   onClick={() => setIsModalOpen(false)}
                 />
