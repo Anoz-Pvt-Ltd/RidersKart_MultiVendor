@@ -276,7 +276,7 @@ const BuyNow = ({ startLoading, stopLoading }) => {
               className={"w-full"}
             /> */}
               <Button
-                className={`w-full bg-white text-blue-600 hover:bg-green-500 hover:text-black`}
+                className={`w-full`}
                 label={"Login"}
                 onClick={handleSubmit}
               />
@@ -285,7 +285,7 @@ const BuyNow = ({ startLoading, stopLoading }) => {
               <Button
                 label={"Register Here"}
                 onClick={NavigateRegister}
-                className={`w-1/2 hover:bg-green-500 bg-white text-blue-600  hover:text-black`}
+                className={`w-1/2 `}
               />
               <p className="text-xs text-neutral-500 text-center">
                 ** By continuing, you agree to our Terms of Use and Privacy
@@ -419,14 +419,14 @@ const BuyNow = ({ startLoading, stopLoading }) => {
               </select>
               {paymentMethod === "online" && (
                 <Button
-                  className={` hover:bg-green-500 hover:text-black mt-5 w-full`}
+                  className={`  mt-5 w-full`}
                   onClick={Payment}
                   label={"Proceed for payment"}
                 />
               )}
               {paymentMethod === "cash" && (
                 <Button
-                  className={` hover:bg-green-500 hover:text-black mt-5 w-full`}
+                  className={`  mt-5 w-full`}
                   onClick={handleOrderConfirmation}
                   label={"Place order"}
                 />

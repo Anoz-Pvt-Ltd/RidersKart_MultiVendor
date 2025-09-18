@@ -61,12 +61,12 @@ export const ThreeProductGrid = ({ heading = "", products = [] }) => {
               products.length === 3 && index === 2
                 ? "col-start-2 row-start-2"
                 : ""
-            }  flex flex-col justify-center overflow-hidden hover:shadow-xl duration-300 ease-in-out m-1 p-1 rounded-xl`}
+            }  flex flex-col justify-center overflow-hidden hover:shadow-xl duration-300 ease-in-out m-1 p-1 rounded-xl border-black/20 border`}
           >
             <div
               className={`w-full ${
                 products.length === 3 && index === 0 ? "h-fit" : "h-4/5 "
-              }  flex justify-between items-start p-1 overflow-hidden rounded-lg`}
+              }  flex justify-between items-start p-1 overflow-hidden rounded-lg lg:`}
             >
               <img
                 src={product.images[0].url}
@@ -75,7 +75,7 @@ export const ThreeProductGrid = ({ heading = "", products = [] }) => {
                   products.length === 3 && index === 0 ? "w-full" : "h-full "
                 } ${
                   products.length === 3 && index > 0 ? "h-full" : " "
-                } rounded-lg h-20 w-20 lg:h-20 lg:w-20 lg:object-center object-contain`}
+                } rounded-lg h-20 w-20 bg-black/10 lg:w-3/4 lg:h-full lg:object-center object-contain`}
               />
               <button
                 onClick={() => addProductToCart({ productId: product._id })}
