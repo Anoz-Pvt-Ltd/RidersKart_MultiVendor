@@ -34,42 +34,33 @@ const Home = ({ startLoading, stopLoading }) => {
   // }, [user]);
 
   const arrayOfGridItems = [];
-  // console.log(products);
 
   useEffect(() => {
-    // const fetchProducts = async () => {
-    //   try {
-    //     startLoading();
-    //     const response = await FetchData("products/get-all-products", "get");
-    //     console.log(response);
-    //     setProducts(response.data.data.products);
-    //   } catch (err) {
-    //     setError(err.response?.data?.message || "Failed to fetch products.");
-    //   } finally {
-    //     stopLoading();
-    //   }
-    // };
     const fetchProducts = async () => {
       try {
         startLoading();
         const response = await FetchData("products/get-all-products", "get");
         let allProducts = response.data.data.products;
 
-        // filter products based on pincode
+        const allowedProducts = allProducts.filter(
+          (product) => !product.status || product.status === "active"
+        );
+
+        // further filter products based on pincode
         const filtered = FilterByPincode(
-          allProducts,
+          allowedProducts,
           userPostalCode,
           PinCodeData
         );
 
         setProducts(filtered);
-        // setProducts(response.data.data.products);
       } catch (err) {
         setError(err.response?.data?.message || "Failed to fetch products.");
       } finally {
         stopLoading();
       }
     };
+
     const fetchAllCategories = async () => {
       try {
         startLoading();

@@ -225,11 +225,13 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
         const response = await FetchData("products/get-all-products", "get");
         // console.log(response);
         let allProducts = response.data.data.products;
-        // console.log(allProducts);
+        const allowedProducts = allProducts.filter(
+          (product) => !product.status || product.status === "active"
+        );
 
-        // filter products based on pincode
+        // further filter products based on pincode
         const filtered = FilterByPincode(
-          allProducts,
+          allowedProducts,
           userPostalCode,
           PinCodeData
         );

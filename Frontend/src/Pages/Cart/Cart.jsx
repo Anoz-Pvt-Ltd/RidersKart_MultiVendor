@@ -13,19 +13,23 @@ import {
 import { useDebounce } from "../../Utility/Utility-functions";
 import { useNavigate } from "react-router";
 import { parseErrorMessage } from "../../Utility/ErrorMessageParser";
-import { CheckOutCard } from "../../Components/ProductCard";
+import { Card, CheckOutCard } from "../../Components/ProductCard";
 import { Trash } from "lucide-react";
 import { alertError, alertInfo, alertSuccess } from "../../Utility/Alert";
 import { AnimatePresence, motion } from "framer-motion";
+import { PinCodeData } from "../../Constants/PinCodeData";
+import { FilterByPincode } from "../../Utility/FilterByPincode";
+import { ChevronDown, MoveRight } from "lucide-react";
 
 const CartPage = ({ startLoading, stopLoading }) => {
   const [error, setError] = useState("");
-  const [products, setProducts] = useState([]);
+  const [products, setAllProducts] = useState([]);
   const user = useSelector((store) => store.UserInfo.user);
   const cart = useSelector((store) => store.CartList.cart);
   const [addresses, setAddresses] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState();
   const [paymentMethod, setPaymentMethod] = useState("");
+  const userPostalCode = user[0]?.address?.[0]?.postalCode;
 
   const dispatch = useDispatch();
   const Navigate = useNavigate();
@@ -186,24 +190,35 @@ const CartPage = ({ startLoading, stopLoading }) => {
     fetchUserAddresses();
   }, [user]);
 
-  // useEffect(() => {
-  //   const fetchProducts = async () => {
-  //     try {
-  //       startLoading();
-  //       const response = await FetchData("products/get-all-products", "get");
-  //       if (response.data.success) {
-  //         setProducts(response.data.data.products);
-  //       } else {
-  //         setError("Failed to load products.");
-  //       }
-  //     } catch (err) {
-  //       setError(err.response?.data?.message || "Failed to fetch products.");
-  //     } finally {
-  //       stopLoading();
-  //     }
-  //   };
-  //   fetchProducts();
-  // }, []);
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        startLoading();
+        const response = await FetchData("products/get-all-products", "get");
+        // console.log(response);
+        let allProducts = response.data.data.products;
+        const allowedProducts = allProducts.filter(
+          (product) => !product.status || product.status === "active"
+        );
+
+        // further filter products based on pincode
+        const filtered = FilterByPincode(
+          allowedProducts,
+          userPostalCode,
+          PinCodeData
+        );
+
+        setAllProducts(filtered);
+        // console.log("filtered", filtered);
+        // setProducts(response.data.data.products);
+      } catch (err) {
+        setError(err.response?.data?.message || "Failed to fetch products.");
+      } finally {
+        stopLoading();
+      }
+    };
+    fetchProducts();
+  }, []);
 
   const removeFromCart = async (productId) => {
     try {
@@ -481,51 +496,28 @@ const CartPage = ({ startLoading, stopLoading }) => {
           />
         </div>
       )}
-      {/* 
-      <h1 className="text-xl mx-4 my-10 w-full text-center border-t border-neutral-400 font-bold">
-        Recommendations
-      </h1>
-      {products.length === 0 ? (
-        <div>
-          <h1>No Recommendations available </h1>
+      <div className="pb-20">
+        <h1 className="px-10 bg-neutral-200 text-center py-4 flex justify-center items-center gap-5">
+          Recommendations <ChevronDown className="h-4 w-4" />
+        </h1>
+        <div className="flex gap-4 bg-transparent justify-start items-center overflow-x-auto p-5 max-w-full">
+          {products?.map((product) => (
+            <Card
+              Image={product?.images[0]?.url}
+              key={product._id}
+              ProductName={product.name}
+              CurrentPrice={product.price.sellingPrice}
+              Mrp={product.price.MRP}
+              Rating={product.Rating}
+              Offer={product.off}
+              Description={product.description}
+              productId={product._id}
+              Discount={product.price.discount}
+              Stock={product.stockQuantity}
+            />
+          ))}
         </div>
-      ) : (
-        <>
-          <div className="flex flex-row gap-4 bg-transparent justify-start items-center overflow-x-auto p-5 w-full no-scrollbar">
-            {products?.map((product) => (
-              <ProductCard
-                Image={product?.images[0]?.url}
-                key={product._id}
-                ProductName={product.name}
-                CurrentPrice={product.price.sellingPrice}
-                Mrp={product.price.MRP}
-                Rating={product.Rating}
-                Offer={product.off}
-                Description={product.description}
-                productId={product._id}
-                Discount={product.price.discount}
-                Stock={product.stockQuantity}
-                className={`hidden lg:block`}
-              />
-            ))}
-          </div>
-          <div className="flex lg:hidden flex-col gap-4 bg-transparent justify-start items-center overflow-x-auto w-full">
-            {products?.map((product) => (
-              <ProductCardMobile
-                key={product._id}
-                Image={product?.images[0]?.url}
-                ProductName={product.name}
-                CurrentPrice={product.price.sellingPrice}
-                Mrp={product.price.MRP}
-                Rating={product.rating || "No rating"}
-                Offer="No offer"
-                Category={product.category.main}
-                StockQuantity={product.stockQuantity}
-              />
-            ))}
-          </div>
-        </>
-      )} */}
+      </div>
     </div>
   );
 };

@@ -78,9 +78,13 @@ const BuyNow = ({ startLoading, stopLoading }) => {
         const response = await FetchData("products/get-all-products", "get");
         let allProducts = response.data.data.products;
 
-        // filter products based on pincode
+        const allowedProducts = allProducts.filter(
+          (product) => !product.status || product.status === "active"
+        );
+
+        // further filter products based on pincode
         const filtered = FilterByPincode(
-          allProducts,
+          allowedProducts,
           userPostalCode,
           PinCodeData
         );
