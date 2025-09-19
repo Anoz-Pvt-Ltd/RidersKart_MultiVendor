@@ -548,6 +548,53 @@ const deleteProduct = asyncHandler(async (req, res) => {
   });
 });
 
+const markProductActive = asyncHandler(async (req, res) => {
+  const { productId } = req.params;
+
+  // Find product
+  const product = await Product.findById(productId);
+  if (!product) {
+    return res.status(404).json({
+      success: false,
+      message: "Product not found",
+    });
+  }
+
+  // Update status
+  product.status = "active";
+  await product.save();
+
+  res.status(200).json({
+    success: true,
+    message: "Product marked as active successfully",
+    product,
+  });
+});
+
+// Mark product as suspended
+const markProductSuspended = asyncHandler(async (req, res) => {
+  const { productId } = req.params;
+
+  // Find product
+  const product = await Product.findById(productId);
+  if (!product) {
+    return res.status(404).json({
+      success: false,
+      message: "Product not found",
+    });
+  }
+
+  // Update status
+  product.status = "suspended";
+  await product.save();
+
+  res.status(200).json({
+    success: true,
+    message: "Product marked as suspended successfully",
+    product,
+  });
+});
+
 const getProductByCategory = asyncHandler(async (req, res) => {
   // console.log("Fetching products by category");
 
@@ -1098,4 +1145,6 @@ export {
   deleteProductsByVendor,
   productRating,
   checkUserProductRating,
+  markProductSuspended,
+  markProductActive,
 };

@@ -14,37 +14,35 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
   const [currentSubCategory, setCurrentSubCategory] = useState([]);
   const [currentCategory, setCurrentCategory] = useState([]);
   const [currentVendor, setCurrentVendor] = useState([]);
+  const [model, openModel] = useState(false);
+  const [model2, openModel2] = useState(false);
+  const [model3, openModel3] = useState(false);
   const navigate = useNavigate();
   const handleHome = () => {
     navigate("/home");
   };
-  useEffect(() => {
-    const fetchProduct = async () => {
-      if (user?.length > 0) {
-        try {
-          startLoading();
-          const response = await FetchData(
-            `products/admin/get-single-product/${productId}`,
-            "get"
-          );
-          console.log(response);
-          if (response.data.success) {
-            setCurrentProduct(response.data.data);
-            setCurrentBrand(response.data.data.brand);
-            setCurrentSubCategory(response.data.data.subcategory);
-            setCurrentVendor(response.data.data.vendor);
-            setCurrentCategory(response.data.data.category);
-          } else {
-            setError("Failed to load orders.");
-          }
-        } catch (err) {
-          setError(err.response?.data?.message || "Failed to fetch orders.");
-        } finally {
-          stopLoading();
-        }
+  const fetchProduct = async () => {
+    if (user?.length > 0) {
+      try {
+        startLoading();
+        const response = await FetchData(
+          `products/admin/get-single-product/${productId}`,
+          "get"
+        );
+        console.log(response);
+        setCurrentProduct(response.data.data);
+        setCurrentBrand(response.data.data.brand);
+        setCurrentSubCategory(response.data.data.subcategory);
+        setCurrentVendor(response.data.data.vendor);
+        setCurrentCategory(response.data.data.category);
+      } catch (err) {
+        setError(err.response?.data?.message || "Failed to fetch orders.");
+      } finally {
+        stopLoading();
       }
-    };
-
+    }
+  };
+  useEffect(() => {
     fetchProduct();
   }, [user]);
 
@@ -69,6 +67,42 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
     }
   };
 
+  const handleActiveProduct = async () => {
+    try {
+      startLoading();
+      const response = await FetchData(
+        `products/admin/single-product-active/${productId}`,
+        "post"
+      );
+      console.log(response);
+      alert(response.data.message);
+      openModel2(false);
+      fetchProduct();
+    } catch (err) {
+      console.log(err);
+    } finally {
+      stopLoading();
+    }
+  };
+
+  const handleSuspendProduct = async () => {
+    try {
+      startLoading();
+      const response = await FetchData(
+        `products/admin/single-product-suspend/${productId}`,
+        "post"
+      );
+      console.log(response);
+      alert(response.data.message);
+      openModel3(false);
+      fetchProduct();
+    } catch (err) {
+      console.log(err);
+    } finally {
+      stopLoading();
+    }
+  };
+
   return (
     <div className="flex justify-evenly items-center flex-col">
       <div>
@@ -83,16 +117,21 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
           <span className="text-xl font-bold">{currentProduct?._id}</span>
         </h1>
         <div className="flex justify-evenly items-center gap-5 py-10">
-          <Button
-            label={"Delete Product"}
-            onClick={handleDeleteProduct}
-            className={"hover:bg-red-500"}
-          />
-          {/* <Button label={"Ban Product"} /> */}
-          {/* <Button label={"Edit Product"} /> */}
+          <Button label={"Delete Product"} onClick={() => openModel(true)} />
+          {currentProduct?.status === "active" ? (
+            <Button
+              label={"Suspend Product"}
+              onClick={() => openModel3(true)}
+            />
+          ) : (
+            <Button
+              label={"Activate Product"}
+              onClick={() => openModel2(true)}
+            />
+          )}
         </div>
       </div>
-      <div className="flex justify-evenly items-center px-4 py-10 bg-white shadow-m rounded-xl w-3/4 ">
+      <div className="flex justify-evenly items-center px-4 py-10 bg-white shadow-m rounded-xl w-full  ">
         <div className="w-full flex justify-center flex-col items-center">
           <h1 className="text-center text-2xl mb-10 font-semibold">
             Product Description
@@ -170,6 +209,33 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
           ))}
         </div>
       </div>
+      {model && (
+        <div className="flex justify-center items-center h-screen w-full fixed bg-white top-0 left-0 flex-col gap-5">
+          <h1>Are you sure you want to DELETE the product permanently ?</h1>
+          <div className="flex justify-center items-center gap-5">
+            <Button label={"Cancel"} onClick={() => openModel(false)} />
+            <Button label={"Confirm"} onClick={handleDeleteProduct} />
+          </div>
+        </div>
+      )}
+      {model2 && (
+        <div className="flex justify-center items-center h-screen w-full fixed bg-white top-0 left-0 flex-col gap-5">
+          <h1>Are you sure you want to ACTIVATE the product ?</h1>
+          <div className="flex justify-center items-center gap-5">
+            <Button label={"Cancel"} onClick={() => openModel2(false)} />
+            <Button label={"Confirm"} onClick={handleActiveProduct} />
+          </div>
+        </div>
+      )}
+      {model3 && (
+        <div className="flex justify-center items-center h-screen w-full fixed bg-white top-0 left-0 flex-col gap-5">
+          <h1>Are you sure you want to SUSPEND the product ?</h1>
+          <div className="flex justify-center items-center gap-5">
+            <Button label={"Cancel"} onClick={() => openModel3(false)} />
+            <Button label={"Confirm"} onClick={handleSuspendProduct} />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

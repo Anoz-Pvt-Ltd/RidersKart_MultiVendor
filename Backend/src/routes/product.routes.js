@@ -15,6 +15,8 @@ import {
   deleteProductsByVendor,
   productRating,
   checkUserProductRating,
+  markProductActive,
+  markProductSuspended,
 } from "../controllers/product.controllers.js";
 import {
   VerifyAdminUser,
@@ -73,5 +75,11 @@ router
 router
   .route("/admin/single-product/:productId")
   .delete(VerifyAdminUser, deleteProduct);
+router
+  .route("/admin/single-product-active/:productId")
+  .post(VerifyAdminUser, markProductActive);
+router
+  .route("/admin/single-product-suspend/:productId")
+  .post(VerifyAdminUser, markProductSuspended);
 
 export default router;
