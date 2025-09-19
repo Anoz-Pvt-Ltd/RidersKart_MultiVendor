@@ -110,6 +110,7 @@ const Products = ({ startLoading, stopLoading }) => {
   const filteredProducts = products.filter((product) =>
     product?.name?.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
   const handleImageFileChange = (e) => {
     const file = e.target.files[0];
 
@@ -174,13 +175,10 @@ const Products = ({ startLoading, stopLoading }) => {
   const fetchProducts = async () => {
     try {
       startLoading();
-      console.log(user);
-      console.log(user?.[0]?._id);
       const response = await FetchData(
         `products/get-all-product-of-vendor/${user?.[0]?._id}`,
         "get"
       );
-      console.log(response);
       setProducts(response.data.data);
     } catch (err) {
       setError(err.response?.data?.message || "Failed to fetch products.");
@@ -201,9 +199,9 @@ const Products = ({ startLoading, stopLoading }) => {
     // console.log(images);
     // formData.append("image", images);
 
-    for (var pair of formData.entries()) {
-      console.log(pair[0] + ", " + pair[1]);
-    }
+    // for (var pair of formData.entries()) {
+    //   console.log(pair[0] + ", " + pair[1]);
+    // }
 
     try {
       startLoading();
@@ -213,7 +211,6 @@ const Products = ({ startLoading, stopLoading }) => {
         formData,
         true
       );
-      console.log(response);
       setSuccess("Product added successfully!");
       setProducts((prev) => [...prev, response.data.data.product]);
       alert("Product added successfully!");
@@ -223,7 +220,6 @@ const Products = ({ startLoading, stopLoading }) => {
       formRef.current.reset();
       setIsModalOpen(false);
     } catch (err) {
-      console.log(err);
       alert(parseErrorMessage(err.response.data));
     } finally {
       stopLoading();
@@ -281,7 +277,6 @@ const Products = ({ startLoading, stopLoading }) => {
       try {
         startLoading();
         const response = await FetchData("brands/get-all-brands", "get");
-        console.log(response);
         if (response.data.success) setBrands(response.data.data);
       } catch {
         setError("Failed to fetch brands.");
@@ -303,9 +298,9 @@ const Products = ({ startLoading, stopLoading }) => {
 
       const formData = new FormData(formRef.current);
 
-      for (let [key, value] of formData.entries()) {
-        console.log(key, value);
-      }
+      // for (let [key, value] of formData.entries()) {
+      //   console.log(key, value);
+      // }
       try {
         startLoading();
         const response = await FetchData(
@@ -315,7 +310,6 @@ const Products = ({ startLoading, stopLoading }) => {
           true
         );
 
-        console.log("Image uploaded", response.data);
         alert(response.data.message);
         onClose();
       } catch (error) {
@@ -493,7 +487,6 @@ const Products = ({ startLoading, stopLoading }) => {
     } catch (err) {
       setError(err.response?.data?.message || "Failed to update the product.");
       alert("Product updation failed.");
-      console.log(err);
     } finally {
       stopLoading();
     }
@@ -1013,7 +1006,7 @@ const Products = ({ startLoading, stopLoading }) => {
               placeholder="Search by Product name..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full px-4 py-2 text-gray-700 bg-white  border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 outline-none transition duration-200 ease-in-out hover:shadow-md"
+              className="w-full px-4 py-2 text-gray-700 bg-white  border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 outline-none transition duration-200 ease-in-out hover:shadow-md border"
             />
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -1022,39 +1015,54 @@ const Products = ({ startLoading, stopLoading }) => {
                 key={product?._id}
                 className="mx-2 p-4 border rounded-lg shadow-md bg-gray-100"
               >
-                <h3 className="font-bold text-gray-900 flex items-center justify-start gap-10 ">
-                  {product?.name}{" "}
+                <h3 className=" text-gray-900 flex items-center justify-start ">
+                  <strong>Name</strong>: {product?.name}{" "}
                 </h3>
                 <div className="flex">
                   <span className=" p-1 rounded-xl flex items-center  ">
                     <img
                       src={product?.images[0]?.url}
-                      className="min-w-20 h-20 m-1 rounded-xl  shadow"
+                      className="min-w-20 h-20 m-1 rounded-xl  shadow object-contain"
                     />
                   </span>
+
                   <div className="flex flex-col items-center justify-evenly px-1">
-                    <button
-                      onClick={() => {
-                        setUrlData({ productId: product?._id });
-                        setPopup((prev) => {
-                          return { ...prev, image: true };
-                        });
-                      }}
-                      title="Add images"
-                    >
-                      <CircleFadingPlus /> <span> Add Image</span>
-                    </button>
-                    <button
-                      onClick={() => handleEditProduct(product)}
-                      title="Edit product"
-                      className=" text-black "
-                    >
-                      <Pencil /> <span>Edit Product</span>
-                    </button>
+                    {product?.status === "inactive" ? (
+                      <div>
+                        <h1 className="bg-neutral-300 text-center px-4 py-2 rounded-2xl cursor-not-allowed mt-2 text-xs">
+                          Product is under review
+                        </h1>
+                      </div>
+                    ) : (
+                      <div className="w-full">
+                        <button
+                          className="flex justify-evenly items-center w-full "
+                          onClick={() => {
+                            setUrlData({ productId: product?._id });
+                            setPopup((prev) => {
+                              return { ...prev, image: true };
+                            });
+                          }}
+                          title="Add images"
+                        >
+                          <CircleFadingPlus className="w-4 h-4" />{" "}
+                          <span> Image</span>
+                        </button>
+                        <button
+                          onClick={() => handleEditProduct(product)}
+                          title="Edit product"
+                          className="flex justify-evenly items-center w-full "
+                        >
+                          <Pencil className="w-4 h-4" /> <span>Product</span>
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
 
-                <p className="truncate">{product?.description}</p>
+                <p className="truncate">
+                  <strong>Description</strong>: {product?.description}
+                </p>
                 <p>
                   <strong>Category:</strong> {product?.category?.title} -{" "}
                   {product?.subcategory?.title}
@@ -1065,12 +1073,26 @@ const Products = ({ startLoading, stopLoading }) => {
                 <p>
                   <strong>Stock:</strong> {product?.stockQuantity}
                 </p>
-                <Button
+                {product?.status === "inactive" ? (
+                  <div>
+                    <h1 className="bg-neutral-300 text-center px-4 py-2 rounded-2xl cursor-not-allowed mt-2 text-xs">
+                      Product is under review
+                    </h1>
+                  </div>
+                ) : (
+                  <Button
+                    label="Delete"
+                    Type="button"
+                    className="mt-2 w-full hover:bg-red-500"
+                    onClick={() => handleDeleteProduct(product?._id)}
+                  />
+                )}
+                {/* <Button
                   label="Delete"
                   Type="button"
                   className="mt-2 w-full hover:bg-red-500"
                   onClick={() => handleDeleteProduct(product?._id)}
-                />
+                /> */}
               </div>
             ))}
           </div>

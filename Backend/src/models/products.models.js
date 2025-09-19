@@ -91,7 +91,7 @@ const productSchema = new mongoose.Schema({
   status: {
     type: String,
     enum: ["active", "inactive", "out-of-stock"],
-    default: "active",
+    default: "inactive",
   },
   brand: {
     type: Schema.Types.ObjectId,
@@ -137,11 +137,6 @@ const productSchema = new mongoose.Schema({
       },
     },
   ],
-  status: {
-    type: String,
-    enum: ["active", "inactive", "suspended"],
-    default: "inactive",
-  },
 
   createdAt: {
     type: Date,
