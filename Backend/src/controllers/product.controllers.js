@@ -159,7 +159,7 @@ const getAllProductForAdmin = asyncHandler(async (req, res) => {
   const products = await Product.find()
     .populate("category", "title")
     .populate("subcategory", "title")
-    .populate("vendor", "name email")
+    .populate("vendor", "name email contactNumber")
     .populate("brand", "title logo")
     .sort({ createdAt: -1 });
 
