@@ -28,24 +28,26 @@ const userSchema = new mongoose.Schema({
     {
       street: {
         type: String,
-        required: true,
+        // required: true,
       },
       city: {
         type: String,
-        required: true,
+        // required: true,
       },
       state: {
         type: String,
-        required: true,
+        // required: true,
       },
       country: {
         type: String,
-        required: true,
+        // required: true,
       },
       postalCode: {
         type: String,
         required: true,
       },
+      //remove comment when API for maps will be available
+      // coordinates: { type: [Number] },
     },
   ],
 

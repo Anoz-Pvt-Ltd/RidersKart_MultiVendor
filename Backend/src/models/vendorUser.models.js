@@ -45,6 +45,8 @@ const vendorSchema = new mongoose.Schema({
       type: String,
       required: true,
     },
+    //remove comment when API for maps will be available
+    // coordinates: { type: [Number], required: true },
   },
   ratings: {
     average: {
@@ -141,7 +143,6 @@ const vendorSchema = new mongoose.Schema({
       type: String,
       required: true,
     },
-    
   },
   status: {
     type: String,

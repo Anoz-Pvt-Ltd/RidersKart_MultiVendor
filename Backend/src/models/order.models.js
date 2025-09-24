@@ -90,6 +90,9 @@ const orderSchema = new mongoose.Schema({
       // required: true,
     },
   },
+  //remove comment when API for maps will be available
+  // pickUpCoordinates: { type: [Number] },
+  // dropCoordinates: { type: [Number] },
   placedAt: {
     type: Date,
     default: Date.now, // Timestamp for when the order was placed

@@ -29,6 +29,7 @@ import UserTC from "./UserProfile_T_C";
 import OrderSection from "./OrderSection";
 import UserFAQ from "./UserProfile_FAQ";
 import { truncateString } from "../../Utility/Utility-functions";
+import MapInput from "../../Components/MapInput";
 
 const ProfileSection = ({ startLoading, stopLoading }) => {
   const ProfileEditFromRef = useRef(null);
@@ -37,7 +38,7 @@ const ProfileSection = ({ startLoading, stopLoading }) => {
   const Dispatch = useDispatch();
   const user = useSelector((store) => store.UserInfo.user);
   // const [allOrders, setAllOrders] = useState([]);
-  // console.log(allOrders);
+  console.log(user);
   const [showModal, setShowModal] = useState(false);
   const [showModal2, setShowModal2] = useState(false);
   const [showModal3, setShowModal3] = useState(false);
@@ -355,31 +356,31 @@ const ProfileSection = ({ startLoading, stopLoading }) => {
                     <li className=" font-semibold list-none">
                       Street:{" "}
                       <span className="font-normal text-xs ">
-                        {truncateString(address.street, 10)}
+                        {truncateString(address?.street || "Not available", 10)}
                       </span>
                     </li>
                     <li className=" font-semibold list-none">
                       City:{" "}
                       <span className="font-normal text-xs ">
-                        {address.city}
+                        {address?.city || "Not available"}
                       </span>
                     </li>
                     <li className=" font-semibold list-none">
                       Country:{" "}
                       <span className="font-normal text-xs ">
-                        {address.country}
+                        {address?.country || "Not available"}
                       </span>
                     </li>
                     <li className=" font-semibold list-none">
                       Postal Code:{" "}
                       <span className="font-normal text-xs ">
-                        {address.postalCode}
+                        {address?.postalCode || "Not available"}
                       </span>
                     </li>
                     <li className=" font-semibold list-none">
                       State:{" "}
                       <span className="font-normal text-xs ">
-                        {address.state}
+                        {address?.state || "Not available"}
                       </span>
                     </li>
                     <div className="flex justify-evenly items-center gap-5 pt-2">
@@ -581,82 +582,92 @@ const ProfileSection = ({ startLoading, stopLoading }) => {
               <span className="text-2xl font-bold ">{user?.[0]?.name}</span> you
               can edit your address here
             </h1>
-
-            <div className="flex justify-center items-center gap-10 lg:w-1/2 w-full  rounded-xl shadow lg:py-10 whiteSoftBG">
-              <div className="lg:w-1/2 w-full">
-                <form
-                  ref={EditAddressFromRef}
-                  onSubmit={handleEditAddress}
-                  className="w-full flex flex-col justify-center items-center px-5 py-2"
-                >
-                  <InputBox
-                    LabelName="Street"
-                    Placeholder={editAddress.street}
-                    Name="street"
-                    Value={editAddress.street}
-                    onChange={(e) =>
-                      setEditAddress({ ...editAddress, street: e.target.value })
-                    }
-                  />
-                  <InputBox
-                    LabelName="City"
-                    Placeholder={editAddress.city}
-                    Name="city"
-                    Value={editAddress.city}
-                    onChange={(e) =>
-                      setEditAddress({ ...editAddress, city: e.target.value })
-                    }
-                  />
-                  <InputBox
-                    LabelName="State"
-                    Placeholder={editAddress.state}
-                    Name="state"
-                    Value={editAddress.state}
-                    onChange={(e) =>
-                      setEditAddress({ ...editAddress, state: e.target.value })
-                    }
-                  />
-                  <InputBox
-                    LabelName="Postal Code"
-                    Placeholder={editAddress.postalCode}
-                    Name="postalCode"
-                    Value={editAddress.postalCode}
-                    onChange={(e) =>
-                      setEditAddress({
-                        ...editAddress,
-                        postalCode: e.target.value,
-                      })
-                    }
-                  />
-                  <InputBox
-                    LabelName="Country"
-                    Placeholder={editAddress.country}
-                    Name="country"
-                    Value={editAddress.country}
-                    onChange={(e) =>
-                      setEditAddress({
-                        ...editAddress,
-                        country: e.target.value,
-                      })
-                    }
-                  />
-
-                  <div className="flex justify-center items-center gap-5">
-                    <Button
-                      type="button"
-                      onClick={closeModal3}
-                      label="Cancel"
-                      className="mt-4"
+            {/* //remove comment when API for maps willbe available */}
+            <div className="w-full flex justify-center items-start">
+              {/* <div>
+                <MapInput className="text-white" />
+              </div> */}
+              <div className="flex justify-center items-center gap-10 lg:w-1/2 w-full  rounded-xl shadow lg:py-10 whiteSoftBG">
+                <div className="lg:w-1/2 w-full">
+                  <form
+                    ref={EditAddressFromRef}
+                    onSubmit={handleEditAddress}
+                    className="w-full flex flex-col justify-center items-center px-5 py-2"
+                  >
+                    <InputBox
+                      LabelName="Street"
+                      Placeholder={editAddress.street}
+                      Name="street"
+                      Value={editAddress.street}
+                      onChange={(e) =>
+                        setEditAddress({
+                          ...editAddress,
+                          street: e.target.value,
+                        })
+                      }
                     />
-                    <Button
-                      className={`mt-4 hover:bg-green-500 hover:text-black`}
-                      type="submit"
-                      label="Update Profile"
+                    <InputBox
+                      LabelName="City"
+                      Placeholder={editAddress.city}
+                      Name="city"
+                      Value={editAddress.city}
+                      onChange={(e) =>
+                        setEditAddress({ ...editAddress, city: e.target.value })
+                      }
                     />
-                  </div>
-                </form>
-              </div>
-              {/* <div className="flex flex-col gap-5">
+                    <InputBox
+                      LabelName="State"
+                      Placeholder={editAddress.state}
+                      Name="state"
+                      Value={editAddress.state}
+                      onChange={(e) =>
+                        setEditAddress({
+                          ...editAddress,
+                          state: e.target.value,
+                        })
+                      }
+                    />
+                    <InputBox
+                      LabelName="Postal Code"
+                      Placeholder={editAddress.postalCode}
+                      Name="postalCode"
+                      Value={editAddress.postalCode}
+                      onChange={(e) =>
+                        setEditAddress({
+                          ...editAddress,
+                          postalCode: e.target.value,
+                        })
+                      }
+                    />
+                    <InputBox
+                      LabelName="Country"
+                      Placeholder={editAddress.country}
+                      Name="country"
+                      Value={editAddress.country}
+                      onChange={(e) =>
+                        setEditAddress({
+                          ...editAddress,
+                          country: e.target.value,
+                        })
+                      }
+                    />
+
+                    <div className="flex justify-center items-center gap-5">
+                      <Button
+                        type="button"
+                        onClick={closeModal3}
+                        label="Cancel"
+                        className="mt-4"
+                      />
+                      <Button
+                        className={`mt-4 hover:bg-green-500 hover:text-black`}
+                        type="submit"
+                        label="Update Profile"
+                      />
+                    </div>
+                  </form>
+                </div>
+                {/* <div className="flex flex-col gap-5">
                 <Button
                   type="button"
                   onClick={closeModal3}
@@ -664,6 +675,7 @@ const ProfileSection = ({ startLoading, stopLoading }) => {
                   className="mt-4 hover:bg-orange-500 hidden lg:block"
                 />
               </div> */}
+              </div>
             </div>
           </motion.div>
         )}
