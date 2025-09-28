@@ -47,7 +47,7 @@ const userSchema = new mongoose.Schema({
         required: true,
       },
       //remove comment when API for maps will be available
-      // coordinates: { type: [Number] },
+      coordinates: { type: [Number] },
     },
   ],
 
