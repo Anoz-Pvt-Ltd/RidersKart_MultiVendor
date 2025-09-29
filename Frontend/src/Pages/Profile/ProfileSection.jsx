@@ -5,6 +5,7 @@ import { FetchData } from "../../Utility/FetchFromApi";
 import Button from "../../Components/Button";
 import InputBox from "../../Components/InputBox";
 import {
+  Check,
   Edit,
   Heart,
   ListOrdered,
@@ -38,7 +39,7 @@ const ProfileSection = ({ startLoading, stopLoading }) => {
   const Dispatch = useDispatch();
   const user = useSelector((store) => store.UserInfo.user);
   // const [allOrders, setAllOrders] = useState([]);
-  console.log(user);
+  // console.log(user);
   const [showModal, setShowModal] = useState(false);
   const [showModal2, setShowModal2] = useState(false);
   const [showModal3, setShowModal3] = useState(false);
@@ -56,7 +57,6 @@ const ProfileSection = ({ startLoading, stopLoading }) => {
     phoneNumber: "",
     password: "",
   });
-
   const [editAddress, setEditAddress] = useState({
     street: "",
     city: "",
@@ -230,29 +230,26 @@ const ProfileSection = ({ startLoading, stopLoading }) => {
     }
   };
 
-  // useEffect(() => {
-  //   const fetchAllOrders = async () => {
-  //     if (user?.length > 0) {
-  //       try {
-  //         startLoading();
-  //         const response = await FetchData(
-  //           `orders/all-products-of/${user?.[0]?._id}`,
-  //           "get"
-  //         );
-  //         if (response.data.success) {
-  //           setAllOrders(response.data.orders);
-  //         } else {
-  //           setError("Failed to load orders.");
-  //         }
-  //       } catch (err) {
-  //         setError(err.response?.data?.message || "Failed to fetch orders.");
-  //       } finally {
-  //         stopLoading();
-  //       }
-  //     }
-  //   };
-  //   fetchAllOrders();
-  // }, [user]);
+  const makeDefaultAddress = async (addressId) => {
+    console.log(addressId);
+    try {
+      startLoading();
+      const response = await FetchData(
+        `users/${user?.[0]?._id}/addresses/${addressId}/set-default-address`,
+        "post"
+      );
+      alertSuccess("Default address set successfully");
+      window.location.reload();
+    } catch (err) {
+      console.log(err);
+      alertError(
+        err.response?.data?.message || "Failed to set default address."
+      );
+      // setError(err.response?.data?.message || "Failed to set default address.");
+    } finally {
+      stopLoading();
+    }
+  };
 
   return (
     <section className="flex justify-center items-center flex-col">
@@ -326,7 +323,6 @@ const ProfileSection = ({ startLoading, stopLoading }) => {
               Personal Details
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:gap-4 text-gray-600">
-              {console.log(user)}
               <div>
                 <strong>Name:</strong> {user?.[0]?.name}
               </div>
@@ -334,10 +330,49 @@ const ProfileSection = ({ startLoading, stopLoading }) => {
                 <strong>Email:</strong> {user?.[0]?.email}
               </div>
               <div>
-                <strong>Password:</strong> {user?.[0]?.phoneNumber}
+                <strong>Contact Number:</strong> {user?.[0]?.phoneNumber}
               </div>
               <div>
-                <strong>Contact Number:</strong> {user?.[0]?.phoneNumber}
+                <strong>Default address:</strong>{" "}
+                <h1 className=" text-xs">
+                  <p className="shadow rounded-xl bg-neutral-200 py-2 px-3 w-fit">
+                    <li className=" font-semibold list-none">
+                      Street:{" "}
+                      <span className="font-normal text-xs ">
+                        {truncateString(
+                          user?.[0]?.defaultAddress?.street || "Not available",
+                          20
+                        )}
+                        ,
+                      </span>
+                    </li>
+                    <li className=" font-semibold list-none">
+                      City:{" "}
+                      <span className="font-normal text-xs ">
+                        {user?.[0]?.defaultAddress?.city || "Not available"},
+                      </span>
+                    </li>
+                    <li className=" font-semibold list-none">
+                      Country:{" "}
+                      <span className="font-normal text-xs ">
+                        {user?.[0]?.defaultAddress?.country || "Not available"}
+                      </span>
+                    </li>
+                    <li className=" font-semibold list-none">
+                      Postal Code:{" "}
+                      <span className="font-normal text-xs ">
+                        {user?.[0]?.defaultAddress?.postalCode ||
+                          "Not available"}
+                      </span>
+                    </li>
+                    <li className=" font-semibold list-none">
+                      State:{" "}
+                      <span className="font-normal text-xs ">
+                        {user?.[0]?.defaultAddress?.state || "Not available"}
+                      </span>
+                    </li>
+                  </p>
+                </h1>
               </div>
             </div>
           </div>
@@ -346,6 +381,7 @@ const ProfileSection = ({ startLoading, stopLoading }) => {
             <p className=" font-bold lg:hidden block">Address:</p>
             <p className=" font-bold  hidden lg:block">Available address:</p>
             {/* address list  */}
+
             <div className="flex lg:flex-row flex-col flex-wrap justify-start items-center text-xs">
               {user?.[0]?.address?.map((address, index) => (
                 <div
@@ -402,6 +438,13 @@ const ProfileSection = ({ startLoading, stopLoading }) => {
                         <Trash className="h-4 w-4" />
                         <span className="lg:hidden">Delete</span>
                       </button>
+                      <button
+                        className="flex justify-center items-center gap-2 hover:text-red-500 "
+                        onClick={() => makeDefaultAddress(address?._id)}
+                      >
+                        <Check className="h-4 w-4 border-black border rounded-full" />
+                        <span className="lg:hidden">Default</span>
+                      </button>
                     </div>
                   </span>
                 </div>
@@ -434,7 +477,10 @@ const ProfileSection = ({ startLoading, stopLoading }) => {
             className="modal backdrop-blur-lg bg-black/70 fixed top-0 left-0 w-full h-full flex justify-center items-center z-50"
           >
             <div className="modal-content flex  justify-center px-20 items-center gap-20 bg-white p-4 rounded-xl">
-              <form>
+              <div className="w-1/2">
+                <MapInput />
+              </div>
+              <form className="w-full flex flex-col justify-center items-center px-5 py-2">
                 <InputBox
                   LabelName="Street"
                   Placeholder="Enter street address"
@@ -587,8 +633,11 @@ const ProfileSection = ({ startLoading, stopLoading }) => {
               {/* <div>
                 <MapInput className="text-white" />
               </div> */}
-              <div className="flex justify-center items-center gap-10 lg:w-1/2 w-full  rounded-xl shadow lg:py-10 whiteSoftBG">
-                <div className="lg:w-1/2 w-full">
+              <div className="flex justify-center items-center gap-10  w-full  rounded-xl shadow lg:py-10 whiteSoftBG">
+                {/* <div className="flex justify-center items-center gap-10 lg:w-1/2 w-full  rounded-xl shadow lg:py-10 whiteSoftBG"> */}
+                <div className=" w-full flex">
+                  {/* <div className="lg:w-1/2 w-full flex"> */}
+                  <MapInput />
                   <form
                     ref={EditAddressFromRef}
                     onSubmit={handleEditAddress}
