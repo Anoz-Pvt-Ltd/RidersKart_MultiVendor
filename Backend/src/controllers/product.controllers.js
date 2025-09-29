@@ -361,7 +361,7 @@ const getAllProducts = asyncHandler(async (req, res) => {
     }
 
     // Take first postalCode for now (can expand to all later)
-    const userPostalCode = user.address[0].postalCode;
+  const userPostalCode = user?.defaultAddress?.postalCode;
 
     if (userPostalCode) {
       products = products.filter((product) => {

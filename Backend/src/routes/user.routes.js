@@ -24,6 +24,7 @@ import {
   generateOTP,
   resetPasswordWithOTP,
   getBulkUsers,
+  markDefaultAddress,
   //   getUserProfile,
 } from "../controllers/user.controllers.js";
 
@@ -62,6 +63,9 @@ router.route("/:userId/addresses").get(VerifyUser, getUserAddresses);
 router.route("/:userId/addresses/:addressId").post(VerifyUser, editAddress);
 router.route("/:userId/addresses/:addressId").delete(VerifyUser, deleteAddress);
 router.route("/edit-user-profile/:userId").post(VerifyUser, editUserDetails);
+router
+  .route("/:userId/addresses/:addressId/set-default-address")
+  .post(VerifyUser, markDefaultAddress);
 // router.route("/user-profile/:userId").get(getUserProfile);
 router.route("/get-bulk-name-rating").post(getBulkUsers);
 

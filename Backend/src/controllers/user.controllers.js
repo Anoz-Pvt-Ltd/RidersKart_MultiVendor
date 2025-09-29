@@ -68,6 +68,7 @@ const registerUser = asyncHandler(async (req, res, next) => {
     phoneNumber,
     password,
     address,
+    defaultAddress: address,
   });
   if (!newUser) throw new ApiError(500, "Internal server error");
   const { RefreshToken, AccessToken } = await generateAccessAndRefreshTokens(
@@ -336,6 +337,26 @@ const editUserDetails = async (req, res) => {
   }
 };
 
+const markDefaultAddress = asyncHandler(async (req, res) => {
+  const { userId, addressId } = req.params;
+  if (!userId || !addressId) {
+    throw new ApiError(400, "User ID and Address ID are required");
+  }
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+  const address = user.address.id(addressId);
+  if (!address) {
+    throw new ApiError(404, "Address not found");
+  }
+  user.defaultAddress = address;
+  await user.save();
+  res
+    .status(200)
+    .json(new ApiResponse(200, user, "Default address updated successfully"));
+});
+
 const getCurrentUser = asyncHandler(async (req, res) => {
   const { userId } = req.params;
   try {
@@ -572,6 +593,7 @@ const addAddress = asyncHandler(async (req, res, next) => {
     throw new ApiError(404, "User not found");
   }
   user.address.push(newAddress);
+  user.defaultAddress = newAddress; // Set the newly added address as default
   await user.save();
   // console.log("user address");
 
@@ -823,4 +845,5 @@ export {
   generateOTP,
   resetPasswordWithOTP,
   getBulkUsers,
+  markDefaultAddress,
 };

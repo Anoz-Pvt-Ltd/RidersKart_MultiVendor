@@ -50,6 +50,30 @@ const userSchema = new mongoose.Schema({
       coordinates: { type: [Number] },
     },
   ],
+  defaultAddress: {
+    street: {
+      type: String,
+      // required: true,
+    },
+    city: {
+      type: String,
+      // required: true,
+    },
+    state: {
+      type: String,
+      // required: true,
+    },
+    country: {
+      type: String,
+      // required: true,
+    },
+    postalCode: {
+      type: String,
+      required: true,
+    },
+    //remove comment when API for maps will be available
+    coordinates: { type: [Number] },
+  },
 
   CartProducts: [
     {

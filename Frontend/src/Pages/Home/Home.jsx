@@ -21,7 +21,7 @@ const Home = ({ startLoading, stopLoading }) => {
   const [subcategories, setSubcategories] = useState([]);
   const { promotions, status } = useSelector((store) => store.PromotionList);
   const user = useSelector((store) => store.UserInfo.user);
-  const userPostalCode = user[0]?.address?.[0]?.postalCode;
+  const userPostalCode = user[0]?.defaultAddress?.postalCode;
   const dispatch = useDispatch();
   // const [userCity, setUserCity] = useState(null);
   const [productsAvailableForUser, setProductsAvailableForUser] =
