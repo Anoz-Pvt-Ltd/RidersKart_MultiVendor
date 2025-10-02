@@ -29,7 +29,7 @@ const CartPage = ({ startLoading, stopLoading }) => {
   const [addresses, setAddresses] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState();
   const [paymentMethod, setPaymentMethod] = useState("");
-  const userPostalCode = user[0]?.address?.[0]?.postalCode;
+ const userPostalCode = user[0]?.defaultAddress?.postalCode;
 
   const dispatch = useDispatch();
   const Navigate = useNavigate();
