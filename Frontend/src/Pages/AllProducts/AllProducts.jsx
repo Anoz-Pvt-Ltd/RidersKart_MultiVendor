@@ -16,8 +16,7 @@ const AllProducts = ({ startLoading, stopLoading }) => {
   console.log(products.length);
 
   const user = useSelector((store) => store.UserInfo.user);
-  const userPostalCode = user[0]?.address?.[0]?.postalCode;
-
+const userPostalCode = user[0]?.defaultAddress?.postalCode;
   const { category, subcategory, category_title, subcategory_title } =
     useParams();
 
