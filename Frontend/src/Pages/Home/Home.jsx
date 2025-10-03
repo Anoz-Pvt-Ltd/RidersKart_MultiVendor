@@ -23,6 +23,15 @@ const Home = ({ startLoading, stopLoading }) => {
   const user = useSelector((store) => store.UserInfo.user);
   const userPostalCode = user[0]?.defaultAddress?.postalCode;
   const dispatch = useDispatch();
+  function shuffleArray(array) {
+    const arr = [...array];
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+  const shuffleProduct = shuffleArray(products);
   // const [userCity, setUserCity] = useState(null);
   const [productsAvailableForUser, setProductsAvailableForUser] =
     useState(false);
@@ -123,9 +132,9 @@ const Home = ({ startLoading, stopLoading }) => {
   // }, [user, userCity]);
 
   const suggestedItems = products && products.slice(0, 4);
-  const recommendation = products && products.slice(6, 10);
-  const topSelection = products && products.slice(5, 8);
-  const youMayLike = products && products.slice(7, 11);
+  const recommendation = shuffleProduct && shuffleProduct.slice(6, 10);
+  const topSelection = shuffleProduct && shuffleProduct.slice(5, 8);
+  const youMayLike = shuffleProduct && shuffleProduct.slice(7, 11);
 
   arrayOfGridItems.push(
     { products: suggestedItems, title: "Suggested Products" },
@@ -251,7 +260,7 @@ const Home = ({ startLoading, stopLoading }) => {
         <div className="bg-red-500 text-white p-4 rounded">{error}</div>
       )} */}
 
-      <div className="lg:h-[35vw] h-fit w-full p-2 lg:p-5  flex flex-col lg:flex-row lg:gap-10 gap-2 lg:overflow-x-auto flex-nowrap whitespace-nowrap  scroll-smooth justify-start items-center">
+      <div className="lg:h-[35vw] h-fit w-full p-2 lg:p-5  flex flex-col md:flex-row lg:flex-row lg:gap-10 gap-2 lg:overflow-x-auto md:overflow-x-auto flex-nowrap whitespace-nowrap  scroll-smooth justify-start items-center">
         {arrayOfGridItems.map((item, index) => (
           <div key={index} className="flex-none w-fit">
             <ThreeProductGrid products={item.products} heading={item.title} />
@@ -348,7 +357,7 @@ const Home = ({ startLoading, stopLoading }) => {
       </div>
 
       <div className="flex gap-4 bg-transparent justify-start items-center overflow-x-auto p-5 max-w-full no-scrollbar">
-        {products?.map((product) => (
+        {shuffleProduct?.map((product) => (
           <Card
             Image={product?.images[0]?.url}
             key={product._id}

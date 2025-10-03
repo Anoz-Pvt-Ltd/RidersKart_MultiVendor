@@ -12,7 +12,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import Button from "./Button";
 import InputBox from "./InputBox";
 import { useSelector } from "react-redux";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import logo from "../assets/Logo.png";
 import { PlatformName } from "../Constants/Global";
 
@@ -34,24 +34,49 @@ const Header = () => {
   };
 
   return (
-    <header className="flex justify-between items-center px-5 py-3  shadow-md relative">
+    <header className="flex flex-col lg:flex-row justify-between items-center px-5 py-3  shadow-md relative">
       {/* Hamburger opening button */}
-      <motion.button
-        className="md:hidden lg:hidden flex justify-center items-center gap-2"
-        onClick={toggleMenu}
-        whileTap={{ scale: 0.9 }}
-      >
-        {isOpen ? <X size={28} /> : <Menu size={28} />}
-      </motion.button>
+      <div className="lg:hidden flex justify-between items-center w-full">
+        <div className="flex justify-center items-center gap-1">
+          <motion.button
+            className="lg:hidden flex justify-start items-center gap-2"
+            onClick={toggleMenu}
+            whileTap={{ scale: 0.9 }}
+          >
+            {isOpen ? <X size={28} /> : <Menu size={28} />}
+          </motion.button>
+          <img src={logo} alt="Logo" className="lg:hidden block h-12" />
+        </div>
+        <div className="flex justify-center items-center gap-5">
+          <Link
+            to={"/"}
+            className="flex items-center justify-center hover:scale-110 duration-300 ease-in-out hover:text-red-500"
+          >
+            {/* <img src={logo} alt="Logo" className="lg:h-20 h-12" /> */}
+            <h1 className="">
+              <Home />
+            </h1>
+          </Link>
+          <Link
+            to={`/cart/${user?.[0]?._id}`}
+            className="text-blue-600  rounded  duration-300 ease-in-out shadow-neutral-600 flex lg:hidden"
+          >
+            <ShoppingCart />{" "}
+            <span className="bg-[#DF3F33] px-2 rounded-full text-white text-xs text-center flex justify-center items-center">
+              {cartCount}
+            </span>
+          </Link>
+        </div>
+      </div>
       {/* Logo */}
-      <div className="flex items-center lg:pl-20 justify-center gap-5">
+      <div className="lg:flex hidden items-center lg:pl-20 justify-center gap-5 ">
         <Link to={"/"} className="flex items-center justify-center">
           <img src={logo} alt="Logo" className="lg:h-20 h-12" />
           <h1 className="lg:text-xl   ">{PlatformName}</h1>
         </Link>
         <Link
           to={"/"}
-          className="flex items-center justify-center hover:scale-110 duration-300 ease-in-out hover:text-red-500"
+          className="lg:flex items-center justify-center hover:scale-110 duration-300 ease-in-out hover:text-red-500 hidden"
         >
           {/* <img src={logo} alt="Logo" className="lg:h-20 h-12" /> */}
           <h1 className="">
@@ -61,21 +86,24 @@ const Header = () => {
       </div>
 
       {/* Search Bar - Hidden in Mobile */}
-      <div className="hidden md:flex justify-center items-center w-[50%] h-20 ">
+      <div className="md:flex justify-center items-center lg:w-[50%] w-full flex lg:h-20">
         <InputBox
           Value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
           Placeholder="Search for products..."
-          className="w-full "
+          className="w-full"
           keyPress={handleSearch}
         />
-        <button onClick={handleSearch} className="relative right-10 mt-2 ">
+        <button
+          onClick={handleSearch}
+          className="relative lg:right-10 right-0 bg-neutral-300 rounded-full p-1 mt-2"
+        >
           <Search />
         </button>
       </div>
 
-      {/* Desktop Navigation */}
-      <div className="hidden md:flex items-center gap-5">
+      {/* Desktop Navigation Profile Login and shopping buttons */}
+      <div className="hidden lg:flex items-center gap-5">
         {user.length ? (
           <div className="flex items-center gap-5">
             <Button
@@ -114,9 +142,8 @@ const Header = () => {
         )}
       </div>
 
-      {/* Mobile Hamburger Button */}
-
-      <motion.div whileHover={{ scale: 1.1 }}>
+      {/* Mobile Hamburger cart Button  */}
+      {/* <motion.div whileHover={{ scale: 1.1 }}>
         <Link
           to={`/cart/${user?.[0]?._id}`}
           className="text-blue-600  rounded  duration-300 ease-in-out shadow-neutral-600 flex lg:hidden"
@@ -126,48 +153,49 @@ const Header = () => {
             {cartCount}
           </span>
         </Link>
-      </motion.div>
+      </motion.div> */}
 
       {/* Mobile Menu */}
-      {isOpen && (
-        <motion.div
-          initial={{ x: "-100%" }}
-          animate={{ x: 0 }}
-          exit={{ x: "-100%" }}
-          transition={{ type: "spring", stiffness: 120 }}
-          className="fixed top-0 left-0 w-3/4 h-full bg-white shadow-lg p-5 flex flex-col gap-5 md:hidden z-50"
-        >
-          <button className="self-end" onClick={toggleMenu}>
-            <X size={28} />
-          </button>
-          {user.length ? (
-            <Button
-              className={` hover:bg-green-500 hover:text-black`}
-              label={
-                <h1 className="flex gap-2">
-                  <User2 /> {user?.[0]?.name}
-                </h1>
-              }
-              onClick={() => {
-                navigate(`/user-profile/dashboard/${user?.[0]?._id}`);
-                toggleMenu();
-              }}
-            />
-          ) : (
-            <Button
-              className={` hover:bg-green-500 hover:text-black`}
-              label={
-                <h1 className="flex gap-2">
-                  <LogIn /> Login
-                </h1>
-              }
-              onClick={() => {
-                navigate("/login");
-                toggleMenu();
-              }}
-            />
-          )}
-          {/* <Button
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ x: "-100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "-100%" }}
+            transition={{ type: "spring", stiffness: 120 }}
+            className="fixed top-0 left-0 w-3/4 h-full bg-white shadow-lg p-5 flex flex-col gap-5 z-50"
+          >
+            <button className="self-end" onClick={toggleMenu}>
+              <X size={28} />
+            </button>
+            {user.length ? (
+              <Button
+                className={` hover:bg-green-500 hover:text-black`}
+                label={
+                  <h1 className="flex gap-2">
+                    <User2 /> {user?.[0]?.name}
+                  </h1>
+                }
+                onClick={() => {
+                  navigate(`/user-profile/dashboard/${user?.[0]?._id}`);
+                  toggleMenu();
+                }}
+              />
+            ) : (
+              <Button
+                className={` hover:bg-green-500 hover:text-black`}
+                label={
+                  <h1 className="flex gap-2">
+                    <LogIn /> Login
+                  </h1>
+                }
+                onClick={() => {
+                  navigate("/login");
+                  toggleMenu();
+                }}
+              />
+            )}
+            {/* <Button
             label={
               <h1 className="flex gap-2">
                 <Store /> Become a Seller
@@ -178,15 +206,16 @@ const Header = () => {
               toggleMenu();
             }}
           /> */}
-          <Link
-            to={`/cart/${user?.[0]?._id}`}
-            className="flex items-center gap-2"
-            onClick={toggleMenu}
-          >
-            <ShoppingCart /> <span>Cart</span>
-          </Link>
-        </motion.div>
-      )}
+            <Link
+              to={`/cart/${user?.[0]?._id}`}
+              className="flex items-center gap-2"
+              onClick={toggleMenu}
+            >
+              <ShoppingCart /> <span>Cart</span>
+            </Link>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 };
