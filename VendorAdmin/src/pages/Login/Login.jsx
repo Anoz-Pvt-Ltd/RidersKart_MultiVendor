@@ -6,12 +6,14 @@ import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import LoadingUI from "../../components/Loading";
 import Button from "../../components/Button";
+import { Eye, EyeOff } from "lucide-react"; // for eye icons
 
 const LoginForm = ({
   startLoading,
   stopLoading,
   openRegister,
   openForgetPassword,
+  onCancel,
 }) => {
   const Dispatch = useDispatch();
   const Navigate = useNavigate();
@@ -22,6 +24,7 @@ const LoginForm = ({
 
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -46,12 +49,13 @@ const LoginForm = ({
       localStorage.setItem(
         "AccessToken",
         response.data.data.tokens.accessToken
-      ); // Save token to localStorage
+      );
       localStorage.setItem(
         "RefreshToken",
         response.data.data.tokens.refreshToken
-      ); // Save token to localStorage
+      );
       Navigate("/dashboard");
+      alert("Login Successful");
     } catch (err) {
       setError(err.response?.data?.message || "Invalid email or password.");
     } finally {
@@ -77,27 +81,37 @@ const LoginForm = ({
           onChange={handleChange}
         />
 
-        {/* Password Input */}
-        <InputBox
-          LabelName="Password"
-          Type="password"
-          Name="password"
-          Value={credentials.password}
-          Placeholder="Enter your password"
-          onChange={handleChange}
-        />
+        {/* Password Input with toggle */}
+        <div className="relative">
+          <InputBox
+            LabelName="Password"
+            Type={showPassword ? "text" : "password"}
+            Name="password"
+            Value={credentials.password}
+            Placeholder="Enter your password"
+            onChange={handleChange}
+          />
+          <button
+            type="button"
+            className="absolute right-3 top-14 text-gray-500"
+            onClick={() => setShowPassword(!showPassword)}
+          >
+            {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+          </button>
+        </div>
 
         {/* Submit Button */}
-        <div>
+        <div className="flex flex-col gap-2 justify-center items-center ">
           <Button Type={"submit"} label={"Login"} className={"w-full"} />
-          {/* <button
-            type="submit"
-            className="w-full bg-blue-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-600"
-          >
-            Login
-          </button> */}
+          <Button
+            label={"Cancel"}
+            className={"w-full"}
+            onClick={onCancel}
+            Type="reset"
+          />
         </div>
       </form>
+
       <div className="lg:block hidden">
         <p className="text-sm text-gray-500">
           Forget Password ?{" "}

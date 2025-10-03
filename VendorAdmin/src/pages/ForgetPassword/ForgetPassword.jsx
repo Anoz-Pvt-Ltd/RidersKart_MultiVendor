@@ -6,7 +6,7 @@ import LoadingUI from "../../components/Loading";
 import { parseErrorMessage } from "../../utils/ErrorMessageParser";
 import { useNavigate } from "react-router-dom";
 
-const ForgetPassword = ({ startLoading, stopLoading }) => {
+const ForgetPassword = ({ startLoading, stopLoading, cancel }) => {
   const formRef = useRef();
   const navigate = useNavigate();
   const [isOpenOtpModel, setIsOpenOtpModel] = useState(false);
@@ -83,7 +83,19 @@ const ForgetPassword = ({ startLoading, stopLoading }) => {
               ** Note OTP will be valid for 1 minute only
             </h1>
           ) : (
-            <Button label="Generate OTP" onClick={handleGenerateOTP} />
+            <div className="flex flex-col gap-2 justify-center items-center">
+              <Button
+                label="Generate OTP"
+                onClick={handleGenerateOTP}
+                className="w-full"
+              />
+              <Button
+                label="Cancel"
+                Type="reset"
+                className="w-full"
+                onClick={cancel}
+              />
+            </div>
           )}
           {/* <Button label="Generate OTP" Type="submit" /> */}
           {isOpenOtpModel && (
