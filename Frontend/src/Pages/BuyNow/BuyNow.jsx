@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { AnimatePresence, motion } from "framer-motion";
 import Button from "../../Components/Button";
 import LoadingUI from "../../Components/Loading";
-import { ChevronDown, MoveRight } from "lucide-react";
+import { Check, ChevronDown, MoveRight } from "lucide-react";
 import InputBox from "../../Components/InputBox";
 import { parseErrorMessage } from "../../Utility/ErrorMessageParser";
 import { alertError, alertInfo, alertSuccess } from "../../Utility/Alert";
@@ -26,11 +26,14 @@ const BuyNow = ({ startLoading, stopLoading }) => {
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState(null);
   const [error, setError] = useState("");
+  const [addressPopUp, setAddressPopUp] = useState(false);
   const user = useSelector((store) => store.UserInfo.user);
-  const userPostalCode = user[0]?.address?.[0]?.postalCode;
+  const userPostalCode = user[0]?.defaultAddress?.postalCode;
   const Navigate = useNavigate();
   const Dispatch = useDispatch();
-  console.log(products);
+  const handleLogin = () => {
+    Navigate("/login");
+  };
 
   useEffect(() => {
     const fetchProductDetails = async () => {
@@ -102,9 +105,23 @@ const BuyNow = ({ startLoading, stopLoading }) => {
     fetchProducts();
   }, [productId, user]);
 
-  const handleAddressChange = (e) => {
-    setSelectedAddress(e.target.value);
-  };
+  // const handleAddressChange = (e) => {
+  //   setSelectedAddress(e.target.value);
+  // };
+
+  useEffect(() => {
+    if (user?.[0]?.defaultAddress) {
+      const defaultAddr = `${
+        user?.[0]?.defaultAddress?.street || "Not available"
+      }, ${user?.[0]?.defaultAddress?.city || "Not available"}, ${
+        user?.[0]?.defaultAddress?.state || "Not available"
+      }, ${user?.[0]?.defaultAddress?.country || "Not available"}, ${
+        user?.[0]?.defaultAddress?.postalCode || "Not available"
+      }`;
+
+      setSelectedAddress(defaultAddr);
+    }
+  }, [user]);
 
   const handlePaymentChange = (e) => {
     setPaymentMethod(e.target.value);
@@ -120,9 +137,8 @@ const BuyNow = ({ startLoading, stopLoading }) => {
       const response = await FetchData("orders/update-order-status", "post", {
         orderId,
         status: "confirmed",
-        address: addresses[selectedAddress],
+        address: user?.[0]?.defaultAddress,
       });
-      console.log(response);
       if (response.status === 200) {
         alertSuccess("Order confirmed successfully!");
         Navigate("/"); // Redirect to orders page after confirmation
@@ -184,130 +200,26 @@ const BuyNow = ({ startLoading, stopLoading }) => {
     e.preventDefault();
   };
 
-  const Login = () => {
-    const NavigateRegister = () => {
-      Navigate("/register");
-    };
-
-    const formRef = useRef(null);
-    const [formData, setFormData] = useState({
-      email: "",
-      password: "",
-    });
-    const [error, setError] = useState("");
-    const [success, setSuccess] = useState("");
-
-    const handleChange = (e) => {
-      const { name, value } = e.target;
-      setFormData({
-        ...formData,
-        [name]: value,
-      });
-    };
-
-    const handleSubmit = async (e) => {
-      e.preventDefault();
-      setError("");
-      setSuccess("");
-      startLoading(); // Start loading when login button is clicked
-
-      try {
-        const response = await FetchData("users/login", "post", formData);
-        console.log(response);
-        localStorage.clear(); // will clear the all the data from localStorage
-        localStorage.setItem(
-          "AccessToken",
-          response.data.data.tokens.AccessToken
-        );
-        localStorage.setItem(
-          "RefreshToken",
-          response.data.data.tokens.RefreshToken
-        );
-
-        alertSuccess(response.data.message);
-        Dispatch(clearUser());
-        Dispatch(addUser(response.data.data.user));
-        setSuccess("Login successful!");
-        Navigate(`/checkout/${productId}/${user?._id}`);
-      } catch (err) {
-        console.log(err);
-        // alert(parseErrorMessage(error.response.data.data.statusCode));
-        alertError(parseErrorMessage(err.response.data));
-      } finally {
-        stopLoading(); // Stop loading once response is received
-      }
-    };
-
-    return (
-      <div>
-        <section className="flex lg:m-28 lg:border rounded-lg lg:shadow-md lg:shadow-neutral-300 lg:h-96 my-20">
-          <div className="lg:w-1/2 p-10 rounded-lg rounded-r-none headerBg text-white hidden lg:block">
-            <h1 className="text-4xl h-3/4 text-white font-semibold">
-              Login with your e-mail to get started !
-            </h1>
-            <h1 className="flex justify-around items-center">
-              If you are not registered with us create your new account here{" "}
-              <MoveRight />
-            </h1>
-          </div>
-          <div className=" lg:w-1/2 w-full flex justify-center items-center flex-col lg:whiteSoftBG">
-            <form
-              ref={formRef}
-              className="login h-3/4 flex justify-top items-top flex-col w-3/4"
-            >
-              <InputBox
-                onChange={handleChange}
-                LabelName={"Login"}
-                Placeholder={"Email Address"}
-                Type={"email"}
-                className={"w-full"}
-                Name={"email"}
-                Value={formData.email}
-              />
-              <InputBox
-                onChange={handleChange}
-                LabelName={"Password"}
-                Placeholder={"Password"}
-                Type={"password"}
-                className={"w-full"}
-                Name={"password"}
-                Value={formData.password}
-              />
-              {/* <InputBox
-              LabelName={"Login"}
-              Placeholder={"Your Mobile Number"}
-              Type={"number"}
-              className={"w-full"}
-            /> */}
-              <Button
-                className={`w-full`}
-                label={"Login"}
-                onClick={handleSubmit}
-              />
-            </form>
-            <div className="w-full h-full justify-center items-center flex flex-col mt-20 lg:mt-0">
-              <Button
-                label={"Register Here"}
-                onClick={NavigateRegister}
-                className={`w-1/2 `}
-              />
-              <p className="text-xs text-neutral-500 text-center">
-                ** By continuing, you agree to our Terms of Use and Privacy
-                Policy.
-              </p>
-            </div>
-          </div>
-        </section>
-      </div>
-    );
+  const makeDefaultAddress = async (addressId) => {
+    try {
+      startLoading();
+      await FetchData(
+        `users/${user?.[0]?._id}/addresses/${addressId}/set-default-address`,
+        "post"
+      );
+      alertSuccess("Default address set successfully");
+      // Set flag in localStorage
+      window.location.reload();
+      setAddressPopUp(false);
+    } catch (err) {
+      alertError(
+        err.response?.data?.message || "Failed to set default address."
+      );
+    } finally {
+      stopLoading();
+    }
   };
 
-  // function getTotalPayablePrice() {
-  //   return product.map((total, item) => {
-  //     if (!item.product) return total;
-  //     return total + item.product.price.sellingPrice * item.quantity;
-  //   }, 0);
-  // }
   return (
     <div>
       {user === null || user.length === 0 ? (
@@ -322,7 +234,7 @@ const BuyNow = ({ startLoading, stopLoading }) => {
               </h1>
             </section>
           </div>
-          <Login />
+          <Button label={"Login"} onclick={handleLogin} />
         </div>
       ) : (
         <div className="buy-now-page flex flex-col lg:flex-row justify-center items-center lg:py-10 h-full gap-20">
@@ -374,29 +286,92 @@ const BuyNow = ({ startLoading, stopLoading }) => {
               }}
               className="addresses w-full"
             >
-              <h2 className="mb-5 font-semibold">Select Shipping Address</h2>
+              <h1 className="mb-5 font-semibold flex justify-evenly items-center ">
+                Selected Default Address{" "}
+                <span>
+                  <button
+                    className="text-sm font-light text-blue-500 hover:underline"
+                    onClick={() => setAddressPopUp(true)}
+                  >
+                    Change Shipping Address
+                  </button>
+                </span>
+              </h1>
               {addresses?.length > 0 ? (
-                <select
-                  value={selectedAddress}
-                  onChange={handleAddressChange}
-                  className="bg-white border border-neutral-400 p-2 rounded-xl outline-none w-full"
-                >
-                  <option value="" selected disabled>
-                    Select an address
-                  </option>
-                  {addresses?.map((address, index) => (
-                    <option
-                      key={address?._id}
-                      value={index}
-                      className="bg-white max-w-40"
-                    >
-                      {`${address?.street}, ${address?.city}, ${address?.state}, ${address?.country}, ${address?.postalCode}`}
-                    </option>
-                  ))}
-                </select>
+                <div>
+                  <select
+                    disabled
+                    value={selectedAddress}
+                    // onChange={handleAddressChange}
+                    className="bg-white border border-neutral-400 p-2 rounded-xl outline-none w-full cursor-not-allowed"
+                  >
+                    <option value={selectedAddress}>{selectedAddress}</option>
+                    {/* <option value={selectedAddress}>{selectedAddress}</option> */}
+
+                    {/* If later you want to add other addresses, you can uncomment this */}
+                    {/* {addresses?.map((address, index) => (
+          <option
+            key={address?._id}
+            value={`${address?.street}, ${address?.city}, ${address?.state}, ${address?.country}, ${address?.postalCode}`}
+          >
+            {`${address?.street}, ${address?.city}, ${address?.state}, ${address?.country}, ${address?.postalCode}`}
+          </option>
+        ))} */}
+                  </select>
+                  {user?.[0]?.defaultAddress?.coordinates.length === 0 ? (
+                    <h1 className="w-96 text-red-500 text-xs">
+                      ! Please provide exact location to avoid calls from
+                      Delivery partner.
+                    </h1>
+                  ) : (
+                    ""
+                  )}
+                </div>
               ) : (
                 <p>No addresses available. Please add one in your profile.</p>
               )}
+              {/* <select value={selectedAddress}>
+                <strong>Default address:</strong>{" "}
+                <h1 className="">
+                  <p className="shadow rounded-xl bg-neutral-200 py-2 px-3 w-fit">
+                    <li className=" font-semibold list-none">
+                      Street:{" "}
+                      <span className="font-normal ">
+                        {truncateString(
+                          user?.[0]?.defaultAddress?.street || "Not available",
+                          20
+                        )}
+                        ,
+                      </span>
+                    </li>
+                    <li className=" font-semibold list-none">
+                      City:{" "}
+                      <span className="font-normal ">
+                        {user?.[0]?.defaultAddress?.city || "Not available"},
+                      </span>
+                    </li>
+                    <li className=" font-semibold list-none">
+                      Country:{" "}
+                      <span className="font-normal ">
+                        {user?.[0]?.defaultAddress?.country || "Not available"}
+                      </span>
+                    </li>
+                    <li className=" font-semibold list-none">
+                      Postal Code:{" "}
+                      <span className="font-normal ">
+                        {user?.[0]?.defaultAddress?.postalCode ||
+                          "Not available"}
+                      </span>
+                    </li>
+                    <li className=" font-semibold list-none">
+                      State:{" "}
+                      <span className="font-normal ">
+                        {user?.[0]?.defaultAddress?.state || "Not available"}
+                      </span>
+                    </li>
+                  </p>
+                </h1>
+              </select> */}
             </motion.div>
             {/* payment method  */}
             <motion.div
@@ -461,6 +436,61 @@ const BuyNow = ({ startLoading, stopLoading }) => {
           ))}
         </div>
       </div>
+      {addressPopUp && (
+        <div className="fixed top-0 left-0 py-5 w-full h-screen overflow-scroll bg-neutral-200 flex justify-center items-center">
+          {console.log("Hello")}
+          <div className="flex lg:flex-row flex-col flex-wrap justify-start items-center ">
+            {user?.[0]?.address?.map((address, index) => (
+              <div
+                key={address._id}
+                className="gap-5 flex justify-center items-center flex-row flex-wrap w-full lg:w-fit"
+              >
+                <span className="shadow m-1 py-3 px-2 rounded-xl bg-neutral-200 w-full lg:w-fit">
+                  <li className=" font-semibold list-none">
+                    Street:{" "}
+                    <span className="font-normal  ">
+                      {truncateString(address?.street || "Not available")}
+                    </span>
+                  </li>
+                  <li className=" font-semibold list-none">
+                    City:{" "}
+                    <span className="font-normal  ">
+                      {address?.city || "Not available"}
+                    </span>
+                  </li>
+                  <li className=" font-semibold list-none">
+                    Country:{" "}
+                    <span className="font-normal  ">
+                      {address?.country || "Not available"}
+                    </span>
+                  </li>
+                  <li className=" font-semibold list-none">
+                    Postal Code:{" "}
+                    <span className="font-normal  ">
+                      {address?.postalCode || "Not available"}
+                    </span>
+                  </li>
+                  <li className=" font-semibold list-none">
+                    State:{" "}
+                    <span className="font-normal  ">
+                      {address?.state || "Not available"}
+                    </span>
+                  </li>
+                  <div className="flex justify-evenly items-center gap-5 pt-2">
+                    <button
+                      className="flex justify-center items-center gap-2 hover:text-red-500 "
+                      onClick={() => makeDefaultAddress(address?._id)}
+                    >
+                      <Check className="h-4 w-4 border-black border rounded-full" />
+                      <span>Mark as Default</span>
+                    </button>
+                  </div>
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
