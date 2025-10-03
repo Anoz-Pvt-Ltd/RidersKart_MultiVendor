@@ -407,6 +407,7 @@ const getCurrentOrder = asyncHandler(async (req, res) => {
 
 const updateOrderStatus = asyncHandler(async (req, res) => {
   const { orderId, status, address } = req.body;
+  console.log("Order Address -------------------", address);
   if (!orderId || !status) {
     throw new ApiError(400, "Missing required fields");
   }
