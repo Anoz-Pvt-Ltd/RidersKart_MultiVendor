@@ -12,11 +12,12 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { clearUser } from "../../utils/Slice/UserInfoSlice";
 import { FetchData } from "../../utils/FetchFromApi";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import LoadingUI from "../../components/Loading";
 import VerifiedDrivers from "../Delivery-partner/VerifiedDrivers";
 import dayjs from "dayjs";
+import logo from "../../assets/Logo.png";
 
 const Dashboard = ({ startLoading, stopLoading }) => {
   const user = useSelector((store) => store.UserInfo.user);
@@ -116,7 +117,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
       {
         label: "Orders per Month",
         data: [],
-        backgroundColor: "#8E44AD",
+        backgroundColor: "#DF3F33",
       },
     ],
   });
@@ -157,7 +158,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
         {
           label: "Orders per Month",
           data: orderCounts,
-          backgroundColor: "#8E44AD",
+          backgroundColor: "#DF3F33",
         },
       ],
     });
@@ -167,7 +168,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
     const fetchAllOrders = async () => {
       if (user?.length > 0) {
         try {
-          startLoading();
+          // startLoading();
           const response = await FetchData(
             `orders/get-vendor-orders/${user?.[0]?._id}`,
             "get"
@@ -181,7 +182,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
         } catch (err) {
           setError(err.response?.data?.message || "Failed to fetch orders.");
         } finally {
-          stopLoading();
+          // stopLoading();
         }
       }
     };
@@ -191,7 +192,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
   useEffect(() => {
     const fetchVendor = async () => {
       try {
-        startLoading();
+        // startLoading();
         const response = await FetchData(
           `vendor/vendor-profile/${user?.[0]?._id}`,
           "get"
@@ -202,7 +203,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
       } catch (err) {
         setError("Failed to load vendor profile.");
       } finally {
-        stopLoading();
+        // stopLoading();
       }
     };
 
@@ -237,6 +238,10 @@ const Dashboard = ({ startLoading, stopLoading }) => {
     ],
   });
   // console.log(user);
+  const cardVariants = {
+    hidden: { scale: 0, rotate: -180, opacity: 0 },
+    visible: { scale: 1, rotate: 0, opacity: 1 },
+  };
 
   const renderContent = () => {
     switch (selectedMenu) {
@@ -258,50 +263,124 @@ const Dashboard = ({ startLoading, stopLoading }) => {
       default:
         return (
           <div className="flex flex-col gap-5">
-            <div className="flex flex-col lg:flex-row gap-4 lg:gap-0 lg:justify-evenly lg:w-full lg:items-center shadow-lg p-4 bg-white rounded-lg ">
-              <div className="p-4 bg-[#B5BD63]  shadow-xl rounded">
-                <h3 className="text-black">Total Orders</h3>
-                <p className="text-2xl font-bold">{allOrders?.length}</p>
-              </div>
-              <div className="p-4 bg-[#19465C] shadow-xl text-white rounded">
-                <h3 className="">Products</h3>
-                <p className="text-2xl font-bold">{products?.length}</p>
-              </div>
-              <div className="p-4 bg-[#8EBD9D] shadow-xl rounded">
-                <h3 className="text-gray-500">Rating</h3>
-                <p className="text-2xl font-bold">
-                  Avg:{user?.[0]?.ratings?.average}/Total:
-                  {user?.[0]?.ratings?.reviewsCount}
+            <div className="flex flex-col lg:flex-row md:flex-row gap-4 lg:gap-0 md:justify-evenly lg:justify-evenly lg:w-full lg:items-center shadow-lg p-4 bg-white rounded-lg ">
+              <motion.div
+                className="p-4 text-white bg-[#1F2937] shadow-xl rounded lg:w-40 md:w-40"
+                variants={cardVariants}
+                initial="hidden"
+                animate="visible"
+                transition={{
+                  delay: 0.2,
+                  type: "spring",
+                  stiffness: 120,
+                  damping: 10,
+                }}
+                whileHover={{
+                  scale: 1.05,
+                  rotate: 5,
+                  boxShadow: "0px 0px 20px rgba(223,63,51,0.6)",
+                }}
+              >
+                <h3>Total Orders</h3>
+                <p className="text-xl tracking-wide bg-[#DF3F33] rounded-xl w-full px-2 text-right">
+                  {allOrders?.length}
                 </p>
-              </div>
-              <div className="p-4 text-white bg-[#8E44AD] shadow-xl rounded">
-                <h3 className="">Transactions (₹)</h3>
-                <p className="text-2xl font-bold">0</p>
-              </div>
+              </motion.div>
+
+              {/* Products */}
+              <motion.div
+                className="p-4 bg-[#1F2937] shadow-xl text-white rounded lg:w-40 md:w-40"
+                variants={cardVariants}
+                initial="hidden"
+                animate="visible"
+                transition={{
+                  delay: 0.4,
+                  type: "spring",
+                  stiffness: 120,
+                  damping: 10,
+                }}
+                whileHover={{
+                  scale: 1.05,
+                  rotate: -5,
+                  boxShadow: "0px 0px 20px rgba(223,63,51,0.6)",
+                }}
+              >
+                <h3>Products</h3>
+                <p className="text-xl tracking-wide bg-[#DF3F33] rounded-xl w-full px-2 text-right">
+                  {products?.length}
+                </p>
+              </motion.div>
+
+              {/* Rating */}
+              <motion.div
+                className="p-4 bg-[#1F2937] shadow-xl rounded text-white lg:w-40 md:w-40"
+                variants={cardVariants}
+                initial="hidden"
+                animate="visible"
+                transition={{
+                  delay: 0.6,
+                  type: "spring",
+                  stiffness: 120,
+                  damping: 10,
+                }}
+                whileHover={{
+                  scale: 1.05,
+                  rotate: 8,
+                  boxShadow: "0px 0px 20px rgba(223,63,51,0.6)",
+                }}
+              >
+                <h3>Rating</h3>
+                <p className="text-xl tracking-wide bg-[#DF3F33] rounded-xl w-full px-2 text-right">
+                  {user?.[0]?.ratings?.average || 0} /{" "}
+                  {user?.[0]?.ratings?.reviewsCount || 0}
+                </p>
+              </motion.div>
+
+              {/* Transactions */}
+              <motion.div
+                className="p-4 text-white bg-[#1F2937] shadow-xl rounded lg:w-40 md:w-40"
+                variants={cardVariants}
+                initial="hidden"
+                animate="visible"
+                transition={{
+                  delay: 0.8,
+                  type: "spring",
+                  stiffness: 120,
+                  damping: 10,
+                }}
+                whileHover={{
+                  scale: 1.05,
+                  rotate: -8,
+                  boxShadow: "0px 0px 20px rgba(223,63,51,0.6)",
+                }}
+              >
+                <h3>Transactions (₹)</h3>
+                <p className="text-xl tracking-wide bg-[#DF3F33] rounded-xl w-full px-2 text-right">
+                  0
+                </p>
+              </motion.div>
             </div>
 
-            <div className="flex lg:flex-row flex-col lg:gap-0 gap-5">
-              <div className="bg-white p-6 rounded-lg shadow-lg lg:w-full lg:h-[70vh] h-fit overflow-scroll">
-                <h2 className="text-2xl font-bold text-gray-700">
-                  Todays Orders
-                </h2>
+            <div className="flex flex-col gap-5">
+              <div className="bg-white lg:p-6 rounded-lg shadow-lg lg:w-full lg:h-[40vh] h-fit overflow-scroll">
+                <h2 className=" font-bold text-gray-700">Todays Orders</h2>
                 {/* Detailed Order List */}
                 <div className="container p-4">
                   <div className="overflow-x-auto">
-                    <table className="min-w-full bg-white border border-gray-200 ">
+                    <table className="min-w-full bg-white border border-gray-200 text-xs font-light">
                       <thead>
                         <tr>
-                          <th className="py-2 px-4 border-b">Order ID</th>
-                          <th className="py-2 px-4 border-b">Product Name</th>
-                          <th className="py-2 px-4 border-b">
+                          <th className="py-2 px-2 border-b">Order ID</th>
+                          <th className="py-2 px-2 border-b">Product Name</th>
+                          <th className="py-2 px-2 border-b">
                             Category ID / Subcategory ID
                           </th>
-                          <th className="py-2 px-4 border-b">Quantity</th>
-                          <th className="py-2 px-4 border-b">MRP</th>
-                          <th className="py-2 px-4 border-b">Sold at</th>
-                          <th className="py-2 px-4 border-b">Order Status</th>
-                          <th className="py-2 px-4 border-b">Payment Status</th>
-                          <th className="py-2 px-4 border-b">Placed At</th>
+                          <th className="py-2 px-2 border-b">Quantity</th>
+                          <th className="py-2 px-2 border-b">MRP</th>
+                          <th className="py-2 px-2 border-b">Sold at</th>
+                          <th className="py-2 px-2 border-b">Order Status</th>
+                          <th className="py-2 px-2 border-b">Payment Status</th>
+                          <th className="py-2 px-2 border-b">Placed At</th>
                           {/* <th className="py-2 px-4 border-b">Actions</th> */}
                         </tr>
                       </thead>
@@ -367,12 +446,12 @@ const Dashboard = ({ startLoading, stopLoading }) => {
                 </div>
               </div>
 
-              <div className="flex justify-center flex-col items-center gap-4 lg:w-3/4 w-full">
-                <div className="bg-white shadow rounded p-4 lg:w-3/4 w-full">
+              <div className="flex justify-center flex-col lg:flex-row items-start gap-4 w-full">
+                <div className="bg-white shadow rounded p-4 w-full h-full">
                   <h3 className="text-gray-500">Monthly Orders</h3>
                   <Bar data={barData} />
                 </div>
-                <div className="bg-white shadow rounded p-4 lg:w-3/4 w-full">
+                <div className="bg-white shadow rounded p-4 w-full h-full">
                   <h3 className="text-gray-500">
                     Category Wise Product's Count
                   </h3>
@@ -392,95 +471,96 @@ const Dashboard = ({ startLoading, stopLoading }) => {
       visible: {
         x: "0%",
         opacity: 1,
-        transition: { duration: 0.4, ease: "easeOut" },
+        transition: { duration: 0.6, ease: "easeOut", type: "spring" },
       },
       exit: {
         x: "-100%",
         opacity: 0,
-        transition: { duration: 0.3, ease: "easeIn" },
+        transition: { duration: 0.5, ease: "easeIn", type: "spring" },
       },
     };
     return (
-      <div className="  w-full lg:hidden bg-purple-600 flex justify-start py-5 z-50">
+      <div className="  w-full lg:hidden bg-[#374151] flex justify-start py-5 z-50">
         <div className="flex justify-start items-center w-full gap-10">
           <button
-            className={`ml-5 border rounded-lg p-1 text-white`}
+            className={`ml-5 border rounded-lg p-1 text-white bg-red-600`}
             onClick={() => showHamburger(true)}
           >
             <Menu />
           </button>
-          <h1>
-            Hello, <span className="text-white">{user?.[0]?.name}</span>
+          <h1 className="text-white tracking-wide">
+            Hello, <span className="">{user?.[0]?.name}</span>
           </h1>
         </div>
-
-        {hamburger && (
-          <motion.div
-            variants={menuVariants}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-            className="dashboard w-full h-screen bg-gray-800 text-white flex flex-col absolute top-0 z-50"
-          >
-            <div className="p-4 text-2xl font-bold bg-purple-600 flex justify-between items-center">
-              <h1>Dashboard</h1>
-              <button onClick={() => showHamburger(false)} className="">
-                <X />
-              </button>
-            </div>
-            <ul className="flex-1">
-              {[
-                "Home",
-                "Orders",
-                "Categories",
-                "Brands",
-                "Manage Stock",
-                "Products",
-                "Delivery-partner",
-                "Wallet Transactions",
-              ].map((menu) => (
-                <li
-                  key={menu}
-                  className={`p-4 hover:bg-gray-700 cursor-pointer ${
-                    selectedMenu === menu ? "bg-gray-700" : ""
-                  }`}
-                  onClick={() => setSelectedMenu(menu)}
-                >
-                  {menu}
-                </li>
-              ))}
-            </ul>
-            <div className="mb-10 w-full flex flex-col gap-5 justify-center items-center p-5">
-              {user?.length > 0 ? (
-                <div className="flex flex-col justify-center items-center gap-5 w-full">
+        <AnimatePresence>
+          {hamburger && (
+            <motion.div
+              variants={menuVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              className="dashboard w-full h-screen bg-gray-800 text-white flex flex-col absolute top-0 z-50"
+            >
+              <div className="p-4 text-2xl font-bold bg-[#DF3F33]  flex justify-between items-center">
+                <h1>Dashboard</h1>
+                <button onClick={() => showHamburger(false)} className="">
+                  <X />
+                </button>
+              </div>
+              <ul className="flex-1">
+                {[
+                  "Home",
+                  "Orders",
+                  "Categories",
+                  "Brands",
+                  "Manage Stock",
+                  "Products",
+                  "Delivery-partner",
+                  "Wallet Transactions",
+                ].map((menu) => (
+                  <li
+                    key={menu}
+                    className={`p-4 hover:bg-gray-700 cursor-pointer ${
+                      selectedMenu === menu ? "bg-gray-700" : ""
+                    }`}
+                    onClick={() => setSelectedMenu(menu)}
+                  >
+                    {menu}
+                  </li>
+                ))}
+              </ul>
+              <div className="mb-10 w-full flex flex-col gap-5 justify-center items-center p-5">
+                {user?.length > 0 ? (
+                  <div className="flex flex-col justify-center items-center gap-5 w-full">
+                    <Button
+                      label={"View Profile"}
+                      className={"w-full"}
+                      onClick={handleProfile}
+                    />
+                    <Button
+                      label={"Logout"}
+                      className={"w-full"}
+                      onClick={() => {
+                        Dispatch(clearUser());
+                        localStorage.removeItem("AccessToken");
+                        localStorage.removeItem("RefreshToken");
+                        alert("You are logged out! Please log in.");
+                        setTimeout(() => navigate("/login"), 100);
+                        console.log(localStorage.getItem("RefreshToken"));
+                      }}
+                    />
+                  </div>
+                ) : (
                   <Button
-                    label={"View Profile"}
+                    label={"Login"}
                     className={"w-full"}
-                    onClick={handleProfile}
+                    onClick={handleLogin}
                   />
-                  <Button
-                    label={"Logout"}
-                    className={"w-full"}
-                    onClick={() => {
-                      Dispatch(clearUser());
-                      localStorage.removeItem("AccessToken");
-                      localStorage.removeItem("RefreshToken");
-                      alert("You are logged out! Please log in.");
-                      setTimeout(() => navigate("/login"), 100);
-                      console.log(localStorage.getItem("RefreshToken"));
-                    }}
-                  />
-                </div>
-              ) : (
-                <Button
-                  label={"Login"}
-                  className={"w-full"}
-                  onClick={handleLogin}
-                />
-              )}
-            </div>
-          </motion.div>
-        )}
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     );
   };
@@ -488,7 +568,13 @@ const Dashboard = ({ startLoading, stopLoading }) => {
   return (
     <div className="flex lg:flex-row flex-col h-screen bg-gray-100">
       <div className="dashboard w-64 bg-gray-800 text-white lg:flex flex-col hidden ">
-        <div className="p-4 text-2xl font-bold bg-purple-600">Dashboard</div>
+        <div className="p-4 text-xl font-semibold tracking-widest uppercase flex justify-center items-center gap-1 bg-white/80 text-black">
+          {" "}
+          <span>
+            <img className="w-16 object-contain" src={logo} />
+          </span>
+          Dashboard
+        </div>
         <ul className="flex-1">
           {[
             "Home",
@@ -502,8 +588,8 @@ const Dashboard = ({ startLoading, stopLoading }) => {
           ].map((menu) => (
             <li
               key={menu}
-              className={`p-4 hover:bg-gray-700 cursor-pointer ${
-                selectedMenu === menu ? "bg-gray-700" : ""
+              className={`p-4 hover:bg-[#DF3F33] duration-300 ease-in-out cursor-pointer rounded-r-full ${
+                selectedMenu === menu ? "bg-[#DF3F33] rounded-r-full" : ""
               }`}
               onClick={() => setSelectedMenu(menu)}
             >
