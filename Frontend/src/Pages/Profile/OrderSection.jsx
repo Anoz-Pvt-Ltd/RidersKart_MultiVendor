@@ -4,10 +4,15 @@ import { useDispatch, useSelector } from "react-redux";
 import { FetchData } from "../../Utility/FetchFromApi";
 import LoadingUI from "../../Components/Loading";
 import { Link } from "react-router";
+import Button from "../../Components/Button";
 
 const OrderSection = ({ startLoading, stopLoading }) => {
+  const count = 8;
   const user = useSelector((store) => store.UserInfo.user);
   const [allOrders, setAllOrders] = useState([]);
+  const [visibleCount, setVisibleCount] = useState(count);
+  const reversedOrders = [...allOrders].reverse();
+  const visibleOrders = reversedOrders.slice(0, visibleCount);
 
   useEffect(() => {
     const fetchAllOrders = async () => {
@@ -94,17 +99,25 @@ const OrderSection = ({ startLoading, stopLoading }) => {
     <section>
       <h2 className="text-2xl font-bold mb-4">Orders</h2>
       <div className="flex justify-start items-start lg:gap-5 gap-1 flex-wrap lg:p-5 ">
-        {/* {console.log(allOrders)} */}
-        {allOrders?.map((product, index) => (
+        {visibleOrders.map((product, index) => (
           <ProductCard
             Image={product?.products[0]?.product?.images[0]?.url}
-            key={index}
+            key={product?._id || index}
             ProductName={product?.products[0]?.product?.name}
             CurrentPrice={product?.totalAmount}
             productId={product?._id}
             productLength={product?.products?.length}
           />
         ))}
+
+        {visibleCount < allOrders.length && (
+          <div className="flex justify-center mt-4">
+            <Button
+              onClick={() => setVisibleCount((prev) => prev + count)}
+              label={"Load More"}
+            />
+          </div>
+        )}
       </div>
     </section>
   );

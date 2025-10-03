@@ -11,6 +11,7 @@ import { parseErrorMessage } from "../../Utility/ErrorMessageParser";
 const CurrentOrder = ({ startLoading, stopLoading }) => {
   const { orderId } = useParams();
   const [order, setOrder] = useState([]);
+  console.log(order);
   const [orderProducts, setOrderProducts] = useState([]);
   const [error, setError] = useState(null);
   const [shippingAddress, setShippingAddress] = useState([]);
@@ -113,16 +114,13 @@ const CurrentOrder = ({ startLoading, stopLoading }) => {
     );
 
     return (
-      <div className="flex lg:flex-row flex-col justify-center lg:items-center items-start bg-white shadow-md rounded-lg p-4 lg:mb-5 mb-2 lg:mx-5 w-screen lg:w-full gap-20">
+      <div className="flex lg:flex-row flex-col justify-center lg:items-center items-start bg-white shadow-md rounded-lg p-4 lg:mb-5 mb-2 lg:mx-5 w-screen lg:w-full lg:gap-20">
         <div className="flex flex-col-reverse justify-between items-center">
           <div className="py-2 flex flex-col justify-center items-start lg:gap-5 ">
             <h1 className="lg:text-base text-sm">{productName}</h1>
             <h2 className="">Seller: {sellerName}</h2>
             <h3 className="font-medium text-xl">
               <span>₹ {orderAmount}</span>{" "}
-              <span className="lg:text-base text-sm p-2 rounded-xl">
-                {paymentMethod}
-              </span>
             </h3>
           </div>
           <div className="lg:w-48 lg:h-48 w-24 h-24 shadow overflow-hidden flex justify-center items-center rounded-lg object-center">
@@ -226,20 +224,26 @@ const CurrentOrder = ({ startLoading, stopLoading }) => {
               <h1 className="flex flex-col">
                 <span>
                   Street :{" "}
-                  <span className="font-normal">{shippingAddress.street}</span>
+                  <span className="font-normal">
+                    {shippingAddress?.street || "N/A"}
+                  </span>
                 </span>
                 <span>
                   City:{" "}
-                  <span className="font-normal">{shippingAddress.city}</span>
+                  <span className="font-normal">
+                    {shippingAddress?.city || "N/A"}
+                  </span>
                 </span>
                 <span>
                   State:{" "}
-                  <span className="font-normal">{shippingAddress.state}</span>
+                  <span className="font-normal">
+                    {shippingAddress?.state || "N/A"}
+                  </span>
                 </span>
                 <span>
                   Postal Code:{" "}
                   <span className="font-normal">
-                    {shippingAddress.postalCode}
+                    {shippingAddress?.postalCode || "N/A"}
                   </span>
                 </span>
               </h1>
