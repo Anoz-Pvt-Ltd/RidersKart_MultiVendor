@@ -6,6 +6,7 @@ import {
   Menu,
   X,
   Home,
+  BellRing,
 } from "lucide-react";
 import React, { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -23,6 +24,7 @@ const Header = () => {
   const cart = useSelector((store) => store.CartList.cart);
   const cartCount = cart.length;
   const searchedValue = useParams().searchData;
+  const [notificationOpen, setNotificationOpen] = useState(false);
   const [searchInput, setSearchInput] = useState(searchedValue || "");
 
   const toggleMenu = () => setIsOpen(!isOpen);
@@ -66,6 +68,15 @@ const Header = () => {
               {cartCount}
             </span>
           </Link>
+          <button
+            className="flex text-xs"
+            onClick={() => setNotificationOpen(true)}
+          >
+            <BellRing />
+            {/* <span className="bg-[#DF3F33] p-1 rounded-full text-white h-fit w-fit">
+                .
+              </span> */}
+          </button>
         </div>
       </div>
       {/* Logo */}
@@ -128,6 +139,15 @@ const Header = () => {
                 </span>
               </Link>
             </motion.div>
+            <button
+              className="flex text-xs"
+              onClick={() => setNotificationOpen(true)}
+            >
+              <BellRing />
+              {/* <span className="bg-[#DF3F33] p-1 rounded-full text-white h-fit w-fit">
+                .
+              </span> */}
+            </button>
           </div>
         ) : (
           <Button
@@ -213,6 +233,28 @@ const Header = () => {
             >
               <ShoppingCart /> <span>Cart</span>
             </Link>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {notificationOpen && (
+          <motion.div
+            initial={{ x: "100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "100%" }}
+            transition={{ type: "spring", stiffness: 120 }}
+            className="fixed top-0 right-0 lg:w-1/2 w-3/4 h-full bg-neutral-200 shadow-lg p-5 flex flex-col gap-5 z-50"
+          >
+            <button
+              className="self-end"
+              onClick={() => setNotificationOpen(false)}
+            >
+              <X size={28} />
+            </button>
+            <h1>Notifications</h1>
+            <div>
+              <h1>No Notifications found !</h1>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
