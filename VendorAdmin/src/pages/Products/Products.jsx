@@ -493,7 +493,7 @@ const Products = ({ startLoading, stopLoading }) => {
   };
 
   return (
-    <div className="lg:max-w-6xl lg:mx-auto lg:p-4 bg-white shadow-lg rounded-lg">
+    <div className="lg:max-w-6xl lg:mx-auto lg:p-4 lg:bg-white lg:shadow-lg rounded-lg">
       <h1 className="text-2xl font-bold text-gray-800 mb-4 sm:mb-6 mx-4">
         Your Products
       </h1>
@@ -1001,12 +1001,11 @@ const Products = ({ startLoading, stopLoading }) => {
       ) : (
         <div>
           <div className="mb-4">
-            <input
-              type="text"
-              placeholder="Search by Product name..."
-              value={searchQuery}
+            <InputBox
+              Type="text"
+              Placeholder={"Search by Product name..."}
+              Value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full px-4 py-2 text-gray-700 bg-white  border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 outline-none transition duration-200 ease-in-out hover:shadow-md border"
             />
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">

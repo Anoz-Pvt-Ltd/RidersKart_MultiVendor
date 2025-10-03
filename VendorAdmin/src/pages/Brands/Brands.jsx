@@ -5,6 +5,7 @@ import { parseErrorMessage } from "../../utils/ErrorMessageParser";
 import InputBox from "../../components/InputBox";
 import SelectBox from "../../components/SelectionBox";
 import Button from "../../components/Button";
+import { motion, AnimatePresence } from "framer-motion";
 
 const Brands = ({ startLoading, stopLoading }) => {
   const formRef = useRef(null);
@@ -110,12 +111,11 @@ const Brands = ({ startLoading, stopLoading }) => {
 
       {/* Search and Sort */}
       <div className="flex flex-col lg:flex-row w-full justify-evenly items-center mb-4 gap-4 lg:gap-0">
-        <input
-          type="text"
-          placeholder="Search by name..."
-          value={searchQuery}
+        <InputBox
+          Type="text"
+          Placeholder={"Search by name..."}
+          Value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="border px-3 py-2 rounded lg:w-1/3 w-full"
         />
         <select
           value={sortBy}
@@ -129,12 +129,16 @@ const Brands = ({ startLoading, stopLoading }) => {
 
       {/* Add Brand Button */}
       <div className="mb-4">
-        <button
+        <Button
+          label={showForm ? "Cancel" : "Add Brand request"}
+          onClick={() => setShowForm(!showForm)}
+        />
+        {/* <button
           className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
           onClick={() => setShowForm(!showForm)}
         >
           {showForm ? "Cancel" : "Add Brand request"}
-        </button>
+        </button> */}
         {selectedBrands.length > 0 && (
           <button
             className="bg-red-600 text-white px-4 py-2 rounded ml-4 hover:bg-red-700"
@@ -146,62 +150,60 @@ const Brands = ({ startLoading, stopLoading }) => {
       </div>
 
       {/* Add/Edit Brand Form */}
-      {showForm && (
-        <form
-          ref={formRef}
-          onSubmit={addBrandRequest}
-          className="bg-gray-100 p-4 rounded mb-6 shadow"
-        >
-          <InputBox
-            Type="text"
-            LabelName={"Brand name"}
-            Name={"brand"}
-            Placeholder="Enter Brand Name"
-          />
-          <InputBox
-            Type="file"
-            Name={"image"}
-            LabelName="Logo "
-            Placeholder="Enter Logo URL"
-          />
-          <SelectBox
-            LabelName="Main Category"
-            Name="category"
-            onChange={(e) => setSelectedCategory(e.target.value)}
-            Placeholder="Select main category"
-            Options={categories?.map((cat) => ({
-              label: cat.title,
-              value: cat._id, // Correctly linking ID for selection
-            }))}
-          />
-
-          {selectedCategory !== null && (
+      <AnimatePresence>
+        {showForm && (
+          <motion.form
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            ref={formRef}
+            onSubmit={addBrandRequest}
+            className="bg-gray-100 p-4 rounded mb-6 shadow"
+          >
+            <InputBox
+              Type="text"
+              LabelName={"Brand name"}
+              Name={"brand"}
+              Placeholder="Enter Brand Name"
+            />
+            <InputBox
+              Type="file"
+              Name={"image"}
+              LabelName="Logo "
+              Placeholder="Enter Logo URL"
+            />
             <SelectBox
-              LabelName="subcategory"
-              Name="subcategoryId"
-              Placeholder="Select subcategory"
-              Options={categories
-                ?.find((cat) => cat._id === selectedCategory)
-                ?.subcategories.map((subcat) => ({
-                  label: subcat.title,
-                  value: subcat._id, // Correctly linking ID for selection
-                }))}
+              LabelName="Main Category"
+              Name="category"
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              Placeholder="Select main category"
+              Options={categories?.map((cat) => ({
+                label: cat.title,
+                value: cat._id, // Correctly linking ID for selection
+              }))}
             />
-          )}
 
-          <div className="flex flex-col gap-3">
-            <Button label={"Add request"} type={"submit"} />
-            <Button
-              className={"hover:bg-red-400"}
-              label={"Cancel"}
-              onClick={() => {
-                // Add Brand Logic
-                setShowForm(false);
-              }}
-            />
-          </div>
-        </form>
-      )}
+            {selectedCategory !== null && (
+              <SelectBox
+                LabelName="subcategory"
+                Name="subcategoryId"
+                Placeholder="Select subcategory"
+                Options={categories
+                  ?.find((cat) => cat._id === selectedCategory)
+                  ?.subcategories.map((subcat) => ({
+                    label: subcat.title,
+                    value: subcat._id, // Correctly linking ID for selection
+                  }))}
+              />
+            )}
+
+            <div className="flex flex-col gap-3">
+              <Button label={"Add request"} type={"submit"} />
+            </div>
+          </motion.form>
+        )}
+      </AnimatePresence>
 
       {/* Brand Table */}
       <div className="overflow-x-auto">
