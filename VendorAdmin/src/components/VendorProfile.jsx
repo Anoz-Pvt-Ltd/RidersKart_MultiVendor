@@ -7,32 +7,34 @@ import { motion } from "framer-motion";
 import LoadingUI from "./Loading";
 
 const VendorProfile = ({ startLoading, stopLoading }) => {
+  const [location, setLocation] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [vendor, setVendor] = useState(null);
   const [error, setError] = useState(null);
   const user = useSelector((store) => store.UserInfo.user);
+  // console.log(vendor);
   const [VendorProduct, setVendorProducts] = useState(null);
 
-  useEffect(() => {
-    const fetchVendor = async () => {
-      if (user?.length > 0) {
-        try {
-          startLoading();
-          const response = await FetchData(
-            `vendor/vendor-profile/${user?.[0]?._id}`,
-            "get"
-          );
-          console.log(response);
-          setVendor(response.data.data);
-        } catch (err) {
-          setError("Failed to load vendor profile.");
-        } finally {
-          stopLoading();
-        }
+  const fetchVendor = async () => {
+    if (user?.length > 0) {
+      try {
+        startLoading();
+        const response = await FetchData(
+          `vendor/vendor-profile/${user?.[0]?._id}`,
+          "get"
+        );
+        // console.log(response);
+        setVendor(response.data.data);
+      } catch (err) {
+        setError("Failed to load vendor profile.");
+      } finally {
+        stopLoading();
       }
-    };
-
+    }
+  };
+  useEffect(() => {
     fetchVendor();
-  }, [vendor]);
+  }, [user]);
 
   const fetchProducts = async () => {
     if (user.length > 0) {
@@ -58,12 +60,71 @@ const VendorProfile = ({ startLoading, stopLoading }) => {
     navigate("/dashboard");
   };
 
+  const fetchLocation = () => {
+    setLoading(true);
+    setError(null);
+
+    const handleLocation = async () => {
+      try {
+        startLoading();
+        // console.log(user?.[0]?._id);
+        const data = JSON.stringify({
+          coordinates: [location.lng, location.lat],
+        });
+        const response = await FetchData(
+          `vendor/update-location/${user?.[0]?._id}`,
+          "post",
+          data
+        );
+        // console.log(response);
+        fetchVendor();
+        alert("Location updated successfully");
+      } catch (err) {
+        // console.log(err);
+      } finally {
+        stopLoading();
+      }
+    };
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          setLocation({
+            lat: pos.coords.latitude,
+            lng: pos.coords.longitude,
+            source: "browser",
+          });
+          setLoading(false);
+        },
+        async (err) => {
+          // console.warn("Geolocation failed, falling back to IP:", err);
+
+          try {
+            const res = await fetch("https://ipapi.co/json/");
+            const data = await res.json();
+            setLocation({
+              lat: data.latitude,
+              lng: data.longitude,
+              source: "ip",
+            });
+            handleLocation();
+          } catch (ipErr) {
+            setError("Unable to determine location: " + ipErr.message);
+          } finally {
+            setLoading(false);
+          }
+        }
+      );
+    } else {
+      setError("Geolocation not supported by this browser");
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="lg:p-6 rounded-lg shadow-md bg-neutral-200 h-screen overflow-scroll">
       {/* Profile Header */}
       <div className="flex gap-4 justify-evenly items-center border-b-2 pb-5 lg:hidden">
         <Button label="Home" onClick={handleHome} />
-        {/* <Button label="Edit Profile" /> */}
       </div>
       {/* vendor name and location section  */}
       <div className="flex flex-col lg:flex-row justify-between w-full lg:gap-10 gap-5 h-fit ">
@@ -117,7 +178,12 @@ const VendorProfile = ({ startLoading, stopLoading }) => {
               {user?.[0]?.location.postalCode}
             </p>
           </div>
-          <Button label="Edit Address" className="text-base" />
+          {vendor?.vendor?.coordinates?.length === 2 ? (
+            <Button label="Edit Address" className="text-base" />
+          ) : (
+            <Button onClick={fetchLocation} label="Update Current Location" />
+          )}
+          {/* <Button onClick={fetchLocation} label="Update Current Location" /> */}
         </motion.div>
       </div>
       {/* Business Details and Bank Details */}
