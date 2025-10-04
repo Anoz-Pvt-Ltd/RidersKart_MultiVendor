@@ -42,7 +42,7 @@ const Brands = ({ startLoading, stopLoading }) => {
           `categories/get-all-category-and-subcategories`,
           "get"
         );
-        console.log(response);
+        // console.log(response);
         setCategories(response.data.data.categories);
       } catch (err) {
         alert(err.response?.data?.message || "Failed to fetch products.");
@@ -65,7 +65,7 @@ const Brands = ({ startLoading, stopLoading }) => {
         formData,
         true
       );
-      console.log(response);
+      // console.log(response);
       alert(
         "Your Brand is sent for approval... It might take time to get reviewed"
       );
@@ -73,7 +73,7 @@ const Brands = ({ startLoading, stopLoading }) => {
       setShowForm(false);
     } catch (error) {
       alert(parseErrorMessage(error.response.data));
-      console.log("Error in adding request for a new brand!", error);
+      // console.log("Error in adding request for a new brand!", error);
       setShowForm(false);
     } finally {
       stopLoading();

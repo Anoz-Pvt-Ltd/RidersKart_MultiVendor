@@ -34,7 +34,7 @@ const Categories = ({ startLoading, stopLoading }) => {
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [products, setProducts] = useState([]);
   const [error, setError] = useState("");
-  console.log(categories);
+  // console.log(categories);
 
   useEffect(() => {
     const getAllMainSubcategories = async () => {
@@ -49,7 +49,7 @@ const Categories = ({ startLoading, stopLoading }) => {
         // Ensure categories exist before setting state
         setCategories(response.data?.data?.categories || []);
       } catch (error) {
-        console.log("Error getting all main subcategories", error);
+        // console.log("Error getting all main subcategories", error);
       } finally {
         stopLoading();
       }
@@ -66,7 +66,7 @@ const Categories = ({ startLoading, stopLoading }) => {
           `products/get-all-product-of-vendor/${user?.[0]?._id}`,
           "get"
         );
-        console.log(response);
+        // console.log(response);
         if (response.data.success) setProducts(response.data.data);
       } catch (err) {
         setError(err.response?.data?.message || "Failed to fetch products.");
@@ -82,9 +82,9 @@ const Categories = ({ startLoading, stopLoading }) => {
     e.preventDefault();
     const formData = new FormData(categoryFormRef.current);
 
-    for (let [key, value] of formData.entries()) {
-      console.log(`${key}: ${value}`);
-    }
+    // for (let [key, value] of formData.entries()) {
+    //   console.log(`${key}: ${value}`);
+    // }
 
     try {
       startLoading();
@@ -94,14 +94,14 @@ const Categories = ({ startLoading, stopLoading }) => {
         formData,
         true
       );
-      console.log(response);
+      // console.log(response);
       setHandlePopup((prev) => ({
         ...prev,
         addCategoryPopup: false,
       }));
       alert("Your category request has been added successfully");
     } catch (err) {
-      console.log(err);
+      // console.log(err);
       alert(parseErrorMessage(err.response?.data));
     } finally {
       stopLoading();

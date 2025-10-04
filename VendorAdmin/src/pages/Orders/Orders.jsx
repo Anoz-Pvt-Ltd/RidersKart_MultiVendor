@@ -40,7 +40,7 @@ const Orders = ({ startLoading, stopLoading }) => {
             `orders/get-vendor-orders/${user?.[0]?._id}`,
             "get"
           );
-          console.log(response);
+          // console.log(response);
           if (response.data.success) {
             setAllOrders(response.data.orders);
           } else {
@@ -61,7 +61,7 @@ const Orders = ({ startLoading, stopLoading }) => {
     return <p className="text-red-600 text-center">{error}</p>;
   }
 
-  console.log(allOrders);
+  // console.log(allOrders);
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-lg  h-screen overflow-scroll">

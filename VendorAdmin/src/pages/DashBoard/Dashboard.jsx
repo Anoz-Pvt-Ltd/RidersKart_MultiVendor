@@ -28,7 +28,8 @@ const Dashboard = ({ startLoading, stopLoading }) => {
   const [vendor, setVendor] = useState(null);
   const [error, setError] = useState(null);
   const [allOrders, setAllOrders] = useState([]);
-
+  const [locationPopUp, setLocationPopUp] = useState(false);
+  const [dismissed, setDismissed] = useState(false);
   const [selectedDate, setSelectedDate] = useState("");
   const [sortedOrders, setSortedOrders] = useState([]);
 
@@ -41,6 +42,18 @@ const Dashboard = ({ startLoading, stopLoading }) => {
     setSortedOrders(todaysOrders);
   }, [allOrders]);
 
+  useEffect(() => {
+    const coords = user?.[0]?.coordinates;
+    if (!dismissed && coords && Array.isArray(coords) && coords.length === 0) {
+      setLocationPopUp(true);
+    }
+  }, [user, dismissed]);
+
+  const handleClose = () => {
+    setLocationPopUp(false);
+    setDismissed(true); // prevent reopening
+  };
+
   const fetchProducts = async () => {
     if (user?.length > 0) {
       try {
@@ -49,7 +62,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
           `products/get-all-product-of-vendor/${user?.[0]?._id}`,
           "get"
         );
-        console.log(response);
+        // console.log(response);
 
         const fetchedProducts = response.data.data || [];
         setProducts(fetchedProducts);
@@ -81,7 +94,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
           ],
         }));
       } catch (err) {
-        console.error(err);
+        // console.error(err);
         setError(err.response?.data?.message || "Failed to fetch products.");
       } finally {
         stopLoading();
@@ -173,7 +186,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
             `orders/get-vendor-orders/${user?.[0]?._id}`,
             "get"
           );
-          console.log(response);
+          // console.log(response);
           if (response.data.success) {
             setAllOrders(response.data.orders);
           } else {
@@ -208,7 +221,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
     };
 
     fetchVendor();
-  }, [vendor]);
+  }, [user]);
 
   const handleLogin = () => {
     navigate("/login");
@@ -546,7 +559,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
                         localStorage.removeItem("RefreshToken");
                         alert("You are logged out! Please log in.");
                         setTimeout(() => navigate("/login"), 100);
-                        console.log(localStorage.getItem("RefreshToken"));
+                        // console.log(localStorage.getItem("RefreshToken"));
                       }}
                     />
                   </div>
@@ -627,6 +640,35 @@ const Dashboard = ({ startLoading, stopLoading }) => {
       <div>
         <Hamburger />
       </div>
+      <AnimatePresence>
+        {locationPopUp && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.5 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.5 }}
+            transition={{ duration: 0.5, ease: "easeInOut", type: "spring" }}
+            className="fixed w-full flex justify-center items-center lg:items-start px-5 py-4 top-0 left-0 h-full z-50 bg-black/90"
+          >
+            <h1 className="bg-red-300 h-full lg:h-fit w-full rounded-xl flex flex-col lg:flex-row justify-center items-center text-center gap-5 py-5">
+              <span className="text-7xl text-blue-500 bg-white/50 rounded-full px-10 py-3 ">
+                !
+              </span>
+              Please update your location in your profile section.
+              <span>
+                <Button onClick={handleClose} label="Ok" />
+              </span>
+            </h1>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* {user[0]?.coordinates?.length === 0 ? (
+        <div>
+          <h1>Please update your location in your profile section.</h1>
+        </div>
+      ) : (
+        ""
+      )} */}
 
       <div className="flex-1 p-6 overflow-y-auto">{renderContent()}</div>
     </div>
