@@ -16,6 +16,7 @@ import {
   VendorBan,
   generateOTP,
   resetPasswordWithOTP,
+  vendorLocation,
 } from "../controllers/Vendor.controllers.js";
 import {
   VerifyVendorUser,
@@ -39,6 +40,9 @@ router.route("/re-login").post(regenerateRefreshToken);
 router.route("/vendor-profile/:vendorId").get(getVendorData);
 router.route("/edit-vendor").post(editVendor);
 router.route("/delete-vendor/:vendorId").post(deleteVendor);
+router
+  .route("/update-location/:vendorId")
+  .post(VerifyVendorUser, vendorLocation);
 router
   .route("/get-vendor-by-product-id/:productId")
   .get(getVendorDetailsByProductId);

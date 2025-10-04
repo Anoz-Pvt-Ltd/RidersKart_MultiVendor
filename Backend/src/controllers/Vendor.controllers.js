@@ -190,6 +190,7 @@ const loginVendor = asyncHandler(async (req, res, next) => {
       createdAt: vendor.createdAt,
       bankDetails: vendor.bankDetails,
       businessDetails: vendor.businessDetails,
+      coordinates: vendor.coordinates,
     },
     tokens: {
       accessToken,
@@ -201,7 +202,7 @@ const loginVendor = asyncHandler(async (req, res, next) => {
 });
 
 const getVendorData = asyncHandler(async (req, res, next) => {
-  const vendorId = req.user._id; // Assumes vendor's ID is available from authentication middleware
+  const { vendorId } = req.params; // Assumes vendor's ID is available from authentication middleware
 
   // Fetch vendor profile
   const vendor = await VendorUser.findById(vendorId);
@@ -221,6 +222,7 @@ const getVendorData = asyncHandler(async (req, res, next) => {
       contactNumber: vendor.contactNumber || "",
       businessName: vendor.businessName || "",
       address: vendor.address || "",
+      coordinates: vendor.coordinates,
     },
     products,
   });
@@ -463,10 +465,7 @@ const resetPasswordWithOTP = asyncHandler(async (req, res) => {
   if (!vendor) throw new ApiError(404, "Vendor not found");
 
   if (vendor.otp !== otp) {
-    throw new ApiError(
-      404,
-      "Invalid OTP Please Try again !"
-    );
+    throw new ApiError(404, "Invalid OTP Please Try again !");
   }
   if (vendor.otpExpiry < Date.now()) {
     throw new ApiError(404, "OTP has expired");
@@ -487,6 +486,21 @@ const resetPasswordWithOTP = asyncHandler(async (req, res) => {
     );
 });
 
+const vendorLocation = asyncHandler(async (req, res) => {
+  const { coordinates } = req.body;
+  const { vendorId } = req.params;
+  if (!coordinates) throw new ApiError(400, "Location is required");
+  if (!vendorId) throw new ApiError(400, "Invalid Vendor ID");
+
+  const vendor = await VendorUser.findById(vendorId);
+  if (!vendor) throw new ApiError(400, "Invalid Vendor");
+
+  vendor.coordinates = coordinates;
+  await vendor.save();
+
+  res.status(200).json(new ApiResponse(200, vendor, "Location saved!"));
+});
+
 export {
   registerVendor,
   loginVendor,
@@ -504,4 +518,5 @@ export {
   rejectVendor,
   generateOTP,
   resetPasswordWithOTP,
+  vendorLocation,
 };
