@@ -307,15 +307,14 @@ const getAllProductForAdmin = asyncHandler(async (req, res) => {
 // });
 const getAllProducts = asyncHandler(async (req, res) => {
   try {
-    const { category, subcategory, vendor, page = 1, limit = 10 } = req.query;
-    const userId = req.user?._id; // Assuming auth middleware attaches logged-in user
+    const { category, subcategory, vendor, page = 1, limit = 20 } = req.query;
+    const userId = req.user?._id;
 
     const filter = {};
     if (category) filter.category = category;
     if (subcategory) filter.subcategory = subcategory;
     if (vendor) filter.vendor = vendor;
 
-    // Fetch all products first
     let products = await Product.find(filter)
       .populate("category", "name")
       .populate("subcategory", "name")
@@ -329,88 +328,91 @@ const getAllProducts = asyncHandler(async (req, res) => {
       throw new ApiError(404, "No products found");
     }
 
-    // 👉 If user not present → return all products
     if (!userId) {
-      const response = new ApiResponse(
-        200,
-        {
-          total: products.length,
-          page: parseInt(page),
-          limit: parseInt(limit),
-          products,
-        },
-        "Products fetched successfully (no user filtering)"
+      return res.status(200).json(
+        new ApiResponse(
+          200,
+          {
+            total: products.length,
+            page: parseInt(page),
+            limit: parseInt(limit),
+            products,
+          },
+          "Products fetched successfully (no user filtering)"
+        )
       );
-      return res.status(response.statusCode).json(response);
     }
 
-    // 👉 User present → apply postalCode filtering
     const user = await User.findById(userId);
-    if (!user || !user.address || user.address.length === 0) {
-      const response = new ApiResponse(
-        200,
-        {
-          total: products.length,
-          page: parseInt(page),
-          limit: parseInt(limit),
-          products,
-        },
-        "Products fetched successfully (user has no valid address)"
+    if (!user || !user.defaultAddress || !user.defaultAddress.postalCode) {
+      return res.status(200).json(
+        new ApiResponse(
+          200,
+          {
+            total: products.length,
+            page: parseInt(page),
+            limit: parseInt(limit),
+            products,
+          },
+          "Products fetched successfully (user has no default postal code)"
+        )
       );
-      return res.status(response.statusCode).json(response);
     }
 
-    // Take first postalCode for now (can expand to all later)
-  const userPostalCode = user?.defaultAddress?.postalCode;
+    const userPostalCode = user.defaultAddress.postalCode;
 
-    if (userPostalCode) {
-      products = products.filter((product) => {
-        if (!product.deliveryScope) return false;
+    const filteredProducts = products.filter((product) => {
+      const deliveryScope = product?.deliveryScope || "all";
+      const deliveryStates = product?.deliveryStates || [];
+      const deliveryCities = product?.deliveryCities || [];
 
-        if (product.deliveryScope === "all") return true;
+      if (deliveryScope === "all" || !product.deliveryScope) return true;
 
-        if (
-          product.deliveryScope === "state" &&
-          Array.isArray(product.deliveryStates)
-        ) {
-          return product.deliveryStates.some((state) =>
-            state.pincodes?.includes(userPostalCode)
-          );
+      if (deliveryScope === "state" && deliveryStates.length > 0) {
+        for (let state of deliveryStates) {
+          const cities = PinCodeData[state];
+          if (cities) {
+            for (let city in cities) {
+              if (cities[city].includes(userPostalCode)) {
+                return true;
+              }
+            }
+          }
         }
-
-        if (
-          product.deliveryScope === "city" &&
-          Array.isArray(product.deliveryCities)
-        ) {
-          return product.deliveryCities.some((city) =>
-            city.pincodes?.includes(userPostalCode)
-          );
-        }
-
-        if (
-          product.deliveryScope === "pincode" &&
-          Array.isArray(product.deliveryPincodes)
-        ) {
-          return product.deliveryPincodes.includes(userPostalCode);
-        }
-
         return false;
-      });
-    }
+      }
+
+      if (deliveryScope === "city" && deliveryCities.length > 0) {
+        for (let city of deliveryCities) {
+          for (let state in PinCodeData) {
+            if (
+              PinCodeData[state][city] &&
+              PinCodeData[state][city].includes(userPostalCode)
+            ) {
+              return true;
+            }
+          }
+        }
+        return false;
+      }
+
+      return false;
+    });
 
     const response = new ApiResponse(
       200,
       {
-        total: products.length,
+        total: filteredProducts.length,
         page: parseInt(page),
         limit: parseInt(limit),
-        products,
+        products: filteredProducts,
       },
-      "Products fetched successfully with postalCode filtering"
+      "Products fetched successfully (postalCode filtered)"
     );
 
     res.status(response.statusCode).json(response);
   } catch (error) {
+    console.error("Error in getAllProducts:", error);
     throw new ApiError(500, error.message || "Internal Server Error");
   }
 });
