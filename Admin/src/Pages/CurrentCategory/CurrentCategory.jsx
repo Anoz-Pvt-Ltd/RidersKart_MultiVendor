@@ -7,6 +7,7 @@ import LoadingUI from "../../Components/Loading";
 import { Trash } from "lucide-react";
 import { useRef } from "react";
 import InputBox from "../../components/InputBox";
+import { parseErrorMessage } from "../../Utility/ErrorMessageParser";
 
 const CurrentCategory = ({ startLoading, stopLoading }) => {
   const { categoryId } = useParams();
@@ -28,31 +29,28 @@ const CurrentCategory = ({ startLoading, stopLoading }) => {
   // const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editData, setEditData] = useState({ id: "", title: "", image: "" });
 
-  useEffect(() => {
-    const fetchAllOrders = async () => {
-      if (user?.length > 0) {
-        try {
-          startLoading();
-          const response = await FetchData(
-            `categories/get-category-by-id/${categoryId}`,
-            "get"
-          );
-          if (response.data.success) {
-            setCurrentCategory(response.data.data.category);
-            setCurrentSubCategory(response.data.data.category.subcategories);
-          } else {
-            setError("Failed to load Categories.");
-          }
-        } catch (err) {
-          setError(
-            err.response?.data?.message || "Failed to fetch Categories."
-          );
-        } finally {
-          stopLoading();
+  const fetchAllOrders = async () => {
+    if (user?.length > 0) {
+      try {
+        startLoading();
+        const response = await FetchData(
+          `categories/get-category-by-id/${categoryId}`,
+          "get"
+        );
+        if (response.data.success) {
+          setCurrentCategory(response.data.data.category);
+          setCurrentSubCategory(response.data.data.category.subcategories);
+        } else {
+          setError("Failed to load Categories.");
         }
+      } catch (err) {
+        setError(err.response?.data?.message || "Failed to fetch Categories.");
+      } finally {
+        stopLoading();
       }
-    };
-
+    }
+  };
+  useEffect(() => {
     fetchAllOrders();
   }, [user]);
 
@@ -76,11 +74,12 @@ const CurrentCategory = ({ startLoading, stopLoading }) => {
         ...prev,
         addSubCategory: false,
       }));
+      fetchAllOrders();
       alert("Your Subcategory has been added successfully, kindly refresh !");
     } catch (err) {
       console.log(err);
-      // alert(parseErrorMessage(err.response?.data));
-      alert("Failed to add new Subcategory.");
+      alert(parseErrorMessage(err?.response?.data));
+      // alert("Failed to add new Subcategory.");
     } finally {
       stopLoading();
     }
@@ -95,8 +94,8 @@ const CurrentCategory = ({ startLoading, stopLoading }) => {
         "delete"
       );
       //   console.log(response);
+      fetchAllOrders();
       alert("Subcategory has been deleted successfully");
-      window.location.reload();
     } catch (err) {
       setError(err.response?.data?.message || "Failed to delete Subcategory.");
     } finally {
@@ -217,9 +216,7 @@ const CurrentCategory = ({ startLoading, stopLoading }) => {
       <div className="p-4 ">
         <h1>
           All the Subcategories under{" "}
-          <span className="font-semibold ">
-            {CurrentCategory?.title} 
-          </span>
+          <span className="font-semibold ">{CurrentCategory?.title}</span>
           {""} are listed below
         </h1>
         {CurrentSubCategory?.map((subcategory) => (
