@@ -41,7 +41,7 @@ const Promotion = ({ startLoading, stopLoading }) => {
   };
 
   return (
-    <div>
+    <div className="h-screen overflow-scroll w-full">
       <Button
         label={"Add promotions"}
         onClick={() =>

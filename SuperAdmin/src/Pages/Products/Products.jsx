@@ -4,6 +4,8 @@ import { FetchData } from "../../Utility/FetchFromApi";
 import { Link } from "react-router-dom";
 import InputBox from "../../Components/InputBox";
 import LoadingUI from "../../Components/Loading";
+import { Check } from "lucide-react";
+import { truncateNumber } from "../../Utility/UtilityFunctions";
 
 const Products = ({ startLoading, stopLoading }) => {
   const user = useSelector((store) => store.UserInfo.user);
@@ -25,8 +27,8 @@ const Products = ({ startLoading, stopLoading }) => {
     "Product ID",
     "Vendor",
     "Product Name",
-    "Category ID",
-    "Subcategory ID",
+    "Category",
+    "Subcategory",
   ];
   const [allActiveProducts, setAllActiveProducts] = useState([]);
   const [allInactiveProducts, setAllInactiveProducts] = useState([]);
@@ -154,13 +156,13 @@ const Products = ({ startLoading, stopLoading }) => {
                         className="hover:text-blue-500 underline-blue-500 hover:underline"
                         to={`/current-product/${product._id}`}
                       >
-                        {product._id}
+                        {truncateNumber(product._id, 20)}
                       </Link>
                     </td>
 
                     {/* Vendor Info */}
                     <td className="border border-gray-500 px-4 py-2">
-                      <div className="flex flex-col justify-center items-center">
+                      <div className="flex flex-col justify-center items-center text-nowrap">
                         <h2>
                           <strong>Name: </strong>
                           {product.vendor?.name}
@@ -169,10 +171,10 @@ const Products = ({ startLoading, stopLoading }) => {
                           <strong>Contact Number: </strong>
                           {product.vendor?.contactNumber}
                         </span>
-                        <span className="text-gray-500 text-xs">
+                        {/* <span className="text-gray-500 text-xs">
                           <strong>ID: </strong>
                           {product.vendor?._id}
-                        </span>
+                        </span> */}
                       </div>
                     </td>
 
@@ -208,13 +210,13 @@ const Products = ({ startLoading, stopLoading }) => {
                     <td className="border border-gray-500 px-4 py-2">
                       <div className="flex flex-col justify-center items-center">
                         <h2>
-                          <strong>Name: </strong>
+                          {/* <strong>Name: </strong> */}
                           {product.category?.title}
                         </h2>
-                        <span className="text-gray-500 text-xs">
+                        {/* <span className="text-gray-500 text-xs">
                           <strong>ID: </strong>
                           {product.category?._id}
-                        </span>
+                        </span> */}
                       </div>
                     </td>
 
@@ -222,13 +224,13 @@ const Products = ({ startLoading, stopLoading }) => {
                     <td className="border border-gray-500 px-4 py-2">
                       <div className="flex flex-col justify-center items-center">
                         <h2>
-                          <strong>Name: </strong>
+                          {/* <strong>Name: </strong> */}
                           {product.subcategory?.title}
                         </h2>
-                        <span className="text-gray-500 text-xs">
+                        {/* <span className="text-gray-500 text-xs">
                           <strong>ID: </strong>
                           {product.subcategory?._id}
-                        </span>
+                        </span> */}
                       </div>
                     </td>
                   </tr>
@@ -248,7 +250,7 @@ const Products = ({ startLoading, stopLoading }) => {
   };
 
   return (
-    <section>
+    <section className="h-screen overflow-scroll w-full">
       <h2 className="text-2xl font-bold mb-4">Products</h2>
       <section className="flex justify-start items-center gap-5">
         {sections.map((section, idx) => (
