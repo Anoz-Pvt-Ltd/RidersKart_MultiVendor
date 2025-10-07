@@ -68,7 +68,7 @@ const VendorsVerified = ({ startLoading, stopLoading }) => {
   }, [user]);
 
   return (
-    <section>
+    <section className="h-screen overflow-scroll w-full">
       <h2 className="text-2xl font-bold mb-4">Vendors (Verified)</h2>
       {/* Vendors (Verified) content */}
       <InputBox

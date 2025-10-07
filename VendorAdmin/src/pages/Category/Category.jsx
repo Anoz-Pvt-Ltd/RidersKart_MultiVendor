@@ -34,7 +34,12 @@ const Categories = ({ startLoading, stopLoading }) => {
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [products, setProducts] = useState([]);
   const [error, setError] = useState("");
-  // console.log(categories);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    const cleanValue = value.replace(/[^a-zA-Z0-9\s]/g, "");
+    setFormData((prev) => ({ ...prev, [name]: cleanValue }));
+  };
 
   useEffect(() => {
     const getAllMainSubcategories = async () => {
@@ -214,12 +219,14 @@ const Categories = ({ startLoading, stopLoading }) => {
                 Placeholder={"Add Category"}
                 Name={"category"}
                 Required
+                onChange={handleChange}
               />
               <InputBox
                 LabelName={"Sub Category"}
                 Placeholder={"Add Sub Category"}
                 Name={"subcategory"}
                 Required
+                onChange={handleChange}
               />
               <div className="mt-4">
                 <label className="block text-sm font-medium text-gray-700">
