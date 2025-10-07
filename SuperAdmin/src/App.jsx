@@ -62,52 +62,52 @@ const App = () => {
   }, [dispatch]);
 
   return (
-    <div className="absolute top-0 z-[-2] h-screen w-screen bg-white bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.3),rgba(255,255,255,0))] overflow-x-hidden antialiased selection:bg-cyan-500 selection:text-cyan-900 no-scrollbar">
-      <div className="text-black">
-        <Header />
-        <Routes>
-          <Route path="/admin-register" element={<AdminRegister />} />
-          <Route path="/" element={<AdminLogin />} />
-          <Route path="/home" element={<Dashboard />} />
-          <Route path="/current-user/:userId" element={<CurrentUser />} />
-          <Route
-            path="/current-product/:productId"
-            element={<CurrentProduct />}
-          />
-          <Route path="/current-order/:orderId" element={<CurrentOrder />} />
-          <Route
-            path="/current-transaction-detail/:transactionId"
-            element={<CurrentTransactionOnline />}
-          />
-          <Route
-            path="/current-category/:categoryId"
-            element={<CurrentCategory />}
-          />
-          <Route
-            path="/current-cash-transaction-detail/:transactionId"
-            element={<CurrentTransactionCash />}
-          />
-          <Route
-            path="/current-verified-vendor/:vendorId"
-            element={<CurrentVerifiedVendor />}
-          />
-          <Route
-            path="/current-un-verified-vendor/:vendorId"
-            element={<CurrentUnVerifiedVendor />}
-          />
-          <Route
-            path="/current-verified-driver/:driverId"
-            element={<CurrentVerifiedDriver />}
-          />
-          <Route
-            path="/current-un-verified-driver/:driverId"
-            element={<CurrentUnVerifiedDriver />}
-          />
-          <Route path="/promotions" element={<Promotion />} />
-          <Route path="*" element={<h1>Not Found</h1>} />
-        </Routes>
-      </div>
+    <div className="text-black bg-neutral-100">
+      <Header />
+      <Routes>
+        <Route path="/admin-register" element={<AdminRegister />} />
+        <Route path="/" element={<AdminLogin />} />
+        <Route path="/home" element={<Dashboard />} />
+        <Route path="/current-user/:userId" element={<CurrentUser />} />
+        <Route
+          path="/current-product/:productId"
+          element={<CurrentProduct />}
+        />
+        <Route path="/current-order/:orderId" element={<CurrentOrder />} />
+        <Route
+          path="/current-transaction-detail/:transactionId"
+          element={<CurrentTransactionOnline />}
+        />
+        <Route
+          path="/current-category/:categoryId"
+          element={<CurrentCategory />}
+        />
+        <Route
+          path="/current-cash-transaction-detail/:transactionId"
+          element={<CurrentTransactionCash />}
+        />
+        <Route
+          path="/current-verified-vendor/:vendorId"
+          element={<CurrentVerifiedVendor />}
+        />
+        <Route
+          path="/current-un-verified-vendor/:vendorId"
+          element={<CurrentUnVerifiedVendor />}
+        />
+        <Route
+          path="/current-verified-driver/:driverId"
+          element={<CurrentVerifiedDriver />}
+        />
+        <Route
+          path="/current-un-verified-driver/:driverId"
+          element={<CurrentUnVerifiedDriver />}
+        />
+        <Route path="/promotions" element={<Promotion />} />
+        <Route path="*" element={<h1>Not Found</h1>} />
+      </Routes>
     </div>
+    // <div className="absolute top-0 z-[-2] h-screen w-screen bg-white bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.3),rgba(255,255,255,0))] overflow-x-hidden antialiased selection:bg-cyan-500 selection:text-cyan-900 no-scrollbar">
+    // </div>
   );
 };
 
