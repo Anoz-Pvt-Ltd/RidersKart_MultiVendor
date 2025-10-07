@@ -1,28 +1,18 @@
 import React, { useEffect, useState } from "react";
 import {
-  ChevronDown,
   Heart,
   ListOrdered,
-  Newspaper,
   Package,
-  PencilLine,
   ScanLine,
   User,
-  X,
   Bike,
   IndianRupee,
   MemoryStick,
   ChartColumnStacked,
   Vote,
 } from "lucide-react";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { useSelector } from "react-redux";
-import { FetchData } from "../../Utility/FetchFromApi";
-import { Link } from "react-router-dom";
-import InputBox from "../../Components/InputBox";
-import Button from "../../Components/Button";
-import { useRef } from "react";
-import { ClipboardCopy } from "lucide-react";
 import LoadingUI from "../../Components/Loading";
 import Users from "../Users/Users";
 import VendorUnderReview from "../Vendor_UnderReview/VendorUnderReview";
@@ -73,17 +63,16 @@ const Dashboard = ({ startLoading, stopLoading }) => {
   return (
     <div className="flex min-h-screen overflow-scroll">
       {user === null || user.length === 0 ? (
-        <div>
-          <h1>
-            You are not logged in kindly request your Team leader to provide you
-            an Admin id and password.
-          </h1>
+        <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-[#D5D5D7]  z-50 transition-opacity duration-300 ease-in-out">
+          <div className="flex flex-col items-center space-y-4">
+            <div className="w-16 h-16 border-4 border-[#DF3F32] border-t-transparent rounded-full animate-spin"></div>
+            <p className="text-black text-lg font-medium">Please wait ...</p>
+          </div>
         </div>
       ) : (
-        <div>
-          {" "}
+        <div className="flex justify-start items-start w-full ">
           <motion.aside
-            className="w-64 text-black p-4 shadow-lg fixed overscroll-auto top-0 h-screen bg-black/50 overflow-scroll no-scrollbar z-10"
+            className="w-96 text-black p-4 shadow-lg static overscroll-auto top-0 h-screen bg-black/50 overflow-scroll no-scrollbar z-10 rounded-r-xl"
             initial="hidden"
             animate="visible"
             variants={sidebarVariants}
@@ -109,42 +98,50 @@ const Dashboard = ({ startLoading, stopLoading }) => {
                   >
                     {<ListOrdered />}Vendors
                   </div>
-                  {isVendorOpen && (
-                    <ul className="ml-6 mt-2">
-                      <li
-                        className={`p-3 rounded-md cursor-pointer mb-2 transition-all ${
-                          activeSection === "Vendors (Under review)"
-                            ? "bg-[#DF3F33] text-white"
-                            : "bg-gray-200 text-black"
-                        }`}
-                        onClick={() =>
-                          setActiveSection("Vendors (Under review)")
-                        }
+                  <AnimatePresence>
+                    {isVendorOpen && (
+                      <motion.ul
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="ml-6 mt-2"
                       >
-                        Under review
-                      </li>
-                      <li
-                        className={`p-3 rounded-md cursor-pointer transition-all mb-2 ${
-                          activeSection === "Vendors (Verified)"
-                            ? "bg-[#DF3F33] text-white"
-                            : "bg-gray-200 text-black"
-                        }`}
-                        onClick={() => setActiveSection("Vendors (Verified)")}
-                      >
-                        Verified
-                      </li>
-                      <li
-                        className={`p-3 rounded-md cursor-pointer transition-all ${
-                          activeSection === "Vendors Orders"
-                            ? "bg-[#DF3F33] text-white"
-                            : "bg-gray-200 text-black"
-                        }`}
-                        onClick={() => setActiveSection("Vendors Orders")}
-                      >
-                        Vendors Orders
-                      </li>
-                    </ul>
-                  )}
+                        <li
+                          className={`p-3 rounded-md cursor-pointer mb-2 transition-all ${
+                            activeSection === "Vendors (Under review)"
+                              ? "bg-[#DF3F33] text-white"
+                              : "bg-gray-200 text-black"
+                          }`}
+                          onClick={() =>
+                            setActiveSection("Vendors (Under review)")
+                          }
+                        >
+                          Under review
+                        </li>
+                        <li
+                          className={`p-3 rounded-md cursor-pointer transition-all mb-2 ${
+                            activeSection === "Vendors (Verified)"
+                              ? "bg-[#DF3F33] text-white"
+                              : "bg-gray-200 text-black"
+                          }`}
+                          onClick={() => setActiveSection("Vendors (Verified)")}
+                        >
+                          Verified
+                        </li>
+                        <li
+                          className={`p-3 rounded-md cursor-pointer transition-all ${
+                            activeSection === "Vendors Orders"
+                              ? "bg-[#DF3F33] text-white"
+                              : "bg-gray-200 text-black"
+                          }`}
+                          onClick={() => setActiveSection("Vendors Orders")}
+                        >
+                          Vendors Orders
+                        </li>
+                      </motion.ul>
+                    )}
+                  </AnimatePresence>
                 </li>
 
                 {/* Brands with nested items */}
@@ -155,32 +152,40 @@ const Dashboard = ({ startLoading, stopLoading }) => {
                   >
                     {<MemoryStick />}Brands
                   </div>
-                  {isBrandOpen && (
-                    <ul className="ml-6 mt-2">
-                      <li
-                        className={`p-3 rounded-md cursor-pointer mb-2 transition-all ${
-                          activeSection === "Brands (Under review)"
-                            ? "bg-[#DF3F33] text-white"
-                            : "bg-gray-200 text-black"
-                        }`}
-                        onClick={() =>
-                          setActiveSection("Brands (Under review)")
-                        }
+                  <AnimatePresence>
+                    {isBrandOpen && (
+                      <motion.ul
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="ml-6 mt-2"
                       >
-                        Under review
-                      </li>
-                      <li
-                        className={`p-3 rounded-md cursor-pointer transition-all ${
-                          activeSection === "Brands (Verified)"
-                            ? "bg-[#DF3F33] text-white"
-                            : "bg-gray-200 text-black"
-                        }`}
-                        onClick={() => setActiveSection("Brands (Verified)")}
-                      >
-                        Verified
-                      </li>
-                    </ul>
-                  )}
+                        <li
+                          className={`p-3 rounded-md cursor-pointer mb-2 transition-all ${
+                            activeSection === "Brands (Under review)"
+                              ? "bg-[#DF3F33] text-white"
+                              : "bg-gray-200 text-black"
+                          }`}
+                          onClick={() =>
+                            setActiveSection("Brands (Under review)")
+                          }
+                        >
+                          Under review
+                        </li>
+                        <li
+                          className={`p-3 rounded-md cursor-pointer transition-all ${
+                            activeSection === "Brands (Verified)"
+                              ? "bg-[#DF3F33] text-white"
+                              : "bg-gray-200 text-black"
+                          }`}
+                          onClick={() => setActiveSection("Brands (Verified)")}
+                        >
+                          Verified
+                        </li>
+                      </motion.ul>
+                    )}
+                  </AnimatePresence>
                 </li>
                 <li className="mb-2">
                   <div
@@ -189,34 +194,42 @@ const Dashboard = ({ startLoading, stopLoading }) => {
                   >
                     {<ChartColumnStacked />}Category & Subcategory
                   </div>
-                  {isCategoryOpen && (
-                    <ul className="ml-6 mt-2">
-                      <li
-                        className={`p-3 rounded-md cursor-pointer mb-2 transition-all ${
-                          activeSection === "Categories (Under review)"
-                            ? "bg-[#DF3F33] text-white"
-                            : "bg-gray-200 text-black"
-                        }`}
-                        onClick={() =>
-                          setActiveSection("Categories (Under review)")
-                        }
+                  <AnimatePresence>
+                    {isCategoryOpen && (
+                      <motion.ul
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="ml-6 mt-2"
                       >
-                        Under review
-                      </li>
-                      <li
-                        className={`p-3 rounded-md cursor-pointer transition-all ${
-                          activeSection === "Categories (Verified)"
-                            ? "bg-[#DF3F33] text-white"
-                            : "bg-gray-200 text-black"
-                        }`}
-                        onClick={() =>
-                          setActiveSection("Categories (Verified)")
-                        }
-                      >
-                        Verified
-                      </li>
-                    </ul>
-                  )}
+                        <li
+                          className={`p-3 rounded-md cursor-pointer mb-2 transition-all ${
+                            activeSection === "Categories (Under review)"
+                              ? "bg-[#DF3F33] text-white"
+                              : "bg-gray-200 text-black"
+                          }`}
+                          onClick={() =>
+                            setActiveSection("Categories (Under review)")
+                          }
+                        >
+                          Under review
+                        </li>
+                        <li
+                          className={`p-3 rounded-md cursor-pointer transition-all ${
+                            activeSection === "Categories (Verified)"
+                              ? "bg-[#DF3F33] text-white"
+                              : "bg-gray-200 text-black"
+                          }`}
+                          onClick={() =>
+                            setActiveSection("Categories (Verified)")
+                          }
+                        >
+                          Verified
+                        </li>
+                      </motion.ul>
+                    )}
+                  </AnimatePresence>
                 </li>
 
                 {/* Other items */}
@@ -247,36 +260,44 @@ const Dashboard = ({ startLoading, stopLoading }) => {
                   >
                     {<IndianRupee />}Transactions
                   </div>
-                  {isTransactionOpen && (
-                    <ul className="ml-6 mt-2">
-                      <li
-                        className={`p-3 rounded-md cursor-pointer mb-2 transition-all ${
-                          activeSection === "Transactions (Online payment)"
-                            ? "bg-[#DF3F33] text-white"
-                            : "bg-gray-200 text-black"
-                        }`}
-                        onClick={() =>
-                          setActiveSection("Transactions (Online payment)")
-                        }
+                  <AnimatePresence>
+                    {isTransactionOpen && (
+                      <motion.ul
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="ml-6 mt-2"
                       >
-                        Transactions <br />
-                        (Online payment)
-                      </li>
-                      <li
-                        className={`p-3 rounded-md cursor-pointer mb-2 transition-all ${
-                          activeSection === "Transactions (Cash on delivery)"
-                            ? "bg-[#DF3F33] text-white"
-                            : "bg-gray-200 text-black"
-                        }`}
-                        onClick={() =>
-                          setActiveSection("Transactions (Cash on delivery)")
-                        }
-                      >
-                        Transactions <br />
-                        (Cash on delivery)
-                      </li>
-                    </ul>
-                  )}
+                        <li
+                          className={`p-3 rounded-md cursor-pointer mb-2 transition-all ${
+                            activeSection === "Transactions (Online payment)"
+                              ? "bg-[#DF3F33] text-white"
+                              : "bg-gray-200 text-black"
+                          }`}
+                          onClick={() =>
+                            setActiveSection("Transactions (Online payment)")
+                          }
+                        >
+                          Transactions <br />
+                          (Online payment)
+                        </li>
+                        <li
+                          className={`p-3 rounded-md cursor-pointer mb-2 transition-all ${
+                            activeSection === "Transactions (Cash on delivery)"
+                              ? "bg-[#DF3F33] text-white"
+                              : "bg-gray-200 text-black"
+                          }`}
+                          onClick={() =>
+                            setActiveSection("Transactions (Cash on delivery)")
+                          }
+                        >
+                          Transactions <br />
+                          (Cash on delivery)
+                        </li>
+                      </motion.ul>
+                    )}
+                  </AnimatePresence>
                 </li>
                 <li className="mb-2">
                   <div
@@ -285,34 +306,42 @@ const Dashboard = ({ startLoading, stopLoading }) => {
                   >
                     {<Bike />}Driver
                   </div>
-                  {isDriverOpen && (
-                    <ul className="ml-6 mt-2">
-                      <li
-                        className={`p-3 rounded-md cursor-pointer mb-2 transition-all ${
-                          activeSection === "Drivers (Under review)"
-                            ? "bg-[#DF3F33] text-white"
-                            : "bg-gray-200 text-black"
-                        }`}
-                        onClick={() =>
-                          setActiveSection("Drivers (Under review)")
-                        }
+                  <AnimatePresence>
+                    {isDriverOpen && (
+                      <motion.ul
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="ml-6 mt-2"
                       >
-                        Drivers <br />
-                        (Under review)
-                      </li>
-                      <li
-                        className={`p-3 rounded-md cursor-pointer mb-2 transition-all ${
-                          activeSection === "Drivers (Verified)"
-                            ? "bg-[#DF3F33] text-white"
-                            : "bg-gray-200 text-black"
-                        }`}
-                        onClick={() => setActiveSection("Drivers (Verified)")}
-                      >
-                        Drivers <br />
-                        (Verified)
-                      </li>
-                    </ul>
-                  )}
+                        <li
+                          className={`p-3 rounded-md cursor-pointer mb-2 transition-all ${
+                            activeSection === "Drivers (Under review)"
+                              ? "bg-[#DF3F33] text-white"
+                              : "bg-gray-200 text-black"
+                          }`}
+                          onClick={() =>
+                            setActiveSection("Drivers (Under review)")
+                          }
+                        >
+                          Drivers <br />
+                          (Under review)
+                        </li>
+                        <li
+                          className={`p-3 rounded-md cursor-pointer mb-2 transition-all ${
+                            activeSection === "Drivers (Verified)"
+                              ? "bg-[#DF3F33] text-white"
+                              : "bg-gray-200 text-black"
+                          }`}
+                          onClick={() => setActiveSection("Drivers (Verified)")}
+                        >
+                          Drivers <br />
+                          (Verified)
+                        </li>
+                      </motion.ul>
+                    )}
+                  </AnimatePresence>
                 </li>
                 <li
                   className={`p-4 rounded-md cursor-pointer transition-all duration-300 mb-2 ${
@@ -337,7 +366,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
               </ul>
             </nav>
           </motion.aside>
-          <main className="flex-1 p-6 ml-64 w-full">
+          <main className="flex w-full h-fit justify-start items-start px-6">
             <motion.div
               initial="hidden"
               animate="visible"

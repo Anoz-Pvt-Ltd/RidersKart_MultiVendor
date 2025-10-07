@@ -100,7 +100,7 @@ const Orders = ({ startLoading, stopLoading }) => {
   }, [user]);
 
   return (
-    <section>
+    <section  className="h-screen overflow-scroll w-full">
       <h2 className="text-2xl font-bold mb-4">Orders</h2>
       <div className="overflow-x-auto">
         <InputBox

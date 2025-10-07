@@ -105,7 +105,7 @@ const BrandsUnderReview = ({ startLoading, stopLoading }) => {
   };
 
   return (
-    <section className="w-full">
+    <section  className="h-screen overflow-scroll w-full">
       <h2 className="text-2xl font-bold mb-4">Brands</h2>
       <div className="overflow-x-auto">
         <InputBox

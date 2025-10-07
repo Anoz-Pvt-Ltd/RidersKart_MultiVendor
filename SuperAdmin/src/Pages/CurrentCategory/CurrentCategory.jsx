@@ -6,7 +6,7 @@ import Button from "../../Components/Button";
 import LoadingUI from "../../Components/Loading";
 import { Trash, Pencil } from "lucide-react";
 import { useRef } from "react";
-import InputBox from "../../components/InputBox";
+import InputBox from "../../Components/InputBox";
 
 const CurrentCategory = ({ startLoading, stopLoading }) => {
   const { categoryId } = useParams();
@@ -28,31 +28,28 @@ const CurrentCategory = ({ startLoading, stopLoading }) => {
   // const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editData, setEditData] = useState({ id: "", title: "", image: "" });
 
-  useEffect(() => {
-    const fetchAllOrders = async () => {
-      if (user?.length > 0) {
-        try {
-          startLoading();
-          const response = await FetchData(
-            `categories/get-category-by-id/${categoryId}`,
-            "get"
-          );
-          if (response.data.success) {
-            setCurrentCategory(response.data.data.category);
-            setCurrentSubCategory(response.data.data.category.subcategories);
-          } else {
-            setError("Failed to load Categories.");
-          }
-        } catch (err) {
-          setError(
-            err.response?.data?.message || "Failed to fetch Categories."
-          );
-        } finally {
-          stopLoading();
+  const fetchAllOrders = async () => {
+    if (user?.length > 0) {
+      try {
+        startLoading();
+        const response = await FetchData(
+          `categories/get-category-by-id/${categoryId}`,
+          "get"
+        );
+        if (response.data.success) {
+          setCurrentCategory(response.data.data.category);
+          setCurrentSubCategory(response.data.data.category.subcategories);
+        } else {
+          setError("Failed to load Categories.");
         }
+      } catch (err) {
+        setError(err.response?.data?.message || "Failed to fetch Categories.");
+      } finally {
+        stopLoading();
       }
-    };
-
+    }
+  };
+  useEffect(() => {
     fetchAllOrders();
   }, [user]);
 
@@ -76,6 +73,8 @@ const CurrentCategory = ({ startLoading, stopLoading }) => {
         ...prev,
         addSubCategory: false,
       }));
+      fetchAllOrders();
+      navigate("/home");
       alert("Your Subcategory has been added successfully, kindly refresh !");
     } catch (err) {
       console.log(err);
@@ -95,8 +94,9 @@ const CurrentCategory = ({ startLoading, stopLoading }) => {
         "delete"
       );
       //   console.log(response);
+      fetchAllOrders();
+      navigate("/home");
       alert("Subcategory has been deleted successfully");
-      window.location.reload();
     } catch (err) {
       setError(err.response?.data?.message || "Failed to delete Subcategory.");
     } finally {

@@ -112,7 +112,7 @@ const Policies = ({ startLoading, stopLoading }) => {
   };
 
   return (
-    <div>
+    <div className="h-screen overflow-scroll w-full">
       <h2 className="text-2xl font-bold mb-4">Add policies</h2>
       <Button label={"Add new Policy"} onClick={() => setModalOpen1(true)} />
 

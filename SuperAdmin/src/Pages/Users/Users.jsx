@@ -60,7 +60,7 @@ const Users = ({ startLoading, stopLoading }) => {
     fetchAllUsers();
   }, [user]);
   return (
-    <section className="">
+    <section className="w-full h-screen overflow-scroll">
       {/* main component */}
       <h2 className="text-2xl font-bold mb-4">Users</h2>
       {/* sorting box */}
@@ -90,7 +90,7 @@ const Users = ({ startLoading, stopLoading }) => {
             {filteredUsers.length > 0 ? (
               filteredUsers.map((user) => (
                 <tr key={user._id}>
-                  <td className="border border-gray-500 px-4 py-2">
+                  <td className="border border-gray-500 px-4 py-2 text-blue-500 ">
                     <Link
                       className="hover:text-blue-500 underline-blue-500 hover:underline "
                       to={`/current-user/${user._id}`}
