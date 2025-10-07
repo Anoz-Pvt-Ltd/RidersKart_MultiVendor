@@ -8,6 +8,8 @@ import { Trash } from "lucide-react";
 import { useRef } from "react";
 import InputBox from "../../components/InputBox";
 import { parseErrorMessage } from "../../Utility/ErrorMessageParser";
+import { use } from "react";
+import { useNavigate } from "react-router";
 
 const CurrentCategory = ({ startLoading, stopLoading }) => {
   const { categoryId } = useParams();
@@ -17,6 +19,7 @@ const CurrentCategory = ({ startLoading, stopLoading }) => {
   const [error, setError] = useState("");
   const [CurrentCategory, setCurrentCategory] = useState();
   const [CurrentSubCategory, setCurrentSubCategory] = useState([]);
+  const navigate = useNavigate();
   const [handlePopup, setHandlePopup] = useState({
     addCategoryPopup: false,
     allCategoryPopup: false,
@@ -75,6 +78,7 @@ const CurrentCategory = ({ startLoading, stopLoading }) => {
         addSubCategory: false,
       }));
       fetchAllOrders();
+      navigate("/home");
       alert("Your Subcategory has been added successfully, kindly refresh !");
     } catch (err) {
       console.log(err);
