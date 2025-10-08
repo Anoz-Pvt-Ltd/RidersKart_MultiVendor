@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { FetchData } from "../../Utility/FetchFromApi";
 import Button from "../../Components/Button";
 import LoadingUI from "../../Components/Loading";
@@ -10,6 +10,7 @@ import InputBox from "../../Components/InputBox";
 
 const CurrentCategory = ({ startLoading, stopLoading }) => {
   const { categoryId } = useParams();
+  const navigate = useNavigate();
   const editSubcategoryFormRef = useRef(null);
   const SubcategoryFormRef = useRef(null);
   const user = useSelector((store) => store.UserInfo.user);
@@ -93,7 +94,7 @@ const CurrentCategory = ({ startLoading, stopLoading }) => {
         `categories/sub-category/delete/${subcategoryId}`,
         "delete"
       );
-      //   console.log(response);
+      // console.log(response);
       fetchAllOrders();
       navigate("/home");
       alert("Subcategory has been deleted successfully");
