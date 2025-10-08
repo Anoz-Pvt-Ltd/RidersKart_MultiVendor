@@ -1009,12 +1009,12 @@ const Products = ({ startLoading, stopLoading }) => {
             />
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredProducts.map((product) => (
+            {[...filteredProducts].reverse().map((product) => (
               <div
                 key={product?._id}
                 className="mx-2 p-4 border rounded-lg shadow-md bg-gray-100"
               >
-                <h3 className=" text-gray-900 flex items-center justify-start ">
+                <h3 className=" text-gray-900 flex items-center justify-start truncate">
                   <strong>Name</strong>: {product?.name}{" "}
                 </h3>
                 <div className="flex">
@@ -1062,7 +1062,7 @@ const Products = ({ startLoading, stopLoading }) => {
                 <p className="truncate">
                   <strong>Description</strong>: {product?.description}
                 </p>
-                <p>
+                <p className="truncate">
                   <strong>Category:</strong> {product?.category?.title} -{" "}
                   {product?.subcategory?.title}
                 </p>

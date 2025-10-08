@@ -101,24 +101,24 @@ const Orders = ({ startLoading, stopLoading }) => {
           <table className="min-w-full bg-white border border-gray-200 ">
             <thead>
               <tr>
-                <th className="py-2 px-4 border-b">Order ID</th>
-                <th className="py-2 px-4 border-b">Product Name</th>
-                <th className="py-2 px-4 border-b">
+                <th className="py-2 px-4 border-b text-nowrap">Order ID</th>
+                <th className="py-2 px-4 border-b text-nowrap">Product Name</th>
+                <th className="py-2 px-4 border-b text-nowrap">
                   Category ID / Subcategory ID
                 </th>
-                <th className="py-2 px-4 border-b">Quantity</th>
-                <th className="py-2 px-4 border-b">MRP</th>
-                <th className="py-2 px-4 border-b">Sold at</th>
-                <th className="py-2 px-4 border-b">Order Status</th>
-                <th className="py-2 px-4 border-b">Payment Status</th>
-                <th className="py-2 px-4 border-b">Placed At</th>
+                <th className="py-2 px-4 border-b text-nowrap">Quantity</th>
+                <th className="py-2 px-4 border-b text-nowrap">MRP</th>
+                <th className="py-2 px-4 border-b text-nowrap">Sold at</th>
+                <th className="py-2 px-4 border-b text-nowrap">Order Status</th>
+                <th className="py-2 px-4 border-b text-nowrap">Payment Status</th>
+                <th className="py-2 px-4 border-b text-nowrap">Placed At</th>
                 {/* <th className="py-2 px-4 border-b">Actions</th> */}
               </tr>
             </thead>
             <tbody>
               {sortedOrders.length > 0 ? (
                 sortedOrders.map((order) => (
-                  <tr key={order._id} className="hover:bg-gray-100">
+                  <tr key={order._id} className="hover:bg-gray-100 text-xs">
                     <td className="py-2 px-4 border-b">{order._id}</td>
                     <td className="py-2 px-4 border-b">
                       {order.products[0]?.product.name || "N/A"}
