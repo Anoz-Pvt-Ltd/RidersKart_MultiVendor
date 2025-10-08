@@ -34,7 +34,14 @@ import Policies from "../Policy/Policies";
 const Dashboard = ({ startLoading, stopLoading }) => {
   const user = useSelector((store) => store.UserInfo.user);
   const [error, setError] = useState("");
-  const [activeSection, setActiveSection] = useState("Users");
+  const [activeSection, setActiveSection] = useState(
+    () => localStorage.getItem("activeSection") || "Users"
+  );
+  useEffect(() => {
+    // startLoading();
+    localStorage.setItem("activeSection", activeSection);
+    // stopLoading()
+  }, [activeSection]);
   const [isVendorOpen, setIsVendorOpen] = useState(false);
   const [isBrandOpen, setIsBrandOpen] = useState(false);
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
