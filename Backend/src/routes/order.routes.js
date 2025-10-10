@@ -34,6 +34,10 @@ router.route("/all-products-of/:userId").get(VerifyUser, getUserAllOrders);
 router.route("/update-order-status").post(VerifyUser, updateOrderStatus);
 router.route("/update-payment-status").post(VerifyUser, updatePaymentStatus);
 
+router
+  .route("/get-current-order/:orderId")
+  .get(VerifyVendorUser, getCurrentOrder);
+
 //admin routes
 router.route("/admin/all-orders").get(getAllOrders);
 router.route("/admin/current-order/:orderId").get(getCurrentOrder);
