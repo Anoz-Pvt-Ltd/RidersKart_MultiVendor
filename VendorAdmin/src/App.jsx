@@ -11,6 +11,7 @@ import { addUser, clearUser } from "./utils/Slice/UserInfoSlice";
 import { FetchData } from "./utils/FetchFromApi";
 import { parseErrorMessage } from "./utils/ErrorMessageParser";
 import ForgetPassword from "./pages/ForgetPassword/ForgetPassword";
+import CurrentOrder from "./pages/Orders/CurrentOrder";
 
 function App() {
   const dispatch = useDispatch();
@@ -55,6 +56,7 @@ function App() {
         <Route path="/login" element={<Hero />} />
         <Route path="/register" element={<Hero />} />
         <Route path="/vendor-profile" element={<VendorProfile />} />
+        <Route path="/current/order/:orderId" element={<CurrentOrder />} />
       </Routes>
     </div>
   );
