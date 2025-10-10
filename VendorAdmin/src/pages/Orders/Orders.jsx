@@ -3,6 +3,7 @@ import OrderCard from "./OrderCard";
 import { FetchData } from "../../utils/FetchFromApi";
 import { useSelector } from "react-redux";
 import LoadingUI from "../../components/Loading";
+import { Link, useNavigate } from "react-router-dom";
 
 const Orders = ({ startLoading, stopLoading }) => {
   const user = useSelector((store) => store.UserInfo.user);
@@ -10,6 +11,7 @@ const Orders = ({ startLoading, stopLoading }) => {
   const [allOrders, setAllOrders] = useState([]);
   const [selectedDate, setSelectedDate] = useState("");
   const [sortedOrders, setSortedOrders] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     setSortedOrders(allOrders);
@@ -110,7 +112,9 @@ const Orders = ({ startLoading, stopLoading }) => {
                 <th className="py-2 px-4 border-b text-nowrap">MRP</th>
                 <th className="py-2 px-4 border-b text-nowrap">Sold at</th>
                 <th className="py-2 px-4 border-b text-nowrap">Order Status</th>
-                <th className="py-2 px-4 border-b text-nowrap">Payment Status</th>
+                <th className="py-2 px-4 border-b text-nowrap">
+                  Payment Status
+                </th>
                 <th className="py-2 px-4 border-b text-nowrap">Placed At</th>
                 {/* <th className="py-2 px-4 border-b">Actions</th> */}
               </tr>
@@ -119,7 +123,15 @@ const Orders = ({ startLoading, stopLoading }) => {
               {sortedOrders.length > 0 ? (
                 sortedOrders.map((order) => (
                   <tr key={order._id} className="hover:bg-gray-100 text-xs">
-                    <td className="py-2 px-4 border-b">{order._id}</td>
+                    <td className="py-2 px-4 border-b text-blue-500">
+                      <Link
+                        // onClick={() => navigate(`/current/order/${order.id}`)}
+                        to={`/current/order/${order._id}`}
+                        className="hover:underline"
+                      >
+                        {order._id}
+                      </Link>
+                    </td>
                     <td className="py-2 px-4 border-b">
                       {order.products[0]?.product.name || "N/A"}
                     </td>
