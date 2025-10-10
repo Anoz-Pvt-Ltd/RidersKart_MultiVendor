@@ -1,6 +1,5 @@
 import Hero from "./pages/Hero/Hero";
 import { Route, Routes, useNavigate } from "react-router-dom";
-import Header from "./components/Header";
 import VendorRegistrationForm from "./pages/Registration/Registration";
 import LoginForm from "./pages/Login/Login";
 import Dashboard from "./pages/DashBoard/Dashboard";
