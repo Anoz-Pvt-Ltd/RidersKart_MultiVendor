@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { DemoImageBanner } from "../../Constants/DemoImages";
 import { FetchData } from "../../Utility/FetchFromApi";
-import { Card, ProductCardResponsive } from "../../Components/ProductCard";
+import { Card } from "../../Components/ProductCard";
 import { Link } from "react-router";
 import { ThreeProductGrid } from "../../Components/Product-Grid";
 import { truncateString } from "../../Utility/Utility-functions";
