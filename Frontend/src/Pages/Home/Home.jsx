@@ -105,7 +105,6 @@ const Home = ({ startLoading, stopLoading }) => {
     fetchProducts();
   }, [user]);
 
-  // It will fetch products only for the specific user
   // useEffect(() => {
   //   // if (!userCity) return;
 
