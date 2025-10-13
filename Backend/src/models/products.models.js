@@ -138,6 +138,12 @@ const productSchema = new mongoose.Schema({
     },
   ],
 
+  featured: {
+    type: String,
+    enum: ["featured", "non-featured", "suspended"],
+    default: "non-featured",
+  },
+
   createdAt: {
     type: Date,
     default: Date.now,
