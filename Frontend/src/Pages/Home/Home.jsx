@@ -38,7 +38,7 @@ const Home = ({ startLoading, stopLoading }) => {
   // const [userCity, setUserCity] = useState(null);
   const [productsAvailableForUser, setProductsAvailableForUser] =
     useState(false);
-  // console.log(user);
+
   // useEffect(() => {
   //   if (user && user[0]?.address) {
   //     setUserCity(user[0]?.address[0]?.city);
