@@ -307,7 +307,7 @@ const getAllProductForAdmin = asyncHandler(async (req, res) => {
 // });
 const getAllProducts = asyncHandler(async (req, res) => {
   try {
-    const { category, subcategory, vendor, page = 1, limit = 20 } = req.query;
+    const { category, subcategory, vendor, page = 1, limit = 100 } = req.query;
     const userId = req.user?._id;
 
     const filter = {};
