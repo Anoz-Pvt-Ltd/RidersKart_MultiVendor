@@ -5,20 +5,36 @@ import { FetchData } from "../../Utility/FetchFromApi";
 import { Link } from "react-router-dom";
 import InputBox from "../../Components/InputBox";
 import Button from "../../Components/Button";
-// import { useRef } from "react";
+import { Check } from "lucide-react";
 import LoadingUI from "../../Components/Loading";
 
 const Orders = ({ startLoading, stopLoading }) => {
   const user = useSelector((store) => store.UserInfo.user);
   const [allOrders, setAllOrders] = useState([]);
-  const tableHeadersOrder = [
+  const tableHeaders = [
     "Order ID",
     "User ID",
+    "Quantity",
     "Price",
-    "Status",
+    "Order Status",
+    "Payment Status",
     "Placed On",
   ];
-
+  const sections = [
+    "Pending",
+    "Confirmed",
+    "Shipped",
+    "Delivered",
+    "Cancelled",
+    "Return",
+  ];
+  const [activeSection, setActiveSection] = useState("Confirmed");
+  const [allPendingOrders, setAllPendingOrders] = useState([]);
+  const [allConfirmOrders, setAllConfirmOrders] = useState([]);
+  const [allShippedOrders, setAllShippedOrders] = useState([]);
+  const [allDeliveredOrders, setAllDeliveredOrders] = useState([]);
+  const [allCancelOrders, setAllCancelOrders] = useState([]);
+  console.log(allConfirmOrders);
   const [searchTermOrders, setSearchTermOrders] = useState("");
   const [filteredOrders, setFilteredOrders] = useState(allOrders);
   const [sortOrder, setSortOrder] = useState("desc"); // "asc" or "desc"
@@ -71,36 +87,144 @@ const Orders = ({ startLoading, stopLoading }) => {
     setSortOrder("desc");
   }, [allOrders]);
 
-  // useEffect(() => {
-  //   setFilteredOrders(allOrders);
-  // }, [allOrders]);
+  const fetchAllOrders = async () => {
+    if (user?.length > 0) {
+      try {
+        startLoading();
+        const response = await FetchData(`orders/admin/all-orders`, "get");
+        // setAllOrders(response.data.orders);
+        let orders = response.data.data.orders;
+        console.log(response);
+        const pending = orders.filter(
+          (o) => !o.orderStatus || o.orderStatus === "pending"
+        );
+        const confirm = orders.filter(
+          (o) => !o.orderStatus || o.orderStatus === "confirmed"
+        );
+        const shipped = orders.filter(
+          (o) => !o.orderStatus || o.orderStatus === "shipped"
+        );
+        const delivered = orders.filter(
+          (o) => !o.orderStatus || o.orderStatus === "delivered"
+        );
+        const cancel = orders.filter(
+          (o) => !o.orderStatus || o.orderStatus === "cancelled"
+        );
+        setAllPendingOrders(pending);
+        setAllConfirmOrders(confirm);
+        setAllShippedOrders(shipped);
+        setAllDeliveredOrders(delivered);
+        setAllCancelOrders(cancel);
+      } catch (err) {
+        setError(err.response?.data?.message || "Failed to fetch orders.");
+      } finally {
+        stopLoading();
+      }
+    }
+  };
 
   useEffect(() => {
-    const fetchAllOrders = async () => {
-      if (user?.length > 0) {
-        try {
-          startLoading();
-          const response = await FetchData("orders/admin/all-orders", "get");
-          // console.log(response);
-          if (response.data.success) {
-            setAllOrders(response.data.data.orders);
-          } else {
-            setError("Failed to Products.");
-          }
-        } catch (err) {
-          setError(err.response?.data?.message || "Failed to Products");
-        } finally {
-          stopLoading();
-        }
-      }
-    };
+    // const fetchAllOrders = async () => {
+    //   if (user?.length > 0) {
+    //     try {
+    //       startLoading();
+    //       const response = await FetchData("orders/admin/all-orders", "get");
+    //       console.log(response);
+    //       if (response.data.success) {
+    //         setAllOrders(response.data.data.orders);
+    //       } else {
+    //         setError("Failed to Products.");
+    //       }
+    //     } catch (err) {
+    //       setError(err.response?.data?.message || "Failed to Products");
+    //     } finally {
+    //       stopLoading();
+    //     }
+    //   }
+    // };
 
     // fetchAllProducts();
     fetchAllOrders();
   }, [user]);
 
+  const TableUi = ({ orders, headers }) => {
+    return (
+      <div className="">
+        <div className="overflow-x-auto">
+          <table className="min-w-full bg-white border border-gray-200 ">
+            <thead>
+              <tr>
+                {headers.map((header, index) => (
+                  <th className="py-2 px-4 border-b text-nowrap">{header}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {orders.length > 0 ? (
+                orders.map((order) => (
+                  <tr key={order._id} className="hover:bg-gray-100 text-xs">
+                    <td className="py-2 px-4 border-b text-blue-500">
+                      <Link
+                        // onClick={() => navigate(`/current/order/${order.id}`)}
+                        to={`/current-order/${order._id}`}
+                        className="hover:underline"
+                      >
+                        {order._id}
+                      </Link>
+                    </td>
+                    <td className="py-2 px-4 border-b">
+                      {order.user || "N/A"}
+                    </td>
+                    {/* <td className="py-2 px-4 border-b truncate">
+                      Category ID:{" "}
+                      <span className="text-xs">
+                        {order.products[0]?.product.category || "N/A"}
+                      </span>{" "}
+                      <br />
+                      Subcategory ID:
+                      <span className="text-xs">
+                        {order.products[0]?.product.subcategory || "N/A"}
+                      </span>
+                    </td> */}
+                    <td className="py-2 px-4 border-b">
+                      {order.products[0]?.quantity}
+                    </td>
+                    <td className="py-2 px-4 border-b">{order.totalAmount}</td>
+                    {/* <td className="py-2 px-4 border-b">
+                      {order.products[0]?.price?.sellingPrice}
+                    </td> */}
+                    <td className="py-2 px-4 border-b">{order.orderStatus}</td>
+                    <td className="py-2 px-4 border-b">
+                      {order.paymentStatus}
+                    </td>
+
+                    <td className="py-2 px-4 border-b">
+                      {new Date(order.updatedAt).toLocaleDateString()}
+                      {/* {order.updatedAt} */}
+                    </td>
+                    {/* <td className="py-2 px-4 border-b">
+                      <button className="bg-blue-500 text-white py-1 px-3 rounded hover:bg-blue-600">
+                        View
+                      </button>
+                    </td> */}
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="11" className="py-2 px-4 text-center">
+                    No orders found.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    );
+  };
+
   return (
-    <section  className="h-screen overflow-scroll w-full">
+    <section className="h-screen overflow-scroll w-full">
       <h2 className="text-2xl font-bold mb-4">Orders</h2>
       <div className="overflow-x-auto">
         <InputBox
@@ -145,66 +269,48 @@ const Orders = ({ startLoading, stopLoading }) => {
             Reset
           </button>
         </div>
-        <table className="min-w-full border-collapse border border-gray-300 rounded-xl h-screen">
-          <thead>
-            <tr>
-              {tableHeadersOrder.map((header, index) => (
-                <th
-                  key={index}
-                  className="border border-gray-500 px-4 py-2 bg-neutral-300"
-                >
-                  {header}
-                  {header === "Placed On" && (
-                    <button
-                      className="ml-2 text-xs underline text-blue-600"
-                      onClick={handleSortByDate}
-                      type="button"
-                    >
-                      Sort {sortOrder === "asc" ? "Newest" : "Oldest"}
-                    </button>
-                  )}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {filteredOrders.length > 0 ? (
-              filteredOrders.map((order) => (
-                <tr key={order.id}>
-                  <td className="border border-gray-500 px-4 py-2">
-                    <Link
-                      className="hover:text-blue-500 underline-blue-500 hover:underline "
-                      to={`/current-order/${order._id}`}
-                    >
-                      {order._id}
-                    </Link>
-                  </td>
-                  <td className="border border-gray-500 px-4 py-2">
-                    {order?.user}
-                  </td>
-                  <td className="border border-gray-500 px-4 py-2">
-                    {order.totalAmount}
-                  </td>
-                  <td className="border border-gray-500 px-4 py-2">
-                    {order.orderStatus}
-                  </td>
-                  <td className="border border-gray-500 px-4 py-2">
-                    {order.bookingDate}
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td
-                  colSpan={tableHeadersOrder.length}
-                  className="text-center py-4"
-                >
-                  No orders found.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+        <div className="hidden lg:flex flex-col lg:flex-row lg:bg-neutral-200 w-3/4 justify-evenly items-center py-2 rounded-xl gap-2">
+          {sections.map((section, idx) => (
+            <li
+              key={section}
+              className={`cursor-pointer transition-all duration-300 color-purple rounded-xl shadow-2xl lg:w-fit w-full px-4 py-2 list-none hover:text-[#DF3F33] ${
+                activeSection === section
+                  ? " list-none bg-[#DF3F33] text-white hover:text-white"
+                  : "bg-white text-black"
+              }`}
+              onClick={() => {
+                setActiveSection(section);
+              }}
+            >
+              <span className="flex items-center gap-2">
+                {activeSection === section && (
+                  <span className="text-white">
+                    <Check className="h-4 w-4" />
+                  </span>
+                )}
+                {section}
+              </span>
+            </li>
+          ))}
+        </div>
+        {activeSection === "Pending" && (
+          <TableUi orders={allPendingOrders} headers={tableHeaders} />
+        )}
+        {activeSection === "Confirmed" && (
+          <TableUi orders={allConfirmOrders} headers={tableHeaders} />
+        )}
+        {activeSection === "Shipped" && (
+          <TableUi orders={allShippedOrders} headers={tableHeaders} />
+        )}
+        {activeSection === "Delivered" && (
+          <TableUi orders={allDeliveredOrders} headers={tableHeaders} />
+        )}
+        {activeSection === "Cancelled" && (
+          <TableUi orders={allCancelOrders} headers={tableHeaders} />
+        )}
+        {activeSection === "Return" && (
+          <TableUi orders={allCancelOrders} headers={tableHeaders} />
+        )}
       </div>
     </section>
   );
