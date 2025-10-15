@@ -30,7 +30,7 @@ const Orders = ({ startLoading, stopLoading }) => {
     "Shipped",
     "Delivered",
     "Cancelled",
-    // "Booked",
+    "Return",
   ];
   const tableHeaders = [
     "Order Id",
@@ -189,7 +189,7 @@ const Orders = ({ startLoading, stopLoading }) => {
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-lg  h-screen overflow-scroll">
-      <h2 className="text-2xl font-bold text-gray-700 mb-4 flex justify-start items-center">
+      <h2 className="text-2xl font-bold text-gray-700 mb-4 flex justify-start items-center ">
         Orders{" "}
         <span>
           <button onClick={() => fetchAllOrders()}>
@@ -197,7 +197,7 @@ const Orders = ({ startLoading, stopLoading }) => {
           </button>
         </span>
       </h2>
-      <div className="flex items-start justify-center mb-4 gap-2 flex-col">
+      <div className="flex items-start justify-center mb-4 gap-2 flex-col sticky top-0 left-0 bg-white">
         <div className="flex lg:items-center lg:flex-row flex-col mb-4 gap-2">
           <label htmlFor="date" className="font-medium">
             Sort by Date:
@@ -321,6 +321,9 @@ const Orders = ({ startLoading, stopLoading }) => {
         <TableUi orders={allDeliveredOrders} headers={tableHeaders} />
       )}
       {activeSection === "Cancelled" && (
+        <TableUi orders={allCancelOrders} headers={tableHeaders} />
+      )}
+      {activeSection === "Return" && (
         <TableUi orders={allCancelOrders} headers={tableHeaders} />
       )}
     </div>
