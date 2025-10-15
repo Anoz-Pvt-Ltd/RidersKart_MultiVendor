@@ -366,7 +366,7 @@ const getVendorAllOrders = asyncHandler(async (req, res) => {
         },
     },
   ]);
-
+  console.log(orders);
   if (!orders || orders.length === 0) {
     return res.status(404).json({ message: "No orders found for this user" });
   }
@@ -380,7 +380,8 @@ const getVendorAllOrders = asyncHandler(async (req, res) => {
 const getAllOrders = asyncHandler(async (req, res) => {
   // const { orderId } = req.body;
   try {
-    const orders = await Order.find({ orderStatus: "confirmed" });
+    // const orders = await Order.find({ orderStatus: "confirmed" });
+    const orders = await Order.find();
     res.json(
       new ApiResponse(200, { orders }, "All users fetched successfully")
     );
