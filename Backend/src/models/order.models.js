@@ -5,7 +5,7 @@ const orderSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
-    required: true, // The user who placed the order
+    required: true,
   },
   // vendor: {
   //   type: mongoose.Schema.Types.ObjectId,
