@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { FetchData } from "../../Utility/FetchFromApi";
-import InputBox from "../../components/InputBox";
-import Button from "../../components/Button";
+import InputBox from "../../Components/InputBox";
+import Button from "../../Components/Button";
 import LoadingUI from "../../Components/Loading";
 
 const VendorRegistrationForm = ({ startLoading, stopLoading }) => {
