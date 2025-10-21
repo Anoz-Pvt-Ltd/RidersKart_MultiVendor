@@ -6,7 +6,7 @@ import Button from "../../Components/Button";
 import LoadingUI from "../../Components/Loading";
 import { Trash } from "lucide-react";
 import { useRef } from "react";
-import InputBox from "../../components/InputBox";
+import InputBox from "../../Components/InputBox";
 import { parseErrorMessage } from "../../Utility/ErrorMessageParser";
 import { use } from "react";
 import { useNavigate } from "react-router";
