@@ -15,7 +15,7 @@ import {
   RotateCw,
 } from "lucide-react";
 import PopUp from "../../components/PopUpWrapper";
-import { PinCodeData } from "../../constants/PinCOdeData";
+import { PinCodeData } from "../../constants/PinCodeData";
 import { parseErrorMessage } from "../../utils/ErrorMessageParser";
 import { Check } from "lucide-react";
 

@@ -19,7 +19,7 @@ import VendorUnderReview from "../Vendor_UnderReview/VendorUnderReview";
 import VendorsVerified from "../Vendors_Verified/VendorsVerified";
 import Products from "../Products/Products";
 import Orders from "../Orders/Orders";
-import Brandsverified from "../Brands_Verified/Brandsverified";
+import BrandsVerified from "../Brands_Verified/BrandsVerified";
 import BrandsUnderReview from "../Brands_UnderReview/BrandsUnderReview";
 import Promotion from "../Promotions/promotion";
 import TransactionOnline from "../TransactionOnline/TransactionOnline";
@@ -30,6 +30,7 @@ import DriverUnderReview from "../Driver_UnderReview/DriverUnderReview";
 import CategoriesVerified from "../CategoriesVerified/CategoriesVerified";
 import CategoriesUnderReview from "../CategoriesUnderReview/CategoriesUnderReview";
 import Policies from "../Policy/Policies";
+import Brandsverified from "../Brands_Verified/BrandsVerified";
 
 const Dashboard = ({ startLoading, stopLoading }) => {
   const user = useSelector((store) => store.UserInfo.user);
@@ -387,7 +388,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
               {activeSection === "Vendors (Verified)" && <VendorsVerified />}
               {activeSection === "Vendors Orders" && <VendorsOrders />}
               {activeSection === "Products" && <Products />}
-              {activeSection === "Brands (Verified)" && <Brandsverified />}
+              {activeSection === "Brands (Verified)" && <BrandsVerified />}
               {activeSection === "Brands (Under review)" && (
                 <BrandsUnderReview />
               )}

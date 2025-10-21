@@ -19,7 +19,7 @@ import VendorUnderReview from "../Vendor_UnderReview/VendorUnderReview";
 import VendorsVerified from "../Vendors_Verified/VendorsVerified";
 import Products from "../Products/Products";
 import Orders from "../Orders/Orders";
-import Brandsverified from "../Brands_Verified/Brandsverified";
+import BrandsVerified from "../Brands_Verified/BrandsVerified";
 import BrandsUnderReview from "../Brands_UnderReview/BrandsUnderReview";
 import Promotion from "../Promotions/promotion";
 import TransactionOnline from "../TransactionOnline/TransactionOnline";
@@ -172,7 +172,7 @@ const Dashboard = ({ startLoading, stopLoading }) => {
     "Vendors (Verified)": <VendorsVerified />,
     "Vendors Orders": <VendorsOrders />,
     Products: <Products />,
-    "Brands (Verified)": <Brandsverified />,
+    "Brands (Verified)": <BrandsVerified />,
     "Brands (Under review)": <BrandsUnderReview />,
     "Categories (Verified)": <CategoriesVerified />,
     "Categories (Under review)": <CategoriesUnderReview />,
