@@ -1,8 +1,7 @@
 import axios from "axios";
 
 export const FetchData = async (url, method, data, file = false) => {
-  // const Base_URL = `${process.env.DomainUrl}/api/v1`;
-  const Base_URL = `http://${process.env.DomainUrl}/api/v1`;
+  const Base_URL = `${process.env.DomainUrl}/api/v1`;
   const AccessToken = localStorage.getItem("AccessToken");
 
   const options = {
