@@ -35,25 +35,9 @@ const createProductPolicy = asyncHandler(async (req, res) => {
     language,
   } = req.body;
 
-  // Validate required fields
-  if (
-    !title ||
-    !termsAndConditions ||
-    !policy ||
-    !policyType ||
-    !policyFor ||
-    !effectiveDate
-  ) {
-    throw new ApiError(400, "Required fields are missing");
-  }
+  // Convert "on"/"true" strings to booleans
+  const toBool = (val) => val === "on" || val === "true" || val === true;
 
-  // Check if policy already exists with the same title
-  const existingPolicy = await ProductPolicy.findOne({ title });
-  if (existingPolicy) {
-    throw new ApiError(409, "Policy with this title already exists");
-  }
-
-  // Create new policy
   const newPolicy = await ProductPolicy.create({
     title,
     policy,
@@ -66,9 +50,9 @@ const createProductPolicy = asyncHandler(async (req, res) => {
     subcategory,
     brand,
     products,
-    appliesToAllCategories,
-    appliesToAllSubcategories,
-    appliesToAllBrands,
+    appliesToAllCategories: toBool(appliesToAllCategories),
+    appliesToAllSubcategories: toBool(appliesToAllSubcategories),
+    appliesToAllBrands: toBool(appliesToAllBrands),
     effectiveDate,
     expiryDate,
     isActive,
