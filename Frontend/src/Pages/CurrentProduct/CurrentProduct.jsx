@@ -354,7 +354,7 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
       return (
         <div className="max-w-md w-full bg-white p-4 rounded-lg shadow text-center">
           <h2 className="text-xl font-bold mb-2">Customer reviews</h2>
-          <p className="text-gray-600">No reviews yet.</p>
+          <p className="text-gray-600 text-xs">No reviews yet.</p>
         </div>
       );
     }
@@ -431,7 +431,7 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
 
   const RatingProduct = ({ reviews }) => {
     if (!reviews || reviews.length === 0) {
-      return <p className="text-gray-600">No reviews yet.</p>;
+      return <p className="text-gray-600 text-xs">No reviews yet.</p>;
     }
 
     const totalRatings = reviews.length;
@@ -478,7 +478,10 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
   return (
     <div className="mt-2 h-fit">
       <div className="flex flex-col lg:flex-row justify-between items-start lg:p-4 ">
-        <section ref={productRef} className="ImageSection w-full lg:w-[40vw] ">
+        <section
+          ref={productRef}
+          className="ImageSection w-full lg:w-[40vw] lg:sticky top-0 left-0"
+        >
           <div className="flex flex-col-reverse lg:flex-row h-5/6 lg:mb-10 ">
             {/* Image Array */}
             <div className="lg:w-20 lg:h-full  ">
@@ -744,12 +747,10 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
               )}
             </div>
             {/* policies  */}
-            <div>
-              <ul>
-                <Policies
-                  categorizedPolicies={productPolicy.categorizedPolicies}
-                />
-              </ul>
+            <div className="h-fit bg-neutral-300 px-5 py-4 rounded-xl shadow-xl">
+              <Policies
+                categorizedPolicies={productPolicy.categorizedPolicies}
+              />
             </div>
           </div>
         </div>
