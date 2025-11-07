@@ -25,6 +25,7 @@ import {
   resetPasswordWithOTP,
   getBulkUsers,
   markDefaultAddress,
+  autoSupportReply,
   //   getUserProfile,
 } from "../controllers/user.controllers.js";
 
@@ -35,6 +36,7 @@ router.route("/register").post(registerUser);
 router.route("/login").post(loginUser);
 
 // Private routes (require authentication)
+router.route("/support/:userId").post(VerifyUser, autoSupportReply);
 router.route("/re-login").post(VerifyUser, regenerateRefreshToken);
 router.route("/:userId/:productId/cart/add").post(VerifyUser, addProductToCart);
 router
