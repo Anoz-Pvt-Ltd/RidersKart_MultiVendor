@@ -5,8 +5,10 @@ import { FetchData } from "../../Utility/FetchFromApi";
 import Button from "../../Components/Button";
 import InputBox from "../../Components/InputBox";
 import {
+  Calculator,
   Check,
   Edit,
+  Headset,
   Heart,
   ListOrdered,
   LogOut,
@@ -31,10 +33,12 @@ import OrderSection from "./OrderSection";
 import UserFAQ from "./UserProfile_FAQ";
 import { truncateString } from "../../Utility/Utility-functions";
 import MapInput from "../../Components/MapInput";
+import { parseErrorMessage } from "../../Utility/ErrorMessageParser";
 
 const ProfileSection = ({ startLoading, stopLoading }) => {
   const ProfileEditFromRef = useRef(null);
   const EditAddressFromRef = useRef(null);
+  const HandleSupport = useRef(null);
   const [error, setError] = useState("");
   const Dispatch = useDispatch();
   const user = useSelector((store) => store.UserInfo.user);
@@ -43,6 +47,7 @@ const ProfileSection = ({ startLoading, stopLoading }) => {
   const [showModal, setShowModal] = useState(false);
   const [showModal2, setShowModal2] = useState(false);
   const [showModal3, setShowModal3] = useState(false);
+  const [showModal4, setShowModal4] = useState(false);
   const [selectedAddressIndex, setSelectedAddressIndex] = useState(0);
   const [newAddress, setNewAddress] = useState({
     street: "",
@@ -119,6 +124,9 @@ const ProfileSection = ({ startLoading, stopLoading }) => {
   const openModal3 = () => {
     setShowModal3(true);
   };
+  const openModal4 = () => {
+    setShowModal4(true);
+  };
 
   // Close modal
   const closeModal = () => {
@@ -151,6 +159,16 @@ const ProfileSection = ({ startLoading, stopLoading }) => {
       phoneNumber: "",
       password: "",
     });
+    setError(null); // Reset any errors
+  };
+  const closeModal4 = () => {
+    setShowModal4(false);
+    // setEditAddress({
+    //   name: "",
+    //   email: "",
+    //   phoneNumber: "",
+    //   password: "",
+    // });
     setError(null); // Reset any errors
   };
 
@@ -251,18 +269,45 @@ const ProfileSection = ({ startLoading, stopLoading }) => {
     }
   };
 
+  const handleSupport = async (e) => {
+    e.preventDefault();
+    try {
+      startLoading();
+      const formData = new FormData(HandleSupport.current);
+      if (!user?.[0]?._id) {
+        alertError("Please login to submit support request.");
+        closeModal4();
+        return;
+      }
+      const response = await FetchData(
+        `users/support/${user?.[0]?._id}`,
+        "post",
+        formData
+      );
+      console.log(response);
+      alertSuccess(response.data.message);
+      closeModal4();
+    } catch (err) {
+      console.log(err);
+      alertError(parseErrorMessage(err.response?.data));
+      closeModal4();
+    } finally {
+      stopLoading();
+    }
+  };
+
   return (
     <section className="flex justify-center items-center flex-col">
       <div className="flex flex-col-reverse lg:flex-col w-full justify-evenly items-start lg:shadow py-2 rounded-xl lg:px-20 gap-5">
         {/* all_FourButtons */}
         <div className="all_FourButtons flex lg:gap-5 justify-center items-center w-full">
-          <div className="button flex justify-start items-center lg:gap-3 gap-1 w-full flex-col lg:flex-row ">
+          <div className="button flex justify-start items-center lg:gap-3 gap-1 w-full flex-col lg:flex-row md:flex-row ">
             <Button
               className={`lg:w-fit w-full`}
               onClick={navigateHome}
               // label={<ShoppingBag/>"Continue Shopping"}
               label={
-                <h1 className="flex justify-start gap-2">
+                <h1 className="flex justify-start gap-2 md:truncate">
                   <span>
                     <ShoppingBag />
                   </span>
@@ -298,6 +343,18 @@ const ProfileSection = ({ startLoading, stopLoading }) => {
                     <Edit />
                   </span>
                   Profile{" "}
+                </h1>
+              }
+            />
+            <Button
+              className={`lg:w-fit w-full`}
+              onClick={openModal4}
+              label={
+                <h1 className="flex justify-start gap-2 w-full">
+                  <span>
+                    <Headset />
+                  </span>
+                  Support{" "}
                 </h1>
               }
             />
@@ -724,6 +781,64 @@ const ProfileSection = ({ startLoading, stopLoading }) => {
                   className="mt-4 hover:bg-orange-500 hidden lg:block"
                 />
               </div> */}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {showModal4 && (
+          <motion.div
+            whileInView={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, x: -100 }}
+            exit={{ opacity: 0, x: 100 }}
+            transition={{ type: "spring", duration: 0.4, ease: "easeInOut" }}
+            className=" fixed top-0 left-0 w-full h-full flex flex-col justify-center items-center backdrop-blur-lg z-50 bg-black/70"
+          >
+            <h1 className="mb-5 text-center text-white">
+              Hello <span className=" font-bold ">{user?.[0]?.name}</span>, How
+              can we help you today ?
+            </h1>
+
+            <div className="flex justify-center items-center gap-10 lg:w-1/2 w-full  rounded-xl shadow lg:py-10 whiteSoftBG">
+              <div className="lg:w-1/2 w-full">
+                <form
+                  ref={HandleSupport}
+                  onSubmit={handleSupport}
+                  className="w-full flex flex-col justify-center items-center px-5 py-2"
+                >
+                  <label
+                    htmlFor={"description"}
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
+                    Please describe your issue:
+                  </label>
+                  <textarea
+                    required
+                    className={`w-full px-4 py-2 text-gray-700 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 outline-none transition duration-200 ease-in-out hover:shadow-md`}
+                  />
+                  <p>Our team will reach you within 24 - 48 hours.</p>
+                  <p className="lg:text-nowrap ">
+                    For urgent assistance, you may also write to us at:{" "}
+                    <a
+                      href="https://mail.google.com/mail/?view=cm&fs=1&to=support@riderskart.in&su=Help%20Support&body="
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-500 hover:underline"
+                    >
+                      support@riderskart.in
+                    </a>
+                  </p>
+                  <div className="flex justify-center items-center gap-5">
+                    <Button
+                      type="button"
+                      onClick={closeModal4}
+                      label="Cancel"
+                      className="mt-4"
+                    />
+                    <Button className={`mt-4 `} type="submit" label="Submit" />
+                  </div>
+                </form>
               </div>
             </div>
           </motion.div>
