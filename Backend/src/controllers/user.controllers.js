@@ -820,6 +820,25 @@ const getBulkUsers = asyncHandler(async (req, res) => {
   return res.json(new ApiResponse(200, users, "Users fetched successfully"));
 });
 
+const autoSupportReply = asyncHandler(async (req, res) => {
+  const { userId } = req.params;
+
+  const user = await User.findById(userId);
+  if (!user) throw new ApiError(404, "user not found");
+
+  const email = user.email;
+
+  SendMail(
+    email,
+    "Our customer support team will contact you soon",
+    "Thank you for reaching out to us.."
+    // register_ui
+  );
+  return res.json(
+    new ApiResponse(200, null, "Support email sent successfully")
+  );
+});
+
 export {
   registerUser,
   loginUser,
@@ -846,4 +865,5 @@ export {
   resetPasswordWithOTP,
   getBulkUsers,
   markDefaultAddress,
+  autoSupportReply,
 };
