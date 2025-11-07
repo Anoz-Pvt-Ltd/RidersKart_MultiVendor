@@ -72,23 +72,21 @@ const Orders = ({ startLoading, stopLoading }) => {
           `orders/get-vendor-orders/${user?.[0]?._id}`,
           "get"
         );
-        // setAllOrders(response.data.orders);
-        let orders = response.data.orders;
+        let orders = response.data.orders || [];
+
+        // keep a master list (used by sorting) and initial sorted state
+        setAllOrders(orders);
+        setSortedOrders(orders);
+
+        // proper per-status filters (don't reuse !o.orderStatus for every status)
         const pending = orders.filter(
           (o) => !o.orderStatus || o.orderStatus === "pending"
         );
-        const confirm = orders.filter(
-          (o) => !o.orderStatus || o.orderStatus === "confirmed"
-        );
-        const shipped = orders.filter(
-          (o) => !o.orderStatus || o.orderStatus === "shipped"
-        );
-        const delivered = orders.filter(
-          (o) => !o.orderStatus || o.orderStatus === "delivered"
-        );
-        const cancel = orders.filter(
-          (o) => !o.orderStatus || o.orderStatus === "cancelled"
-        );
+        const confirm = orders.filter((o) => o.orderStatus === "confirmed");
+        const shipped = orders.filter((o) => o.orderStatus === "shipped");
+        const delivered = orders.filter((o) => o.orderStatus === "delivered");
+        const cancel = orders.filter((o) => o.orderStatus === "cancelled");
+
         setAllPendingOrders(pending);
         setAllConfirmOrders(confirm);
         setAllShippedOrders(shipped);
@@ -185,6 +183,20 @@ const Orders = ({ startLoading, stopLoading }) => {
         </div>
       </div>
     );
+  };
+
+  const ordersForSection = (section) => {
+    const s = section.toLowerCase();
+    if (section === "Pending") {
+      return sortedOrders.filter(
+        (o) => !o.orderStatus || o.orderStatus === "pending"
+      );
+    }
+    if (section === "Return") {
+      return sortedOrders.filter((o) => o.orderStatus === "return");
+    }
+    // other sections map directly to lowercase status
+    return sortedOrders.filter((o) => o.orderStatus === s);
   };
 
   return (
@@ -307,24 +319,32 @@ const Orders = ({ startLoading, stopLoading }) => {
           ))}
         </div>
       </div>
-      {/* Detailed Order List */}
       {activeSection === "Pending" && (
-        <TableUi orders={allPendingOrders} headers={tableHeaders} />
+        <TableUi orders={ordersForSection("Pending")} headers={tableHeaders} />
       )}
       {activeSection === "Confirmed" && (
-        <TableUi orders={allConfirmOrders} headers={tableHeaders} />
+        <TableUi
+          orders={ordersForSection("Confirmed")}
+          headers={tableHeaders}
+        />
       )}
       {activeSection === "Shipped" && (
-        <TableUi orders={allShippedOrders} headers={tableHeaders} />
+        <TableUi orders={ordersForSection("Shipped")} headers={tableHeaders} />
       )}
       {activeSection === "Delivered" && (
-        <TableUi orders={allDeliveredOrders} headers={tableHeaders} />
+        <TableUi
+          orders={ordersForSection("Delivered")}
+          headers={tableHeaders}
+        />
       )}
       {activeSection === "Cancelled" && (
-        <TableUi orders={allCancelOrders} headers={tableHeaders} />
+        <TableUi
+          orders={ordersForSection("Cancelled")}
+          headers={tableHeaders}
+        />
       )}
       {activeSection === "Return" && (
-        <TableUi orders={allCancelOrders} headers={tableHeaders} />
+        <TableUi orders={ordersForSection("Return")} headers={tableHeaders} />
       )}
     </div>
   );
