@@ -155,18 +155,19 @@ const Products = ({ startLoading, stopLoading }) => {
 
     if (mrp > 0 && discount >= 0 && discount <= 100) {
       const sellingPrice = mrp - (mrp * discount) / 100;
-      spRef.current.value = sellingPrice.toFixed(2); // Update the Selling Price field
+      spRef.current.value = Math.round(sellingPrice);
     } else {
-      spRef.current.value = ""; // Clear if invalid input
+      spRef.current.value = "";
     }
   };
+
   const updateSellingPriceUpdateForm = () => {
     const mrp = parseFloat(mrpUpdRef.current?.value) || 0;
     const discount = parseFloat(discountUpdRef.current?.value) || 0;
 
     if (mrp > 0 && discount >= 0 && discount <= 100) {
       const sellingPrice = mrp - (mrp * discount) / 100;
-      spUpdRef.current.value = sellingPrice.toFixed(2); // Update the Selling Price field
+      spUpdRef.current.value = Math.round(sellingPrice); // Update the Selling Price field
     } else {
       spUpdRef.current.value = ""; // Clear if invalid input
     }
