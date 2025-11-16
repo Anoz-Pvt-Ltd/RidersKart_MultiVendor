@@ -16,6 +16,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import oops from "../../assets/Oops.png";
 
 const Home = ({ startLoading, stopLoading }) => {
+  const scrollRefs = useRef([]);
   const scrollContainer = useRef(null);
   const [products, setProducts] = useState([]);
   // const scrollContainer = useRef(null);
@@ -330,8 +331,9 @@ const Home = ({ startLoading, stopLoading }) => {
 
         {categories.map((category, index) => {
           const scrollLeft = () => {
-            if (scrollContainer.current) {
-              scrollContainer.current.scrollBy({
+            const current = scrollRefs.current[index];
+            if (current) {
+              current.scrollBy({
                 left: -300,
                 behavior: "smooth",
               });
@@ -339,15 +341,15 @@ const Home = ({ startLoading, stopLoading }) => {
           };
 
           const scrollRight = () => {
-            if (scrollContainer.current) {
-              scrollContainer.current.scrollBy({
+            const current = scrollRefs.current[index];
+            if (current) {
+              current.scrollBy({
                 left: 300,
                 behavior: "smooth",
               });
             }
           };
 
-          // 🔍 Filter products belonging to this category
           const categoryProducts = products.filter(
             (product) => product.category?._id === category._id
           );
@@ -360,8 +362,6 @@ const Home = ({ startLoading, stopLoading }) => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.2 }}
             >
-              {/* Category Title + Buttons */}
-
               <div className="flex justify-between items-center mb-3">
                 <h2 className="text-xl font-bold">{category.title}</h2>
                 <div className="flex gap-2">
@@ -371,6 +371,7 @@ const Home = ({ startLoading, stopLoading }) => {
                   >
                     <ChevronLeft size={18} />
                   </button>
+
                   <button
                     onClick={scrollRight}
                     className="bg-[#fe4343af] text-white px-3 py-1 rounded-full shadow hover:bg-[#FE4343] hover:text-black/50 font-extrabold duration-300 ease-in-out"
@@ -380,9 +381,8 @@ const Home = ({ startLoading, stopLoading }) => {
                 </div>
               </div>
 
-              {/* Product Carousel */}
               <div
-                ref={scrollContainer}
+                ref={(el) => (scrollRefs.current[index] = el)}
                 className="flex overflow-x-auto overflow-y-hidden scrollbar-hide gap-4 py-2 px-1 justify-start items-start scroll-smooth"
               >
                 {categoryProducts.length > 0 ? (
