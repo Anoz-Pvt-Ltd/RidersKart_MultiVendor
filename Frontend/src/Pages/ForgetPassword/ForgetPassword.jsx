@@ -5,8 +5,9 @@ import { parseErrorMessage } from "../../Utility/ErrorMessageParser";
 import { useNavigate } from "react-router-dom";
 import { FetchData } from "../../Utility/FetchFromApi";
 import InputBox from "../../Components/InputBox";
+import { X } from "lucide-react";
 
-const ForgetPassword = ({ startLoading, stopLoading }) => {
+const ForgetPassword = ({ startLoading, stopLoading, onCancel }) => {
   const formRef = useRef();
   const navigate = useNavigate();
   const [isOpenOtpModel, setIsOpenOtpModel] = useState(false);
@@ -65,7 +66,14 @@ const ForgetPassword = ({ startLoading, stopLoading }) => {
   return (
     <div className="w-full h-screen flex justify-center items-center">
       <div className="flex justify-center items-center flex-col shadow lg:px-20 px-5 py-10 rounded-xl">
-        <h1>Forget password ?</h1>
+        <h1 className="flex justify-around items-center gap-10 w-full">
+          Forget password ?{" "}
+          <span>
+            <button onClick={onCancel}>
+              <X />
+            </button>
+          </span>
+        </h1>
         <form ref={formRef} className="w-full" onSubmit={handleOTPSubmit}>
           <InputBox
             LabelName={"Enter email"}

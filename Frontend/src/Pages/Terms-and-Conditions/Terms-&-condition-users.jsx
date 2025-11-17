@@ -1,15 +1,21 @@
 import React from "react";
+import Button from "../../Components/Button";
+import { useNavigate } from "react-router";
 
 const TermsAndConditions = () => {
+  const navigate = useNavigate();
+  const handleRegister = () => {
+    navigate("/register");
+  };
   return (
     <div className="max-w-5xl mx-auto px-6 py-12 text-gray-700 leading-relaxed">
       <h1 className="text-3xl font-bold mb-6">Terms and Conditions</h1>
       <p className="mb-6">
-        Welcome to our e-commerce platform (“Platform”). By accessing, browsing,
-        or making a purchase on our website, you agree to comply with and be
-        bound by the following Terms and Conditions (“Terms”). Please read them
-        carefully before using our services. If you do not agree with any part
-        of these Terms, you must not use this Platform.
+        Welcome to our e-commerce platform. By accessing, browsing, or making a
+        purchase on our website, you agree to comply with and be bound by the
+        following Terms and Conditions. Please read them carefully before using
+        our services. If you do not agree with any part of these Terms, you must
+        not use this Platform.
       </p>
 
       {/* Section 1 */}
@@ -173,7 +179,7 @@ const TermsAndConditions = () => {
       <p>
         These Terms are governed by and construed in accordance with the laws of
         India. Any disputes arising shall be subject to the exclusive
-        jurisdiction of the courts located in [Your City/State].
+        jurisdiction of the courts located in Delhi.
       </p>
 
       {/* Section 14 */}
@@ -191,13 +197,17 @@ const TermsAndConditions = () => {
       <p>
         For questions or concerns regarding these Terms and Conditions, please
         contact us at: <br />
-        <strong>Email:</strong> support@yourecommerce.com <br />
-        <strong>Phone:</strong> +91-XXXXXXXXXX
+        <strong>Email:</strong> support@riderskart.in <br />
+        {/* <strong>Phone:</strong> +91-XXXXXXXXXX */}
       </p>
 
       <p className="mt-10 text-sm text-gray-500">
         Last Updated: {new Date().toLocaleDateString()}
       </p>
+      <Button
+        label={"I accept the terms and conditions"}
+        onClick={() => handleRegister()}
+      />
     </div>
   );
 };

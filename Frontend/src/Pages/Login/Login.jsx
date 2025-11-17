@@ -12,6 +12,7 @@ import { parseErrorMessage } from "../../Utility/ErrorMessageParser";
 import LoginImage from "../../assets/Login_Image.png";
 import { alertError, alertSuccess } from "../../Utility/Alert";
 import ForgetPassword from "../ForgetPassword/ForgetPassword";
+import { motion, AnimatePresence } from "framer-motion";
 
 const Login = ({ startLoading, stopLoading }) => {
   const Navigate = useNavigate();
@@ -133,7 +134,7 @@ const Login = ({ startLoading, stopLoading }) => {
             />
           </form>
           <div className="flex lg:flex-row flex-col lg:gap-5 justify-center items-center w-full lg:pt-5 pt-2">
-            <h1>Forget password ? reset here</h1>
+            <h1>Forget password ?</h1>
             <Button
               label={"Reset Password"}
               onClick={() => setIsOpenModel(true)}
@@ -152,11 +153,19 @@ const Login = ({ startLoading, stopLoading }) => {
           </div>
         </div>
       </section>
-      {openModel && (
-        <div className="fixed top-0 left-0 flex justify-center items-center h-screen w-full bg-neutral-200">
-          <ForgetPassword />
-        </div>
-      )}
+      <AnimatePresence>
+        {openModel && (
+          <motion.div
+            whileInView={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, x: -100 }}
+            exit={{ opacity: 0, x: 100 }}
+            transition={{ type: "spring", duration: 0.4, ease: "easeInOut" }}
+            className="fixed top-0 left-0 flex justify-center items-center h-screen w-full bg-neutral-200"
+          >
+            <ForgetPassword onCancel={() => setIsOpenModel(false)} />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
