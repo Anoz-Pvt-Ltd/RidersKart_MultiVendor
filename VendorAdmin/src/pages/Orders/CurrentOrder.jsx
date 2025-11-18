@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { FetchData } from "../../../../Frontend/src/Utility/FetchFromApi";
+import { FetchData } from "../../utils/FetchFromApi";
 import { useSelector } from "react-redux";
 import Button from "../../components/Button";
 import { motion, AnimatePresence } from "framer-motion";
