@@ -1,11 +1,15 @@
 import React from "react";
 import Button from "../../Components/Button";
 import { useNavigate } from "react-router";
+import { alertInfo } from "../../Utility/Alert";
 
-const TermsAndConditions = () => {
+const TermsAndConditions = ({ onClose }) => {
   const navigate = useNavigate();
   const handleRegister = () => {
     navigate("/register");
+    // window.location.reload();
+    onClose();
+    // alertInfo("You have accepted our T&C's now you can register freely !");
   };
   return (
     <div className="max-w-5xl mx-auto px-6 py-12 text-gray-700 leading-relaxed">

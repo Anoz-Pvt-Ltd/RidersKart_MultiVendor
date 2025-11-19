@@ -220,8 +220,10 @@ import { useDispatch } from "react-redux";
 import LoadingUI from "../../Components/Loading";
 import { alertError, alertSuccess } from "../../Utility/Alert";
 import { parseErrorMessage } from "../../Utility/ErrorMessageParser";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, LucideInspect, X } from "lucide-react";
 import MapInput from "../../Components/MapInput";
+import TermsAndConditions from "../Terms-and-Conditions/Terms-&-condition-users";
+import { motion, AnimatePresence } from "framer-motion";
 
 const UserRegister = ({ startLoading, stopLoading }) => {
   const [formData, setFormData] = useState({
@@ -239,6 +241,7 @@ const UserRegister = ({ startLoading, stopLoading }) => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [openModal, setIsOpenModal] = useState(false);
   const [passwordValid, setPasswordValid] = useState({
     length: false,
     uppercase: false,
@@ -364,6 +367,12 @@ const UserRegister = ({ startLoading, stopLoading }) => {
           Welcome!
           <br /> Register your account here and get started
         </h1>
+        {/* <button onClick={() => setIsOpenModal(true)}>
+          <span className="text-blue-600 hover:text-blue-800 hover:underline flex justify-center items-center gap-2">
+            <LucideInspect />
+            Click here to view terms and conditions
+          </span>
+        </button> */}
 
         {error && <div className="text-red-500 mb-4">{error}</div>}
         {success && <div className="text-green-500 mb-4">{success}</div>}
@@ -494,17 +503,46 @@ const UserRegister = ({ startLoading, stopLoading }) => {
             <div className="w-fit h-fit">
               <InputBox Name="privacyPolicy" className="" Type="checkbox" />
             </div>
-            <Link to={"/terms-and-conditions"}>
-              <span className="text-blue-600 hover:text-blue-800 hover:underline">
-                Read our terms and conditions
-              </span>
-            </Link>
+            <div>
+              <span>You have read our terms and conditions !</span>
+            </div>
           </div>
           <div className="md:col-span-2">
             <Button className={`w-full`} label={"Register"} Type={"submit"} />
           </div>
         </form>
+        {/* <button onClick={() => setIsOpenModal(true)}>
+          <span className="text-blue-600 hover:text-blue-800 hover:underline">
+            Read our terms and conditions here...
+          </span>
+        </button> */}
+        <button onClick={() => setIsOpenModal(true)} className="pt-10">
+          <span className="text-blue-600 hover:text-blue-800 hover:underline flex justify-center items-center gap-2 ">
+            <LucideInspect />
+            Click here to view terms and conditions
+          </span>
+        </button>
       </div>
+
+      <AnimatePresence>
+        {openModal && (
+          <motion.div
+            whileInView={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, x: -100 }}
+            exit={{ opacity: 0, x: 100 }}
+            transition={{ type: "spring", duration: 0.4, ease: "easeInOut" }}
+            className="fixed h-screen w-full top-0 left-0 px-20 bg-neutral-300 overflow-scroll z-10"
+          >
+            {/* <button
+              onClick={() => setIsOpenModal(false)}
+              className="bg-[#DF3F33] px-4 py-2 rounded-2xl drop-shadow-xl hover:scale-105 hover:drop-shadow-2xl transition duration-150 ease-in-out text-white "
+            >
+              <X />
+            </button> */}
+            <TermsAndConditions onClose={() => setIsOpenModal(false)} />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
