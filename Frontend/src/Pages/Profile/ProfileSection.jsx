@@ -99,6 +99,7 @@ const ProfileSection = ({ startLoading, stopLoading }) => {
         // console.log(response.data.data);
         alertSuccess("Address added successfully");
         setShowModal(false); // Close modal after success
+        window.location.reload();
       } else {
         setError("Failed to add address.");
       }

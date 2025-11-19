@@ -69,7 +69,7 @@ const userSchema = new mongoose.Schema({
     },
     postalCode: {
       type: String,
-      required: true,
+      // required: true,
     },
     //remove comment when API for maps will be available
     coordinates: { type: [Number] },

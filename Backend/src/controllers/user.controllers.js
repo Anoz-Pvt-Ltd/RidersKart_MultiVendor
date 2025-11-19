@@ -31,9 +31,12 @@ const generateAccessAndRefreshTokens = async (userId) => {
 const registerUser = asyncHandler(async (req, res, next) => {
   const { name, email, phoneNumber, password, address } = req.body;
 
-  if (!name || !email || !phoneNumber || !password || !address) {
+  if (!name || !email || !phoneNumber || !password ) {
     throw new ApiError(400, "All fields are required");
   }
+  // if (!name || !email || !phoneNumber || !password || !address) {
+  //   throw new ApiError(400, "All fields are required");
+  // }
 
   // Phone validation (10 digits only)
   if (!/^\d{10}$/.test(phoneNumber)) {
@@ -67,8 +70,8 @@ const registerUser = asyncHandler(async (req, res, next) => {
     email,
     phoneNumber,
     password,
-    address,
-    defaultAddress: address,
+    // address,
+    // defaultAddress: address,
   });
   if (!newUser) throw new ApiError(500, "Internal server error");
   const { RefreshToken, AccessToken } = await generateAccessAndRefreshTokens(

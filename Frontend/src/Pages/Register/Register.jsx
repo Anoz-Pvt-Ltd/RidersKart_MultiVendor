@@ -229,11 +229,11 @@ const UserRegister = ({ startLoading, stopLoading }) => {
     email: "",
     phoneNumber: "",
     //comment down address,city,state and country when API for maps will be available
-    address: "",
-    city: "",
-    state: "",
-    country: "",
-    postalCode: "",
+    // address: "",
+    // city: "",
+    // state: "",
+    // country: "",
+    // postalCode: "",
     password: "",
   });
   const [error, setError] = useState("");
@@ -276,11 +276,11 @@ const UserRegister = ({ startLoading, stopLoading }) => {
       phoneNumber,
       //comment down address,city,state and country when API for maps will be available
 
-      address,
-      city,
-      state,
-      country,
-      postalCode,
+      // address,
+      // city,
+      // state,
+      // country,
+      // postalCode,
       password,
     } = formData;
 
@@ -298,21 +298,21 @@ const UserRegister = ({ startLoading, stopLoading }) => {
       return;
     }
 
-    const addressObj = {
-      //comment down address,city,state and country when API for maps will be available
-      street: address,
-      city,
-      state,
-      country,
-      postalCode,
-    };
+    // const addressObj = {
+    //   //comment down address,city,state and country when API for maps will be available
+    //   street: address,
+    //   city,
+    //   state,
+    //   country,
+    //   postalCode,
+    // };
 
     const dataToSend = {
       name,
       email,
       phoneNumber,
       password,
-      address: addressObj,
+      // address: addressObj,
     };
 
     try {
@@ -336,11 +336,11 @@ const UserRegister = ({ startLoading, stopLoading }) => {
           name: "",
           email: "",
           phoneNumber: "",
-          address: "",
-          city: "",
-          state: "",
-          country: "",
-          postalCode: "",
+          // address: "",
+          // city: "",
+          // state: "",
+          // country: "",
+          // postalCode: "",
           password: "",
         });
       }
@@ -397,7 +397,7 @@ const UserRegister = ({ startLoading, stopLoading }) => {
           />
           {/* //comment down address,city,state and country when API for maps will
           be available */}
-          <InputBox
+          {/* <InputBox
             LabelName="Address"
             Name="address"
             Value={formData.address}
@@ -431,7 +431,7 @@ const UserRegister = ({ startLoading, stopLoading }) => {
             Value={formData.postalCode}
             Placeholder="Enter Postal Code"
             onChange={handleChange}
-          />
+          /> */}
           <div className="relative">
             <InputBox
               LabelName="Password"
