@@ -23,24 +23,11 @@ const registerProduct = asyncHandler(async (req, res) => {
     tags,
     brand,
     MRP,
-    // SP,
     discount,
+    deliveryScope,
+    deliveryStates,
+    deliveryCities,
   } = req.body;
-  console.log("Controller Reached");
-  console.log([
-    name,
-    description,
-    category,
-    subcategory,
-    stockQuantity,
-    sku,
-    specifications,
-    tags,
-    brand,
-    MRP,
-    // SP,
-    discount,
-  ]);
 
   const vendorId = req.user._id;
 
@@ -52,60 +39,77 @@ const registerProduct = asyncHandler(async (req, res) => {
     !subcategory ||
     !stockQuantity ||
     !brand ||
-    !sku || // Stock keeping unit => Provided to every unique type of products for keeping track of quantity.
-    !MRP || // Maximum Retail Price
-    !discount // Discount percentage
+    !sku ||
+    !MRP ||
+    !discount
   ) {
     throw new ApiError(400, "All required fields must be filled");
   }
 
-  const allTags = tags.split(",");
-  console.log("allTags: ", allTags, typeof allTags);
+  const allTags = tags ? tags.split(",") : [];
 
-  // Validate main category
+  // Validate category
   const existingCategory = await Category.findById(category);
   if (!existingCategory) throw new ApiError(400, "Invalid category selected");
 
+  // Validate subcategory
   const existingSubCategory = await Subcategory.findById(subcategory);
   if (!existingSubCategory)
     throw new ApiError(400, "Invalid subcategory selected");
 
-  // Check if SKU already exists
+  // Check SKU
   const existingProduct = await Product.findOne({ sku });
   if (existingProduct) {
-    // throw new ApiError(400, "A product with this SKU already exists");
     throw new ApiError(
       400,
-      "This product might have already been added!! Please try increasing the quantity"
+      "This product might already be added! Try increasing the quantity."
     );
   }
 
-  // Verify vendor exists
+  // Validate vendor
   const vendor = await VendorUser.findById(vendorId);
-  if (!vendor) {
-    throw new ApiError(404, "Vendor not found");
-  }
+  if (!vendor) throw new ApiError(404, "Vendor not found");
 
+  // Validate brand
   const checkBrand = await Brand.findById(brand);
   if (!checkBrand) throw new ApiError(404, "Brand not found");
 
-  const ImageFile = req.file;
-  const UploadedImage = await UploadImages(
-    ImageFile.filename,
-    {
-      folderStructure: `all-vendor/${vendor.name.split(" ").join("-")}/${category.split(" ").join("-")}/${subcategory.split(" ").join("-")}/${name.split(" ").join("-")}`,
-    },
-    tags,
-    { description, category, subcategory }
-  );
+  // MULTIPLE IMAGES FROM MULTER
+  const images = req.files;
 
-  const { deliveryScope, deliveryStates, deliveryCities } = req.body;
+  if (!images || images.length === 0) {
+    throw new ApiError(400, "At least one product image is required");
+  }
 
+  // Upload all images
+  const uploadedImages = [];
+  for (const image of images) {
+    const uploaded = await UploadImages(
+      image.filename,
+      {
+        folderStructure: `all-vendor/${vendor.name
+          .split(" ")
+          .join("-")}/${category.split(" ").join("-")}/${subcategory
+          .split(" ")
+          .join("-")}/${name.split(" ").join("-")}`,
+      },
+      tags,
+      { description, category, subcategory }
+    );
+
+    uploadedImages.push({
+      url: uploaded.url,
+      altText: name,
+      fileId: uploaded.fileId,
+    });
+  }
+
+  // Validate delivery scope
   if (!["all", "state", "city"].includes(deliveryScope)) {
     throw new ApiError(400, "Invalid delivery scope");
   }
 
-  // Create a new product instance
+  // Create product
   const newProduct = new Product({
     name,
     description,
@@ -119,11 +123,7 @@ const registerProduct = asyncHandler(async (req, res) => {
     },
     stockQuantity,
     sku,
-    images: {
-      url: UploadedImage.url,
-      altText: name,
-      fileId: UploadedImage.fileId,
-    },
+    images: uploadedImages, // MULTIPLE IMAGES SAVED
     specifications: {
       details: `${specifications}`,
     },
@@ -135,14 +135,11 @@ const registerProduct = asyncHandler(async (req, res) => {
     deliveryCities: deliveryScope === "city" ? deliveryCities : [],
   });
 
-  // Save the product to the database
   await newProduct.save();
 
-  // Add the product to the vendor's products list
+  // Add product to vendor collection
   vendor.products.push(newProduct._id);
   await vendor.save();
-
-  console.log("product uploaded");
 
   res
     .status(200)
@@ -154,6 +151,7 @@ const registerProduct = asyncHandler(async (req, res) => {
       )
     );
 });
+
 
 const getAllProductForAdmin = asyncHandler(async (req, res) => {
   const products = await Product.find()

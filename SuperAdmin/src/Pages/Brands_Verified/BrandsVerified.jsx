@@ -198,6 +198,7 @@ const BrandsVerified = ({ startLoading, stopLoading }) => {
                   label: cat.title,
                   value: cat._id, // Correctly linking ID for selection
                 }))}
+                Required={false}
               />
 
               {selectedCategory !== null && (
@@ -211,6 +212,7 @@ const BrandsVerified = ({ startLoading, stopLoading }) => {
                       label: subcat.title,
                       value: subcat._id, // Correctly linking ID for selection
                     }))}
+                  Required={false}
                 />
               )}
 

@@ -70,7 +70,7 @@ const MultiSelect = ({ label, options, selected, onChange }) => {
 
 const Products = ({ startLoading, stopLoading }) => {
   const user = useSelector((store) => store.UserInfo.user);
-  const [images, setImages] = useState(null);
+  const [images, setImages] = useState([]);
   const formRef = useRef(null);
   const mrpRef = useRef(null);
   const discountRef = useRef(null);
@@ -90,14 +90,15 @@ const Products = ({ startLoading, stopLoading }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [products, setProducts] = useState([]);
   const [productName, setProductName] = useState("");
-  const [popup, setPopup] = useState({
-    image: false,
-  });
   const [UrlData, setUrlData] = useSearchParams();
   const [editProductData, setEditProductData] = useState(null);
   const editFormRef = useRef(null);
   const [deliveryScope, setDeliveryScope] = useState("all");
   const [editDeliveryScope, setEditDeliveryScope] = useState("all");
+  const [imagePreviews, setImagePreviews] = useState([]);
+  const [popup, setPopup] = useState({
+    image: false,
+  });
 
   useEffect(() => {
     if (!isModalOpen && formRef.current) {
@@ -110,6 +111,20 @@ const Products = ({ startLoading, stopLoading }) => {
   const filteredProducts = products.filter((product) =>
     product?.name?.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const handleMultipleImageChange = (e) => {
+    const files = Array.from(e.target.files);
+
+    setImages((prev) => [...prev, ...files]);
+
+    const previewUrls = files.map((file) => URL.createObjectURL(file));
+    setImagePreviews((prev) => [...prev, ...previewUrls]);
+  };
+
+  const handleRemoveImage = (indexToRemove) => {
+    setImages((prev) => prev.filter((_, i) => i !== indexToRemove));
+    setImagePreviews((prev) => prev.filter((_, i) => i !== indexToRemove));
+  };
 
   const handleImageFileChange = (e) => {
     const file = e.target.files[0];
@@ -197,31 +212,34 @@ const Products = ({ startLoading, stopLoading }) => {
     setSuccess("");
 
     const formData = new FormData(formRef.current);
-    // console.log(images);
-    // formData.append("image", images);
 
-    // for (var pair of formData.entries()) {
-    //   console.log(pair[0] + ", " + pair[1]);
-    // }
+    // Append all selected images manually
+    images.forEach((img) => {
+      formData.append("images", img);
+    });
 
     try {
       startLoading();
+
       const response = await FetchData(
         `products/register-product/${user?.[0]?._id}`,
         "post",
         formData,
         true
       );
+
       setSuccess("Product added successfully!");
       setProducts((prev) => [...prev, response.data.data.product]);
       alert("Product added successfully!");
-      // window.location.reload();
+
+      // Reset the UI
       setProductName("");
-      setImagePreview(null);
+      setImages([]); // IMPORTANT: clear your images state
+      setImagePreviews([]); // clear previews
       formRef.current.reset();
       setIsModalOpen(false);
     } catch (err) {
-      alert(parseErrorMessage(err.response.data));
+      alert(parseErrorMessage(err?.response?.data));
     } finally {
       stopLoading();
     }
@@ -630,25 +648,43 @@ const Products = ({ startLoading, stopLoading }) => {
                 </div>
 
                 <div className="px-2 row-span-5">
-                  <InputBox
-                    LabelName="Upload Image"
-                    Type="file"
-                    Name="image"
-                    onChange={handleImageFileChange}
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Upload Images{" "}
+                    <span className="text-xs text-red-600 ">
+                      (*Upload max 5 images here)
+                    </span>
+                  </label>
+
+                  {/* Native File Input (multiple) */}
+                  <input
+                    type="file"
+                    name="images"
+                    multiple
+                    accept="image/*"
+                    onChange={handleMultipleImageChange}
+                    className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none"
                   />
-                  {imagePreview && (
-                    <div className="flex items-center gap-3">
-                      <img
-                        src={imagePreview}
-                        alt="Preview"
-                        className="w-32 h-32 object-cover rounded-md"
-                      />
-                      <button
-                        onClick={handleImageCancel}
-                        className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition"
-                      >
-                        Cancel
-                      </button>
+
+                  {/* Preview Grid */}
+                  {imagePreviews.length > 0 && (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-3">
+                      {imagePreviews.map((img, index) => (
+                        <div key={index} className="relative group">
+                          <img
+                            src={img}
+                            className="w-full h-32 object-cover rounded-md"
+                            alt={`preview-${index}`}
+                          />
+
+                          {/* Remove Button */}
+                          <button
+                            onClick={() => handleRemoveImage(index)}
+                            className="absolute top-2 right-2 bg-red-600 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      ))}
                     </div>
                   )}
                 </div>
@@ -1029,7 +1065,7 @@ const Products = ({ startLoading, stopLoading }) => {
                   <div className="flex flex-col items-center justify-evenly px-1">
                     {product?.status === "inactive" ? (
                       <div>
-                        <h1 className="bg-neutral-300 text-center px-4 py-2 rounded-2xl cursor-not-allowed mt-2 text-xs">
+                        <h1 className="bg-neutral-300 text-center px-4 py-2 rounded-2xl cursor-not-allowed mt-2 text-xs ">
                           Product is under review
                         </h1>
                       </div>

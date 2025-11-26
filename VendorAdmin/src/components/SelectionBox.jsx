@@ -7,6 +7,7 @@ const SelectBox = ({
   onChange,
   className = "",
   className2 = "",
+  Required = true,
 }) => {
   return (
     <div className={`mb-4 py-4 ${className2}`}>
@@ -17,6 +18,7 @@ const SelectBox = ({
         {LabelName}
       </label>
       <select
+        required={Required}
         id={Name}
         name={Name}
         value={Value}

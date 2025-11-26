@@ -9,6 +9,7 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
   const { productId } = useParams();
   const user = useSelector((store) => store.UserInfo.user);
   const [error, setError] = useState("");
+  const [activeSection, setActiveSection] = useState("Active Products");
   const [currentProduct, setCurrentProduct] = useState([]);
   const [currentBrand, setCurrentBrand] = useState([]);
   const [currentSubCategory, setCurrentSubCategory] = useState([]);
@@ -139,14 +140,21 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
           {[
             { label: "Name", value: currentProduct?.name },
             {
-              label: " Product Image",
+              label: "Product Image/s",
               value: (
                 <div className="w-full flex justify-end items-center">
-                  <img
+                  {currentProduct?.images?.map((image) => (
+                    <img
+                      alt="no image found"
+                      className="w-20 h-20 mx-2 border object-contain"
+                      src={image.url}
+                    />
+                  ))}
+                  {/* <img
                     src={currentProduct?.images?.[0]?.url}
                     alt="no image found"
                     className="w-20 h-20 "
-                  />
+                  /> */}
                 </div>
               ),
             },
@@ -159,7 +167,14 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
                 </div>
               ),
             },
-            { label: "Description", value: currentProduct?.description },
+            {
+              label: "Description",
+              value: (
+                <div className="text-justify">
+                  {currentProduct?.description}
+                </div>
+              ),
+            },
             { label: "SubCategory", value: currentSubCategory?.title },
             {
               label: "SubCategory Image",
@@ -167,7 +182,7 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
                 <div className="w-full flex justify-end items-center">
                   <img
                     src={currentSubCategory?.image?.url}
-                    className="w-20 h-20 "
+                    className="w-20 h-20 object-contain"
                   />
                 </div>
               ),
@@ -184,7 +199,12 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
             { label: "SKU", value: currentProduct?.sku },
             {
               label: "Specifications",
-              value: currentProduct?.specifications?.details,
+              // value: currentProduct?.specifications?.details,
+              value: (
+                <div className="text-justify">
+                  {currentProduct?.specifications?.details}
+                </div>
+              ),
             },
             { label: "Product Created At", value: currentProduct?.createdAt },
             { label: "Vendor Name", value: currentVendor?.name },
@@ -199,12 +219,10 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
           ].map((item, index) => (
             <h2
               key={index}
-              className="flex justify-between items-center gap-10 w-1/2 border-b border-neutral-300 m-1"
+              className="flex justify-between items-center gap-10 w-3/4 border-b border-neutral-300 m-1 px-5"
             >
-              {item.label}:{" "}
-              <span className="text-xl font-bold  w-full text-right">
-                {item.value}
-              </span>
+              <h1 className="text-nowrap font-bold">{item.label} :</h1>{" "}
+              <span className="w-full text-right">{item.value}</span>
             </h2>
           ))}
         </div>

@@ -28,9 +28,12 @@ import { upload } from "../middlewares/multer.middleware.js";
 const router = Router();
 
 //routes without authorization (public)
+// router
+//   .route("/register-product/:vendorId")
+//   .post(VerifyVendorUser, upload.single("image"), registerProduct);
 router
   .route("/register-product/:vendorId")
-  .post(VerifyVendorUser, upload.single("image"), registerProduct);
+  .post(VerifyVendorUser, upload.array("images", 5), registerProduct);
 router.route("/get-all-products").get(getAllProducts);
 router.route("/get-single-product/:productId").get(getProduct);
 

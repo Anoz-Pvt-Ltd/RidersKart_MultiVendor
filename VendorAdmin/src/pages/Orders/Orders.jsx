@@ -16,6 +16,8 @@ const Orders = ({ startLoading, stopLoading }) => {
   const [sortedOrders, setSortedOrders] = useState([]);
   const [openIndex, setOpenIndex] = useState(null);
   const navigate = useNavigate();
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [activeSection, setActiveSection] = useState("Confirmed");
 
   const [allPendingOrders, setAllPendingOrders] = useState([]);
@@ -53,15 +55,31 @@ const Orders = ({ startLoading, stopLoading }) => {
   };
 
   const handleSort = () => {
-    if (!selectedDate) {
-      setSortedOrders(allOrders);
+    if (!startDate || !endDate) {
+      // If either date missing → show all but sorted latest first
+      const sorted = [...allOrders].sort(
+        (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)
+      );
+      setSortedOrders(sorted);
       return;
     }
+
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    // Include whole day properly
+    end.setHours(23, 59, 59, 999);
+
     const filtered = allOrders.filter((order) => {
-      const orderDate = new Date(order.updatedAt).toISOString().split("T")[0];
-      return orderDate === selectedDate;
+      const orderDate = new Date(order.updatedAt);
+      return orderDate >= start && orderDate <= end;
     });
-    setSortedOrders(filtered);
+
+    const sortedFiltered = filtered.sort(
+      (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)
+    );
+
+    setSortedOrders(sortedFiltered);
   };
 
   const fetchAllOrders = async () => {
@@ -211,27 +229,39 @@ const Orders = ({ startLoading, stopLoading }) => {
       </h2>
       <div className="flex items-start justify-center mb-4 gap-2 flex-col sticky top-0 left-0 bg-white">
         <div className="flex lg:items-center lg:flex-row flex-col mb-4 gap-2">
-          <label htmlFor="date" className="font-medium">
-            Sort by Date:
-          </label>
+          <label className="font-medium">Date Range:</label>
+
           <input
             type="date"
-            id="date"
-            value={selectedDate}
-            onChange={handleDateChange}
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
             className="border rounded px-2 py-1"
           />
+          <h1>from</h1>
+          <input
+            type="date"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+            className="border rounded px-2 py-1"
+          />
+
           <button
             onClick={handleSort}
             className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
           >
-            Sort
+            Filter
           </button>
-          {selectedDate && (
+
+          {(startDate || endDate) && (
             <button
               onClick={() => {
-                setSelectedDate("");
-                setSortedOrders(allOrders);
+                setStartDate("");
+                setEndDate("");
+                // Reset to all orders sorted latest first
+                const sorted = [...allOrders].sort(
+                  (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)
+                );
+                setSortedOrders(sorted);
               }}
               className="ml-2 text-sm text-gray-600 underline"
             >
@@ -239,6 +269,7 @@ const Orders = ({ startLoading, stopLoading }) => {
             </button>
           )}
         </div>
+
         <div className="border-b border-gray-200 rounded-lg shadow-md w-full text-xs lg:hidden block">
           {/* Question Row */}
           <button

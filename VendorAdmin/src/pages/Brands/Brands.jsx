@@ -161,16 +161,19 @@ const Brands = ({ startLoading, stopLoading }) => {
             onSubmit={addBrandRequest}
             className="bg-gray-100 p-4 rounded mb-6 shadow"
           >
+            <h1 className="text-xs text-neutral-600">
+              * Marked fields are required
+            </h1>
             <InputBox
               Type="text"
-              LabelName={"Brand name"}
+              LabelName={"Brand name *"}
               Name={"brand"}
               Placeholder="Enter Brand Name"
             />
             <InputBox
               Type="file"
               Name={"image"}
-              LabelName="Logo "
+              LabelName="Logo *"
               Placeholder="Enter Logo URL"
             />
             <SelectBox
@@ -182,6 +185,7 @@ const Brands = ({ startLoading, stopLoading }) => {
                 label: cat.title,
                 value: cat._id, // Correctly linking ID for selection
               }))}
+              Required={false}
             />
 
             {selectedCategory !== null && (
@@ -195,6 +199,7 @@ const Brands = ({ startLoading, stopLoading }) => {
                     label: subcat.title,
                     value: subcat._id, // Correctly linking ID for selection
                   }))}
+                Required={false}
               />
             )}
 

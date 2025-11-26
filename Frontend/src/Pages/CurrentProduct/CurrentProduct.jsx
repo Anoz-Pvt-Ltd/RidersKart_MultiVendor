@@ -564,15 +564,20 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
             ) : (
               <>
                 {/* Manual pincode check for guests */}
-                <div className="flex flex-col lg:flex-row justify-center items-center lg:gap-5">
-                  <InputBox
-                    LabelName="Enter Pincode to check product availability "
-                    Placeholder="Enter here"
-                    Type="text"
-                    Value={pincode}
-                    onChange={(e) => setPincode(e.target.value)}
-                  />
-                  <Button onClick={handleCheck} label={"Check"} />
+                <div className="">
+                  <div className="flex flex-col lg:flex-row justify-center items-center lg:gap-5">
+                    <InputBox
+                      LabelName="Enter Pincode to check product availability "
+                      Placeholder="Enter here"
+                      Type="text"
+                      Value={pincode}
+                      onChange={(e) => setPincode(e.target.value)}
+                    />
+                    <Button onClick={handleCheck} label={"Check"} />
+                  </div>
+                  <h1 className="text-sm text-red-600 text-center">
+                    * Kindly update your current address on your profile !
+                  </h1>
                 </div>
 
                 {availability !== null && (
