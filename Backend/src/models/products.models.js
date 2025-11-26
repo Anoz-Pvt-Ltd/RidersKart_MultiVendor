@@ -171,6 +171,11 @@ const productSchema = new mongoose.Schema({
     default: "",
   },
 
+  commission: {
+    percentage: { type: String },
+    amount: { type: String },
+  },
+
   createdAt: {
     type: Date,
     default: Date.now,

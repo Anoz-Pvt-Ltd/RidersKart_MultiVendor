@@ -165,7 +165,6 @@ const registerProduct = asyncHandler(async (req, res) => {
     );
 });
 
-
 const getAllProductForAdmin = asyncHandler(async (req, res) => {
   const products = await Product.find()
     .populate("category", "title")
@@ -508,7 +507,6 @@ const editProduct = asyncHandler(async (req, res) => {
   });
 });
 
-
 const AddProductImages = asyncHandler(async (req, res) => {
   const { productId } = req.params;
   const images = req.files; // Array of uploaded images
@@ -571,7 +569,17 @@ const deleteProduct = asyncHandler(async (req, res) => {
 const markProductActive = asyncHandler(async (req, res) => {
   const { productId } = req.params;
 
-  // Find product
+  // You are sending "commission" from frontend
+  const { commission } = req.body;
+
+  if (!commission || isNaN(commission)) {
+    return res.status(400).json({
+      success: false,
+      message: "Commission percentage must be a valid number",
+    });
+  }
+
+  // Fetch product
   const product = await Product.findById(productId);
   if (!product) {
     return res.status(404).json({
@@ -580,8 +588,17 @@ const markProductActive = asyncHandler(async (req, res) => {
     });
   }
 
-  // Update status
+  // Calculate commission amount
+  const commissionAmount =
+    Number(product.price.MRP) * (Number(commission) / 100);
+
+  // Update product fields
   product.status = "active";
+  product.commission = {
+    percentage: String(commission), // your schema expects String
+    amount: String(commissionAmount.toFixed(2)),
+  };
+
   await product.save();
 
   res.status(200).json({
