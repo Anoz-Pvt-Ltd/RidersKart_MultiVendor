@@ -27,6 +27,10 @@ const registerProduct = asyncHandler(async (req, res) => {
     deliveryScope,
     deliveryStates,
     deliveryCities,
+
+    // NEW FIELDS
+    productDimensions,
+    productWeight,
   } = req.body;
 
   const vendorId = req.user._id;
@@ -115,21 +119,30 @@ const registerProduct = asyncHandler(async (req, res) => {
     description,
     category,
     subcategory,
+
     price: {
       MRP,
       sellingPrice: MRP - (MRP * discount) / 100,
       discount,
       discountedPrice: MRP - (MRP * discount) / 100,
     },
+
     stockQuantity,
     sku,
-    images: uploadedImages, // MULTIPLE IMAGES SAVED
+    images: uploadedImages,
+
     specifications: {
       details: `${specifications}`,
     },
+
+    // ➕ NEW FIELDS
+    productDimensions,
+    productWeight,
+
     tags: allTags,
     vendor: vendorId,
     brand,
+
     deliveryScope,
     deliveryStates: deliveryScope === "state" ? deliveryStates : [],
     deliveryCities: deliveryScope === "city" ? deliveryCities : [],
@@ -469,10 +482,16 @@ const editProduct = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const updates = req.body;
 
-  // Find and update the product by ID
-  const updatedProduct = await Product.findByIdAndUpdate(id, updates, {
-    new: true, // Return the updated document
-    runValidators: true, // Ensure validation is run on updates
+  // NEW: allow updating dimensions & weight safely
+  const allowedUpdates = {
+    ...updates,
+    productDimensions: updates.productDimensions,
+    productWeight: updates.productWeight,
+  };
+
+  const updatedProduct = await Product.findByIdAndUpdate(id, allowedUpdates, {
+    new: true,
+    runValidators: true,
   });
 
   if (!updatedProduct) {
@@ -488,6 +507,7 @@ const editProduct = asyncHandler(async (req, res) => {
     data: updatedProduct,
   });
 });
+
 
 const AddProductImages = asyncHandler(async (req, res) => {
   const { productId } = req.params;

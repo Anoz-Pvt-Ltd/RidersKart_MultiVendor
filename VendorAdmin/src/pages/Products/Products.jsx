@@ -430,6 +430,8 @@ const Products = ({ startLoading, stopLoading }) => {
       SP: product.price?.sellingPrice || "",
       stockQuantity: product.stockQuantity || "",
       sku: product.sku || "",
+      productDimensions: product.productDimensions || "",
+      productWeight: product.productWeight || "",
       description: product.description || "",
       specifications: product.specifications?.details || "",
       tags: Array.isArray(product.tags)
@@ -477,6 +479,8 @@ const Products = ({ startLoading, stopLoading }) => {
       },
       stockQuantity: editProductData.stockQuantity,
       sku: editProductData.sku,
+      productDimensions: editProductData.productDimensions,
+      productWeight: editProductData.productWeight,
       description: editProductData.description,
       specifications: { details: editProductData.specifications },
       tags: editProductData.tags.split(",").map((t) => t.trim()),
@@ -715,6 +719,25 @@ const Products = ({ startLoading, stopLoading }) => {
                     className="max-h-20 min-h-20"
                   />
                 </div>
+
+                {/* Product Dimensions */}
+                <div className="flex items-start justify-center">
+                  <InputBox
+                    LabelName="Product Dimensions"
+                    Name="productDimensions"
+                    Placeholder="e.g. 10 x 5 x 3 cm"
+                  />
+                </div>
+
+                {/* Product Weight */}
+                <div className="flex items-start justify-center">
+                  <InputBox
+                    LabelName="Product Weight"
+                    Name="productWeight"
+                    Placeholder="e.g. 250 g"
+                  />
+                </div>
+
                 {/* Delivery Scope Selection */}
                 <div className="flex items-start justify-center">
                   <SelectBox
@@ -950,6 +973,29 @@ const Products = ({ startLoading, stopLoading }) => {
                     className="max-h-20 min-h-20"
                   />
                 </div>
+
+                {/* Product Dimensions */}
+                <div className="flex items-start justify-center">
+                  <InputBox
+                    LabelName="Product Dimensions"
+                    Name="productDimensions"
+                    Placeholder="e.g. 10 x 5 x 3 cm"
+                    Value={editProductData.productDimensions}
+                    onChange={handleEditChange}
+                  />
+                </div>
+
+                {/* Product Weight */}
+                <div className="flex items-start justify-center">
+                  <InputBox
+                    LabelName="Product Weight"
+                    Name="productWeight"
+                    Placeholder="e.g. 250 g"
+                    Value={editProductData.productWeight}
+                    onChange={handleEditChange}
+                  />
+                </div>
+
                 {/* Delivery Scope Selection */}
                 <div className="flex items-start justify-center">
                   <SelectBox

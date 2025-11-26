@@ -1,26 +1,30 @@
 import mongoose, { Schema } from "mongoose";
-// import { User } from "./user.model";
+
 const productSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
     trim: true,
   },
+
   description: {
     type: String,
     required: true,
     trim: true,
   },
+
   category: {
     type: Schema.Types.ObjectId,
     ref: "Category",
     required: true,
   },
+
   subcategory: {
     type: Schema.Types.ObjectId,
     ref: "Subcategory",
     required: true,
   },
+
   price: {
     MRP: {
       type: Number,
@@ -34,12 +38,11 @@ const productSchema = new mongoose.Schema({
     discount: {
       type: Number,
       min: 0,
-      max: 100, // Maximum discount percentage allowed
+      max: 100,
     },
     discountedPrice: {
       type: Number,
-      // required: true,
-      min: 0, // Calculated discounted price based on MRP and discount percentage
+      min: 0,
       get: function () {
         return this.MRP - (this.MRP * this.discount) / 100;
       },
@@ -48,26 +51,30 @@ const productSchema = new mongoose.Schema({
       },
     },
   },
+
   stockQuantity: {
     type: Number,
     required: true,
     min: 0,
   },
+
   sku: {
     type: String,
     required: true,
-    unique: true, // Stock Keeping Unit for unique product identification
+    unique: true,
   },
+
   vendor: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "VendorUser", // Reference to the vendor who registered the product
+    ref: "VendorUser",
     required: true,
   },
+
   images: [
     {
       fileId: {
-        type: String, // ImageKit file ID
-        required: true, // The unique identifier for the uploaded image file
+        type: String,
+        required: true,
       },
       url: {
         type: String,
@@ -79,38 +86,45 @@ const productSchema = new mongoose.Schema({
       },
     },
   ],
+
   specifications: {
     type: Map,
-    of: String, // Key-value pair for product specifications (e.g., "Color": "Red", "Size": "Large")
+    of: String,
     default: {},
   },
+
   tags: {
     type: [String],
-    default: [], // Optional tags for search and categorization
+    default: [],
   },
+
   status: {
     type: String,
     enum: ["active", "inactive", "suspended"],
     default: "inactive",
   },
+
   brand: {
     type: Schema.Types.ObjectId,
     ref: "Brand",
     required: true,
   },
+
   deliveryScope: {
     type: String,
     enum: ["all", "state", "city"],
-    // required: true,
   },
+
   deliveryStates: {
-    type: [String], // e.g. ["BIHAR", "JHARKHAND"]
+    type: [String],
     default: [],
   },
+
   deliveryCities: {
-    type: [String], // e.g. ["PATNA", "NALANDA"]
+    type: [String],
     default: [],
   },
+
   ratings: [
     {
       user: {
@@ -144,10 +158,24 @@ const productSchema = new mongoose.Schema({
     default: "non-featured",
   },
 
+  // ➕ NEW FIELDS
+  productDimensions: {
+    type: String,
+    trim: true,
+    default: "",
+  },
+
+  productWeight: {
+    type: String,
+    trim: true,
+    default: "",
+  },
+
   createdAt: {
     type: Date,
     default: Date.now,
   },
+
   updatedAt: {
     type: Date,
     default: Date.now,
