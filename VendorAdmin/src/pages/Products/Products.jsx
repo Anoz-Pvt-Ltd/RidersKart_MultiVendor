@@ -1155,6 +1155,9 @@ const Products = ({ startLoading, stopLoading }) => {
                 <p>
                   <strong>Stock:</strong> {product?.stockQuantity}
                 </p>
+                <p>
+                  <strong>Platform Charges:</strong> ₹{product?.commission?.amount || "NA"}
+                </p>
                 {product?.status === "inactive" ? (
                   <div>
                     <h1 className="bg-neutral-300 text-center px-4 py-2 rounded-2xl cursor-not-allowed mt-2 text-xs">
