@@ -286,7 +286,7 @@ const Products = ({ startLoading, stopLoading }) => {
         );
         setSubcategories(allSubcategories);
       } catch (error) {
-        console.log("Error getting all main subcategories", error);
+        // console.log("Error getting all main subcategories", error);
       } finally {
         stopLoading();
       }

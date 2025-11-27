@@ -39,7 +39,7 @@ const LoginForm = ({
     try {
       startLoading();
       const response = await FetchData("vendor/login", "post", credentials);
-      console.log(response);
+      // console.log(response);
       Dispatch(clearUser());
       Dispatch(addUser(response.data.data.vendor));
       setSuccess("Login successful!");

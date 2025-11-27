@@ -12,7 +12,7 @@ const VerifiedDrivers = ({ startLoading, stopLoading }) => {
       try {
         startLoading();
         const response = await FetchData(`driver/registration-request`, "get");
-        console.log(response);
+        // console.log(response);
         if (response.data.success) {
           setAllDrivers(response.data.orders);
         } else {

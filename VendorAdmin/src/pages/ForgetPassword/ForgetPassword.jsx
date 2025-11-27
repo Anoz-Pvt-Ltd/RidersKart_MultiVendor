@@ -27,11 +27,11 @@ const ForgetPassword = ({ startLoading, stopLoading, cancel }) => {
         formData
       );
 
-      console.log(response);
+      // console.log(response);
       alert(response.data.message);
       setIsOpenOtpModel(true);
     } catch (err) {
-      console.log(err);
+      // console.log(err);
       alert(parseErrorMessage(err.response.data));
     } finally {
       stopLoading();
@@ -50,11 +50,11 @@ const ForgetPassword = ({ startLoading, stopLoading, cancel }) => {
         "post",
         formData
       );
-      console.log(response);
+      // console.log(response);
       alert(response.data.message);
       navigate("/login"); // redirect after success
     } catch (err) {
-      console.log(err);
+      // console.log(err);
       alert(parseErrorMessage(err.response.data));
       window.location.reload();
     } finally {

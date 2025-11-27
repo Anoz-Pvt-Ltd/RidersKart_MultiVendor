@@ -28,7 +28,7 @@ export const FetchData = async (url, method, data, file = false) => {
     const response = await axios.delete(`${Base_URL}/${url}`, options);
     return response;
   } else {
-    console.log(method);
+    // console.log(method);
     return "Please enter the valid method";
   }
 };

@@ -49,9 +49,9 @@ const VendorRegistrationForm = ({ startLoading, stopLoading, onClose }) => {
       "vendorRegistrationForm",
       JSON.stringify(existingObject)
     );
-    console.log(existingObject);
+    // console.log(existingObject);
     setStep((prev) => prev + 1);
-    console.log(step);
+    // console.log(step);
   };
 
   const prevStep = () => setStep((prev) => prev - 1);
@@ -92,7 +92,7 @@ const VendorRegistrationForm = ({ startLoading, stopLoading, onClose }) => {
         formData,
         true
       );
-      console.log(response);
+      // console.log(response);
       if (response.status === 201) {
         setSuccess("Vendor registered successfully!");
         alert("Please wait until our team completes the verification process.");
@@ -101,7 +101,7 @@ const VendorRegistrationForm = ({ startLoading, stopLoading, onClose }) => {
         setStep(0);
       }
     } catch (err) {
-      console.log(err);
+      // console.log(err);
       setError(
         err.response?.data?.message || "An error occurred during registration."
       );

@@ -44,9 +44,9 @@ const ManageStocks = ({ startLoading, stopLoading }) => {
   const handleAddStock = async (e) => {
     e.preventDefault();
     const formData = new FormData(formRef.current);
-    for (let [key, value] of formData.entries()) {
-      console.log(`${key}: ${value}`);
-    }
+    // for (let [key, value] of formData.entries()) {
+    //   console.log(`${key}: ${value}`);
+    // }
     try {
       startLoading();
       const response = await FetchData(
@@ -54,7 +54,7 @@ const ManageStocks = ({ startLoading, stopLoading }) => {
         "post",
         formData
       );
-      console.log(response);
+      // console.log(response);
       alert("Stock added successfully");
       fetchProducts();
       setHandlePopup((prev) => {
@@ -74,9 +74,9 @@ const ManageStocks = ({ startLoading, stopLoading }) => {
     e.preventDefault();
 
     const formData = new FormData(formRef.current);
-    for (let [key, value] of formData.entries()) {
-      console.log(`${key}: ${value}`);
-    }
+    // for (let [key, value] of formData.entries()) {
+    //   console.log(`${key}: ${value}`);
+    // }
     try {
       startLoading();
       const response = await FetchData(
@@ -84,7 +84,7 @@ const ManageStocks = ({ startLoading, stopLoading }) => {
         "post",
         formData
       );
-      console.log(response);
+      // console.log(response);
       alert("Stock removed successfully");
       fetchProducts();
       setHandlePopup((prev) => {

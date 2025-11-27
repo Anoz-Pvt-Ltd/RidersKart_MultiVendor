@@ -28,7 +28,7 @@ const CurrentOrder = () => {
       setCurrentOrder(response.data.data.order);
       setOrderProducts(response.data.data.order.products);
     } catch (err) {
-      console.log(err);
+      // console.log(err);
     }
   };
   useEffect(() => {
@@ -44,7 +44,7 @@ const CurrentOrder = () => {
       //   console.log(response);
       setCurrentUser(response.data.data.user);
     } catch (err) {
-      console.log(err);
+      // console.log(err);
     }
   };
 
@@ -52,7 +52,7 @@ const CurrentOrder = () => {
     getCurrentClient();
   }, [userId]);
 
-  console.log(currentOrder);
+  // console.log(currentOrder);
 
   const ProductsCard = ({
     images,
