@@ -24,6 +24,7 @@ import Footer from "./Components/Footer";
 import TermsConditionsVendors from "./Pages/Terms-and-Conditions/Terms-&-conditions-vendors";
 import CurrentOrder from "./Pages/CurrentOrder/CurrentOrder";
 import SearchPage from "./Pages/Search-Products/searchFeed";
+import PrivacyPolicy from "./Pages/PrivacyPolicy/PrivacyPolicy";
 // import { io } from "socket.io-client";
 
 const App = () => {
@@ -103,6 +104,7 @@ const App = () => {
             path="/terms-and-conditions"
             element={<TermsAndConditions />}
           />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/vendor-policy" element={<TermsConditionsVendors />} />
           <Route path="/refund-process" element={<RefundPolicy />} />
           <Route

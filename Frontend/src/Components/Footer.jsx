@@ -28,12 +28,6 @@ const Footer = () => {
           <h1 className="text-xl underline-offset-4 underline">Quick Links </h1>
           <ul>
             <li className="small-footer-text">
-              <Link>
-                {/* <Link to={"#services"} onClick={handleNavigate}> */}{" "}
-                Services
-              </Link>
-            </li>
-            <li className="small-footer-text">
               <Link to={`https://postman.riderskart.in/`} target="_blank">
                 Rider's Kart Postman
               </Link>
@@ -44,11 +38,11 @@ const Footer = () => {
           <h1 className="text-xl underline-offset-4 underline">Support</h1>
           <ul>
             <li className="small-footer-text">
-              <Link>Privacy Policy</Link>
+              <a href="/privacy-policy">Privacy Policy</a>
             </li>
-            <li className="small-footer-text">
+            {/* <li className="small-footer-text">
               <Link>Terms of Services</Link>
-            </li>
+            </li> */}
 
             <li className="small-footer-text">
               <a href="/terms-and-conditions">Terms & Conditions: User</a>

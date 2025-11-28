@@ -71,10 +71,10 @@ const DeliveryInstructions = () => {
           <p className="text-yellow-700">
             If your package is late, damaged, or missing, email us at{" "}
             <a
-              href="mailto:support@example.com"
+              href="mailto:support@riderskart.in"
               className="font-semibold hover:underline"
             >
-              support@example.com
+              support@riderskart.in
             </a>
             .
           </p>

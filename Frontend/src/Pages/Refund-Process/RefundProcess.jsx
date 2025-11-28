@@ -66,7 +66,7 @@ const RefundPolicy = () => {
                 href="mailto:support@example.com"
                 className="text-blue-600 hover:underline"
               >
-                support@example.com
+                support@riderskart.in
               </a>{" "}
               with your order number.
             </li>
@@ -191,7 +191,7 @@ const RefundPolicy = () => {
               href="mailto:support@example.com"
               className="font-semibold hover:underline"
             >
-              support@example.com
+              support@riderskart.in
             </a>{" "}
             for any questions.
           </p>
