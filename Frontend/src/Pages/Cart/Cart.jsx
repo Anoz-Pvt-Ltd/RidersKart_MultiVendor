@@ -29,7 +29,7 @@ const CartPage = ({ startLoading, stopLoading }) => {
   const [addresses, setAddresses] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState();
   const [paymentMethod, setPaymentMethod] = useState("");
- const userPostalCode = user[0]?.defaultAddress?.postalCode;
+  const userPostalCode = user[0]?.defaultAddress?.postalCode;
 
   const dispatch = useDispatch();
   const Navigate = useNavigate();
@@ -110,7 +110,8 @@ const CartPage = ({ startLoading, stopLoading }) => {
     const order = await FetchData("payment/create-new-paymentId", "post", {
       options: {
         // amount: (getTotalPayablePrice() * 1.1).toFixed(2),
-        amount: 100,
+        amount: Number((getTotalPayablePrice() * 1.1).toFixed(2)),
+        // amount: 100,
         currency: "INR",
         receipt: "qwerty1234",
       },
