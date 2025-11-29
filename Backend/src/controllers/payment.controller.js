@@ -13,8 +13,8 @@ const CreatePaymentId = asyncHandler(async (req, res) => {
 
   // Ensure amount is in paise (multiply by 100)
   const paymentOptions = {
-    // amount: options.amount * 100, // Convert to paise
-    amount: 100, // For testing, set a fixed amount of 100 paise (1 INR)
+    amount: options.amount * 100, // Convert to paise
+    // amount: 100, // For testing, set a fixed amount of 100 paise (1 INR)
     currency: options.currency,
     receipt: `receipt_${Date.now()}`, // Ensure a receipt is always there
     payment_capture: 1, // Auto-capture payment
