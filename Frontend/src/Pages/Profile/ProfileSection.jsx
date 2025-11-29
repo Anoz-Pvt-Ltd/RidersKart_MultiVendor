@@ -43,7 +43,7 @@ const ProfileSection = ({ startLoading, stopLoading }) => {
   const Dispatch = useDispatch();
   const user = useSelector((store) => store.UserInfo.user);
   // const [allOrders, setAllOrders] = useState([]);
-  // console.log(user);
+  console.log(user);
   const [showModal, setShowModal] = useState(false);
   const [showModal2, setShowModal2] = useState(false);
   const [showModal3, setShowModal3] = useState(false);
@@ -395,7 +395,7 @@ const ProfileSection = ({ startLoading, stopLoading }) => {
                 <h1 className=" text-xs">
                   <p className="shadow rounded-xl bg-neutral-200 py-2 px-3 w-fit">
                     <li className=" font-semibold list-none">
-                      Street:{" "}
+                      Address:{" "}
                       <span className="font-normal text-xs ">
                         {truncateString(
                           user?.[0]?.defaultAddress?.street || "Not available",
@@ -448,7 +448,7 @@ const ProfileSection = ({ startLoading, stopLoading }) => {
                 >
                   <span className="shadow m-1 py-3 px-2 rounded-xl bg-neutral-200 w-full lg:w-fit">
                     <li className=" font-semibold list-none">
-                      Street:{" "}
+                      Address:{" "}
                       <span className="font-normal text-xs ">
                         {truncateString(address?.street || "Not available", 10)}
                       </span>
@@ -540,8 +540,8 @@ const ProfileSection = ({ startLoading, stopLoading }) => {
               </div>
               <form className="w-full flex flex-col justify-center items-center px-5 py-2">
                 <InputBox
-                  LabelName="Street"
-                  Placeholder="Enter street address"
+                  LabelName="Address"
+                  Placeholder="Enter address"
                   Name="street"
                   Value={newAddress.street}
                   onChange={handleAddressInputChange}
@@ -702,7 +702,7 @@ const ProfileSection = ({ startLoading, stopLoading }) => {
                     className="w-full flex flex-col justify-center items-center px-5 py-2"
                   >
                     <InputBox
-                      LabelName="Street"
+                      LabelName="Address"
                       Placeholder={editAddress.street}
                       Name="street"
                       Value={editAddress.street}

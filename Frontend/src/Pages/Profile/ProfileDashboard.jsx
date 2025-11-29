@@ -6,10 +6,12 @@ import LoadingUI from "../../Components/Loading";
 import ProfileSection from "./ProfileSection";
 import OrderSection from "./OrderSection";
 import WishListSection from "./WishListSection";
+import { useSelector } from "react-redux";
+import { Link } from "react-router-dom";
+import Button from "../../Components/Button";
 
 const Dashboard = ({ startLoading, stopLoading }) => {
-  // const user = useSelector((store) => store.UserInfo.user);
-  // const [error, setError] = useState(null);
+  const user = useSelector((store) => store.UserInfo.user);
   const [activeSection, setActiveSection] = useState(
     localStorage.getItem("activeSection") || "profile"
   );
@@ -17,8 +19,6 @@ const Dashboard = ({ startLoading, stopLoading }) => {
   useEffect(() => {
     localStorage.setItem("activeSection", activeSection);
   }, [activeSection]);
-  // const [wishlistProducts, setWishlistProducts] = useState();
-  // const [allOrders, setAllOrders] = useState([]);
 
   const sectionVariants = {
     hidden: { opacity: 0, x: -50 },
@@ -29,40 +29,47 @@ const Dashboard = ({ startLoading, stopLoading }) => {
     hidden: { opacity: 0, x: -100 },
     visible: { opacity: 1, x: 0, transition: { duration: 0.8 } },
   };
-
-  // const fetchWishlistProducts = async () => {
-  //   if (user?.length > 0) {
-  //     try {
-  //       startLoading();
-  //       const response = await FetchData(
-  //         `users/${user?.[0]?._id}/wishlist-products`,
-  //         "get"
-  //       );
-  //       if (response.data.success) {
-  //         setWishlistProducts(response.data.data);
-  //       } else {
-  //         setError("Failed to load Wishlist products.");
-  //       }
-  //     } catch (err) {
-  //       setError(
-  //         err.response?.data?.message || "Failed to fetch Wishlist products."
-  //       );
-  //     } finally {
-  //       stopLoading();
-  //     }
-  //   }
-  // };
-  // useEffect(() => {
-  //   fetchWishlistProducts();
-  // }, [user]);
-
   const navigate = useNavigate();
 
-  const navigateHome = () => {
-    navigate("/");
-  };
+  return user?.length === 0 ? (
+    <div className="flex flex-col items-center justify-center h-[80vh] px-4 text-center">
+      <motion.img
+        src="https://cdn-icons-png.flaticon.com/512/1828/1828427.png"
+        alt="Login Required"
+        className="w-28 mb-6"
+        initial={{ scale: 0 }}
+        animate={{ scale: 1 }}
+        transition={{ type: "spring", stiffness: 200, damping: 10 }}
+      />
 
-  return (
+      <motion.h2
+        className="text-2xl font-semibold mb-2"
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+      >
+        You're Not Logged In
+      </motion.h2>
+
+      <motion.p
+        className="text-gray-600 max-w-md mb-6"
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+      >
+        Please register or log in to access your profile and manage your account
+        information.
+      </motion.p>
+      <div className="flex justify-center items-center gap-5">
+        <Button label={"Login Now"} onClick={() => navigate("/login")} />
+        <Button label={"Register Now"} onClick={() => navigate("/register")} />
+      </div>
+      {/* <Link
+        to="/login"
+        className="bg-black text-white px-6 py-2 rounded-lg hover:bg-gray-800 transition-all"
+      >
+        Login Now
+      </Link> */}
+    </div>
+  ) : (
     <div className="flex flex-col lg:flex-row min-h-screen">
       <motion.aside
         className="lg:w-64 text-black p-4 sticky top-0 left-0 z-40 lg:bg-black/10 bg-[#E8E8F5]"
