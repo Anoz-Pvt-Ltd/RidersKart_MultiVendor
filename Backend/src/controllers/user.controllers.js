@@ -31,7 +31,7 @@ const generateAccessAndRefreshTokens = async (userId) => {
 const registerUser = asyncHandler(async (req, res, next) => {
   const { name, email, phoneNumber, password, address } = req.body;
 
-  if (!name || !email || !phoneNumber || !password ) {
+  if (!name || !email || !phoneNumber || !password) {
     throw new ApiError(400, "All fields are required");
   }
   // if (!name || !email || !phoneNumber || !password || !address) {
@@ -63,6 +63,10 @@ const registerUser = asyncHandler(async (req, res, next) => {
   const existingUser = await User.findOne({ email });
   if (existingUser) {
     throw new ApiError(400, "Email is already in use");
+  }
+  const existingContactNumber = await User.findOne({ phoneNumber });
+  if (existingContactNumber) {
+    throw new ApiError(400, "Contact number is already in use");
   }
 
   const newUser = await User.create({
