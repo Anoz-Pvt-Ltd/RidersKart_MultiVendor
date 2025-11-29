@@ -23,6 +23,7 @@ import { alertError, alertInfo, alertSuccess } from "../../Utility/Alert.js";
 import { truncateString } from "../../Utility/Utility-functions.js";
 import MapInput from "../../Components/MapInput.jsx";
 import { AnimatePresence, motion } from "framer-motion";
+import oops from "../../assets/Oops.png";
 
 const CurrentProduct = ({ startLoading, stopLoading }) => {
   const [isReadMoreDescription, setIsReadMoreDescription] = useState(false);
@@ -530,89 +531,107 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
             transition={{ duration: 1 }}
             className=""
           >
-            {userPostalCode ? (
-              <>
-                {/* Auto availability check for logged-in users */}
-                {availability ? (
-                  <div className="flex gap-10 lg:gap-52 justify-center items-center lg:ml-20 ">
-                    {user[0]?.defaultAddress?.coordinates.length === 0 ? (
-                      <Button
-                        label={"Buy Now"}
-                        className="text-white w-36 h-12"
-                        onClick={() => setBuyNowPopUp(true)}
-                      />
-                    ) : (
-                      <Button
-                        label={"Buy Now"}
-                        className="bg-[#ff741b] hover:bg-[#ff924e] text-white w-36 h-12"
-                        onClick={HandleBuyNow}
-                      />
-                    )}
-                    <Button
-                      label={"Add to Cart"}
-                      className="bg-[#ff9f00] hover:bg-[#ffbb4e] text-white w-36 h-12"
-                      onClick={addProductToCart}
-                    />
-                  </div>
-                ) : (
-                  <div className="flex gap-10 lg:gap-52 justify-center items-center lg:ml-20 bg-[#DF3F33] text-white p-4 rounded-lg">
-                    This product is not available for your location (
-                    {userPostalCode})
-                  </div>
-                )}
-              </>
+            {console.log(products)}
+            {products?.stockQuantity === 0 ? (
+              <div className="bg-neutral-200 rounded-xl">
+                <p className="text-gray-500 text-sm px-2 w-full flex justify-center items-center gap-5">
+                  <span className="hidden lg:flex">
+                    <img src={oops} className="w-56" />
+                  </span>
+                  <strong className="text-sm lg:text-xl text-nowrap">
+                    Oops !
+                  </strong>
+                  The product is currently out of stock. Please check back later.
+                </p>
+              </div>
             ) : (
-              <>
-                {/* Manual pincode check for guests */}
-                <div className="">
-                  <div className="flex flex-col lg:flex-row justify-center items-center lg:gap-5">
-                    <InputBox
-                      LabelName="Enter Pincode to check product availability "
-                      Placeholder="Enter here"
-                      Type="text"
-                      Value={pincode}
-                      onChange={(e) => setPincode(e.target.value)}
-                    />
-                    <Button onClick={handleCheck} label={"Check"} />
-                  </div>
-                  <h1 className="text-sm text-red-600 text-center">
-                    * Kindly update your current address on your profile !
-                  </h1>
-                </div>
-
-                {availability !== null && (
+              <div>
+                {" "}
+                {userPostalCode ? (
                   <>
+                    {/* Auto availability check for logged-in users */}
                     {availability ? (
-                      <div className="flex flex-col justify-center items-center gap-3">
-                        <div className="flex gap-10 lg:gap-52 justify-center items-center bg-green-500 text-white p-4 rounded-lg w-full">
-                          This product is available for your location ({pincode}
-                          )
-                        </div>
-                        <div className="flex w-full justify-evenly items-center ">
-                          {user[0]?.address[0]?.coordinates === 0 ? (
-                            <Button
-                              label={"Buy Now"}
-                              className="bg-[#ff741b] hover:bg-[#ff924e] text-white w-36 h-12"
-                              onClick={HandleBuyNow}
-                            />
-                          ) : (
-                            <h1>Please enter your location</h1>
-                          )}
+                      <div className="flex gap-10 lg:gap-52 justify-center items-center lg:ml-20 ">
+                        {user[0]?.defaultAddress?.coordinates.length === 0 ? (
                           <Button
-                            label={"Add to Cart"}
-                            className="bg-[#ff9f00] hover:bg-[#ffbb4e] text-white w-36 h-12"
-                            onClick={addProductToCart}
+                            label={"Buy Now"}
+                            className="text-white w-36 h-12"
+                            onClick={() => setBuyNowPopUp(true)}
                           />
-                        </div>
+                        ) : (
+                          <Button
+                            label={"Buy Now"}
+                            className="bg-[#ff741b] hover:bg-[#ff924e] text-white w-36 h-12"
+                            onClick={HandleBuyNow}
+                          />
+                        )}
+                        <Button
+                          label={"Add to Cart"}
+                          className="bg-[#ff9f00] hover:bg-[#ffbb4e] text-white w-36 h-12"
+                          onClick={addProductToCart}
+                        />
                       </div>
                     ) : (
-                      <div className="flex gap-10 lg:gap-52 justify-center items-center bg-[#DF3F33] text-white p-4 rounded-lg mt-4">
-                        This product is not available for this pincode
+                      <div className="flex gap-10 lg:gap-52 justify-center items-center lg:ml-20 bg-[#DF3F33] text-white p-4 rounded-lg">
+                        This product is not available for your location (
+                        {userPostalCode})
                       </div>
                     )}
                   </>
+                ) : (
+                  <>
+                    {/* Manual pincode check for guests */}
+                    <div className="">
+                      <div className="flex flex-col lg:flex-row justify-center items-center lg:gap-5">
+                        <InputBox
+                          LabelName="Enter Pincode to check product availability "
+                          Placeholder="Enter here"
+                          Type="text"
+                          Value={pincode}
+                          onChange={(e) => setPincode(e.target.value)}
+                        />
+                        <Button onClick={handleCheck} label={"Check"} />
+                      </div>
+                      <h1 className="text-sm text-red-600 text-center">
+                        * Kindly update your current address on your profile !
+                      </h1>
+                    </div>
+
+                    {availability !== null && (
+                      <>
+                        {availability ? (
+                          <div className="flex flex-col justify-center items-center gap-3">
+                            <div className="flex gap-10 lg:gap-52 justify-center items-center bg-green-500 text-white p-4 rounded-lg w-full">
+                              This product is available for your location (
+                              {pincode})
+                            </div>
+                            <div className="flex w-full justify-evenly items-center ">
+                              {user[0]?.address[0]?.coordinates === 0 ? (
+                                <Button
+                                  label={"Buy Now"}
+                                  className="bg-[#ff741b] hover:bg-[#ff924e] text-white w-36 h-12"
+                                  onClick={HandleBuyNow}
+                                />
+                              ) : (
+                                <h1>Please enter your location</h1>
+                              )}
+                              <Button
+                                label={"Add to Cart"}
+                                className="bg-[#ff9f00] hover:bg-[#ffbb4e] text-white w-36 h-12"
+                                onClick={addProductToCart}
+                              />
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="flex gap-10 lg:gap-52 justify-center items-center bg-[#DF3F33] text-white p-4 rounded-lg mt-4">
+                            This product is not available for this pincode
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </>
                 )}
-              </>
+              </div>
             )}
           </motion.div>
         </section>
