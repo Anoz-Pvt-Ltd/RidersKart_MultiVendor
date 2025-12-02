@@ -1,50 +1,32 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose from "mongoose";
 
 const productSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
-    trim: true,
-  },
-
-  description: {
-    type: String,
-    required: true,
-    trim: true,
-  },
+  name: { type: String, required: true, trim: true },
+  description: { type: String, required: true, trim: true },
 
   category: {
-    type: Schema.Types.ObjectId,
+    type: mongoose.Schema.Types.ObjectId,
     ref: "Category",
     required: true,
   },
 
   subcategory: {
-    type: Schema.Types.ObjectId,
+    type: mongoose.Schema.Types.ObjectId,
     ref: "Subcategory",
     required: true,
   },
 
   price: {
-    MRP: {
-      type: Number,
-      required: true,
-      min: 0,
-    },
-    sellingPrice: {
-      type: Number,
-      min: 0,
-    },
-    discount: {
-      type: Number,
-      min: 0,
-      max: 100,
-    },
+    MRP: { type: Number, required: true, min: 0 },
+    sellingPrice: { type: Number, min: 0, default: 0 },
+    discount: { type: Number, min: 0, max: 100, default: 0 },
     discountedPrice: {
       type: Number,
       min: 0,
       get: function () {
-        return this.MRP - (this.MRP * this.discount) / 100;
+        if (!this.MRP) return 0;
+        const d = this.discount || 0;
+        return this.MRP - (this.MRP * d) / 100;
       },
       set: function (value) {
         this.discountedPrice = value;
@@ -52,17 +34,8 @@ const productSchema = new mongoose.Schema({
     },
   },
 
-  stockQuantity: {
-    type: Number,
-    required: true,
-    min: 0,
-  },
-
-  sku: {
-    type: String,
-    required: true,
-    unique: true,
-  },
+  stockQuantity: { type: Number, required: true, min: 0, default: 0 },
+  sku: { type: String, required: true, unique: true },
 
   vendor: {
     type: mongoose.Schema.Types.ObjectId,
@@ -72,18 +45,9 @@ const productSchema = new mongoose.Schema({
 
   images: [
     {
-      fileId: {
-        type: String,
-        required: true,
-      },
-      url: {
-        type: String,
-        required: true,
-      },
-      altText: {
-        type: String,
-        default: "",
-      },
+      fileId: { type: String, required: true },
+      url: { type: String, required: true },
+      altText: { type: String, default: "" },
     },
   ],
 
@@ -93,10 +57,7 @@ const productSchema = new mongoose.Schema({
     default: {},
   },
 
-  tags: {
-    type: [String],
-    default: [],
-  },
+  tags: { type: [String], default: [] },
 
   status: {
     type: String,
@@ -105,7 +66,7 @@ const productSchema = new mongoose.Schema({
   },
 
   brand: {
-    type: Schema.Types.ObjectId,
+    type: mongoose.Schema.Types.ObjectId,
     ref: "Brand",
     required: true,
   },
@@ -113,17 +74,12 @@ const productSchema = new mongoose.Schema({
   deliveryScope: {
     type: String,
     enum: ["all", "state", "city"],
+    default: "all",
   },
 
-  deliveryStates: {
-    type: [String],
-    default: [],
-  },
+  deliveryStates: { type: [String], default: [] },
 
-  deliveryCities: {
-    type: [String],
-    default: [],
-  },
+  deliveryCities: { type: [String], default: [] },
 
   ratings: [
     {
@@ -132,23 +88,10 @@ const productSchema = new mongoose.Schema({
         ref: "User",
         required: true,
       },
-      product: {
-        type: String,
-      },
-      rating: {
-        type: Number,
-        required: true,
-        min: 1,
-        max: 5,
-      },
-      comment: {
-        type: String,
-        trim: true,
-      },
-      createdAt: {
-        type: Date,
-        default: Date.now,
-      },
+      product: { type: String },
+      rating: { type: Number, required: true, min: 1, max: 5 },
+      comment: { type: String, trim: true },
+      createdAt: { type: Date, default: Date.now },
     },
   ],
 
@@ -158,36 +101,18 @@ const productSchema = new mongoose.Schema({
     default: "non-featured",
   },
 
-  // ➕ NEW FIELDS
-  productDimensions: {
-    type: String,
-    trim: true,
-    default: "",
-  },
-
-  productWeight: {
-    type: String,
-    trim: true,
-    default: "",
-  },
+  productDimensions: { type: String, trim: true, default: "" },
+  productWeight: { type: String, trim: true, default: "" },
 
   commission: {
-    percentage: { type: String },
-    amount: { type: String },
+    percentage: { type: String, default: "" },
+    amount: { type: String, default: "" },
   },
 
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-
-  updatedAt: {
-    type: Date,
-    default: Date.now,
-  },
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now },
 });
 
-// Middleware to update the `updatedAt` timestamp before saving
 productSchema.pre("save", function (next) {
   this.updatedAt = Date.now();
   next();
