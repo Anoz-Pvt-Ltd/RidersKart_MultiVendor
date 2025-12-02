@@ -18,7 +18,7 @@ const Orders = ({ startLoading, stopLoading }) => {
   const navigate = useNavigate();
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [activeSection, setActiveSection] = useState("Confirmed");
+  const [activeSectionOrder, setActiveSectionOrder] = useState("Pending");
 
   const [allPendingOrders, setAllPendingOrders] = useState([]);
   const [allConfirmOrders, setAllConfirmOrders] = useState([]);
@@ -90,6 +90,7 @@ const Orders = ({ startLoading, stopLoading }) => {
           `orders/get-vendor-orders/${user?.[0]?._id}`,
           "get"
         );
+        console.log(response);
         let orders = response.data.orders || [];
 
         // keep a master list (used by sorting) and initial sorted state
@@ -278,7 +279,9 @@ const Orders = ({ startLoading, stopLoading }) => {
           >
             <span className="font-medium text-gray-700 space-x-2">
               <strong>Order Status</strong>{" "}
-              <span className="underline text-blue-500">{activeSection}</span>
+              <span className="underline text-blue-500">
+                {activeSectionOrder}
+              </span>
             </span>
             <FaChevronDown
               className={`text-gray-500 transform transition-transform duration-300 ${
@@ -301,17 +304,17 @@ const Orders = ({ startLoading, stopLoading }) => {
                     <li
                       key={section}
                       className={`cursor-pointer transition-all duration-300 color-purple rounded-xl shadow-2xl lg:w-fit w-full px-4 py-2 list-none hover:text-[#DF3F33] ${
-                        activeSection === section
+                        activeSectionOrder === section
                           ? " list-none bg-[#DF3F33] text-white hover:text-white"
                           : "bg-white text-black"
                       }`}
                       onClick={() => {
-                        setActiveSection(section);
+                        setActiveSectionOrder(section);
                         setOpenIndex(false);
                       }}
                     >
                       <span className="flex items-center gap-2">
-                        {activeSection === section && (
+                        {activeSectionOrder === section && (
                           <span className="text-white">
                             <Check className="h-4 w-4" />
                           </span>
@@ -330,16 +333,16 @@ const Orders = ({ startLoading, stopLoading }) => {
             <li
               key={section}
               className={`cursor-pointer transition-all duration-300 color-purple rounded-xl shadow-2xl lg:w-fit w-full px-4 py-2 list-none hover:text-[#DF3F33] ${
-                activeSection === section
+                activeSectionOrder === section
                   ? " list-none bg-[#DF3F33] text-white hover:text-white"
                   : "bg-white text-black"
               }`}
               onClick={() => {
-                setActiveSection(section);
+                setActiveSectionOrder(section);
               }}
             >
               <span className="flex items-center gap-2">
-                {activeSection === section && (
+                {activeSectionOrder === section && (
                   <span className="text-white">
                     <Check className="h-4 w-4" />
                   </span>
@@ -350,31 +353,31 @@ const Orders = ({ startLoading, stopLoading }) => {
           ))}
         </div>
       </div>
-      {activeSection === "Pending" && (
+      {activeSectionOrder === "Pending" && (
         <TableUi orders={ordersForSection("Pending")} headers={tableHeaders} />
       )}
-      {activeSection === "Confirmed" && (
+      {activeSectionOrder === "Confirmed" && (
         <TableUi
           orders={ordersForSection("Confirmed")}
           headers={tableHeaders}
         />
       )}
-      {activeSection === "Shipped" && (
+      {activeSectionOrder === "Shipped" && (
         <TableUi orders={ordersForSection("Shipped")} headers={tableHeaders} />
       )}
-      {activeSection === "Delivered" && (
+      {activeSectionOrder === "Delivered" && (
         <TableUi
           orders={ordersForSection("Delivered")}
           headers={tableHeaders}
         />
       )}
-      {activeSection === "Cancelled" && (
+      {activeSectionOrder === "Cancelled" && (
         <TableUi
           orders={ordersForSection("Cancelled")}
           headers={tableHeaders}
         />
       )}
-      {activeSection === "Return" && (
+      {activeSectionOrder === "Return" && (
         <TableUi orders={ordersForSection("Return")} headers={tableHeaders} />
       )}
     </div>
