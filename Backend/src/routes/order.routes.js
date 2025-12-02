@@ -11,6 +11,8 @@ import {
   updatePaymentStatus,
   allCashOnDeliveryOrders,
   getVendorsOrderReport,
+  markOrderAsConfirm,
+  markOrderAsShipped,
 } from "../controllers/order.controllers.js";
 import {
   VerifyUser,
@@ -24,7 +26,6 @@ const router = Router();
 
 //routes for orders
 router.route("/create-order").post(VerifyUser, CreateOrder);
-router.route("/cancel-order/:orderId").delete(VerifyUser, CancelOrder);
 router.route("/get-vendor-orders/:vendorId").get(getVendorAllOrders);
 router.route("/all-products-of/:userId").get(VerifyUser, getUserAllOrders);
 // router
@@ -32,6 +33,16 @@ router.route("/all-products-of/:userId").get(VerifyUser, getUserAllOrders);
 //   .get( getVendorAllOrders);
 
 router.route("/update-order-status").post(VerifyUser, updateOrderStatus);
+router.route("/cancel-order/:orderId").post(VerifyVendorUser, CancelOrder);
+router
+  .route("/mark-order-as-confirm/:orderId")
+  .post(VerifyVendorUser, markOrderAsConfirm);
+router
+  .route("/mark-order-as-shipped/:orderId")
+  .post(VerifyVendorUser, markOrderAsShipped);
+router
+  .route("/mark-order-as-delivered/:orderId")
+  .post(VerifyVendorUser, markOrderAsConfirm);
 router.route("/update-payment-status").post(VerifyUser, updatePaymentStatus);
 
 router
