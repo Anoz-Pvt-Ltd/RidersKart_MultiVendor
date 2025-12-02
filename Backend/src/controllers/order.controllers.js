@@ -35,7 +35,7 @@ const CreateOrder = asyncHandler(async (req, res) => {
   //   //... more products
   // ];
 
-  console.log("from controller", [userId, products, totalAmount]);
+  // console.log("from controller", [userId, products, totalAmount]);
 
   if (
     !userId ||
@@ -49,7 +49,7 @@ const CreateOrder = asyncHandler(async (req, res) => {
 
   // Verify that all product IDs are valid and available
   for (const item of products) {
-    console.log("item.product: ", item.product);
+    // console.log("item.product: ", item.product);
     const product = await Product.findById(item.product);
     if (!product) {
       throw new ApiError(404, `Product with ID ${item.product} not found`);
@@ -366,7 +366,7 @@ const getVendorAllOrders = asyncHandler(async (req, res) => {
         },
     },
   ]);
-  console.log(orders);
+  // console.log(orders);
   if (!orders || orders.length === 0) {
     return res.status(404).json({ message: "No orders found for this user" });
   }
@@ -408,7 +408,7 @@ const getCurrentOrder = asyncHandler(async (req, res) => {
 
 const updateOrderStatus = asyncHandler(async (req, res) => {
   const { orderId, status, address } = req.body;
-  console.log("Order Address -------------------", address);
+  // console.log("Order Address -------------------", address);
   if (!orderId || !status) {
     throw new ApiError(400, "Missing required fields");
   }
