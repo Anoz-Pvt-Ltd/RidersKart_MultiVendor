@@ -7,19 +7,17 @@ import { useSelector } from "react-redux";
 import SelectBox from "../../components/SelectionBox";
 import LoadingUI from "../../components/Loading";
 import TextArea from "../../components/TextWrapper";
-import {
-  CircleFadingPlus,
-  MonitorUp,
-  Pencil,
-  RotateCcw,
-  RotateCw,
-} from "lucide-react";
+import { CircleFadingPlus, Pencil, RotateCw } from "lucide-react";
 import PopUp from "../../components/PopUpWrapper";
 import { PinCodeData } from "../../constants/PinCodeData";
 import { parseErrorMessage } from "../../utils/ErrorMessageParser";
 import { Check } from "lucide-react";
 
-const MultiSelect = ({ label, options, selected, onChange }) => {
+/**
+ * MultiSelect component (kept inside same file as before).
+ * It manages selection state via props: selected (array) and onChange (fn).
+ */
+const MultiSelect = ({ label, options, selected = [], onChange }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleOption = (value) => {
@@ -30,8 +28,21 @@ const MultiSelect = ({ label, options, selected, onChange }) => {
     }
   };
 
+  useEffect(() => {
+    // close dropdown on outside click
+    const handler = (e) => {
+      // simple approach: close if clicked outside any button
+      // more robust solution could be added, but this is enough for now
+      if (!e.target.closest(".multiselect-root")) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("click", handler);
+    return () => document.removeEventListener("click", handler);
+  }, []);
+
   return (
-    <div className="w-full">
+    <div className="w-full multiselect-root">
       <label className="block text-sm font-medium text-gray-700 mb-1">
         {label}
       </label>
@@ -40,9 +51,14 @@ const MultiSelect = ({ label, options, selected, onChange }) => {
         <button
           type="button"
           className="w-full border border-gray-300 rounded-lg px-4 py-2 text-left bg-white hover:shadow-md transition"
-          onClick={() => setIsOpen(!isOpen)}
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsOpen(!isOpen);
+          }}
         >
-          {selected.length > 0 ? selected.join(", ") : `Select ${label}`}
+          {selected && selected.length > 0
+            ? selected.join(", ")
+            : `Select ${label}`}
         </button>
 
         {isOpen && (
@@ -50,7 +66,10 @@ const MultiSelect = ({ label, options, selected, onChange }) => {
             {options.map((opt) => (
               <li
                 key={opt.value}
-                onClick={() => toggleOption(opt.value)}
+                onClick={(ev) => {
+                  ev.stopPropagation();
+                  toggleOption(opt.value);
+                }}
                 className={`flex justify-between items-center px-4 py-2 cursor-pointer hover:bg-indigo-100 ${
                   selected.includes(opt.value) ? "bg-indigo-50" : ""
                 }`}
@@ -70,7 +89,7 @@ const MultiSelect = ({ label, options, selected, onChange }) => {
 
 const Products = ({ startLoading, stopLoading }) => {
   const user = useSelector((store) => store.UserInfo.user);
-  const [images, setImages] = useState([]);
+  const [images, setImages] = useState([]); // array of File
   const formRef = useRef(null);
   const mrpRef = useRef(null);
   const discountRef = useRef(null);
@@ -78,6 +97,8 @@ const Products = ({ startLoading, stopLoading }) => {
   const mrpUpdRef = useRef(null);
   const discountUpdRef = useRef(null);
   const spUpdRef = useRef(null);
+  const editFormRef = useRef(null);
+
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -92,19 +113,25 @@ const Products = ({ startLoading, stopLoading }) => {
   const [productName, setProductName] = useState("");
   const [UrlData, setUrlData] = useSearchParams();
   const [editProductData, setEditProductData] = useState(null);
-  const editFormRef = useRef(null);
   const [deliveryScope, setDeliveryScope] = useState("all");
   const [editDeliveryScope, setEditDeliveryScope] = useState("all");
-  const [imagePreviews, setImagePreviews] = useState([]);
-  const [popup, setPopup] = useState({
-    image: false,
-  });
+  const [imagePreviews, setImagePreviews] = useState([]); // preview urls for add modal
+  const [popup, setPopup] = useState({ image: false });
+
+  // states for multi-select in add modal
+  const [deliveryStates, setDeliveryStates] = useState([]);
+  const [deliveryCities, setDeliveryCities] = useState([]);
 
   useEffect(() => {
     if (!isModalOpen && formRef.current) {
       formRef.current.reset();
       setProductName("");
       setImagePreview(null);
+      setImages([]);
+      setImagePreviews([]);
+      setDeliveryScope("all");
+      setDeliveryStates([]);
+      setDeliveryCities([]);
     }
   }, [isModalOpen]);
 
@@ -112,13 +139,48 @@ const Products = ({ startLoading, stopLoading }) => {
     product?.name?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  // Ensure images state stays as array (empty array means none)
   const handleMultipleImageChange = (e) => {
-    const files = Array.from(e.target.files);
+    const files = Array.from(e.target.files || []);
 
-    setImages((prev) => [...prev, ...files]);
+    // Enforce max 5 images total
+    const existingCount = images.length;
+    if (existingCount + files.length > 5) {
+      alert("You can upload a maximum of 5 images.");
+      return;
+    }
 
-    const previewUrls = files.map((file) => URL.createObjectURL(file));
+    // Filter valid image types and sizes
+    const validImageTypes = [
+      "image/jpeg",
+      "image/png",
+      "image/gif",
+      "image/webp",
+      "image/svg+xml",
+    ];
+    const maxSize = 1 * 1024 * 1024;
+
+    const acceptedFiles = [];
+    const previewUrls = [];
+
+    for (const file of files) {
+      if (!validImageTypes.includes(file.type)) {
+        alert(`File ${file.name} is not a supported image type.`);
+        continue;
+      }
+      if (file.size > maxSize) {
+        alert(`File ${file.name} must be less than 1MB.`);
+        continue;
+      }
+      acceptedFiles.push(file);
+      previewUrls.push(URL.createObjectURL(file));
+    }
+
+    setImages((prev) => [...prev, ...acceptedFiles]);
     setImagePreviews((prev) => [...prev, ...previewUrls]);
+
+    // reset input element value so same file can be selected again if needed
+    if (e.target) e.target.value = "";
   };
 
   const handleRemoveImage = (indexToRemove) => {
@@ -126,9 +188,9 @@ const Products = ({ startLoading, stopLoading }) => {
     setImagePreviews((prev) => prev.filter((_, i) => i !== indexToRemove));
   };
 
+  // Keep single-file helpers but ensure images state remains consistent
   const handleImageFileChange = (e) => {
     const file = e.target.files[0];
-
     if (!file) return;
 
     const validImageTypes = [
@@ -151,40 +213,46 @@ const Products = ({ startLoading, stopLoading }) => {
       e.target.value = "";
       return;
     }
-    setImages(file);
-    setImagePreview(URL.createObjectURL(file));
+
+    // if this was intended to be a single file field, we place it as single image in array
+    setImages([file]);
+    setImagePreviews([URL.createObjectURL(file)]);
   };
+
   const handleImageCancel = () => {
-    setImages(null);
-    setImagePreview(null);
-    document.getElementById("imageInput").value = "";
+    setImages([]);
+    setImagePreviews([]);
+    const el = document.getElementById("imageInput");
+    if (el) el.value = "";
   };
+
   const findProductById = (id) => {
     return products.find((product) => product._id === id);
   };
 
-  // Function to calculate and update Selling Price
+  // Selling price auto-calculation for Add form
   const updateSellingPrice = () => {
     const mrp = parseFloat(mrpRef.current?.value) || 0;
     const discount = parseFloat(discountRef.current?.value) || 0;
 
     if (mrp > 0 && discount >= 0 && discount <= 100) {
       const sellingPrice = mrp - (mrp * discount) / 100;
-      spRef.current.value = Math.round(sellingPrice);
+      if (spRef.current) spRef.current.value = Math.round(sellingPrice);
     } else {
-      spRef.current.value = "";
+      if (spRef.current) spRef.current.value = "";
     }
   };
 
+  // Selling price auto-calculation for Update form
   const updateSellingPriceUpdateForm = () => {
     const mrp = parseFloat(mrpUpdRef.current?.value) || 0;
     const discount = parseFloat(discountUpdRef.current?.value) || 0;
 
     if (mrp > 0 && discount >= 0 && discount <= 100) {
       const sellingPrice = mrp - (mrp * discount) / 100;
-      spUpdRef.current.value = Math.round(sellingPrice); // Update the Selling Price field
+      if (spUpdRef.current) spUpdRef.current.value = Math.round(sellingPrice);
     } else {
-      spUpdRef.current.value = ""; // Clear if invalid input
+      if (spUpdRef.current) spUpdRef.current.value = "";
     }
   };
 
@@ -195,28 +263,59 @@ const Products = ({ startLoading, stopLoading }) => {
         `products/get-all-product-of-vendor/${user?.[0]?._id}`,
         "get"
       );
-      setProducts(response.data.data);
+      setProducts(response.data.data || []);
     } catch (err) {
       setError(err.response?.data?.message || "Failed to fetch products.");
     } finally {
       stopLoading();
     }
   };
+
   useEffect(() => {
-    fetchProducts();
+    if (user) fetchProducts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
+  // Add product handler (multipart/form-data)
   const handleAddProduct = async (e) => {
     e.preventDefault();
     setError("");
     setSuccess("");
 
+    if (!formRef.current) return;
+
+    // Build FormData
     const formData = new FormData(formRef.current);
 
-    // Append all selected images manually
+    // Append images (array)
     images.forEach((img) => {
       formData.append("images", img);
     });
+
+    // Append delivery scope and arrays
+    formData.set("deliveryScope", deliveryScope || "all");
+    if (deliveryScope === "state") {
+      deliveryStates.forEach((s) => formData.append("deliveryStates[]", s));
+    }
+    if (deliveryScope === "city") {
+      deliveryCities.forEach((c) => formData.append("deliveryCities[]", c));
+    }
+
+    // Parse specifications Option A ("key: value" per line)
+    const rawSpecs = formRef.current.elements["specifications"]?.value || "";
+    const specsObj = {};
+    rawSpecs.split("\n").forEach((line) => {
+      const trimmed = line.trim();
+      if (!trimmed) return;
+      const parts = trimmed.split(":");
+      if (parts.length >= 2) {
+        const key = parts[0].trim();
+        const value = parts.slice(1).join(":").trim();
+        if (key) specsObj[key] = value;
+      }
+    });
+    // Append specifications as JSON string (backend should accept JSON string in multipart)
+    formData.set("specifications", JSON.stringify(specsObj));
 
     try {
       startLoading();
@@ -225,17 +324,20 @@ const Products = ({ startLoading, stopLoading }) => {
         `products/register-product/${user?.[0]?._id}`,
         "post",
         formData,
-        true
+        true // send multipart header
       );
 
       setSuccess("Product added successfully!");
-      setProducts((prev) => [...prev, response.data.data.product]);
+      // add new product to local list if returned
+      if (response?.data?.data?.product) {
+        setProducts((prev) => [...prev, response.data.data.product]);
+      }
       alert("Product added successfully!");
 
       // Reset the UI
       setProductName("");
-      setImages([]); // IMPORTANT: clear your images state
-      setImagePreviews([]); // clear previews
+      setImages([]);
+      setImagePreviews([]);
       formRef.current.reset();
       setIsModalOpen(false);
     } catch (err) {
@@ -274,19 +376,14 @@ const Products = ({ startLoading, stopLoading }) => {
           "categories/get-all-category-and-subcategories",
           "get"
         );
-        // console.log(response);
-
-        // Ensure categories exist before setting state
         const categories = response.data?.data?.categories || [];
         setCategories(categories);
-
-        // Extract all subcategories from each category
         const allSubcategories = categories.flatMap(
           (category) => category.subcategories || []
         );
         setSubcategories(allSubcategories);
       } catch (error) {
-        // console.log("Error getting all main subcategories", error);
+        // ignore for now
       } finally {
         stopLoading();
       }
@@ -304,24 +401,29 @@ const Products = ({ startLoading, stopLoading }) => {
 
     getAllMainSubcategories();
     GetAllBrands();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // ImageUpdationForm - for adding images to existing product
   const ImageUpdationForm = ({ onClose, imagesRequired }) => {
-    const [images, setImages] = useState([]);
-
-    const formRef = useRef(null);
-    const productId = UrlData.get("productId");
+    const [localImages, setLocalImages] = useState([]);
+    const formLocalRef = useRef(null);
+    const maxToUpload = imagesRequired();
 
     const handleAddImages = async (event) => {
       event.preventDefault();
 
-      const formData = new FormData(formRef.current);
+      const formData = new FormData(formLocalRef.current);
 
-      // for (let [key, value] of formData.entries()) {
-      //   console.log(key, value);
-      // }
+      // validate we are not exceeding allowed images
+      if (localImages.length > maxToUpload) {
+        alert(`You can only upload ${maxToUpload} more images.`);
+        return;
+      }
+
       try {
         startLoading();
+        const productId = UrlData.get("productId");
         const response = await FetchData(
           `products/add-images/${productId}`,
           "patch",
@@ -333,6 +435,7 @@ const Products = ({ startLoading, stopLoading }) => {
         onClose();
       } catch (error) {
         console.error("Error uploading images:", error);
+        alert("Failed to upload images.");
       } finally {
         stopLoading();
       }
@@ -342,7 +445,7 @@ const Products = ({ startLoading, stopLoading }) => {
       <PopUp onClose={onClose}>
         <div className="flex justify-center items-center w-[80vw] place-self-center  ">
           <form
-            ref={formRef}
+            ref={formLocalRef}
             onSubmit={handleAddImages}
             className="w-full max-h-screen overflow-y-auto lg:overflow-visible lg:max-h-none p-6 lg:p-16 flex flex-col items-center justify-center rounded-2xl bg-white"
           >
@@ -354,54 +457,58 @@ const Products = ({ startLoading, stopLoading }) => {
             </label>
 
             <div className="w-full h-fit grid grid-cols-1 sm:grid-cols-2 gap-5 justify-center items-center my-10">
-              {Array(imagesRequired())
-                .fill("")
-                .map((_, index) => {
-                  return (
-                    <div
-                      className={`flex items-center justify-center space-x-6 ${
-                        index + 1 == imagesRequired() && (index + 1) % 2 !== 0
-                          ? "sm:col-span-2"
-                          : ""
-                      }`}
-                      key={index}
-                    >
-                      <div className="shrink-0 flex justify-center items-center h-16 w-16">
-                        {images[index] && (
-                          <img
-                            id="preview_img"
-                            className="object-cover rounded"
-                            src={images[index]?.src}
-                            alt="uploaded image"
-                          />
-                        )}
-                      </div>
-                      <label>
-                        <span className="sr-only">Choose photo</span>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          name="images"
-                          className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100 border border-neutral-200 p-2 rounded-full"
-                          onChange={(e) => {
-                            const file = e.target.files[0];
-                            const reader = new FileReader();
-                            reader.onloadend = () => {
-                              setImages((prevImages) => [
-                                ...prevImages,
-                                {
-                                  id: Math.random(),
-                                  src: reader.result,
-                                },
-                              ]);
-                            };
-                            reader.readAsDataURL(file);
-                          }}
-                        />
-                      </label>
+              {Array.from({ length: maxToUpload }).map((_, index) => {
+                return (
+                  <div
+                    className={`flex items-center justify-center space-x-6 ${
+                      index + 1 == maxToUpload && (index + 1) % 2 !== 0
+                        ? "sm:col-span-2"
+                        : ""
+                    }`}
+                    key={index}
+                  >
+                    <div className="shrink-0 flex justify-center items-center h-16 w-16">
+                      {/* No preview per-field here to keep markup simple */}
                     </div>
-                  );
-                })}
+                    <label>
+                      <span className="sr-only">Choose photo</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        name="images"
+                        className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100 border border-neutral-200 p-2 rounded-full"
+                        onChange={(ev) => {
+                          const file = ev.target.files[0];
+                          if (!file) return;
+                          // validate size/type
+                          const validTypes = [
+                            "image/jpeg",
+                            "image/png",
+                            "image/gif",
+                            "image/webp",
+                            "image/svg+xml",
+                          ];
+                          if (!validTypes.includes(file.type)) {
+                            alert("Invalid file type.");
+                            ev.target.value = "";
+                            return;
+                          }
+                          if (file.size > 1 * 1024 * 1024) {
+                            alert("Max 1MB per file.");
+                            ev.target.value = "";
+                            return;
+                          }
+                          setLocalImages((prev) => {
+                            const newArr = [...prev];
+                            newArr[index] = file;
+                            return newArr;
+                          });
+                        }}
+                      />
+                    </label>
+                  </div>
+                );
+              })}
             </div>
 
             <Button label="Submit" Type="submit" className="mt-10" />
@@ -410,9 +517,10 @@ const Products = ({ startLoading, stopLoading }) => {
       </PopUp>
     );
   };
+
+  // Keep product name sanitized
   const handleProductNameChange = (e) => {
     const rawValue = e.target.value;
-    // allow letters, numbers, space, and hyphen
     const sanitizedValue = rawValue.replace(/[^a-zA-Z0-9 \-]/g, "");
     setProductName(sanitizedValue);
   };
@@ -433,31 +541,57 @@ const Products = ({ startLoading, stopLoading }) => {
       productDimensions: product.productDimensions || "",
       productWeight: product.productWeight || "",
       description: product.description || "",
-      specifications: product.specifications?.details || "",
+      specifications:
+        typeof product.specifications === "object" &&
+        product.specifications !== null
+          ? // convert map/object to Option A string for UI
+            Object.entries(product.specifications)
+              .map(([k, v]) => `${k}: ${v}`)
+              .join("\n")
+          : product.specifications || "",
       tags: Array.isArray(product.tags)
         ? product.tags.join(",")
         : product.tags || "",
+      deliveryStates: product.deliveryStates || [],
+      deliveryCities: product.deliveryCities || [],
     });
+    setEditDeliveryScope(product.deliveryScope || "all");
     setEditModalOpen(true);
+    // ensure SP update value is set once modal opens
+    setTimeout(() => {
+      if (spUpdRef.current)
+        spUpdRef.current.value = product.price?.sellingPrice || "";
+    }, 50);
   };
 
-  // Handle changes in edit form
-  const handleEditChange = (e) => {
-    const { name, value } = e.target;
-    setEditProductData((prev) => {
-      // If MRP or discount changes, update SP
-      let updated = { ...prev, [name]: value };
-      if (name === "MRP" || name === "discount") {
-        const mrp = name === "MRP" ? value : prev.MRP;
-        const discount = name === "discount" ? value : prev.discount;
-        const sellingPrice =
-          (parseFloat(mrp) || 0) -
-          ((parseFloat(mrp) || 0) * (parseFloat(discount) || 0)) / 100;
-        updated.SP = sellingPrice > 0 ? sellingPrice.toFixed(2) : "";
-      }
-      return updated;
-    });
-  };
+  // Handle changes in edit form (input elements pass name/value)
+const handleEditChange = (e) => {
+  const { name, value } = e.target;
+
+  setEditProductData((prev) => {
+    let updated = { ...prev, [name]: value };
+
+    if (name === "MRP" || name === "discount") {
+      const mrp = name === "MRP" ? value : prev.MRP;
+      const discount = name === "discount" ? value : prev.discount;
+
+      const sellingPrice =
+        (parseFloat(mrp) || 0) -
+        ((parseFloat(mrp) || 0) * (parseFloat(discount) || 0)) / 100;
+
+      // 🔥 FIX #1 — update the state also
+      updated.SP = Math.round(sellingPrice);
+
+      // Existing DOM update (KEEP IT)
+      setTimeout(() => {
+        if (spUpdRef.current) spUpdRef.current.value = Math.round(sellingPrice);
+      }, 0);
+    }
+
+    return updated;
+  });
+};
+
 
   // Handle update product
   const handleUpdateProduct = async (e) => {
@@ -466,6 +600,20 @@ const Products = ({ startLoading, stopLoading }) => {
     setSuccess("");
     if (!editProductData) return;
 
+    // parse specifications (Option A) into object/map
+    const specsRaw = editProductData.specifications || "";
+    const specsObj = {};
+    specsRaw.split("\n").forEach((line) => {
+      const trimmed = line.trim();
+      if (!trimmed) return;
+      const parts = trimmed.split(":");
+      if (parts.length >= 2) {
+        const key = parts[0].trim();
+        const value = parts.slice(1).join(":").trim();
+        if (key) specsObj[key] = value;
+      }
+    });
+
     const payload = {
       id: editProductData._id,
       name: editProductData.name,
@@ -473,17 +621,20 @@ const Products = ({ startLoading, stopLoading }) => {
       category: editProductData.category,
       subcategory: editProductData.subcategory,
       price: {
-        MRP: editProductData.MRP,
-        sellingPrice: editProductData.SP,
-        discount: editProductData.discount,
+        MRP: Number(editProductData.MRP) || 0,
+        sellingPrice: Number(editProductData.SP) || 0,
+        discount: Number(editProductData.discount) || 0,
       },
-      stockQuantity: editProductData.stockQuantity,
+      stockQuantity: Number(editProductData.stockQuantity) || 0,
       sku: editProductData.sku,
       productDimensions: editProductData.productDimensions,
       productWeight: editProductData.productWeight,
       description: editProductData.description,
-      specifications: { details: editProductData.specifications },
-      tags: editProductData.tags.split(",").map((t) => t.trim()),
+      specifications: specsObj,
+      tags: (editProductData.tags || "")
+        .split(",")
+        .map((t) => t.trim())
+        .filter(Boolean),
       deliveryScope: editDeliveryScope,
       deliveryStates: editProductData.deliveryStates || [],
       deliveryCities: editProductData.deliveryCities || [],
@@ -497,7 +648,7 @@ const Products = ({ startLoading, stopLoading }) => {
         payload
       );
       setSuccess("Product updated successfully!");
-      // Update product in local state
+      // Update product in local state (merge returned fields)
       setProducts((prev) =>
         prev.map((p) =>
           p._id === editProductData._id
@@ -558,7 +709,7 @@ const Products = ({ startLoading, stopLoading }) => {
                     className2="w-full"
                     LabelName="Brand"
                     Name="brand"
-                    Placeholder="Select main category"
+                    Placeholder="Select Brand"
                     Options={brands?.map((brand) => ({
                       label: brand.title,
                       value: brand._id,
@@ -627,8 +778,7 @@ const Products = ({ startLoading, stopLoading }) => {
                     LabelName="Selling Price (Optional)"
                     Type="number"
                     Name="SP"
-                    Value={updateSellingPrice}
-                    Placeholder="Enter Discount"
+                    Placeholder="Auto-calculated"
                     Disabled={true}
                     Ref={spRef}
                   />
@@ -661,6 +811,7 @@ const Products = ({ startLoading, stopLoading }) => {
 
                   {/* Native File Input (multiple) */}
                   <input
+                    id="imageInput"
                     type="file"
                     name="images"
                     multiple
@@ -682,6 +833,7 @@ const Products = ({ startLoading, stopLoading }) => {
 
                           {/* Remove Button */}
                           <button
+                            type="button"
                             onClick={() => handleRemoveImage(index)}
                             className="absolute top-2 right-2 bg-red-600 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition"
                           >
@@ -706,7 +858,9 @@ const Products = ({ startLoading, stopLoading }) => {
                   <TextArea
                     LabelName="Specification"
                     Name="specifications"
-                    Placeholder="Enter Specification"
+                    Placeholder={
+                      "Enter specifications in format:\ncolor: red\nsize: large"
+                    }
                     className="max-h-20 min-h-20"
                   />
                 </div>
@@ -749,22 +903,26 @@ const Products = ({ startLoading, stopLoading }) => {
                       { label: "State Selection", value: "state" },
                       { label: "City Selection", value: "city" },
                     ]}
-                    onChange={(e) => setDeliveryScope(e.target.value)}
+                    onChange={(e) => {
+                      setDeliveryScope(e.target.value);
+                      // reset selections when changing scope
+                      if (e.target.value !== "state") setDeliveryStates([]);
+                      if (e.target.value !== "city") setDeliveryCities([]);
+                    }}
                   />
                 </div>
 
                 {/* State Multi-Select */}
                 {deliveryScope === "state" && (
                   <div className="flex items-start justify-center col-span-2">
-                    <SelectBox
-                      className2="w-full"
-                      LabelName="Select States"
-                      Name="deliveryStates"
-                      multiple={true}
-                      Options={Object.keys(PinCodeData).map((state) => ({
+                    <MultiSelect
+                      label="Select States"
+                      options={Object.keys(PinCodeData).map((state) => ({
                         label: state,
                         value: state,
                       }))}
+                      selected={deliveryStates}
+                      onChange={(values) => setDeliveryStates(values)}
                     />
                   </div>
                 )}
@@ -772,18 +930,17 @@ const Products = ({ startLoading, stopLoading }) => {
                 {/* City Multi-Select */}
                 {deliveryScope === "city" && (
                   <div className="flex items-start justify-center col-span-2">
-                    <SelectBox
-                      className2="w-full"
-                      LabelName="Select Cities"
-                      Name="deliveryCities"
-                      multiple={true}
-                      Options={Object.entries(PinCodeData).flatMap(
+                    <MultiSelect
+                      label="Select Cities"
+                      options={Object.entries(PinCodeData).flatMap(
                         ([state, cities]) =>
                           Object.keys(cities).map((city) => ({
                             label: `${city} (${state})`,
                             value: city,
                           }))
                       )}
+                      selected={deliveryCities}
+                      onChange={(values) => setDeliveryCities(values)}
                     />
                   </div>
                 )}
@@ -831,7 +988,7 @@ const Products = ({ startLoading, stopLoading }) => {
                     className2="w-full"
                     LabelName="Brand"
                     Name="brand"
-                    Placeholder="Select main category"
+                    Placeholder="Select Brand"
                     Value={editProductData.brand}
                     onChange={handleEditChange}
                     Options={brands?.map((brand) => ({
@@ -915,7 +1072,7 @@ const Products = ({ startLoading, stopLoading }) => {
                     Type="number"
                     Name="SP"
                     Disabled={true}
-                    Placeholder="Enter Discount"
+                    Placeholder="Auto-calculated"
                     Ref={spUpdRef}
                   />
                 </div>
@@ -956,9 +1113,16 @@ const Products = ({ startLoading, stopLoading }) => {
                   <TextArea
                     LabelName="Specification"
                     Name="specifications"
-                    Placeholder="Enter Specification"
+                    Placeholder={
+                      "Enter specifications in format:\ncolor: red\nsize: large"
+                    }
                     Value={editProductData.specifications}
-                    onChange={handleEditChange}
+                    onChange={(e) =>
+                      setEditProductData((prev) => ({
+                        ...prev,
+                        specifications: e.target.value,
+                      }))
+                    }
                     className="max-h-20 min-h-20"
                   />
                 </div>
@@ -969,7 +1133,12 @@ const Products = ({ startLoading, stopLoading }) => {
                     Name="tags"
                     Placeholder="Enter Tags"
                     Value={editProductData.tags}
-                    onChange={handleEditChange}
+                    onChange={(e) =>
+                      setEditProductData((prev) => ({
+                        ...prev,
+                        tags: e.target.value,
+                      }))
+                    }
                     className="max-h-20 min-h-20"
                   />
                 </div>
@@ -1003,7 +1172,21 @@ const Products = ({ startLoading, stopLoading }) => {
                     LabelName="Delivery Scope"
                     Name="deliveryScope"
                     Value={editDeliveryScope}
-                    onChange={(e) => setEditDeliveryScope(e.target.value)}
+                    onChange={(e) => {
+                      setEditDeliveryScope(e.target.value);
+                      if (e.target.value !== "state") {
+                        setEditProductData((prev) => ({
+                          ...prev,
+                          deliveryStates: [],
+                        }));
+                      }
+                      if (e.target.value !== "city") {
+                        setEditProductData((prev) => ({
+                          ...prev,
+                          deliveryCities: [],
+                        }));
+                      }
+                    }}
                     Options={[
                       { label: "All India", value: "all" },
                       { label: "State Selection", value: "state" },
@@ -1079,6 +1262,7 @@ const Products = ({ startLoading, stopLoading }) => {
           <RotateCw size={20} color="green" />
         </button>
       </div>
+
       {products.length === 0 ? (
         <div>No products available.</div>
       ) : (
@@ -1103,8 +1287,9 @@ const Products = ({ startLoading, stopLoading }) => {
                 <div className="flex">
                   <span className=" p-1 rounded-xl flex items-center  ">
                     <img
-                      src={product?.images[0]?.url}
+                      src={product?.images?.[0]?.url}
                       className="min-w-20 h-20 m-1 rounded-xl  shadow object-contain"
+                      alt={product?.images?.[0]?.altText || product?.name}
                     />
                   </span>
 
@@ -1121,9 +1306,7 @@ const Products = ({ startLoading, stopLoading }) => {
                           className="flex justify-evenly items-center w-full "
                           onClick={() => {
                             setUrlData({ productId: product?._id });
-                            setPopup((prev) => {
-                              return { ...prev, image: true };
-                            });
+                            setPopup((prev) => ({ ...prev, image: true }));
                           }}
                           title="Add images"
                         >
@@ -1156,7 +1339,8 @@ const Products = ({ startLoading, stopLoading }) => {
                   <strong>Stock:</strong> {product?.stockQuantity}
                 </p>
                 <p>
-                  <strong>Platform Charges:</strong> ₹{product?.commission?.amount || "NA"}
+                  <strong>Platform Charges:</strong> ₹
+                  {product?.commission?.amount || "NA"}
                 </p>
                 {product?.status === "inactive" ? (
                   <div>
@@ -1172,15 +1356,10 @@ const Products = ({ startLoading, stopLoading }) => {
                     onClick={() => handleDeleteProduct(product?._id)}
                   />
                 )}
-                {/* <Button
-                  label="Delete"
-                  Type="button"
-                  className="mt-2 w-full hover:bg-red-500"
-                  onClick={() => handleDeleteProduct(product?._id)}
-                /> */}
               </div>
             ))}
           </div>
+
           {popup.image && (
             <ImageUpdationForm
               onClose={() =>
@@ -1190,7 +1369,7 @@ const Products = ({ startLoading, stopLoading }) => {
               }
               imagesRequired={() => {
                 const product = findProductById(UrlData.get("productId"));
-                return 10 - product?.images?.length;
+                return Math.max(0, 10 - (product?.images?.length || 0));
               }}
             />
           )}
