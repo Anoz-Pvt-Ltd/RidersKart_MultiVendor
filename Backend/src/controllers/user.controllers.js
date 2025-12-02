@@ -251,7 +251,8 @@ const updateAddress = asyncHandler(async (req, res, next) => {
 // Controller: Regenerate refresh token
 const regenerateRefreshToken = asyncHandler(async (req, res) => {
   try {
-    const token = req.cookies.RefreshToken || req.body.RefreshToken;
+    // const token = req.cookies.RefreshToken || req.body.RefreshToken;
+    const token = req.body.RefreshToken;
 
     if (!token) throw new ApiError(401, "Unauthorized request");
     // console.log("Hello from ", token);

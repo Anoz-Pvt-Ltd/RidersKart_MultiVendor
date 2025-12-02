@@ -81,37 +81,6 @@ const CreateOrder = asyncHandler(async (req, res) => {
     .json(new ApiResponse(201, order, "Order created successfully"));
 });
 
-// Controller to cancel an existing order
-const CancelOrder = asyncHandler(async (req, res) => {
-  const { orderId } = req.params;
-
-  const order = await Order.findById(orderId);
-  if (!order) {
-    throw new ApiError(404, "Order not found");
-  }
-
-  // Only allow cancellation if the order is still pending
-  if (order.orderStatus !== "pending") {
-    throw new ApiError(400, "Order cannot be canceled at this stage");
-  }
-
-  // Restore product stock quantities
-  for (const item of order.products) {
-    const product = await Product.findById(item.product);
-    if (product) {
-      product.stockQuantity += item.quantity;
-      await product.save();
-    }
-  }
-
-  order.orderStatus = "cancelled";
-  await order.save();
-
-  res
-    .status(200)
-    .json(new ApiResponse(200, order, "Order canceled successfully"));
-});
-
 const GetVendorOrders = asyncHandler(async (req, res) => {
   const { vendorId } = req.params;
 
@@ -231,141 +200,71 @@ const getVendorAllOrders = asyncHandler(async (req, res) => {
   // Fetch all orders for the specified user
   const orders = await Order.aggregate([
     {
-      $match:
-        /**
-         * query: The query in MQL.
-         */
-        {
-          orderStatus: {
-            $not: {
-              $eq: "pending",
-            },
-          },
-        },
-    },
-    {
       $unwind: {
         path: "$products",
       },
     },
     {
-      $lookup:
-        /**
-         * from: The target collection.
-         * localField: The local join field.
-         * foreignField: The target join field.
-         * as: The name for the results.
-         * pipeline: Optional pipeline to run on the foreign collection.
-         * let: Optional variables to use in the pipeline field stages.
-         */
-        {
-          from: "products",
-          localField: "products.product",
-          foreignField: "_id",
-          as: "productDetails",
-        },
+      $lookup: {
+        from: "products",
+        localField: "products.product",
+        foreignField: "_id",
+        as: "productDetails",
+      },
     },
     {
-      $unwind:
-        /**
-         * path: Path to the array field.
-         * includeArrayIndex: Optional name for index.
-         * preserveNullAndEmptyArrays: Optional
-         *   toggle to unwind null and empty values.
-         */
-        {
-          path: "$productDetails",
-        },
+      $unwind: {
+        path: "$productDetails",
+      },
     },
     {
-      $match:
-        /**
-         * query: The query in MQL.
-         */
-        {
-          $expr: {
-            $eq: [
-              "$productDetails.vendor",
-              new mongoose.Types.ObjectId(vendorId),
-              // ObjectId("67d3071e3a7d05ebfb53bb33"),
-            ],
-          },
+      $match: {
+        $expr: {
+          $eq: [
+            "$productDetails.vendor",
+            new mongoose.Types.ObjectId(vendorId),
+          ],
         },
+      },
     },
     {
-      $lookup:
-        /**
-         * from: The target collection.
-         * localField: The local join field.
-         * foreignField: The target join field.
-         * as: The name for the results.
-         * pipeline: Optional pipeline to run on the foreign collection.
-         * let: Optional variables to use in the pipeline field stages.
-         */
-        {
-          from: "vendorusers",
-          localField: "productDetails.vendor",
-          foreignField: "_id",
-          as: "vendor",
-        },
+      $lookup: {
+        from: "vendorusers",
+        localField: "productDetails.vendor",
+        foreignField: "_id",
+        as: "vendor",
+      },
     },
     {
-      $unwind:
-        /**
-         * path: Path to the array field.
-         * includeArrayIndex: Optional name for index.
-         * preserveNullAndEmptyArrays: Optional
-         *   toggle to unwind null and empty values.
-         */
-        {
-          path: "$vendor",
-        },
+      $unwind: {
+        path: "$vendor",
+      },
     },
     {
-      $group:
-        /**
-         * _id: The id of the group.
-         * fieldN: The first field name.
-         */
-        {
-          _id: "$_id",
-          user: {
-            $first: "$user",
-          },
-          updatedAt: {
-            $first: "$updatedAt",
-          },
-          products: {
-            $push: {
-              product: "$productDetails",
-              quantity: "$products.quantity",
-              price: "$products.price",
-            },
-          },
-          orderStatus: {
-            $first: "$orderStatus",
-          },
-          paymentStatus: {
-            $first: "$paymentStatus",
-          },
-          paymentMethod: {
-            $first: "$paymentMethod",
-          },
-          vendor: {
-            $first: "$vendor",
+      $group: {
+        _id: "$_id",
+        user: { $first: "$user" },
+        updatedAt: { $first: "$updatedAt" },
+        products: {
+          $push: {
+            product: "$productDetails",
+            quantity: "$products.quantity",
+            price: "$products.price",
           },
         },
+        orderStatus: { $first: "$orderStatus" },
+        paymentStatus: { $first: "$paymentStatus" },
+        paymentMethod: { $first: "$paymentMethod" },
+        vendor: { $first: "$vendor" },
+      },
     },
     {
-      $sort:
-        /**
-         * Provide any number of field/order pairs.
-         */
-        {
-          updatedAt: -1,
-        },
+      $sort: {
+        updatedAt: -1,
+      },
     },
   ]);
+
   // console.log(orders);
   if (!orders || orders.length === 0) {
     return res.status(404).json({ message: "No orders found for this user" });
@@ -478,7 +377,7 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
   );
 
   // Send email to user about the order
-  if (status === "confirmed")
+  if (status === "pending")
     await SendMail(
       user.email,
       "Order placed successfully",
@@ -650,6 +549,64 @@ const getVendorsOrderReport = asyncHandler(async (req, res) => {
   });
 });
 
+const markOrderAsConfirm = asyncHandler(async (req, res) => {
+  const { orderId } = req.params;
+  if (!orderId) {
+    throw new ApiError(400, "Order ID is required");
+  }
+  const order = await Order.findById(orderId);
+  if (!order) {
+    throw new ApiError(404, "Order not found");
+  }
+  order.orderStatus = "confirmed";
+  await order.save();
+  res.json(new ApiResponse(200, order, "Order marked as Confirm"));
+});
+const markOrderAsShipped = asyncHandler(async (req, res) => {
+  const { orderId } = req.params;
+  if (!orderId) {
+    throw new ApiError(400, "Order ID is required");
+  }
+  const order = await Order.findById(orderId);
+  if (!order) {
+    throw new ApiError(404, "Order not found");
+  }
+  order.orderStatus = "shipped";
+  await order.save();
+  res.json(new ApiResponse(200, order, "Order marked as Shipped"));
+});
+
+// Controller to cancel an existing order
+const CancelOrder = asyncHandler(async (req, res) => {
+  const { orderId } = req.params;
+
+  const order = await Order.findById(orderId);
+  if (!order) {
+    throw new ApiError(404, "Order not found");
+  }
+
+  // Only allow cancellation if the order is still pending
+  if (order.orderStatus !== "pending") {
+    throw new ApiError(400, "Order cannot be canceled at this stage");
+  }
+
+  // Restore product stock quantities
+  for (const item of order.products) {
+    const product = await Product.findById(item.product);
+    if (product) {
+      product.stockQuantity += item.quantity;
+      await product.save();
+    }
+  }
+
+  order.orderStatus = "cancelled";
+  await order.save();
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, order, "Order canceled successfully"));
+});
+
 export {
   CreateOrder,
   CancelOrder,
@@ -662,6 +619,8 @@ export {
   updatePaymentStatus,
   allCashOnDeliveryOrders,
   getVendorsOrderReport,
+  markOrderAsConfirm,
+  markOrderAsShipped,
 };
 
 //fetch data fn in utils; set domain url;
