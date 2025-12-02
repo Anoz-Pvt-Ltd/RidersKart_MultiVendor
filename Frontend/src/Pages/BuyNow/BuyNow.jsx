@@ -136,7 +136,7 @@ const BuyNow = ({ startLoading, stopLoading }) => {
       startLoading();
       const response = await FetchData("orders/update-order-status", "post", {
         orderId,
-        status: "confirmed",
+        status: "pending",
         address: user?.[0]?.defaultAddress,
       });
       if (response.status === 200) {
