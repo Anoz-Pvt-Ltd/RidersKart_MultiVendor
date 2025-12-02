@@ -541,7 +541,8 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
                   <strong className="text-sm lg:text-xl text-nowrap">
                     Oops !
                   </strong>
-                  The product is currently out of stock. Please check back later.
+                  The product is currently out of stock. Please check back
+                  later.
                 </p>
               </div>
             ) : (
@@ -667,14 +668,18 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
             >
               ₹ {products?.price.sellingPrice}
             </motion.span>
-            <motion.span
-              initial={{ opacity: 0, x: 100 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5, type: "spring", delay: 0.2 }}
-              className="text-gray-500 line-through mr-4"
-            >
-              ₹{products?.price.MRP}
-            </motion.span>
+            {products?.price.discount === 0 ? (
+              ""
+            ) : (
+              <motion.span
+                initial={{ opacity: 0, x: 100 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, type: "spring", delay: 0.2 }}
+                className="text-gray-500 line-through mr-4"
+              >
+                ₹{products?.price.MRP}
+              </motion.span>
+            )}
             {products?.price.discount > 0 && (
               <motion.span
                 initial={{ opacity: 0, x: 100 }}
