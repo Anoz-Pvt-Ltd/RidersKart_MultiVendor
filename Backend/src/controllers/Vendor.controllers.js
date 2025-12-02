@@ -231,7 +231,10 @@ const getVendorData = asyncHandler(async (req, res, next) => {
 });
 
 const regenerateRefreshToken = asyncHandler(async (req, res) => {
-  const token = req.cookies.RefreshToken || req.body.RefreshToken;
+  // const token = req.cookies.RefreshToken || req.body.RefreshToken;
+  const token = req.body.RefreshToken;
+  console.log("Hello ReLogin");
+  console.log(token);
 
   if (!token) throw new ApiError(401, "Unauthorized request");
 
@@ -330,7 +333,7 @@ const getVendorDetailsByProductId = async (req, res) => {
         )
       );
   } catch (error) {
-    console.log(error);
+    // console.log(error);
   }
 };
 
