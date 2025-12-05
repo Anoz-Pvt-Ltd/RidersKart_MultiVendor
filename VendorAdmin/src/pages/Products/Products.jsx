@@ -13,10 +13,6 @@ import { PinCodeData } from "../../constants/PinCodeData";
 import { parseErrorMessage } from "../../utils/ErrorMessageParser";
 import { Check } from "lucide-react";
 
-/**
- * MultiSelect component (kept inside same file as before).
- * It manages selection state via props: selected (array) and onChange (fn).
- */
 const MultiSelect = ({ label, options, selected = [], onChange }) => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -98,7 +94,6 @@ const Products = ({ startLoading, stopLoading }) => {
   const discountUpdRef = useRef(null);
   const spUpdRef = useRef(null);
   const editFormRef = useRef(null);
-
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -188,43 +183,43 @@ const Products = ({ startLoading, stopLoading }) => {
     setImagePreviews((prev) => prev.filter((_, i) => i !== indexToRemove));
   };
 
-  // Keep single-file helpers but ensure images state remains consistent
-  const handleImageFileChange = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+  // // Keep single-file helpers but ensure images state remains consistent
+  // const handleImageFileChange = (e) => {
+  //   const file = e.target.files[0];
+  //   if (!file) return;
 
-    const validImageTypes = [
-      "image/jpeg",
-      "image/png",
-      "image/gif",
-      "image/webp",
-      "image/svg+xml",
-    ];
-    const maxSize = 1 * 1024 * 1024;
+  //   const validImageTypes = [
+  //     "image/jpeg",
+  //     "image/png",
+  //     "image/gif",
+  //     "image/webp",
+  //     "image/svg+xml",
+  //   ];
+  //   const maxSize = 1 * 1024 * 1024;
 
-    if (!validImageTypes.includes(file.type)) {
-      alert("Please upload a valid image file (JPG, PNG, GIF, WebP, SVG).");
-      e.target.value = "";
-      return;
-    }
+  //   if (!validImageTypes.includes(file.type)) {
+  //     alert("Please upload a valid image file (JPG, PNG, GIF, WebP, SVG).");
+  //     e.target.value = "";
+  //     return;
+  //   }
 
-    if (file.size > maxSize) {
-      alert("File size must be less than 1MB.");
-      e.target.value = "";
-      return;
-    }
+  //   if (file.size > maxSize) {
+  //     alert("File size must be less than 1MB.");
+  //     e.target.value = "";
+  //     return;
+  //   }
 
-    // if this was intended to be a single file field, we place it as single image in array
-    setImages([file]);
-    setImagePreviews([URL.createObjectURL(file)]);
-  };
+  //   // if this was intended to be a single file field, we place it as single image in array
+  //   setImages([file]);
+  //   setImagePreviews([URL.createObjectURL(file)]);
+  // };
 
-  const handleImageCancel = () => {
-    setImages([]);
-    setImagePreviews([]);
-    const el = document.getElementById("imageInput");
-    if (el) el.value = "";
-  };
+  // const handleImageCancel = () => {
+  //   setImages([]);
+  //   setImagePreviews([]);
+  //   const el = document.getElementById("imageInput");
+  //   if (el) el.value = "";
+  // };
 
   const findProductById = (id) => {
     return products.find((product) => product._id === id);
@@ -554,6 +549,9 @@ const Products = ({ startLoading, stopLoading }) => {
         : product.tags || "",
       deliveryStates: product.deliveryStates || [],
       deliveryCities: product.deliveryCities || [],
+      productPolicy: {
+        policyDescription: product?.productPolicy?.policyDescription || "",
+      },
     });
     setEditDeliveryScope(product.deliveryScope || "all");
     setEditModalOpen(true);
@@ -565,33 +563,41 @@ const Products = ({ startLoading, stopLoading }) => {
   };
 
   // Handle changes in edit form (input elements pass name/value)
-const handleEditChange = (e) => {
-  const { name, value } = e.target;
+  const handleEditChange = (e) => {
+    const { name, value } = e.target;
 
-  setEditProductData((prev) => {
-    let updated = { ...prev, [name]: value };
+    setEditProductData((prev) => {
+      // special case for nested policyDescription
+      if (name === "policyDescription") {
+        return {
+          ...prev,
+          productPolicy: {
+            ...prev.productPolicy,
+            policyDescription: value,
+          },
+        };
+      }
 
-    if (name === "MRP" || name === "discount") {
-      const mrp = name === "MRP" ? value : prev.MRP;
-      const discount = name === "discount" ? value : prev.discount;
+      let updated = { ...prev, [name]: value };
 
-      const sellingPrice =
-        (parseFloat(mrp) || 0) -
-        ((parseFloat(mrp) || 0) * (parseFloat(discount) || 0)) / 100;
+      if (name === "MRP" || name === "discount") {
+        const mrp = name === "MRP" ? value : prev.MRP;
+        const discount = name === "discount" ? value : prev.discount;
 
-      // 🔥 FIX #1 — update the state also
-      updated.SP = Math.round(sellingPrice);
+        const sellingPrice =
+          (parseFloat(mrp) || 0) -
+          ((parseFloat(mrp) || 0) * (parseFloat(discount) || 0)) / 100;
 
-      // Existing DOM update (KEEP IT)
-      setTimeout(() => {
-        if (spUpdRef.current) spUpdRef.current.value = Math.round(sellingPrice);
-      }, 0);
-    }
+        updated.SP = Math.round(sellingPrice);
+        setTimeout(() => {
+          if (spUpdRef.current)
+            spUpdRef.current.value = Math.round(sellingPrice);
+        }, 0);
+      }
 
-    return updated;
-  });
-};
-
+      return updated;
+    });
+  };
 
   // Handle update product
   const handleUpdateProduct = async (e) => {
@@ -638,6 +644,10 @@ const handleEditChange = (e) => {
       deliveryScope: editDeliveryScope,
       deliveryStates: editProductData.deliveryStates || [],
       deliveryCities: editProductData.deliveryCities || [],
+      productPolicy: {
+        policyDescription:
+          editProductData.productPolicy.policyDescription || "",
+      },
     };
 
     try {
@@ -683,8 +693,8 @@ const handleEditChange = (e) => {
       />
 
       {isModalOpen && (
-        <div className="fixed inset-0 flex items-start lg:items-start justify-center  backdrop-blur-xl p-4 h-screen w-screen overflow-auto top-0 left-0  z-40">
-          <div className="bg-white flex flex-col rounded-lg shadow-lg w-fit lg:px-20 lg:py-10 py-4">
+        <div className="fixed inset-0 flex items-start lg:items-start justify-center  bg-black/70 p-4 h-screen w-screen overflow-auto top-0 left-0  z-40">
+          <div className="bg-white flex flex-col rounded-lg shadow-lg w-full lg:px-20 lg:py-10 py-4">
             <h2 className="text-lg font-semibold text-gray-800 lg:mb-4 w-full text-center">
               Add New Product
             </h2>
@@ -693,18 +703,15 @@ const handleEditChange = (e) => {
               onSubmit={handleAddProduct}
               className="flex flex-col  w-full justify-evenly items-center"
             >
-              <div className="w-full overflow-y-auto max-h-screen p-2 lg:p-0 grid grid-cols-1 lg:grid-cols-3 lg:gap-2 ">
-                <div className="flex items-start justify-center">
-                  <InputBox
-                    LabelName="Product Name (No special characters)"
-                    Name="name"
-                    Placeholder="Enter product name"
-                    Value={productName}
-                    onChange={handleProductNameChange}
-                  />
-                </div>
-
-                <div className="flex items-start justify-center">
+              <div className="w-full  p-2 lg:p-0 flex flex-col justify-start items-start">
+                <InputBox
+                  LabelName="Product Name (No special characters)"
+                  Name="name"
+                  Placeholder="Enter product name"
+                  Value={productName}
+                  onChange={handleProductNameChange}
+                />
+                <div className="flex flex-col md:flex-row items-center justify-center w-full gap-0 md:gap-5">
                   <SelectBox
                     className2="w-full"
                     LabelName="Brand"
@@ -715,9 +722,6 @@ const handleEditChange = (e) => {
                       value: brand._id,
                     }))}
                   />
-                </div>
-
-                <div className="flex items-start justify-center">
                   <SelectBox
                     className2="w-full"
                     LabelName="Main Category"
@@ -729,9 +733,6 @@ const handleEditChange = (e) => {
                       value: cat._id,
                     }))}
                   />
-                </div>
-
-                <div className="flex items-start justify-center">
                   {subcategories.length > 0 && (
                     <SelectBox
                       className2="w-full"
@@ -749,8 +750,7 @@ const handleEditChange = (e) => {
                     />
                   )}
                 </div>
-
-                <div className="flex items-start justify-center">
+                <div className="flex flex-col md:flex-row items-center justify-center w-full gap-0 md:gap-5">
                   <InputBox
                     LabelName="MRP"
                     Type="number"
@@ -759,9 +759,6 @@ const handleEditChange = (e) => {
                     Ref={mrpRef}
                     OnInput={updateSellingPrice}
                   />
-                </div>
-
-                <div className="flex items-start justify-center">
                   <InputBox
                     LabelName="Discount(%)"
                     Type="number"
@@ -771,9 +768,6 @@ const handleEditChange = (e) => {
                     OnInput={updateSellingPrice}
                     max={100}
                   />
-                </div>
-
-                <div className="flex items-start justify-center">
                   <InputBox
                     LabelName="Selling Price (Optional)"
                     Type="number"
@@ -783,8 +777,12 @@ const handleEditChange = (e) => {
                     Ref={spRef}
                   />
                 </div>
-
-                <div className="flex items-start justify-center">
+                <div className="flex flex-col md:flex-row items-center justify-center w-full gap-0 md:gap-5">
+                  <InputBox
+                    LabelName="Stock keeping unit (SKU)"
+                    Name="sku"
+                    Placeholder="Enter SKU"
+                  />
                   <InputBox
                     LabelName="Stock Quantity"
                     Type="number"
@@ -793,35 +791,170 @@ const handleEditChange = (e) => {
                   />
                 </div>
 
-                <div className="flex items-start justify-center">
-                  <InputBox
-                    LabelName="Stock keeping unit (SKU)"
-                    Name="sku"
-                    Placeholder="Enter SKU"
+                <div className="flex items-start justify-center w-full">
+                  <TextArea
+                    LabelName="Description"
+                    Name="description"
+                    Placeholder="Enter product description"
+                    className="max-h-20 min-h-20"
                   />
                 </div>
 
-                <div className="px-2 row-span-5">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Upload Images{" "}
-                    <span className="text-xs text-red-600 ">
-                      (*Upload max 5 images here)
-                    </span>
-                  </label>
-
-                  {/* Native File Input (multiple) */}
-                  <input
-                    id="imageInput"
-                    type="file"
-                    name="images"
-                    multiple
-                    accept="image/*"
-                    onChange={handleMultipleImageChange}
-                    className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none"
+                <div className="flex items-start justify-center w-full">
+                  <TextArea
+                    LabelName="Specification"
+                    Name="specifications"
+                    Placeholder={
+                      "Enter specifications in format:\ncolor: red\nsize: large"
+                    }
+                    className="max-h-24 min-h-24"
                   />
+                </div>
 
-                  {/* Preview Grid */}
-                  {imagePreviews.length > 0 && (
+                <div className="flex items-start justify-center w-full">
+                  <TextArea
+                    LabelName="Tags"
+                    Name="tags"
+                    Placeholder="Enter Tags"
+                    className="max-h-20 min-h-20"
+                  />
+                </div>
+
+                {/* Product Dimensions */}
+                <div className="flex flex-col md:flex-row items-center justify-center w-full gap-0 md:gap-5">
+                  <InputBox
+                    LabelName="Product Dimensions"
+                    Name="productDimensions"
+                    Placeholder="e.g. 10 x 5 x 3 cm"
+                  />
+                  <InputBox
+                    LabelName="Product Weight"
+                    Name="productWeight"
+                    Placeholder="e.g. 250 g"
+                  />
+                  <SelectBox
+                    className2="w-full"
+                    LabelName="Delivery Scope"
+                    Name="deliveryScope"
+                    Options={[
+                      { label: "All India", value: "all" },
+                      { label: "State Selection", value: "state" },
+                      { label: "City Selection", value: "city" },
+                    ]}
+                    onChange={(e) => {
+                      setDeliveryScope(e.target.value);
+                      // reset selections when changing scope
+                      if (e.target.value !== "state") setDeliveryStates([]);
+                      if (e.target.value !== "city") setDeliveryCities([]);
+                    }}
+                  />
+                </div>
+                <div className="flex justify-center items-center w-full">
+                  {/* State Multi-Select */}
+                  {deliveryScope === "state" && (
+                    <div className="flex items-start justify-center col-span-2">
+                      <MultiSelect
+                        label="Select States"
+                        options={Object.keys(PinCodeData).map((state) => ({
+                          label: state,
+                          value: state,
+                        }))}
+                        selected={deliveryStates}
+                        onChange={(values) => setDeliveryStates(values)}
+                      />
+                    </div>
+                  )}
+
+                  {/* City Multi-Select */}
+                  {deliveryScope === "city" && (
+                    <div className="flex items-start justify-center col-span-2">
+                      <MultiSelect
+                        label="Select Cities"
+                        options={Object.entries(PinCodeData).flatMap(
+                          ([state, cities]) =>
+                            Object.keys(cities).map((city) => ({
+                              label: `${city} (${state})`,
+                              value: city,
+                            }))
+                        )}
+                        selected={deliveryCities}
+                        onChange={(values) => setDeliveryCities(values)}
+                      />
+                    </div>
+                  )}
+                </div>
+                {/* policy section  */}
+                <div className="flex flex-col justify-center items-center w-full bg-neutral-200 p-2 rounded-xl my-5">
+                  <h1 className="uppercase tracking-widest">Product Policy</h1>
+                  {/* <InputBox
+                    LabelName="Policy name (e.g. Return Policy)"
+                    Name="policyName"
+                    Placeholder="Enter policy name"
+                    Value={productName}
+                    onChange={handleProductNameChange}
+                    Required={false}
+                  />
+                  <TextArea
+                    LabelName="Terms and Conditions"
+                    Name="policyTermsAndConditions"
+                    Placeholder="Enter product Terms and Conditions"
+                    className="max-h-20 min-h-20"
+                    Required={false}
+                  />
+                  <TextArea
+                    LabelName="policy Summary"
+                    Name="policySummary"
+                    Placeholder="Enter product policy Summary"
+                    className="max-h-20 min-h-20"
+                    Required={false}
+                  /> */}
+                  <TextArea
+                    LabelName="Policy Description"
+                    Name="policyDescription"
+                    Placeholder="Enter product's policy description"
+                    className="max-h-20 min-h-20"
+                    Required={false}
+                  />
+                  {/* <div className="flex w-full justify-center items-center gap-5 flex-col md:flex-row">
+                    <InputBox
+                      LabelName={"Valid from"}
+                      Type="date"
+                      Name={"policyValidFrom"}
+                      Required={false}
+                    />
+                    <InputBox
+                      LabelName={"Valid till"}
+                      Type="date"
+                      Name={"policyValidTill"}
+                      Required={false}
+                    />
+                  </div> */}
+                </div>
+              </div>
+              {/* image section  */}
+              <div className="px-2 py-10">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Upload Images{" "}
+                  <span className="text-xs text-red-600 ">
+                    (*Upload max 5 images here)
+                  </span>
+                </label>
+
+                {/* Native File Input (multiple) */}
+                <input
+                  id="imageInput"
+                  type="file"
+                  name="images"
+                  multiple
+                  accept="image/*"
+                  onChange={handleMultipleImageChange}
+                  className="block w-full text-sm border border-gray-300 rounded-lg cursor-pointer bg-gray-500 focus:outline-none p-5 text-white"
+                />
+
+                {/* Preview Grid */}
+                {imagePreviews.length > 0 && (
+                  <div>
+                    <h3>Selected images are below: </h3>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-3">
                       {imagePreviews.map((img, index) => (
                         <div key={index} className="relative group">
@@ -842,106 +975,6 @@ const handleEditChange = (e) => {
                         </div>
                       ))}
                     </div>
-                  )}
-                </div>
-
-                <div className="flex items-start justify-center">
-                  <TextArea
-                    LabelName="Description"
-                    Name="description"
-                    Placeholder="Enter product description"
-                    className="max-h-20 min-h-20"
-                  />
-                </div>
-
-                <div className="flex items-start justify-center">
-                  <TextArea
-                    LabelName="Specification"
-                    Name="specifications"
-                    Placeholder={
-                      "Enter specifications in format:\ncolor: red\nsize: large"
-                    }
-                    className="max-h-20 min-h-20"
-                  />
-                </div>
-
-                <div className="flex items-start justify-center">
-                  <TextArea
-                    LabelName="Tags"
-                    Name="tags"
-                    Placeholder="Enter Tags"
-                    className="max-h-20 min-h-20"
-                  />
-                </div>
-
-                {/* Product Dimensions */}
-                <div className="flex items-start justify-center">
-                  <InputBox
-                    LabelName="Product Dimensions"
-                    Name="productDimensions"
-                    Placeholder="e.g. 10 x 5 x 3 cm"
-                  />
-                </div>
-
-                {/* Product Weight */}
-                <div className="flex items-start justify-center">
-                  <InputBox
-                    LabelName="Product Weight"
-                    Name="productWeight"
-                    Placeholder="e.g. 250 g"
-                  />
-                </div>
-
-                {/* Delivery Scope Selection */}
-                <div className="flex items-start justify-center">
-                  <SelectBox
-                    className2="w-full"
-                    LabelName="Delivery Scope"
-                    Name="deliveryScope"
-                    Options={[
-                      { label: "All India", value: "all" },
-                      { label: "State Selection", value: "state" },
-                      { label: "City Selection", value: "city" },
-                    ]}
-                    onChange={(e) => {
-                      setDeliveryScope(e.target.value);
-                      // reset selections when changing scope
-                      if (e.target.value !== "state") setDeliveryStates([]);
-                      if (e.target.value !== "city") setDeliveryCities([]);
-                    }}
-                  />
-                </div>
-
-                {/* State Multi-Select */}
-                {deliveryScope === "state" && (
-                  <div className="flex items-start justify-center col-span-2">
-                    <MultiSelect
-                      label="Select States"
-                      options={Object.keys(PinCodeData).map((state) => ({
-                        label: state,
-                        value: state,
-                      }))}
-                      selected={deliveryStates}
-                      onChange={(values) => setDeliveryStates(values)}
-                    />
-                  </div>
-                )}
-
-                {/* City Multi-Select */}
-                {deliveryScope === "city" && (
-                  <div className="flex items-start justify-center col-span-2">
-                    <MultiSelect
-                      label="Select Cities"
-                      options={Object.entries(PinCodeData).flatMap(
-                        ([state, cities]) =>
-                          Object.keys(cities).map((city) => ({
-                            label: `${city} (${state})`,
-                            value: city,
-                          }))
-                      )}
-                      selected={deliveryCities}
-                      onChange={(values) => setDeliveryCities(values)}
-                    />
                   </div>
                 )}
               </div>
@@ -1237,6 +1270,19 @@ const handleEditChange = (e) => {
                     />
                   </div>
                 )}
+                <div className="flex items-start justify-center">
+                  <TextArea
+                    LabelName="Policy Description"
+                    Name="policyDescription"
+                    Placeholder="Enter product's policy description"
+                    className="max-h-20 min-h-20"
+                    // Required={false}
+                    Value={
+                      editProductData.productPolicy.policyDescription || ""
+                    }
+                    onChange={handleEditChange}
+                  />
+                </div>
               </div>
 
               <div className="button flex lg:flex-row flex-col w-full lg:w-fit px-2 justify-end gap-2">

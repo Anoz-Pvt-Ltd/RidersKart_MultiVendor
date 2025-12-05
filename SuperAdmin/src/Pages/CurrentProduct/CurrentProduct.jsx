@@ -192,10 +192,18 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
             { label: "SKU", value: currentProduct?.sku },
             {
               label: "Specifications",
+              value: (
+                <div className="text-justify">
+                  {currentProduct?.specifications?.details || ""}
+                </div>
+              ),
+            },
+            {
+              label: "Product Policy",
               // value: currentProduct?.specifications?.details,
               value: (
                 <div className="text-justify">
-                  {currentProduct?.specifications?.details}
+                  {currentProduct?.productPolicy?.policyDescription || ""}
                 </div>
               ),
             },
