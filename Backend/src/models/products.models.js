@@ -108,6 +108,29 @@ const productSchema = new mongoose.Schema({
     percentage: { type: String, default: "" },
     amount: { type: String, default: "" },
   },
+  productPolicy: {
+    policyName: {
+      type: String,
+      trim: true,
+    },
+    policySummary: {
+      type: String,
+    },
+    policyTermsAndConditions: {
+      type: String,
+      trim: true,
+    },
+    policyDescription: {
+      type: String,
+      trim: true,
+    },
+    policyValidFrom: {
+      type: Date,
+    },
+    policyValidTill: {
+      type: Date,
+    },
+  },
 
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
