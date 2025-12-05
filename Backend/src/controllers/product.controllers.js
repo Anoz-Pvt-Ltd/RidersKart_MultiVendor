@@ -31,6 +31,7 @@ const registerProduct = asyncHandler(async (req, res) => {
     // NEW FIELDS
     productDimensions,
     productWeight,
+    policyDescription,
   } = req.body;
 
   const vendorId = req.user._id;
@@ -146,6 +147,9 @@ const registerProduct = asyncHandler(async (req, res) => {
     deliveryScope,
     deliveryStates: deliveryScope === "state" ? deliveryStates : [],
     deliveryCities: deliveryScope === "city" ? deliveryCities : [],
+    productPolicy: {
+      policyDescription,
+    },
   });
 
   await newProduct.save();
