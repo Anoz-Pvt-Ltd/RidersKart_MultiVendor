@@ -28,12 +28,16 @@ import oops from "../../assets/Oops.png";
 const CurrentProduct = ({ startLoading, stopLoading }) => {
   const [isReadMoreDescription, setIsReadMoreDescription] = useState(false);
   const [isReadMoreSpecification, setIsReadMoreSpecification] = useState(false);
+  const [isReadMoreProductPolicy, setIsReadMoreProductPolicy] = useState(false);
   const maxLength = 100;
   const toggleReadMore = () => {
     setIsReadMoreDescription((prev) => !prev);
   };
   const toggleReadMoreSpecification = () => {
     setIsReadMoreSpecification((prev) => !prev);
+  };
+  const toggleReadMoreProductPolicy = () => {
+    setIsReadMoreProductPolicy((prev) => !prev);
   };
   const user = useSelector((store) => store.UserInfo.user);
   const isProductAvailableForUser = useSelector(
@@ -53,6 +57,7 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
   const [ratings, setRatings] = useState([]);
   const [AllProducts, setAllProducts] = useState();
   const [specifications, setSpecifications] = useState("");
+  const [moreProductPolicy, setMoreProductPolicy] = useState("");
   const [productPolicy, setProductPolicy] = useState([]);
   const userPostalCode = user[0]?.defaultAddress?.postalCode;
   const [pincode, setPincode] = useState("");
@@ -188,6 +193,9 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
       setProducts(Product?.data?.data);
       setRatings(Product?.data?.data?.ratings);
       setSpecifications(Product?.data?.data?.specifications);
+      setMoreProductPolicy(
+        Product?.data?.data?.productPolicy?.policyDescription || "No policy"
+      );
       stopLoading();
       return Product;
     }
@@ -775,6 +783,42 @@ const CurrentProduct = ({ startLoading, stopLoading }) => {
                 </button>
               )}
             </div>
+            {products?.productPolicy?.policyDescription ? (
+              <div className="flex flex-col gap-2 bg-white/50 py-2 px-5 rounded-xl shadow-xl">
+                <h1 className="font-semibold">Product Policy</h1>
+
+                <AnimatePresence initial={false}>
+                  <motion.div
+                    key={isReadMoreProductPolicy ? "expanded" : "collapsed"}
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.5, ease: "easeInOut" }}
+                    className="overflow-hidden"
+                  >
+                    <p className="text-gray-600">
+                      {isReadMoreProductPolicy
+                        ? moreProductPolicy?.details
+                        : `${moreProductPolicy?.details?.substring(
+                            0,
+                            maxLength
+                          )}...`}
+                    </p>
+                  </motion.div>
+                </AnimatePresence>
+
+                {moreProductPolicy?.details?.length > maxLength && (
+                  <button
+                    className="text-blue-500 hover:underline w-fit"
+                    onClick={toggleReadMoreProductPolicy}
+                  >
+                    {isReadMoreProductPolicy ? "Read Less.." : "Read More..."}
+                  </button>
+                )}
+              </div>
+            ) : (
+              ""
+            )}
             {/* policies  */}
             <div className="h-fit bg-neutral-300 px-5 py-4 rounded-xl shadow-xl">
               <Policies
