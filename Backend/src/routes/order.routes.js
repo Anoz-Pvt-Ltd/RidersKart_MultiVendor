@@ -13,6 +13,7 @@ import {
   getVendorsOrderReport,
   markOrderAsConfirm,
   markOrderAsShipped,
+  markOrderAsReadyForShipment,
 } from "../controllers/order.controllers.js";
 import {
   VerifyUser,
@@ -38,11 +39,11 @@ router
   .route("/mark-order-as-confirm/:orderId")
   .post(VerifyVendorUser, markOrderAsConfirm);
 router
+  .route("/mark-order-as-ready-for-shipment/:orderId")
+  .post(VerifyVendorUser, markOrderAsReadyForShipment);
+router
   .route("/mark-order-as-shipped/:orderId")
   .post(VerifyVendorUser, markOrderAsShipped);
-router
-  .route("/mark-order-as-delivered/:orderId")
-  .post(VerifyVendorUser, markOrderAsConfirm);
 router.route("/update-payment-status").post(VerifyUser, updatePaymentStatus);
 
 router

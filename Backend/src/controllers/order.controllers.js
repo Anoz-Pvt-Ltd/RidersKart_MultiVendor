@@ -562,6 +562,21 @@ const markOrderAsConfirm = asyncHandler(async (req, res) => {
   await order.save();
   res.json(new ApiResponse(200, order, "Order marked as Confirm"));
 });
+
+const markOrderAsReadyForShipment = asyncHandler(async (req, res) => {
+  const { orderId } = req.params;
+  if (!orderId) {
+    throw new ApiError(400, "Order ID is required");
+  }
+  const order = await Order.findById(orderId);
+  if (!order) {
+    throw new ApiError(404, "Order not found");
+  }
+  order.orderStatus = "readyForShipment";
+  await order.save();
+  res.json(new ApiResponse(200, order, "Order marked as ready for Shipment"));
+});
+
 const markOrderAsShipped = asyncHandler(async (req, res) => {
   const { orderId } = req.params;
   if (!orderId) {
@@ -620,6 +635,7 @@ export {
   allCashOnDeliveryOrders,
   getVendorsOrderReport,
   markOrderAsConfirm,
+  markOrderAsReadyForShipment,
   markOrderAsShipped,
 };
 

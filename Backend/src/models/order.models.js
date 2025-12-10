@@ -51,6 +51,7 @@ const orderSchema = new mongoose.Schema({
     enum: [
       "pending",
       "confirmed",
+      "readyForShipment",
       "shipped",
       "delivered",
       "cancelled",
@@ -92,7 +93,7 @@ const orderSchema = new mongoose.Schema({
   },
   //remove comment when API for maps will be available
   // pickUpCoordinates: { type: [Number] },
-  // dropCoordinates: { type: [Number] },
+  // dropCoordinates: { type: [Number] },          
   placedAt: {
     type: Date,
     default: Date.now, // Timestamp for when the order was placed
