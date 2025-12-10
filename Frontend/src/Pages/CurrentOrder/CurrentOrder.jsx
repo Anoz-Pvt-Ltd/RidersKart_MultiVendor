@@ -7,6 +7,7 @@ import Button from "../../Components/Button";
 import { ArrowDownToLine } from "lucide-react";
 import { alertError, alertSuccess } from "../../Utility/Alert";
 import { parseErrorMessage } from "../../Utility/ErrorMessageParser";
+import { motion, AnimatePresence } from "framer-motion";
 
 const CurrentOrder = ({ startLoading, stopLoading }) => {
   const { orderId } = useParams();
@@ -17,6 +18,9 @@ const CurrentOrder = ({ startLoading, stopLoading }) => {
   const [shippingAddress, setShippingAddress] = useState([]);
   const user = useSelector((store) => store.UserInfo.user);
   const Navigate = useNavigate();
+  const [handlePopup, setHandlePopup] = useState({
+    cancelOrderPopup: false,
+  });
 
   const fetchOrder = async () => {
     if (user?.length > 0) {
@@ -44,6 +48,22 @@ const CurrentOrder = ({ startLoading, stopLoading }) => {
   useEffect(() => {
     fetchOrder();
   }, [user]);
+  const markAsCancel = () => {
+    try {
+      const response = FetchData(
+        `orders/cancel-order-by-user/${orderId}`,
+        "post"
+      );
+      console.log(response);
+      alert("Order marked as Cancelled");
+      fetchOrder();
+      setHandlePopup((prev) => {
+        return { ...prev, cancelOrderPopup: false };
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   const ProductsCard = ({
     productId,
@@ -54,9 +74,11 @@ const CurrentOrder = ({ startLoading, stopLoading }) => {
     images,
     ratings = [],
     userId,
+    orderId,
   }) => {
     const [rating, setRating] = useState(0);
     const [comment, setComment] = useState("");
+
     const userRating = ratings.find((r) => r.user === userId);
 
     const handleSubmitReview = async () => {
@@ -197,15 +219,28 @@ const CurrentOrder = ({ startLoading, stopLoading }) => {
             </h1>
             <h1 className="font-semibold">
               Payment Status:{" "}
-              <span className="font-normal">{order?.paymentStatus}</span>
+              <span className="font-normal capitalize">
+                {order?.paymentStatus}
+              </span>
             </h1>
             <h1 className="font-semibold">
               Payment method:{" "}
-              <span className="font-normal">{order?.paymentMethod}</span>
+              <span className="font-normal capitalize">
+                {order?.paymentMethod}
+              </span>
             </h1>
             <h1 className="font-semibold">
               Order status:{" "}
-              <span className="font-normal">{order?.orderStatus}</span>
+              {/* <span className="font-normal">{order?.orderStatus} </span> */}
+              <span className="font-normal capitalize">
+                {["pending", "confirmed", "readyForShipment"].includes(
+                  order?.orderStatus
+                )
+                  ? "Confirmed"
+                  : order?.orderStatus === "cancelledByUser"
+                  ? "Cancelled"
+                  : order?.orderStatus}
+              </span>
             </h1>
             <h1 className="font-semibold">
               Order date <span className="text-xs font-light">(MMDDYY)</span>:{" "}
@@ -249,13 +284,29 @@ const CurrentOrder = ({ startLoading, stopLoading }) => {
               </h1>
             </div>
             {/* user: name  */}
-            <div className=" shadow rounded-xl lg:text-base text-sm py-5 lg:px-10 px-5 flex justify-start items-center col-span-4  col-start-1 row-start-2 font-semibold bg-neutral-300">
-              Name: <span className="font-normal ml-2">{user[0]?.name}</span>
+            <div className=" shadow rounded-xl lg:text-base text-sm py-5 lg:px-10 px-5 flex flex-col justify-start items-start col-span-4  col-start-1 row-start-2 font-semibold bg-neutral-300">
+              <span>
+                Name: <span className="font-normal ml-2">{user[0]?.name}</span>
+              </span>
+              <span>
+                Phone number:{" "}
+                <span className="font-normal ml-2">{user[0]?.phoneNumber}</span>
+              </span>
             </div>
             {/* user: contact number */}
             <div className="shadow rounded-xl lg:text-base text-sm py-5 lg:px-10 px-5 flex justify-start items-center col-span-4 row-start-4 font-semibold bg-neutral-300">
-              Phone number:{" "}
-              <span className="font-normal ml-2">{user[0]?.phoneNumber}</span>
+              {order?.orderStatus === "cancelledByUser" ? (
+                <h1>You have cancelled this order</h1>
+              ) : (
+                <Button
+                  label="Cancel Order"
+                  onClick={() =>
+                    setHandlePopup((prev) => {
+                      return { ...prev, cancelOrderPopup: true };
+                    })
+                  }
+                />
+              )}
             </div>
 
             {/* product: name */}
@@ -270,6 +321,7 @@ const CurrentOrder = ({ startLoading, stopLoading }) => {
               sellerName={product?.seller?.name}
               orderAmount={product?.price?.MRP}
               paymentMethod={order?.paymentMethod}
+              orderId={order?._id}
               images={product?.product?.images[0]?.url}
               ratings={product?.product?.ratings} // ✅ pass ratings here
               userId={user[0]?._id} // ✅ pass current user id
@@ -277,6 +329,31 @@ const CurrentOrder = ({ startLoading, stopLoading }) => {
           ))}
         </div>
       </div>
+      {handlePopup.cancelOrderPopup && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.1 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.1 }}
+          transition={{ duration: 0.4, ease: "easeInOut" }}
+          className="fixed top-0 left-0 w-full h-screen flex justify-center items-center bg-neutral-200 flex-col px-10"
+        >
+          <div className="flex flex-col justify-center items-center gap-5 lg:w-96 ">
+            <h1>This action will cancel the order from your end</h1>
+            {/* <InputBox LabelName={"Reason to cancel order"} /> */}
+          </div>
+          <div className="flex justify-center items-center gap-5 ">
+            <Button label="Mark as Cancel" onClick={() => markAsCancel()} />
+            <Button
+              label="Cancel"
+              onClick={() =>
+                setHandlePopup((prev) => {
+                  return { ...prev, cancelOrderPopup: false };
+                })
+              }
+            />
+          </div>
+        </motion.div>
+      )}
     </div>
   );
 };
