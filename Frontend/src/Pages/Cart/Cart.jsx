@@ -100,6 +100,10 @@ const CartPage = ({ startLoading, stopLoading }) => {
   };
 
   const OnlinePayment = async (e) => {
+    if (!selectedAddress || !paymentMethod) {
+      alertInfo("Please select address and payment method.");
+      return;
+    }
     const orderId = await HandleBuyNow();
 
     if (!orderId) {
@@ -437,7 +441,9 @@ const CartPage = ({ startLoading, stopLoading }) => {
                     ))}
                   </select>
                 ) : (
-                  <p>No addresses available. Please add one in your profile.</p>
+                  <p className="text-red-600">
+                    No addresses available. Please add one in your profile.
+                  </p>
                 )}
               </motion.div>
               {/* payment method  */}

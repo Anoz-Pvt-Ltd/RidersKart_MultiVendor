@@ -15,7 +15,7 @@ const CurrentOrder = () => {
   const userId = currentOrder?.user;
   const [handlePopup, setHandlePopup] = useState({
     markAsConfirmed: false,
-    readyForShipment: false,
+    markAsReadyForShipment: false,
     markAsShipped: false,
     cancelOrderPopup: false,
   });
@@ -109,7 +109,7 @@ const CurrentOrder = () => {
     );
   };
 
-  const markAsConfirmed = () => {
+  const statusMarkAsConfirmed = () => {
     try {
       const response = FetchData(
         `orders/mark-order-as-confirm/${currentOrder?._id}`,
@@ -127,17 +127,36 @@ const CurrentOrder = () => {
     }
   };
 
-  const MarkAsShipped = () => {
+  const MarkAsReadyForPickup = () => {
+    try {
+      const response = FetchData(
+        `orders/mark-order-as-ready-for-shipment/${currentOrder?._id}`,
+        "post"
+      );
+      console.log(response);
+      alert("Order marked as ready for shipment");
+      getCurrentOrder();
+      setHandlePopup((prev) => {
+        return { ...prev, markAsShipped: false };
+      });
+      navigate("/dashboard");
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const markAsShipped = () => {
     try {
       const response = FetchData(
         `orders/mark-order-as-shipped/${currentOrder?._id}`,
         "post"
       );
       console.log(response);
-      alert("Order marked as shipped");
+      alert("Order marked as Shipped");
       getCurrentOrder();
       setHandlePopup((prev) => {
-        return { ...prev, markAsShipped: false };
+        // alert("Order has been canceled");
+        return { ...prev, cancelOrderPopup: false };
       });
       navigate("/dashboard");
     } catch (err) {
@@ -158,7 +177,7 @@ const CurrentOrder = () => {
         // alert("Order has been canceled");
         return { ...prev, cancelOrderPopup: false };
       });
-      navigate("/dashboard");
+      // navigate("/dashboard");
     } catch (err) {
       console.log(err);
     }
@@ -193,13 +212,49 @@ const CurrentOrder = () => {
                 If product is ready for shipment, click here to confirm.
               </h1>
               <Button
-                label="Ready for Shipment"
+                label="Mark ready for Shipment"
+                onClick={() =>
+                  setHandlePopup((prev) => {
+                    return { ...prev, markAsReadyForShipment: true };
+                  })
+                }
+              />
+            </div>
+          ) : (
+            ""
+          )}
+          {currentOrder?.orderStatus === "readyForShipment" ? (
+            <div className="bg-gray-300 rounded-xl flex justify-between items-start gap-2 px-10 py-5 w-full">
+              <h1 className="w-96">
+                If product is picked up delivery partner, click here to confirm.
+              </h1>
+              <Button
+                label="Mark Order as Shipped"
                 onClick={() =>
                   setHandlePopup((prev) => {
                     return { ...prev, markAsShipped: true };
                   })
                 }
               />
+            </div>
+          ) : (
+            ""
+          )}
+          {currentOrder?.orderStatus === "shipped" ? (
+            <div className="bg-gray-300 rounded-xl flex justify-between items-start gap-2 px-10 py-5 w-full">
+              <h1 className="w-96">
+                Your order has been shipped successfully. when the delivery
+                partner successfully delivers the order to the customer, the
+                order status will be updated to "Delivered".
+              </h1>
+              {/* <Button
+                label="Mark Order as Shipped"
+                onClick={() =>
+                  setHandlePopup((prev) => {
+                    return { ...prev, markAsShipped: true };
+                  })
+                }
+              /> */}
             </div>
           ) : (
             ""
@@ -233,15 +288,27 @@ const CurrentOrder = () => {
               <strong>Amount</strong>: <p>₹ {currentOrder?.totalAmount}</p>
             </h1>
             <h1 className="flex justify-center items-center gap-1 lg:text-nowrap">
-              <strong>Order Status</strong>: <p>{currentOrder?.orderStatus}</p>
+              <strong>Order Status</strong>:{" "}
+              <p className="capitalize">{currentOrder?.orderStatus}</p>
             </h1>
             <h1 className="flex justify-center items-center gap-1 lg:text-nowrap">
               <strong>Payment Method</strong>:{" "}
-              <p>{currentOrder?.paymentMethod}</p>
+              <p className="uppercase">{currentOrder?.paymentMethod}</p>
             </h1>
             <h1 className="flex justify-center items-center gap-1 lg:text-nowrap">
               <strong>Payment Status</strong>:{" "}
-              <p>{currentOrder?.paymentStatus}</p>
+              {/* <p>{currentOrder?.paymentStatus}</p> */}
+              <h1>
+                {currentOrder?.paymentStatus === "pending" ? (
+                  <h1 className="bg-yellow-100 w-fit px-2 py-1 rounded-xl text-yellow-600">
+                    Pending
+                  </h1>
+                ) : (
+                  <h1 className="bg-green-100 w-fit px-2 py-1 rounded-xl text-green-600">
+                    Complete
+                  </h1>
+                )}
+              </h1>
             </h1>
             <h1 className="flex justify-center items-center gap-1 lg:text-nowrap">
               <strong>Order Created on (MMDDYY): </strong>
@@ -300,14 +367,50 @@ const CurrentOrder = () => {
             transition={{ duration: 0.4, ease: "easeInOut" }}
             className="fixed top-0 left-0 w-full h-screen flex justify-center items-center bg-neutral-200 flex-col px-10 "
           >
-            <h1>This action mark as SHIPPED delivered from your end</h1>
+            <h1 className="w-3/4 text-center py-5">
+              This action will mark Order as Confirmed from your end, after
+              marking as confirmed you cannot cancel the order directly, You
+              will be needing to contact support for cancelling.
+            </h1>
             <div className="flex justify-center items-center gap-5 ">
-              <Button label="Mark as Shipped" onClick={markAsConfirmed()} />
+              <Button
+                label="Mark as Confirmed"
+                onClick={() => statusMarkAsConfirmed()}
+              />
               <Button
                 label="Cancel"
                 onClick={() =>
                   setHandlePopup((prev) => {
                     return { ...prev, markAsConfirmed: false };
+                  })
+                }
+              />
+            </div>
+          </motion.div>
+        )}
+        {handlePopup.markAsReadyForShipment && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.1 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.1 }}
+            transition={{ duration: 0.4, ease: "easeInOut" }}
+            className="fixed top-0 left-0 w-full h-screen flex justify-center items-center bg-neutral-200 flex-col px-10 "
+          >
+            <h1 className="w-3/4 text-center py-5">
+              This action mark ORDER as READY FOR SHIPMENT from your end, after
+              marking as ready for shipment our partner will pick up the order
+              for delivery.
+            </h1>
+            <div className="flex justify-center items-center gap-5 ">
+              <Button
+                label="Mark as Ready for Shipment"
+                onClick={() => MarkAsReadyForPickup()}
+              />
+              <Button
+                label="Cancel"
+                onClick={() =>
+                  setHandlePopup((prev) => {
+                    return { ...prev, markAsReadyForShipment: false };
                   })
                 }
               />
@@ -322,9 +425,9 @@ const CurrentOrder = () => {
             transition={{ duration: 0.4, ease: "easeInOut" }}
             className="fixed top-0 left-0 w-full h-screen flex justify-center items-center bg-neutral-200 flex-col px-10 "
           >
-            <h1>This action mark as SHIPPED delivered from your end</h1>
+            <h1>This action mark ORDER as SHIPPED from your end</h1>
             <div className="flex justify-center items-center gap-5 ">
-              <Button label="Mark as Shipped" onClick={MarkAsShipped} />
+              <Button label="Mark as Shipped" onClick={() => markAsShipped()} />
               <Button
                 label="Cancel"
                 onClick={() =>
@@ -349,7 +452,7 @@ const CurrentOrder = () => {
               <InputBox LabelName={"Reason to cancel order"} />
             </div>
             <div className="flex justify-center items-center gap-5 ">
-              <Button label="Mark as Cancel" onClick={markAsCancel} />
+              <Button label="Mark as Cancel" onClick={() => markAsCancel()} />
               <Button
                 label="Cancel"
                 onClick={() =>

@@ -152,6 +152,10 @@ const BuyNow = ({ startLoading, stopLoading }) => {
   };
 
   const Payment = async (e) => {
+    if (!selectedAddress || !paymentMethod) {
+      alertInfo("Please select address and payment method.");
+      return;
+    }
     const order = await FetchData("payment/create-new-paymentId", "post", {
       options: {
         amount: product?.price.sellingPrice,

@@ -22,6 +22,7 @@ const Orders = ({ startLoading, stopLoading }) => {
 
   const [allPendingOrders, setAllPendingOrders] = useState([]);
   const [allConfirmOrders, setAllConfirmOrders] = useState([]);
+  const [allReadyShipOrders, setAllReadyShipOrders] = useState([]);
   const [allShippedOrders, setAllShippedOrders] = useState([]);
   const [allDeliveredOrders, setAllDeliveredOrders] = useState([]);
   const [allCancelOrders, setAllCancelOrders] = useState([]);
@@ -29,6 +30,7 @@ const Orders = ({ startLoading, stopLoading }) => {
   const sections = [
     "Pending",
     "Confirmed",
+    "Ready For Shipment",
     "Shipped",
     "Delivered",
     "Cancelled",
@@ -39,9 +41,9 @@ const Orders = ({ startLoading, stopLoading }) => {
     "Product Name",
     "Category Id / Subcategory Id",
     "Quantity",
-    "MRP",
+    // "MRP",
     "Selling Price",
-    "Order Status",
+    // "Order Status",
     "Payment Status",
     "Placed at",
   ];
@@ -102,12 +104,16 @@ const Orders = ({ startLoading, stopLoading }) => {
           (o) => !o.orderStatus || o.orderStatus === "pending"
         );
         const confirm = orders.filter((o) => o.orderStatus === "confirmed");
+        const readyForShip = orders.filter(
+          (o) => o.orderStatus === "readyForShipment"
+        );
         const shipped = orders.filter((o) => o.orderStatus === "shipped");
         const delivered = orders.filter((o) => o.orderStatus === "delivered");
         const cancel = orders.filter((o) => o.orderStatus === "cancelled");
 
         setAllPendingOrders(pending);
         setAllConfirmOrders(confirm);
+        setAllReadyShipOrders(readyForShip);
         setAllShippedOrders(shipped);
         setAllDeliveredOrders(delivered);
         setAllCancelOrders(cancel);
@@ -168,15 +174,26 @@ const Orders = ({ startLoading, stopLoading }) => {
                     <td className="py-2 px-4 border-b">
                       {order.products[0]?.quantity}
                     </td>
-                    <td className="py-2 px-4 border-b">
+                    {/* <td className="py-2 px-4 border-b">
                       {order.products[0]?.price?.MRP}
-                    </td>
+                    </td> */}
                     <td className="py-2 px-4 border-b">
                       {order.products[0]?.price?.sellingPrice}
                     </td>
-                    <td className="py-2 px-4 border-b">{order.orderStatus}</td>
+                    {/* <td className="py-2 px-4 border-b">{order.orderStatus}</td> */}
                     <td className="py-2 px-4 border-b">
-                      {order.paymentStatus}
+                      {/* {order.paymentStatus} */}
+                      <h1>
+                        {order.paymentStatus === "pending" ? (
+                          <h1 className="bg-yellow-100 w-fit px-2 py-1 rounded-xl text-yellow-600">
+                            Pending
+                          </h1>
+                        ) : (
+                          <h1 className="bg-green-100 w-fit px-2 py-1 rounded-xl text-green-600">
+                            Complete
+                          </h1>
+                        )}
+                      </h1>
                     </td>
 
                     <td className="py-2 px-4 border-b">
@@ -205,7 +222,6 @@ const Orders = ({ startLoading, stopLoading }) => {
   };
 
   const ordersForSection = (section) => {
-    const s = section.toLowerCase();
     if (section === "Pending") {
       return sortedOrders.filter(
         (o) => !o.orderStatus || o.orderStatus === "pending"
@@ -214,8 +230,11 @@ const Orders = ({ startLoading, stopLoading }) => {
     if (section === "Return") {
       return sortedOrders.filter((o) => o.orderStatus === "return");
     }
-    // other sections map directly to lowercase status
-    return sortedOrders.filter((o) => o.orderStatus === s);
+    if (section === "Ready For Shipment") {
+      return sortedOrders.filter((o) => o.orderStatus === "readyForShipment");
+    }
+    // other sections use lowercase
+    return sortedOrders.filter((o) => o.orderStatus === section.toLowerCase());
   };
 
   return (
@@ -359,6 +378,12 @@ const Orders = ({ startLoading, stopLoading }) => {
       {activeSectionOrder === "Confirmed" && (
         <TableUi
           orders={ordersForSection("Confirmed")}
+          headers={tableHeaders}
+        />
+      )}
+      {activeSectionOrder === "Ready For Shipment" && (
+        <TableUi
+          orders={ordersForSection("Ready For Shipment")}
           headers={tableHeaders}
         />
       )}
