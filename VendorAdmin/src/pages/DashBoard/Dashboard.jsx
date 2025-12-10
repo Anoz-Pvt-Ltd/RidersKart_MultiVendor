@@ -106,24 +106,6 @@ const Dashboard = ({ startLoading, stopLoading }) => {
     fetchProducts();
   }, [user]);
 
-  // const handleDateChange = (e) => {
-  //   setSelectedDate(e.target.value);
-  // };
-
-  // const handleSort = () => {
-  //   if (!selectedDate) {
-  //     setSortedOrders(allOrders);
-  //     return;
-  //   }
-  //   const filtered = allOrders.filter((order) => {
-  //     const orderDate = new Date(order.updatedAt).toISOString().split("T")[0];
-  //     return orderDate === selectedDate;
-  //   });
-  //   setSortedOrders(filtered);
-  // };
-
-  // console.log(user?.[0]?._id);
-
   const [barData, setBarData] = useState({
     labels: [],
     datasets: [
@@ -158,7 +140,8 @@ const Dashboard = ({ startLoading, stopLoading }) => {
     const orderCounts = Array(12).fill(0);
 
     allOrders.forEach((order) => {
-      const date = dayjs(order.createdAt);
+      const date = dayjs(order.updatedAt);
+
       if (date.isValid()) {
         const month = date.month(); // 0-indexed
         orderCounts[month]++;
@@ -171,7 +154,9 @@ const Dashboard = ({ startLoading, stopLoading }) => {
         {
           label: "Orders per Month",
           data: orderCounts,
-          backgroundColor: "#DF3F33",
+          backgroundColor: orderCounts.map((count) =>
+            count === 0 ? "rgba(223,63,51,0.3)" : "#DF3F33"
+          ),
         },
       ],
     });
@@ -383,17 +368,27 @@ const Dashboard = ({ startLoading, stopLoading }) => {
                     <table className="min-w-full bg-white border border-gray-200 text-xs font-light">
                       <thead>
                         <tr>
-                          <th className="py-2 px-2 border-b">Order ID</th>
-                          <th className="py-2 px-2 border-b">Product Name</th>
-                          <th className="py-2 px-2 border-b">
+                          {/* <th className="py-2 px-2 border-b">Order ID</th> */}
+                          <th className="py-2 px-2 border-b text-left">
+                            Product Name
+                          </th>
+                          <th className="py-2 px-2 border-b text-left">
                             Category ID / Subcategory ID
                           </th>
-                          <th className="py-2 px-2 border-b">Quantity</th>
-                          <th className="py-2 px-2 border-b">MRP</th>
-                          <th className="py-2 px-2 border-b">Sold at</th>
-                          <th className="py-2 px-2 border-b">Order Status</th>
-                          <th className="py-2 px-2 border-b">Payment Status</th>
-                          <th className="py-2 px-2 border-b">Placed At</th>
+                          <th className="py-2 px-2 border-b text-left">
+                            Quantity
+                          </th>
+                          {/* <th className="py-2 px-2 border-b">MRP</th> */}
+                          <th className="py-2 px-2 border-b text-left">
+                            Sold at
+                          </th>
+                          <th className="py-2 px-2 border-b text-left">
+                            Order Status
+                          </th>
+                          {/* <th className="py-2 px-2 border-b">Payment Status</th> */}
+                          <th className="py-2 px-2 border-b text-left">
+                            Placed At
+                          </th>
                           {/* <th className="py-2 px-4 border-b">Actions</th> */}
                         </tr>
                       </thead>
@@ -401,10 +396,10 @@ const Dashboard = ({ startLoading, stopLoading }) => {
                         {sortedOrders.length > 0 ? (
                           sortedOrders.map((order) => (
                             <tr key={order._id} className="hover:bg-gray-100">
-                              <td className="py-2 px-4 border-b">
+                              {/* <td className="py-2 px-4 border-b">
                                 {order._id}
-                              </td>
-                              <td className="py-2 px-4 border-b">
+                              </td> */}
+                              <td className="py-2 px-4 border-b truncate">
                                 {order.products[0]?.product.name || "N/A"}
                               </td>
                               <td className="py-2 px-4 border-b truncate">
@@ -422,17 +417,27 @@ const Dashboard = ({ startLoading, stopLoading }) => {
                               <td className="py-2 px-4 border-b">
                                 {order.products[0]?.quantity}
                               </td>
-                              <td className="py-2 px-4 border-b">
+                              {/* <td className="py-2 px-4 border-b">
                                 {order.products[0]?.price?.MRP}
-                              </td>
+                              </td> */}
                               <td className="py-2 px-4 border-b">
                                 {order.products[0]?.price?.sellingPrice}
                               </td>
-                              <td className="py-2 px-4 border-b">
+                              {/* <td className="py-2 px-4 border-b">
                                 {order.orderStatus}
-                              </td>
+                              </td> */}
                               <td className="py-2 px-4 border-b">
-                                {order.paymentStatus}
+                                <h1>
+                                  {order.paymentStatus === "pending" ? (
+                                    <h1 className="bg-yellow-100 w-fit px-2 py-1 rounded-xl text-yellow-600">
+                                      Pending
+                                    </h1>
+                                  ) : (
+                                    <h1 className="bg-green-100 w-fit px-2 py-1 rounded-xl text-green-600">
+                                      Complete
+                                    </h1>
+                                  )}
+                                </h1>
                               </td>
 
                               <td className="py-2 px-4 border-b">

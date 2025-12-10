@@ -92,7 +92,6 @@ const Orders = ({ startLoading, stopLoading }) => {
           `orders/get-vendor-orders/${user?.[0]?._id}`,
           "get"
         );
-        console.log(response);
         let orders = response.data.orders || [];
 
         // keep a master list (used by sorting) and initial sorted state
