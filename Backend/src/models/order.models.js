@@ -56,6 +56,7 @@ const orderSchema = new mongoose.Schema({
       "delivered",
       "cancelled",
       "booked",
+      "cancelledByUser",
     ], // Added "booked"
     default: "pending", // Current status of the order
   },
@@ -93,7 +94,7 @@ const orderSchema = new mongoose.Schema({
   },
   //remove comment when API for maps will be available
   // pickUpCoordinates: { type: [Number] },
-  // dropCoordinates: { type: [Number] },          
+  // dropCoordinates: { type: [Number] },
   placedAt: {
     type: Date,
     default: Date.now, // Timestamp for when the order was placed

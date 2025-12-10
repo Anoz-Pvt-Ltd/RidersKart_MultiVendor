@@ -14,6 +14,7 @@ import {
   markOrderAsConfirm,
   markOrderAsShipped,
   markOrderAsReadyForShipment,
+  UserCancelOrder,
 } from "../controllers/order.controllers.js";
 import {
   VerifyUser,
@@ -34,6 +35,9 @@ router.route("/all-products-of/:userId").get(VerifyUser, getUserAllOrders);
 //   .get( getVendorAllOrders);
 
 router.route("/update-order-status").post(VerifyUser, updateOrderStatus);
+router
+  .route("/cancel-order-by-user/:orderId")
+  .post(VerifyUser, UserCancelOrder);
 router.route("/cancel-order/:orderId").post(VerifyVendorUser, CancelOrder);
 router
   .route("/mark-order-as-confirm/:orderId")

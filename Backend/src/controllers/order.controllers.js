@@ -172,7 +172,7 @@ const getUserAllOrders = asyncHandler(async (req, res) => {
 
   const orders = await Order.find({
     user: userId,
-    orderStatus: "confirmed",
+    // orderStatus: "confirmed",
   }).populate("products.product");
 
   if (!orders || orders.length === 0) {
@@ -622,9 +622,24 @@ const CancelOrder = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, order, "Order canceled successfully"));
 });
 
+const UserCancelOrder = asyncHandler(async (req, res) => {
+  const { orderId } = req.params;
+  if (!orderId) {
+    throw new ApiError(400, "Order ID is required");
+  }
+  const order = await Order.findById(orderId);
+  if (!order) {
+    throw new ApiError(404, "Order not found");
+  }
+  order.orderStatus = "cancelledByUser";
+  await order.save();
+  res.json(new ApiResponse(200, order, "Order marked as Shipped"));
+});
+
 export {
   CreateOrder,
   CancelOrder,
+  UserCancelOrder,
   GetVendorOrders,
   getUserAllOrders,
   getVendorAllOrders,
