@@ -12,7 +12,6 @@ import { motion, AnimatePresence } from "framer-motion";
 const CurrentOrder = ({ startLoading, stopLoading }) => {
   const { orderId } = useParams();
   const [order, setOrder] = useState([]);
-  console.log(order);
   const [orderProducts, setOrderProducts] = useState([]);
   const [error, setError] = useState(null);
   const [shippingAddress, setShippingAddress] = useState([]);
@@ -48,6 +47,7 @@ const CurrentOrder = ({ startLoading, stopLoading }) => {
   useEffect(() => {
     fetchOrder();
   }, [user]);
+
   const markAsCancel = () => {
     try {
       const response = FetchData(
@@ -295,8 +295,9 @@ const CurrentOrder = ({ startLoading, stopLoading }) => {
             </div>
             {/* user: contact number */}
             <div className="shadow rounded-xl lg:text-base text-sm py-5 lg:px-10 px-5 flex justify-start items-center col-span-4 row-start-4 font-semibold bg-neutral-300">
-              {order?.orderStatus === "cancelledByUser" ? (
-                <h1>You have cancelled this order</h1>
+              {order?.orderStatus === "cancelledByUser" ||
+              order?.orderStatus === "cancelled" ? (
+                <h1>Order is cancelled.</h1>
               ) : (
                 <Button
                   label="Cancel Order"

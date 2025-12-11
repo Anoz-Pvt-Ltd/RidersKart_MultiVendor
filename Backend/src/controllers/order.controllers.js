@@ -631,9 +631,16 @@ const UserCancelOrder = asyncHandler(async (req, res) => {
   if (!order) {
     throw new ApiError(404, "Order not found");
   }
-  order.orderStatus = "cancelledByUser";
-  await order.save();
-  res.json(new ApiResponse(200, order, "Order marked as Shipped"));
+  if (order.orderStatus === "pending" || order.orderStatus === "confirmed") {
+    order.orderStatus = "cancelledByUser";
+    await order.save();
+  } else {
+    order.orderStatus = "cancelled";
+    await order.save();
+  }
+  res.json(
+    new ApiResponse(200, order, "Your order has been cancelled successfully !")
+  );
 });
 
 export {
